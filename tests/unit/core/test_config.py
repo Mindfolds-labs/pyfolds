@@ -29,3 +29,14 @@ class TestMPJRDConfig:
         """Test validation."""
         with pytest.raises(ValueError):
             pyfolds.MPJRDConfig(n_min=10, n_max=5)
+
+
+    def test_get_decay_rate_validates_inputs(self):
+        """get_decay_rate should reject invalid tau/dt."""
+        cfg = pyfolds.MPJRDConfig()
+
+        with pytest.raises(ValueError):
+            cfg.get_decay_rate(0.0)
+
+        with pytest.raises(ValueError):
+            cfg.get_decay_rate(10.0, dt=-1.0)

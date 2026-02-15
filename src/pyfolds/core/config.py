@@ -198,8 +198,15 @@ class MPJRDConfig:
     
     def get_decay_rate(self, tau: float, dt: Optional[float] = None) -> float:
         """Calcula taxa de decaimento exponencial."""
+        if tau <= 0:
+            raise ValueError(f"tau must be > 0, got {tau}")
+
         if dt is None:
             dt = self.dt
+
+        if dt < 0:
+            raise ValueError(f"dt must be >= 0, got {dt}")
+
         return math.exp(-dt / max(tau, self.eps))
     
     def to_dict(self) -> Dict:

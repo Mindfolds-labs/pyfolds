@@ -23,6 +23,7 @@ from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator, AccumulatedStats
 from ..utils.types import LearningMode
+from ..utils.validation import validate_input
 
 # ✅ LOGGING - Adicionado
 from ..utils.logging import get_logger
@@ -190,6 +191,10 @@ class MPJRDNeuron(BaseNeuron):
                 mode=mode,
             )
 
+    @validate_input(
+        expected_ndim=3,
+        expected_shape_fn=lambda self: (self.cfg.n_dendrites, self.cfg.n_synapses_per_dendrite),
+    )
     def forward(self, x: torch.Tensor, reward: Optional[float] = None,
                 mode: Optional[LearningMode] = None,
                 collect_stats: bool = True,
@@ -210,13 +215,7 @@ class MPJRDNeuron(BaseNeuron):
         
         device = self.theta.device
         x = x.to(device)
-        B, D, S = x.shape
-
-        # Valida dimensões
-        if D != self.cfg.n_dendrites or S != self.cfg.n_synapses_per_dendrite:
-            self.logger.error(f"❌ Dimensão inválida: esperado ({self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}), recebido ({D}, {S})")
-            raise ValueError(f"Esperado ({self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}), "
-                             f"recebido ({D}, {S})")
+        B, D, _ = x.shape
 
         # ===== 1. INTEGRAÇÃO DENDRÍTICA =====
         v_dend = torch.zeros(B, D, device=device)
