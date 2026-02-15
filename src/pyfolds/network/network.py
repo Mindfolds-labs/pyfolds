@@ -235,10 +235,14 @@ class MPJRDNetwork(nn.Module):
         
         # Dendritos secundários recebem o restante distribuído
         remaining = weighted * 0.6  # [B, to]
-        for d in range(1, D):
-            # Cada dendrito secundário recebe uma fração
-            # A primeira sinapse de cada dendrito recebe a ativação
-            input_tensor[:, :, d, 0] = remaining / (D - 1)
+        if D > 1:
+            for d in range(1, D):
+                # Cada dendrito secundário recebe uma fração
+                # A primeira sinapse de cada dendrito recebe a ativação
+                input_tensor[:, :, d, 0] = remaining / (D - 1)
+        else:
+            # Edge case: camada monodendrítica (evita divisão por zero)
+            input_tensor[:, :, main_dendrite, 0] = weighted
         
         return input_tensor
 
