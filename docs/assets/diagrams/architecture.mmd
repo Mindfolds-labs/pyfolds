@@ -1,0 +1,48 @@
+graph TB
+    subgraph "PyFolds Framework"
+        direction TB
+
+        subgraph "Core Module"
+            C1[MPJRDConfig]
+            C2[MPJRDNeuron]
+            C3[MPJRDDendrite]
+            C4[MPJRDSynapse]
+            C5[HomeostasisController]
+            C6[Neuromodulator]
+
+            C2 --> C3
+            C3 --> C4
+            C2 --> C5
+            C2 --> C6
+        end
+
+        subgraph "Wave Module v3.0"
+            W1[MPJRDWaveNeuron]
+            W2[MPJRDWaveLayer]
+            W3[MPJRDWaveNetwork]
+
+            W1 -.->|extends| C2
+            W2 --> W1
+            W3 --> W2
+        end
+
+        subgraph "Advanced Module"
+            A1[STDPMixin]
+            A2[RefractoryMixin]
+            A3[AdaptationMixin]
+            A4[InhibitionLayer]
+
+            A1 -.-> C2
+            A2 -.-> C2
+            A3 -.-> C2
+        end
+
+        subgraph "External"
+            E1[PyTorch]
+            E2[NumPy]
+            E3[Matplotlib]
+        end
+
+        C2 --> E1
+        W1 --> E1
+    end

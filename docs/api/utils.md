@@ -1,10 +1,10 @@
-# API — Utils
+# API Reference - Utilitários
 
-## Módulos utilitários
+## Itens comuns
+- Tipos (`LearningMode`, estruturas auxiliares)
+- Logging e telemetria
+- Funções de suporte para treinamento e avaliação
 
-| Módulo | Responsabilidade |
-|---|---|
-| `pyfolds.utils.types` | Enums e tipos (`LearningMode`, `ConnectionType`) |
-| `pyfolds.utils.math` | Funções de clamp e utilitários numéricos |
-| `pyfolds.utils.device` | Resolução de dispositivo |
-| `pyfolds.utils.logging` | Logger estruturado |
+## Convenções
+- Prefira type hints em funções públicas.
+- Estruture utilitários por domínio (`training`, `metrics`, `io`).
