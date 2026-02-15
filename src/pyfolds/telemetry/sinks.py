@@ -1,12 +1,17 @@
-"""Sinks (destinos) para eventos de telemetria"""
+"""Sinks (destinations) for telemetry events."""
 
 import json
 import warnings
-from typing import List, Optional
+import logging
+from abc import ABC, abstractmethod
+from typing import List, Optional, Union
+from pathlib import Path
 from .events import TelemetryEvent
 from .ringbuffer import RingBuffer
 
-# Tentativa de importar torch para detecção de tensores
+logger = logging.getLogger(__name__)
+
+# Attempt to import torch for tensor detection
 try:
     import torch
     TORCH_AVAILABLE = True
@@ -14,24 +19,33 @@ except ImportError:
     TORCH_AVAILABLE = False
 
 
-class Sink:
-    """Classe base para sinks de telemetria."""
+class Sink(ABC):
+    """Base class for telemetry sinks with context manager support."""
     
+    @abstractmethod
     def emit(self, event: TelemetryEvent) -> None:
-        """Emite um evento para este sink."""
-        raise NotImplementedError
+        """Emit an event to this sink."""
+        pass
     
     def flush(self) -> None:
-        """Força escrita de buffers (se aplicável)."""
+        """Force buffer writes (if applicable)."""
         pass
     
     def close(self) -> None:
-        """Fecha o sink (libera recursos)."""
+        """Close the sink (release resources)."""
         pass
+    
+    def __enter__(self):
+        """Context manager entry."""
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - ensures close."""
+        self.close()
 
 
 class NoOpSink(Sink):
-    """Sink que não faz nada (para profile=off)."""
+    """Sink that does nothing (for profile=off)."""
     
     def emit(self, event: TelemetryEvent) -> None:
         pass
@@ -39,10 +53,10 @@ class NoOpSink(Sink):
 
 class MemorySink(Sink):
     """
-    Sink que mantém eventos em memória (buffer circular).
+    Sink that keeps events in memory (circular buffer).
     
     Args:
-        capacity: Capacidade máxima do buffer
+        capacity: Maximum buffer capacity
     """
     
     def __init__(self, capacity: int = 512):
@@ -52,21 +66,24 @@ class MemorySink(Sink):
         self.buffer.append(event)
     
     def snapshot(self) -> List[TelemetryEvent]:
-        """Retorna cópia dos eventos no buffer."""
+        """Return copy of events in buffer."""
         return self.buffer.snapshot()
     
     def clear(self) -> None:
-        """Limpa o buffer."""
-        # ✅ CORRIGIDO: Usa property pública capacity
+        """Clear the buffer."""
         self.buffer = RingBuffer[TelemetryEvent](self.buffer.capacity)
+    
+    def close(self) -> None:
+        """Nothing to close for memory sink."""
+        pass
 
 
 class ConsoleSink(Sink):
     """
-    Sink que imprime eventos no console.
+    Sink that prints events to console.
     
     Args:
-        verbose: Se True, imprime payload completo
+        verbose: If True, print full payload
     """
     
     def __init__(self, verbose: bool = False):
@@ -81,44 +98,51 @@ class ConsoleSink(Sink):
                   f"payload={event.payload}")
         else:
             print(f"[pyfolds] step={event.step_id} phase={event.phase}")
+    
+    def close(self) -> None:
+        pass
 
 
 class JSONLinesSink(Sink):
     """
-    Sink que escreve eventos em arquivo JSON Lines.
+    Sink that writes events to JSON Lines file.
     
     Args:
-        path: Caminho do arquivo
-        flush_every: Número de eventos para flush automático (0 = nunca)
+        path: File path
+        flush_every: Number of events before auto-flush (0 = never)
+        truncate: If True, overwrite file on open; otherwise append
     
     Example:
-        >>> with JSONLinesSink("telemetry.jsonl") as sink:
+        >>> with JSONLinesSink("telemetry.jsonl", truncate=True) as sink:
         ...     sink.emit(event)
-        ... # Arquivo fechado automaticamente
+        ... # File automatically closed
     """
     
-    def __init__(self, path: str, flush_every: int = 10):
-        self.path = path
+    def __init__(self, path: Union[str, Path], flush_every: int = 10, truncate: bool = False):
+        self.path = Path(path)
         self.flush_every = flush_every
+        self.truncate = truncate
         self._count = 0
         self._file = None
     
     def __enter__(self):
-        """Abre arquivo ao entrar no context manager."""
-        self._file = open(self.path, 'a', encoding='utf-8')
+        """Open file when entering context."""
+        self._ensure_open()
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Garante fechamento mesmo com erro."""
+        """Ensure close even with error."""
         self.close()
     
     def _ensure_open(self):
-        """Abre arquivo se necessário (para uso sem context manager)."""
+        """Open file if needed."""
         if self._file is None:
-            self._file = open(self.path, 'a', encoding='utf-8')
+            mode = 'w' if self.truncate else 'a'
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self._file = open(self.path, mode, encoding='utf-8')
     
     def _make_serializable(self, obj):
-        """Converte objetos não serializáveis para formatos JSON compatíveis."""
+        """Convert objects to JSON-serializable formats."""
         if TORCH_AVAILABLE and isinstance(obj, torch.Tensor):
             if obj.numel() == 1:
                 return obj.item()
@@ -131,11 +155,11 @@ class JSONLinesSink(Sink):
         elif isinstance(obj, (int, float, str, bool, type(None))):
             return obj
         else:
-            # Fallback para string
+            # Fallback to string
             return str(obj)
     
     def emit(self, event: TelemetryEvent) -> None:
-        """Emite evento para o arquivo."""
+        """Emit event to file."""
         self._ensure_open()
         
         try:
@@ -151,10 +175,9 @@ class JSONLinesSink(Sink):
             self._file.write(json.dumps(data) + '\n')
             
         except (TypeError, ValueError) as e:
-            # Se falhar na serialização, tenta converter objetos não serializáveis
-            warnings.warn(f"Falha ao serializar evento: {e}. Tentando converter...")
+            logger.warning(f"Serialization failed: {e}. Converting...")
             
-            # Converte payload para formato serializável
+            # Convert to serializable format
             serializable_data = {
                 'step_id': event.step_id,
                 'phase': event.phase,
@@ -171,34 +194,34 @@ class JSONLinesSink(Sink):
             self.flush()
     
     def flush(self) -> None:
-        """Força escrita no disco."""
+        """Force write to disk."""
         if self._file is not None:
             self._file.flush()
     
     def close(self) -> None:
-        """Fecha o arquivo."""
+        """Close the file."""
         if self._file is not None:
+            self.flush()
             self._file.close()
             self._file = None
 
 
-# ===== DistributorSink =====
 class DistributorSink(Sink):
     """
-    Sink que distribui eventos para múltiplos sinks.
+    Sink that distributes events to multiple sinks.
     
-    Útil para enviar eventos para diferentes destinos simultaneamente:
-    - MemorySink para MindBoard (tempo real)
-    - JSONLinesSink para MindAudit (persistência)
-    - ConsoleSink para debug
+    Useful for sending events to multiple destinations simultaneously:
+    - MemorySink for MindBoard (real-time)
+    - JSONLinesSink for MindAudit (persistence)
+    - ConsoleSink for debug
     
     Args:
-        sinks: Lista de sinks para onde os eventos serão distribuídos
+        sinks: List of sinks to distribute events to
     
     Example:
         >>> sink = DistributorSink([
-        ...     MemorySink(1000),           # Para MindBoard
-        ...     JSONLinesSink("audit.jsonl") # Para MindAudit
+        ...     MemorySink(1000),           # For MindBoard
+        ...     JSONLinesSink("audit.jsonl") # For MindAudit
         ... ])
         >>> telem = TelemetryController(sink=sink)
     """
@@ -207,18 +230,27 @@ class DistributorSink(Sink):
         self.sinks = sinks
     
     def emit(self, event: TelemetryEvent) -> None:
-        """Distribui evento para todos os sinks."""
+        """Distribute event to all sinks."""
         for sink in self.sinks:
-            sink.emit(event)
+            try:
+                sink.emit(event)
+            except Exception as e:
+                logger.error(f"Error emitting to {type(sink).__name__}: {e}")
     
     def flush(self) -> None:
-        """Flush em todos os sinks que suportam."""
+        """Flush all sinks that support it."""
         for sink in self.sinks:
-            if hasattr(sink, 'flush'):
-                sink.flush()
+            try:
+                if hasattr(sink, 'flush'):
+                    sink.flush()
+            except Exception as e:
+                logger.error(f"Error flushing {type(sink).__name__}: {e}")
     
     def close(self) -> None:
-        """Fecha todos os sinks."""
+        """Close all sinks."""
         for sink in self.sinks:
-            if hasattr(sink, 'close'):
-                sink.close()
+            try:
+                if hasattr(sink, 'close'):
+                    sink.close()
+            except Exception as e:
+                logger.error(f"Error closing {type(sink).__name__}: {e}")

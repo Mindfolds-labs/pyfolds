@@ -1,14 +1,14 @@
-"""Sistema de telemetria para neurônios MPJRD
+"""Telemetry system for MPJRD neurons.
 
-Este módulo fornece:
-- Eventos estruturados (forward, commit, sleep)
-- Buffer circular thread-safe
-- Múltiplos sinks (memória, console, JSON, distribuidor)
-- Controlador com perfis off/light/heavy
-- Decorador para telemetria automática
-- Payloads tipados
+This module provides:
+- Structured events (forward, commit, sleep)
+- Thread-safe circular buffer
+- Multiple sinks (memory, console, JSON, distributor)
+- Controller with off/light/heavy profiles
+- Decorator for automatic telemetry
+- Typed payloads
 
-Uso básico:
+Basic usage:
     from pyfolds.telemetry import TelemetryConfig, TelemetryController, forward_event
     
     cfg = TelemetryConfig(profile="light", sample_every=50)
@@ -25,10 +25,10 @@ from .controller import TelemetryController, TelemetryConfig, Profile
 from .decorator import telemetry
 from .types import ForwardPayload, CommitPayload, SleepPayload
 
-__version__ = "1.2.0"  # ⬆️ Versão atualizada!
+__version__ = "1.2.0"
 
 __all__ = [
-    # Eventos
+    # Events
     "TelemetryEvent",
     "forward_event",
     "commit_event",
@@ -43,21 +43,21 @@ __all__ = [
     "MemorySink",
     "ConsoleSink",
     "JSONLinesSink",
-    "DistributorSink",  # ✅ NOVO!
+    "DistributorSink",
     
-    # Controlador
+    # Controller
     "TelemetryController",
     "TelemetryConfig",
     "Profile",
     
-    # Decorador
+    # Decorator
     "telemetry",
     
-    # Tipos
+    # Types
     "ForwardPayload",
     "CommitPayload",
     "SleepPayload",
     
-    # Metadados
+    # Metadata
     "__version__",
 ]

@@ -1,4 +1,4 @@
-"""Controle de homeostase do neurônio MPJRD - VERSÃO CORRIGIDA"""
+"""Controle de homeostase do neurônio MPJRD - VERSÃO CORRIGIDA FINAL"""
 
 import torch
 import torch.nn as nn
@@ -10,7 +10,10 @@ class HomeostasisController(nn.Module):
     """
     Controla a homeostase do neurônio MPJRD.
     
-    ✅ CORRIGIDO: Removido +self.eps incorreto da média móvel
+    ✅ CORRIGIDO:
+        - Removido +self.eps incorreto da média móvel
+        - ✅ is_stable AGORA É PROPRIEDADE SEM PARÂMETROS
+        - ✅ Adicionado is_stable_with_tolerance para custom tolerance
     """
 
     def __init__(self, cfg: MPJRDConfig):
@@ -76,14 +79,36 @@ class HomeostasisController(nn.Module):
 
     @property
     def homeostasis_error(self) -> torch.Tensor:
+        """Erro homeostático atual (r_hat - target)."""
         return self.r_hat - self.cfg.target_spike_rate
 
     @property
-    def is_stable(self, tolerance: float = 0.05) -> bool:
+    def is_stable(self) -> bool:
+        """
+        Verifica se homeostase está estável (tolerance padrão = 0.05).
+        
+        Returns:
+            True se |r_hat - target| < 0.05
+        """
+        return abs(self.homeostasis_error.item()) < 0.05
+
+    def is_stable_with_tolerance(self, tolerance: float = 0.05) -> bool:
+        """
+        Verifica estabilidade com tolerance customizado.
+        
+        Args:
+            tolerance: Tolerância para considerar estabilidade
+            
+        Returns:
+            True se |r_hat - target| < tolerance
+        """
         return abs(self.homeostasis_error.item()) < tolerance
 
     def extra_repr(self) -> str:
+        """Representação string detalhada do módulo."""
         return (f"θ={self.theta.item():.3f} "
                 f"[{self.cfg.theta_min:.1f}, {self.cfg.theta_max:.1f}], "
                 f"r̂={self.r_hat.item():.3f}, "
-                f"resgate={self.dead_neuron_threshold:.2f}")
+                f"target={self.cfg.target_spike_rate:.2f}, "
+                f"resgate_th={self.dead_neuron_threshold:.2f}, "
+                f"estável={self.is_stable}")

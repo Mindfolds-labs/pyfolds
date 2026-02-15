@@ -1,26 +1,16 @@
-"""Gerenciamento de device para PyFolds"""
+"""Gerenciamento de device para PyFolds - VERSÃO CORRIGIDA."""
 
 import torch
-from typing import Dict, Optional, Union
+import logging
+from typing import Dict, Optional, Union, Tuple, Any
+
+logger = logging.getLogger(__name__)
 
 
 def infer_device(
     inputs: Union[Dict[str, torch.Tensor], torch.Tensor, None] = None
 ) -> torch.device:
-    """
-    Infere o device a partir de inputs ou retorna CPU como fallback.
-    
-    Args:
-        inputs: Tensor, dicionário de tensores ou None
-    
-    Returns:
-        torch.device: Device inferido
-    
-    Example:
-        >>> x = torch.randn(10, device='cuda')
-        >>> device = infer_device(x)  # returns device(type='cuda')
-        >>> device = infer_device()    # returns device(type='cpu')
-    """
+    """Infere device a partir de inputs."""
     if inputs is None:
         return torch.device('cpu')
     
@@ -35,43 +25,82 @@ def infer_device(
     return torch.device('cpu')
 
 
+def get_device(device: Optional[Union[str, torch.device]] = None) -> torch.device:
+    """Retorna melhor device disponível."""
+    if device is not None:
+        return torch.device(device)
+    return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
 def ensure_device(tensor: torch.Tensor, device: Optional[torch.device] = None) -> torch.Tensor:
-    """
-    Garante que o tensor está no device especificado.
-    
-    Args:
-        tensor: Tensor a ser movido
-        device: Device destino (se None, retorna original)
-    
-    Returns:
-        Tensor no device correto
-    
-    Example:
-        >>> x = torch.randn(10)
-        >>> x = ensure_device(x, torch.device('cuda'))
-    """
+    """Garante que tensor está no device especificado."""
     if device is None:
         return tensor
     return tensor.to(device)
 
 
-def get_device(device: Optional[Union[str, torch.device]] = None) -> torch.device:
-    """
-    Retorna o melhor device disponível (CUDA se possível, CPU caso contrário).
+class DeviceManager:
+    """Gerenciador de device para PyFolds."""
     
-    Args:
-        device: Device específico (opcional)
+    def __init__(self, device: Optional[Union[str, torch.device]] = None):
+        if device is None:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        
+        self.device = torch.device(device)
+        self._validate_device()
+        logger.info(f"DeviceManager inicializado: {self.device}")
     
-    Returns:
-        torch.device: Device configurado
+    def _validate_device(self) -> None:
+        """Valida que device está disponível."""
+        if self.device.type == 'cuda' and not torch.cuda.is_available():
+            raise RuntimeError(f"CUDA não disponível (device solicitado: {self.device})")
     
-    Example:
-        >>> device = get_device()  # 'cuda' se disponível, senão 'cpu'
-        >>> device = get_device('cpu')  # Força CPU
-    """
-    if device is not None:
-        return torch.device(device)
+    def to(self, *objs: Any) -> Union[Any, Tuple[Any, ...]]:
+        """
+        Move objetos para o device gerenciado.
+        
+        Args:
+            *objs: Objetos a mover (tensores, módulos, etc)
+        
+        Returns:
+            Objeto único ou tupla de objetos movidos
+        """
+        if not objs:
+            return None
+        
+        moved = []
+        for obj in objs:
+            if hasattr(obj, 'to'):
+                moved.append(obj.to(self.device))
+            else:
+                moved.append(obj)
+        
+        if len(moved) == 1:
+            return moved[0]
+        return tuple(moved)
     
-    if torch.cuda.is_available():
-        return torch.device('cuda')
-    return torch.device('cpu')
+    def check_consistency(self, *tensors: torch.Tensor) -> bool:
+        """
+        Verifica que todos os tensores estão no device correto.
+        
+        Args:
+            *tensors: Tensores a verificar
+        
+        Returns:
+            True se consistentes
+        
+        Raises:
+            ValueError: Se devices não correspondem
+        """
+        devices = {t.device for t in tensors if isinstance(t, torch.Tensor)}
+        
+        if len(devices) > 1:
+            raise ValueError(f"Múltiplos devices encontrados: {devices}")
+        
+        if devices and next(iter(devices)) != self.device:
+            raise ValueError(
+                f"Device mismatch: tensores em {next(iter(devices))}, "
+                f"gerenciador espera {self.device}"
+            )
+        
+        return True

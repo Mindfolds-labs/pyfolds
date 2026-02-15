@@ -1,4 +1,4 @@
-"""Buffer circular thread-safe para telemetria"""
+"""Thread-safe circular buffer for telemetry."""
 
 from typing import List, Optional, TypeVar, Generic
 from threading import Lock
@@ -6,26 +6,31 @@ from collections.abc import Iterable
 
 T = TypeVar('T')
 
+
 class RingBuffer(Generic[T]):
     """
-    Buffer circular thread-safe com capacidade fixa.
+    Thread-safe circular buffer with fixed capacity.
+    
+    This buffer maintains items in FIFO order and overwrites oldest
+    items when capacity is reached. All operations are thread-safe.
     
     Args:
-        capacity: Número máximo de elementos
+        capacity: Maximum number of elements
         
     Example:
         >>> buf = RingBuffer[int](3)
         >>> buf.append(1)
         >>> buf.append(2)
         >>> buf.append(3)
-        >>> buf.append(4)  # Sobrescreve o mais antigo
+        >>> buf.append(4)  # Overwrites oldest (1)
         >>> buf.snapshot()  # [2, 3, 4]
         >>> len(buf)  # 3
     """
     
     def __init__(self, capacity: int):
         if capacity <= 0:
-            raise ValueError("Capacity must be positive")
+            raise ValueError(f"Capacity must be positive, got {capacity}")
+        
         self._cap = capacity
         self._buf: List[Optional[T]] = [None] * capacity
         self._idx = 0
@@ -33,7 +38,7 @@ class RingBuffer(Generic[T]):
         self._lock = Lock()
     
     def append(self, item: T) -> None:
-        """Adiciona um item ao buffer."""
+        """Add an item to the buffer (thread-safe)."""
         with self._lock:
             if self._size < self._cap:
                 self._size += 1
@@ -41,16 +46,16 @@ class RingBuffer(Generic[T]):
             self._idx = (self._idx + 1) % self._cap
     
     def extend(self, items: Iterable[T]) -> None:
-        """Adiciona múltiplos itens ao buffer."""
+        """Add multiple items to the buffer (thread-safe)."""
         for item in items:
             self.append(item)
     
     def snapshot(self) -> List[T]:
         """
-        Retorna uma cópia dos elementos em ordem cronológica.
+        Return a copy of elements in chronological order (thread-safe).
         
         Returns:
-            Lista com os elementos do mais antigo ao mais novo
+            List of elements from oldest to newest
         """
         with self._lock:
             if self._size == 0:
@@ -61,14 +66,13 @@ class RingBuffer(Generic[T]):
             
             for i in range(self._size):
                 idx = (start + i) % self._cap
-                val = self._buf[idx]
-                if val is not None:
-                    result.append(val)
+                # ✅ Always append, even if None (None shouldn't happen)
+                result.append(self._buf[idx])
             
             return result
     
     def clear(self) -> None:
-        """Limpa o buffer."""
+        """Clear the buffer (thread-safe)."""
         with self._lock:
             self._buf = [None] * self._cap
             self._idx = 0
@@ -76,17 +80,19 @@ class RingBuffer(Generic[T]):
     
     @property
     def capacity(self) -> int:
-        """Capacidade máxima do buffer."""
+        """Maximum buffer capacity."""
         return self._cap
     
     @property
     def is_full(self) -> bool:
-        """Buffer está cheio?"""
-        return self._size == self._cap
+        """Is buffer full?"""
+        with self._lock:
+            return self._size == self._cap
     
     def __len__(self) -> int:
-        """Número atual de elementos."""
-        return self._size
+        """Current number of elements."""
+        with self._lock:
+            return self._size
     
     def __repr__(self) -> str:
         return f"RingBuffer(capacity={self._cap}, size={self._size})"

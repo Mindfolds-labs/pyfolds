@@ -1,4 +1,4 @@
-"""Utilitários para PyFolds
+"""Utilitários para PyFolds - VERSÃO CORRIGIDA
 
 Este módulo fornece funções auxiliares e tipos para todo o framework:
 - Funções matemáticas seguras (divisão, clamps, inicialização)
@@ -24,10 +24,16 @@ Uso básico:
 """
 
 from .math import safe_div, clamp_rate, clamp_R, xavier_init, calculate_vc_dimension
-from .device import infer_device, ensure_device, get_device
-from .types import LearningMode, ConnectionType, ModeConfig
+from .device import infer_device, ensure_device, get_device, DeviceManager  # ✅ Adicionado DeviceManager
+from .types import (
+    LearningMode,
+    ConnectionType,
+    ModeConfig,
+    AdaptationOutput,
+    AdaptationConfig,
+)
 
-# ✅ ADICIONADO: Logging
+# Logging
 from .logging import get_logger, PyFoldsLogger, trace, TRACE_LEVEL
 
 __all__ = [
@@ -42,13 +48,16 @@ __all__ = [
     "infer_device",
     "ensure_device", 
     "get_device",
+    "DeviceManager",  # ✅ Adicionado
     
     # Types
     "LearningMode",
     "ConnectionType",
     "ModeConfig",
+    "AdaptationOutput",
+    "AdaptationConfig",
     
-    # ✅ ADICIONADO: Logging
+    # Logging
     "get_logger",
     "PyFoldsLogger",
     "trace",

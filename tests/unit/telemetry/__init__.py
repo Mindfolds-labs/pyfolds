@@ -1,1 +1,1 @@
-"""Tests for telemetry."""
+"""Tests for telemetry module."""

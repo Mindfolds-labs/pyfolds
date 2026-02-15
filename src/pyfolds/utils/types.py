@@ -1,37 +1,22 @@
-"""Tipos e enums para o PyFolds"""
+"""Tipos de configuração para PyFolds - VERSÃO COMPLETA."""
 
-from enum import Enum
 from dataclasses import dataclass
+from typing import NamedTuple, Dict, Optional
+from enum import Enum
+import torch
+from torch import Tensor
 
+# ============================================================================
+# ENUMS PRINCIPAIS - ✅ ADICIONADOS
+# ============================================================================
 
-class LearningMode(str, Enum):
-    """
-    Modos de aprendizado do neurônio MPJRD.
+class LearningMode(Enum):
+    """Modos de aprendizado do neurônio MPJRD."""
     
-    Baseado na literatura:
-    - Xiao et al., 2024 - Dual-process theory
-    - Iatropoulos et al., PNAS 2025 - Two-factor consolidation
-    
-    Modos:
-        ONLINE: Aprendizado imediato (SGD-like)
-        BATCH: Aprendizado em lote (gradient accumulation)
-        SLEEP: Consolidação two-factor (transferência I→N)
-        INFERENCE: Apenas forward (produção)
-    """
     ONLINE = "online"
     BATCH = "batch"
     SLEEP = "sleep"
     INFERENCE = "inference"
-    
-    @property
-    def description(self) -> str:
-        """Descrição do modo de aprendizado."""
-        return {
-            "online": "Aprendizado rápido e imediato (vigília)",
-            "batch": "Aprendizado estável em lote (consolidação)",
-            "sleep": "Sono - two-factor consolidation (I → N)",
-            "inference": "Modo produção - sem aprendizado"
-        }[self.value]
     
     @property
     def learning_rate_multiplier(self) -> float:
@@ -39,17 +24,29 @@ class LearningMode(str, Enum):
         Multiplicador de learning rate para cada modo.
         
         Returns:
-            ONLINE: 5.0 (aprende 5x mais rápido)
-            BATCH: 0.2 (aprende 5x mais devagar)
-            SLEEP: 0.0 (não aprende, consolida)
-            INFERENCE: 0.0 (não aprende)
+            ONLINE: 1.0 (taxa normal)
+            BATCH: 0.8 (80% da taxa)
+            SLEEP: 0.1 (10% - consolidação)
+            INFERENCE: 0.0 (sem aprendizado)
         """
-        return {
-            "online": 5.0,
-            "batch": 0.2,
-            "sleep": 0.0,
-            "inference": 0.0
-        }[self.value]
+        multipliers = {
+            LearningMode.ONLINE: 1.0,
+            LearningMode.BATCH: 0.8,
+            LearningMode.SLEEP: 0.1,
+            LearningMode.INFERENCE: 0.0,
+        }
+        return multipliers[self]
+    
+    @property
+    def description(self) -> str:
+        """Descrição do modo de aprendizado."""
+        descriptions = {
+            LearningMode.ONLINE: "Atualização imediata (vigília)",
+            LearningMode.BATCH: "Acumula e atualiza em lote (consolidação)",
+            LearningMode.SLEEP: "Sono - two-factor consolidation (I → N)",
+            LearningMode.INFERENCE: "Modo produção - sem aprendizado",
+        }
+        return descriptions[self]
     
     def is_learning(self) -> bool:
         """Retorna True se o modo permite aprendizado."""
@@ -60,12 +57,19 @@ class LearningMode(str, Enum):
         return self == LearningMode.SLEEP
 
 
-class ConnectionType(str, Enum):
+class ConnectionType(Enum):
     """Tipos de conexão entre camadas."""
-    DENSE = "dense"        # Totalmente conectado
-    SPARSE = "sparse"      # Conectado esparsamente
-    ENTANGLED = "entangled"  # Conexões emaranhadas (experimental)
+    
+    DENSE = "dense"          # Totalmente conectado
+    SPARSE = "sparse"        # Conectado esparsamente
+    EXCITATORY = "exc"       # Excitatório
+    INHIBITORY = "inh"       # Inibitório
+    MODULATORY = "mod"       # Modulatório (neuromodulador)
 
+
+# ============================================================================
+# CONFIGURAÇÕES - ✅ ModeConfig ADICIONADO
+# ============================================================================
 
 @dataclass
 class ModeConfig:
@@ -73,41 +77,85 @@ class ModeConfig:
     Configurações específicas por modo de aprendizado.
     
     Attributes:
-        online_learning_rate_mult: Multiplicador para modo ONLINE
-        batch_learning_rate_mult: Multiplicador para modo BATCH
-        sleep_consolidation_factor: Fator de consolidação no sono
+        name: Nome do modo
+        learning_rate_multiplier: Multiplicador para learning rate
+        description: Descrição do modo
     """
-    online_learning_rate_mult: float = 5.0
-    batch_learning_rate_mult: float = 0.2
-    sleep_consolidation_factor: float = 0.1
+    name: str
+    learning_rate_multiplier: float = 1.0
+    description: str = ""
     
-    def get_learning_rate(self, base_lr: float, mode: LearningMode) -> float:
-        """
-        Retorna learning rate ajustado para o modo.
-        
-        Args:
-            base_lr: Learning rate base
-            mode: Modo de aprendizado
-        
-        Returns:
-            Learning rate ajustado (base_lr * multiplicador)
-        """
-        mult = {
-            LearningMode.ONLINE: self.online_learning_rate_mult,
-            LearningMode.BATCH: self.batch_learning_rate_mult,
-            LearningMode.SLEEP: 0.0,
-            LearningMode.INFERENCE: 0.0
-        }[mode]
-        return base_lr * mult
+    def __post_init__(self):
+        """Valida configuração."""
+        if not 0.0 <= self.learning_rate_multiplier <= 2.0:
+            raise ValueError(
+                f"learning_rate_multiplier deve estar em [0, 2], "
+                f"got {self.learning_rate_multiplier}"
+            )
     
-    def get_consolidation_factor(self, mode: LearningMode) -> float:
-        """
-        Retorna fator de consolidação para o modo.
+    @classmethod
+    def from_learning_mode(cls, mode: LearningMode) -> 'ModeConfig':
+        """Cria ModeConfig a partir de LearningMode."""
+        return cls(
+            name=mode.value,
+            learning_rate_multiplier=mode.learning_rate_multiplier,
+            description=mode.description
+        )
+
+
+# ============================================================================
+# TYPE ALIASES
+# ============================================================================
+
+TensorBatch = Tensor  # [B, ...]
+TensorShared = Tensor  # [D, S]
+DeviceType = torch.device
+
+
+# ============================================================================
+# ADAPTAÇÃO
+# ============================================================================
+
+class AdaptationOutput(NamedTuple):
+    """Output de _apply_adaptation."""
+    u_adapted: TensorBatch  # [B]
+    adaptation_current: TensorBatch  # [B]
+    metrics: Dict[str, float]
+
+
+@dataclass
+class AdaptationConfig:
+    """Configuração para adaptação de neurônios."""
+    
+    adaptation_increment: float = 0.1
+    """Incremento de corrente de adaptação por spike [nA]."""
+    
+    adaptation_decay: float = 0.98
+    """Fator de decaimento (0.0-1.0)."""
+    
+    adaptation_max: float = 1.0
+    """Máximo valor de corrente de adaptação [nA]."""
+    
+    adaptation_tau: float = 100.0
+    """Constante de tempo de decaimento [ms]."""
+    
+    def validate(self) -> None:
+        """Valida parâmetros."""
+        errors = []
         
-        Args:
-            mode: Modo de aprendizado
+        if not 0.0 < self.adaptation_increment <= 1.0:
+            errors.append(f"adaptation_increment={self.adaptation_increment} "
+                         f"must be in (0.0, 1.0]")
         
-        Returns:
-            Fator de consolidação (apenas SLEEP > 0)
-        """
-        return self.sleep_consolidation_factor if mode == LearningMode.SLEEP else 0.0
+        if not 0.0 <= self.adaptation_decay <= 1.0:
+            errors.append(f"adaptation_decay={self.adaptation_decay} "
+                         f"must be in [0.0, 1.0]")
+        
+        if self.adaptation_max <= 0:
+            errors.append(f"adaptation_max must be > 0, got {self.adaptation_max}")
+        
+        if self.adaptation_tau <= 0:
+            errors.append(f"adaptation_tau must be > 0, got {self.adaptation_tau}")
+        
+        if errors:
+            raise ValueError("\n".join(errors))
