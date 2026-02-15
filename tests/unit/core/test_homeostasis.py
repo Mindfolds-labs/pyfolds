@@ -25,3 +25,14 @@ class TestHomeostasisController:
         
         homeo.update(0.05)  # Below target
         assert homeo.theta.item() < initial
+
+
+    def test_is_stable_accepts_tolerance(self, small_config):
+        """is_stable should accept optional tolerance."""
+        from pyfolds.core import HomeostasisController
+
+        homeo = HomeostasisController(small_config)
+        homeo.r_hat.fill_(small_config.target_spike_rate + 0.08)
+
+        assert homeo.is_stable(tolerance=0.1) is True
+        assert homeo.is_stable(tolerance=0.05) is False

@@ -68,3 +68,16 @@ class TestShortTermDynamicsMixin:
         
         assert abs(neuron.u_stp[0, 0].item() - expected_u_spike) < 1e-4
         assert abs(neuron.u_stp[0, 1].item() - expected_u_no_spike) < 1e-4
+    def test_tsodyks_markram_recovery(self, full_config):
+        """R deve recuperar para próximo de 1 sem estímulo."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
+        neuron.R_stp.fill_(0.2)
+
+        x = torch.zeros(1, full_config.n_dendrites, full_config.n_synapses_per_dendrite)
+        for _ in range(1000):
+            neuron._update_short_term_dynamics(x, dt=1.0)
+
+        assert 0.45 < neuron.R_stp.mean().item() < 0.55

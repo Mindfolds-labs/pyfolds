@@ -8,7 +8,15 @@ from ..core.config import MPJRDConfig
 
 @dataclass(frozen=True)
 class MPJRDWaveConfig(MPJRDConfig):
-    """Extensão de configuração para codificação por fase/frequência."""
+    """Extensão de configuração para codificação por fase/frequência.
+
+    Este neurônio implementa codificação temporal via oscilações (WAVE)
+    usando fase e frequência para representação distribuída de informação.
+
+    Referências:
+        Brette, R. (2012). Computing with neurons.
+        Körding, K. P., & König, P. (2000).
+    """
 
     wave_enabled: bool = True
     base_frequency: float = 12.0

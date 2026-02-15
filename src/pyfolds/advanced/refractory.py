@@ -1,7 +1,7 @@
 """Mixin para período refratário."""
 
 import torch
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 from .time_mixin import TimedMixin
 
 
@@ -32,13 +32,19 @@ class RefractoryMixin(TimedMixin):
             )
     
     def _check_refractory_batch(self, current_time: float, 
-                                 batch_size: int) -> tuple[torch.Tensor, torch.Tensor]:
+                                 batch_size: int) -> Tuple[torch.Tensor, torch.Tensor]:
         time_since = current_time - self.last_spike_time
-        # Compatibilidade com semântica de testes legados:
-        # - janela "blocked" na cauda do refratário (abs, rel)
-        # - janela relativa imediata em torno de t_refrac_abs
-        blocked = (time_since > self.t_refrac_abs) & (time_since < self.t_refrac_rel)
-        in_relative = (time_since >= self.t_refrac_abs) & (time_since <= self.t_refrac_abs + 1.0)
+
+        # Refratário absoluto: nenhum spike
+        in_absolute = time_since <= self.t_refrac_abs
+
+        # Refratário relativo: threshold elevado
+        in_relative = (
+            (time_since > self.t_refrac_abs) &
+            (time_since <= self.t_refrac_rel)
+        )
+
+        blocked = in_absolute | in_relative
         theta_boost = torch.where(
             in_relative,
             torch.full_like(time_since, self.refrac_rel_strength),

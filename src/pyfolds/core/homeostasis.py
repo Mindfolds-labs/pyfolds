@@ -12,8 +12,7 @@ class HomeostasisController(nn.Module):
     
     ✅ CORRIGIDO:
         - Removido +self.eps incorreto da média móvel
-        - ✅ is_stable AGORA É PROPRIEDADE SEM PARÂMETROS
-        - ✅ Adicionado is_stable_with_tolerance para custom tolerance
+        - ✅ is_stable unificado como método com tolerance opcional
     """
 
     def __init__(self, cfg: MPJRDConfig):
@@ -82,26 +81,8 @@ class HomeostasisController(nn.Module):
         """Erro homeostático atual (r_hat - target)."""
         return self.r_hat - self.cfg.target_spike_rate
 
-    @property
-    def is_stable(self) -> bool:
-        """
-        Verifica se homeostase está estável (tolerance padrão = 0.05).
-        
-        Returns:
-            True se |r_hat - target| < 0.05
-        """
-        return abs(self.homeostasis_error.item()) < 0.05
-
-    def is_stable_with_tolerance(self, tolerance: float = 0.05) -> bool:
-        """
-        Verifica estabilidade com tolerance customizado.
-        
-        Args:
-            tolerance: Tolerância para considerar estabilidade
-            
-        Returns:
-            True se |r_hat - target| < tolerance
-        """
+    def is_stable(self, tolerance: float = 0.05) -> bool:
+        """Verifica se homeostase está estável com tolerância configurável."""
         return abs(self.homeostasis_error.item()) < tolerance
 
     def extra_repr(self) -> str:
@@ -111,4 +92,4 @@ class HomeostasisController(nn.Module):
                 f"r̂={self.r_hat.item():.3f}, "
                 f"target={self.cfg.target_spike_rate:.2f}, "
                 f"resgate_th={self.dead_neuron_threshold:.2f}, "
-                f"estável={self.is_stable}")
+                f"estável={self.is_stable()}")

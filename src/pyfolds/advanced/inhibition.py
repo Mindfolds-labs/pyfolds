@@ -13,6 +13,7 @@ Baseado em:
     Neuron, 72(2), 231-243.
 """
 
+import logging
 import torch
 import torch.nn as nn
 from typing import Optional, Dict, Tuple
@@ -89,21 +90,22 @@ class InhibitionLayer(nn.Module):
         self.register_buffer("step_count", torch.tensor(0))
     
     def _init_E2I_weights(self) -> torch.Tensor:
-        """
-        Inicializa pesos E→I com conectividade esparsa.
-        
-        Cada inibitório recebe de ~10% dos excitatórios.
-        """
-        W = torch.zeros(self.n_exc, self.n_inh)
-        
-        # Cada inibitório recebe de ~10% dos excitatórios
-        connections_per_inh = max(1, self.n_exc // 10)
-        
-        for i in range(self.n_inh):
-            # Conecta aleatoriamente
-            indices = torch.randperm(self.n_exc)[:connections_per_inh]
-            W[indices, i] = torch.rand(connections_per_inh) * 0.5
-        
+        """Inicializa pesos E→I com conectividade esparsa determinística."""
+        generator = torch.Generator(device='cpu')
+        generator.manual_seed(42)
+
+        with torch.random.fork_rng(devices=[]):
+            torch.manual_seed(42)
+            dense_weights = torch.nn.init.xavier_uniform_(
+                torch.empty(self.n_exc, self.n_inh)
+            )
+
+        sparsity_level = 0.1
+        mask = torch.bernoulli(
+            torch.full((self.n_exc, self.n_inh), sparsity_level),
+            generator=generator,
+        )
+        W = (dense_weights * mask).clamp(0, 1)
         return W
     
     def _init_I2E_weights(self) -> torch.Tensor:
@@ -161,8 +163,9 @@ class InhibitionLayer(nn.Module):
                 'inh_potential': [n_inh] potencial dos inibitórios
                 'feedforward_input': [n_inh] input feedforward
         """
+        logger = logging.getLogger(__name__)
         self.step_count.add_(1)
-        
+
         # ===== FEEDFORWARD: E → I =====
         # [B, n_exc] @ [n_exc, n_inh] → [B, n_inh]
         feedforward_input = torch.matmul(exc_spikes, self.W_E2I.to(exc_spikes.device))
@@ -175,7 +178,11 @@ class InhibitionLayer(nn.Module):
         
         # Disparo se potencial >= threshold
         inh_spikes = (self.inh_potential >= self.inh_threshold).float()
-        
+
+        inh_rate = inh_spikes.float().mean().item()
+        if inh_rate > 0.5:
+            logger.warning(f"⚠️ Alto nível de inibição: {inh_rate:.1%}")
+
         return {
             'inh_spikes': inh_spikes,  # [n_inh]
             'inh_potential': self.inh_potential.clone(),
