@@ -1,142 +1,110 @@
-# Scientific Logic — PyFolds v2.0/v3.0
+# Scientific Logic — PyFolds (MPJRD v2.0 / MPJRD-Wave v3.0)
 
-## Objetivo científico
+## Objetivo
 
-Este documento descreve **por que** o PyFolds funciona do ponto de vista neurocomputacional, e não apenas como usar a API. A proposta central é reduzir a opacidade de redes tradicionais por meio de estados mecanísticos observáveis, com mapeamento explícito entre estrutura e função.
-
----
-
-## 1) Fundamentação: Computação Dendrítica Não-Linear
-
-A literatura experimental e teórica sugere que neurônios biológicos não são somadores lineares simples:
-
-- **Mel (1992, 1994)**: dendritos como subunidades computacionais não-lineares.
-- **Gidon et al. (2020)**: evidência de computação sofisticada em dendritos humanos.
-- **Bartol et al. (2015)**: precisão/sinalização sináptica em nanoescala, compatível com quantização estrutural.
-
-### Tese operacional do PyFolds
-
-1. **Sinapse como estado** (não apenas peso):
-   - `N`: filamentos discretos (memória estrutural);
-   - `I`: potencial interno (componente volátil);
-   - `W = log2(1+N)/w_scale` (peso derivado, monotônico, interpretável).
-2. **Dendrito como subunidade**:
-   - integração local de sinapses,
-   - resposta não-linear por ramo.
-3. **Soma como decisor**:
-   - integra saídas dendríticas,
-   - define disparo (`spike`) de forma auditável.
-4. **Axônio/onda-fase como saída funcional**:
-   - codificação por presença de spike e, na versão Wave, por fase/interferência.
+Este documento descreve a lógica científica que fundamenta o PyFolds, conectando cada decisão de arquitetura do framework com evidências da literatura neurocientífica e neurocomputacional.
 
 ---
 
-## 2) Quantização de filamentos (N) e interpretabilidade
+## 1. Pilares científicos do modelo
 
-Em redes densas clássicas, um peso contínuo isolado tem baixa semântica causal para humanos. No PyFolds, `N` é discreto e limitado (`n_min ≤ N ≤ n_max`), oferecendo:
+### 1.1 Quantização sináptica e memória estrutural (Bartol et al., 2015)
 
-- **trilhas de auditoria** (promoção/rebaixamento de estado),
-- **estabilidade** contra microflutuações,
-- **ligação direta com capacidade sináptica**.
+Bartol et al. (2015) mostraram que sinapses corticais apresentam **resolução finita de estados estruturais**, com capacidade estimada próxima de ~4.7 bits por sinapse, equivalente a ~26 níveis discerníveis. O PyFolds traduz esse princípio para um modelo operacional usando `N` (filamentos) no intervalo padrão `0..31` (32 estados possíveis; 31 transições úteis), garantindo memória discreta auditável.
 
-### Regra estrutural simplificada
+No MPJRD:
 
-\[
-W(N) = \frac{\log_2(1+N)}{w_{scale}}
-\]
+- `N` representa o estado estrutural de longo prazo.
+- `I` representa o potencial interno de curto prazo.
+- `W` é derivado de `N` por mapeamento logarítmico:
 
 \[
-\Delta I \propto \eta \cdot R \cdot (pre \cdot post) \cdot (1 + \beta_w W) \cdot dt
+W(N) = \frac{\log_2(1 + N)}{w_{scale}}
 \]
 
-Com limiares:
-
-- se `I ≥ θ_LTP` → `N ← N+1` (até `n_max`),
-- se `I ≤ θ_LTD` → `N ← N-1` (até `n_min`).
-
-Essa dinâmica converte sinais de curto prazo em memória estrutural discreta (longo prazo), reduzindo a “caixa preta” porque cada transição de estado é rastreável.
+Consequência prática: pequenas flutuações em atividade não mudam diretamente a memória estrutural; primeiro elas acumulam em `I`, e só depois promovem/rebaixam `N` via limiares (`i_ltp_th`, `i_ltd_th`). Isso reduz instabilidade e aumenta interpretabilidade causal.
 
 ---
 
-## 3) Da competição dura (Hard-WTA) à Integração Cooperativa
+### 1.2 Subunidades dendríticas e neurônio de duas camadas (Poirazi & Mel, 2001)
 
-### Limite da abordagem Hard-WTA
+Poirazi & Mel (2001) propõem que neurônios piramidais podem ser aproximados como uma rede de **duas camadas**:
 
-No mecanismo winner-take-all estrito, apenas um dendrito domina a decisão por passo. Isso favorece separação forte, mas pode:
+1. camada de subunidades dendríticas não lineares;
+2. camada somática de integração/decisão.
 
-- descartar evidência complementar de outros ramos;
-- reduzir robustez em padrões compostos;
-- dificultar explicações multicausais.
+O PyFolds implementa diretamente essa hipótese:
 
-### Introdução da Integração Cooperativa (v2/v3)
+- cada `MPJRDDendrite` integra sinapses localmente com não linearidade;
+- `MPJRDNeuron` agrega saídas dendríticas (`v_dend`) para formar `u`;
+- o spike (`spikes`) é decidido no soma usando limiar adaptativo `theta`.
 
-A proposta de evolução substitui seleção dura por um acoplamento suave entre ramos:
-
-\[
-\alpha_d = \frac{\exp(v_d/\tau)}{\sum_j \exp(v_j/\tau)}
-\]
-
-\[
-u_{soma} = \sum_d \alpha_d \cdot v_d
-\]
-
-Com isso, múltiplos dendritos contribuem proporcionalmente. Resultado: melhor retenção de contexto e explicações mais fiéis ao padrão de entrada.
+Isso justifica arquiteturalmente por que a não-linearidade deve acontecer **antes** da combinação global.
 
 ---
 
-## 4) Lógica de interferência de ondas (Wave Version)
+### 1.3 Spikes dendríticos e computação local (Gidon et al., 2020)
 
-A versão Wave estende a saída binária para um regime de fase:
+Gidon et al. (2020) mostram evidências de que dendritos humanos geram eventos ativos (incluindo spikes dendríticos), ampliando poder computacional local e sensibilidade a padrões cooperativos.
 
-\[
-z_d = a_d e^{i\phi_d}
-\]
+No PyFolds, essa ideia aparece em dois níveis:
 
-\[
-z_{soma} = \sum_d z_d
-\]
+- **v2.0 (MPJRD):** competição/gating entre ramos após computação local;
+- **v3.0 (MPJRD-Wave):** integração cooperativa contínua entre ramos via ativação sigmoid por dendrito (`dendritic_activations`), reduzindo perda de informação causada por seleção dura.
 
-\[
-a_{eff} = |z_{soma}|,
-\quad
-\phi_{eff} = \arg(z_{soma})
-\]
-
-A interferência construtiva/destrutiva modela sinergia ou conflito entre dendritos, preservando informações que seriam perdidas em agregações escalares simples.
-
-```mermaid
-flowchart LR
-    X[Input] --> SD[Sinapses por dendrito]
-    SD --> VD[v_d por ramo]
-    VD --> C[Acoplamento cooperativo]
-    C --> W[Composição de ondas\na_d, phi_d]
-    W --> U[u_soma efetivo]
-    U --> Y[Spike / Fase]
-```
+Interpretação: o dendrito deixa de ser “fio passivo” e passa a ser unidade funcional que participa de inferência, plasticidade e explicação.
 
 ---
 
-## 5) Como isso enfrenta o problema da "Caixa Preta"
+### 1.4 Codificação por fase e latência (O'Keefe & Recce, 1993; Thorpe et al., 2001)
 
-| Problema em MLP tradicional | Mecanismo no PyFolds | Ganho de explicabilidade |
+A arquitetura MPJRD-Wave v3.0 é inspirada em dois eixos experimentais/computacionais:
+
+- **O'Keefe & Recce (1993):** informação pode ser codificada por fase relativa em oscilações neurais;
+- **Thorpe et al. (2001):** códigos temporais/latência suportam reconhecimento rápido e eficiente.
+
+No MPJRD-Wave:
+
+- amplitude funcional: `amplitude = log2(1 + relu(u))`;
+- fase dinâmica: `phase = (π/2) * (1 - sigmoid((u-theta)*phase_sensitivity))`;
+- frequência por classe/contexto: `base_frequency + k*frequency_step` ou `class_frequencies`;
+- saída em quadratura: `wave_real`, `wave_imag`, `wave_complex`.
+
+Assim, a saída não codifica apenas “disparou/não disparou”, mas também **quando** e **em qual fase/frequência** a evidência foi expressa.
+
+---
+
+## 2. Mapeamento científico → componentes do framework
+
+| Conceito científico | Implementação no PyFolds | Variáveis observáveis |
 |---|---|---|
-| Pesos internos sem semântica local | Estado sináptico (`N`, `I`, `W`) | Trajetória causal por sinapse |
-| Ativações ocultas agregadas sem estrutura | Dendritos explícitos (`v_dend`) | Atribuição por subunidade |
-| Decisão final sem decomposição biológica | Soma com limiar homeostático (`theta`) | Decisão auditável por estado |
-| Aprendizado monolítico | Online + consolidação offline | Separação aquisição vs estabilização |
+| Quantização estrutural | `MPJRDSynapse` | `N`, `I`, `W`, `protection`, `sat_time` |
+| Subunidade dendrítica | `MPJRDDendrite` | `v_dend`, `dendritic_activations` |
+| Integração somática adaptativa | `MPJRDNeuron` + `HomeostasisController` | `u`, `theta`, `r_hat`, `spikes` |
+| Modulação contextual | `Neuromodulator` | `R` |
+| Código temporal/fase | `MPJRDWaveNeuron` | `phase`, `latency`, `frequency`, `wave_real/imag` |
 
 ---
 
-## 6) Estrutura sugerida para próximos documentos
+## 3. Hipótese operacional do PyFolds
 
-- `ARCHITECTURE.md`: mapeamento C4 (Container/Component) do pipeline Sinapse→Dendrito→Soma→Axônio.
-- `ALGORITHM.md`: derivação completa do forward, plasticidade e sono.
-- `API_REFERENCE.md`: contrato formal de `MPJRDNeuron`, `MPJRDDendrite`, `StatisticsAccumulator`.
+A hipótese central do framework é:
+
+> Modelos com memória estrutural discreta (`N`), subunidades dendríticas explícitas e controle homeostático/modulatório produzem comportamento mais auditável e biologicamente plausível do que MLPs com pesos contínuos opacos.
+
+### Predições práticas esperadas
+
+1. Melhor rastreabilidade causal de aprendizado (transições de `N`).
+2. Menor sensibilidade a ruído de curto prazo (filtragem via `I`).
+3. Maior separabilidade de padrões compostos (dendritos como especialistas locais).
+4. Em v3.0, maior expressividade temporal por fase/frequência.
 
 ---
 
-## Referências-chave
+## 4. Referências
 
-- Bartol, T. M. et al. (2015). *Nanoconnectomic upper bound on the variability of synaptic plasticity*.
-- Mel, B. W. (1992, 1994). *Dendritic computation and NMDA-based pattern discrimination*.
-- Gidon, A. et al. (2020). *Dendritic action potentials and computation in human layer 2/3 cortical neurons*.
+- Bartol, T. M. et al. (2015). *Nanoconnectomic upper bound on the variability of synaptic plasticity*. eLife.
+- Poirazi, P., & Mel, B. W. (2001). *Impact of active dendrites and structural plasticity on the memory capacity of neural tissue*. Neuron.
+- Gidon, A. et al. (2020). *Dendritic action potentials and computation in human layer 2/3 cortical neurons*. Science.
+- O'Keefe, J., & Recce, M. L. (1993). *Phase relationship between hippocampal place units and the EEG theta rhythm*. Hippocampus.
+- Thorpe, S., Delorme, A., & Van Rullen, R. (2001). *Spike-based strategies for rapid processing*. Neural Networks.
