@@ -21,6 +21,7 @@ __version__ = "2.0.0"
 # ===== CORE COMPONENTS =====
 from .core.config import MPJRDConfig
 from .core.neuron import MPJRDNeuron
+from .core.neuron_v2 import MPJRDNeuronV2
 from .layers import MPJRDLayer
 from .network import MPJRDNetwork
 from .utils.types import LearningMode, ConnectionType
@@ -73,6 +74,7 @@ __all__ = [
     # Core
     "MPJRDConfig",
     "MPJRDNeuron",
+    "MPJRDNeuronV2",
     "MPJRDLayer",
     "MPJRDNetwork",
     

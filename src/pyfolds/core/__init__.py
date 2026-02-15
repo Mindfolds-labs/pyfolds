@@ -25,6 +25,7 @@ Uso básico:
 
 from .config import MPJRDConfig, NeuromodMode
 from .neuron import MPJRDNeuron
+from .neuron_v2 import MPJRDNeuronV2
 from .dendrite import MPJRDDendrite
 from .synapse import MPJRDSynapse
 from .homeostasis import HomeostasisController
@@ -37,6 +38,7 @@ __all__ = [
     # Classes principais
     "MPJRDConfig",
     "MPJRDNeuron",
+    "MPJRDNeuronV2",
     "MPJRDDendrite",
     "MPJRDSynapse",
     "HomeostasisController",
@@ -48,6 +50,7 @@ __all__ = [
     
     # Factory functions
     "create_neuron",
+    "create_neuron_v2",
     "create_accumulator",
     "create_accumulator_from_config",  # ✅ Adicionado
     
@@ -80,6 +83,13 @@ def create_neuron(cfg=None, **kwargs):
     if cfg is None:
         cfg = MPJRDConfig(**kwargs)
     return MPJRDNeuron(cfg)
+
+
+def create_neuron_v2(cfg=None, **kwargs):
+    """Cria neurônio MPJRD V2 (integração cooperativa)."""
+    if cfg is None:
+        cfg = MPJRDConfig(**kwargs)
+    return MPJRDNeuronV2(cfg)
 
 
 def create_accumulator(cfg, track_extra: bool = False):
