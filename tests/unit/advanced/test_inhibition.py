@@ -58,3 +58,15 @@ class TestInhibitionLayer:
         
         assert 'inh_spikes' in out
         assert out['inh_potential'].shape == (2,)
+
+    def test_e2i_initialization_is_deterministic(self):
+        """E→I should be reproducible across instances."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        from pyfolds.advanced import InhibitionLayer
+
+        layer_a = InhibitionLayer(n_excitatory=10, n_inhibitory=3)
+        layer_b = InhibitionLayer(n_excitatory=10, n_inhibitory=3)
+
+        assert torch.allclose(layer_a.W_E2I, layer_b.W_E2I)

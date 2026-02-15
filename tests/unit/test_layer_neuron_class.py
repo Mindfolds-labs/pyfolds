@@ -24,3 +24,9 @@ def test_layer_rejects_invalid_neuron_cls():
 
     with pytest.raises(TypeError):
         MPJRDLayer(n_neurons=2, cfg=cfg, neuron_cls=torch.nn.Linear)
+
+
+def test_layer_has_no_legacy_neuron_class_attr():
+    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    layer = MPJRDLayer(n_neurons=3, cfg=cfg)
+    assert not hasattr(layer, "neuron_class")

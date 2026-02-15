@@ -75,11 +75,12 @@ class ShortTermDynamicsMixin:
         self.u_stp.copy_(u_prev * decay_fac + self.U * (1 - u_prev) * pre_spikes)
         self.u_stp.clamp_(0.0, 1.0)
         
-        # Atualiza recursos (R)
-        # R_new = decay_rec * R_prev + (1 - decay_rec) * (1 - R_prev) - u * R_prev * pre_spikes
-        # Usa R_prev explicitamente para manter a forma correta de Tsodyks-Markram.
+        # Atualiza recursos (R) - Tsodyks-Markram (1997)
+        # R_new = R_old * decay + (1 - R_old) * (1 - decay)
         R_prev = self.R_stp.clone()
-        self.R_stp.copy_(decay_rec * R_prev + (1 - decay_rec) * (1 - R_prev))
+        self.R_stp.copy_(
+            decay_rec * R_prev + (1 - decay_rec) * (1 - R_prev)
+        )
         
         # Termo de depressão: -u * R * pre_spikes
         depression = -self.u_stp * R_prev * pre_spikes

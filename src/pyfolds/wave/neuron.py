@@ -7,6 +7,7 @@ from typing import Dict, Optional
 
 from ..core.neuron import MPJRDNeuron
 from ..utils.types import LearningMode
+from ..utils.validation import validate_input
 from .config import MPJRDWaveConfig
 
 
@@ -56,6 +57,10 @@ class MPJRDWaveNeuron(MPJRDNeuron):
             "wave_complex": torch.complex(amplitude * torch.cos(angle), amplitude * torch.sin(angle)),
         }
 
+    @validate_input(
+        expected_ndim=3,
+        expected_shape_fn=lambda self: (self.cfg.n_dendrites, self.cfg.n_synapses_per_dendrite),
+    )
     def forward(
         self,
         x: torch.Tensor,
@@ -68,13 +73,7 @@ class MPJRDWaveNeuron(MPJRDNeuron):
 
         device = self.theta.device
         x = x.to(device)
-        B, D, S = x.shape
-
-        if D != self.cfg.n_dendrites or S != self.cfg.n_synapses_per_dendrite:
-            raise ValueError(
-                f"Esperado ({self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}), "
-                f"recebido ({D}, {S})"
-            )
+        B, D, _ = x.shape
 
         v_dend = torch.zeros(B, D, device=device)
         for d_idx, dend in enumerate(self.dendrites):

@@ -225,25 +225,20 @@ class MPJRDNetwork(nn.Module):
         # spikes * weights -> [B, to]
         weighted = spikes @ weights  # [B, to]
         
-        # ✅ DISTRIBUIÇÃO REALISTA ENTRE DENDRITOS
-        # Cria tensor de entrada [B, to, D, S]
+        # Distribui em padrão esparso e estável entre dendritos/sinapses
         input_tensor = torch.zeros(B, to_layer_obj.n_neurons, D, S, device=device)
-        
-        # Dendrito principal recebe 40% da ativação
-        main_dendrite = 0
-        input_tensor[:, :, main_dendrite, 0] = weighted * 0.4
-        
-        # Dendritos secundários recebem o restante distribuído
-        remaining = weighted * 0.6  # [B, to]
-        if D > 1:
-            for d in range(1, D):
-                # Cada dendrito secundário recebe uma fração
-                # A primeira sinapse de cada dendrito recebe a ativação
-                input_tensor[:, :, d, 0] = remaining / (D - 1)
-        else:
-            # Edge case: camada monodendrítica (evita divisão por zero)
-            input_tensor[:, :, main_dendrite, 0] = weighted
-        
+
+        # Gerador determinístico para reprodutibilidade
+        generator = torch.Generator(device='cpu')
+        generator.manual_seed(42)
+
+        active_synapses = max(1, S // 4)
+        for d_idx in range(D):
+            syn_indices = torch.randperm(S, generator=generator)[:active_synapses]
+            input_tensor[:, :, d_idx, syn_indices] = (
+                weighted.unsqueeze(-1) / float(active_synapses)
+            )
+
         return input_tensor
 
     def build(self) -> 'MPJRDNetwork':
