@@ -1,144 +1,70 @@
-# ARCHITECTURE — PyFolds (C4 + Runtime Sequence)
+# ARCHITECTURE — PyFOLDS MPJRD (C4)
 
-Este documento descreve a arquitetura do PyFolds usando a abordagem C4 e um diagrama de sequência do `forward`.
+Este documento descreve a arquitetura do PyFOLDS usando a visão C4 (Context, Container, Component), com foco no `MPJRDNeuron` e no processamento dendrítico assimétrico.
 
-## 1. C4 — Contexto (C1)
+## 1) Context (C1)
 
-```mermaid
-flowchart LR
-    U[Pesquisador / Engenheiro de ML]
-    P[PyFolds\nMPJRD v2 + MPJRD-Wave v3]
-    T[PyTorch\nTensores / Autograd / Device]
+**Sistema:** PyFOLDS (framework de computação neural bioinspirada).
 
-    U -->|Configura experimento, treina, analisa métricas| P
-    P -->|Executa operações tensorizadas| T
-    T -->|Backend numérico (CPU/GPU)| P
-```
+**Atores externos principais:**
+- Pesquisador/Engenheiro de ML que define experimentos e hiperparâmetros.
+- Pipeline de dados (ex.: MNIST, sinais contínuos, streams sensoriais).
+- Stack de observabilidade (telemetria e logs).
 
-**Escopo do sistema:** modelagem neural bioinspirada com sinapse estrutural, processamento dendrítico, homeostase, neuromodulação e extensões de fase/frequência.
+**Responsabilidade do sistema:**
+- Executar integração dendrítica compartimentalizada.
+- Produzir disparo somático com homeostase adaptativa.
+- Acumular e aplicar plasticidade (online/batch/sono).
 
----
+## 2) Container (C2)
 
-## 2. C4 — Containers (C2)
+### `pyfolds.core`
+Núcleo biofísico:
+- `config.py`: parâmetros estruturais e dinâmicos (`MPJRDConfig`).
+- `synapse.py`: estado sináptico (N, W, I, proteção).
+- `dendrite.py`: integração local por ramo dendrítico.
+- `neuron.py`: ciclo completo de inferência e aprendizado.
+- `homeostasis.py`, `neuromodulation.py`, `accumulator.py`: controle adaptativo e acumulação estatística.
 
-```mermaid
-flowchart TB
-    subgraph PyFolds
-      C1[core\nConfig, Synapse, Dendrite, Neuron, Homeostasis, Neuromodulation]
-      C2[advanced\nSTDP, adaptation, inhibition, refractory, short-term, backprop]
-      C3[wave\nWaveConfig, WaveNeuron\nIntegração cooperativa + fase/frequência]
-      C4[utils\nTipos, matemática, logging, helpers]
-    end
+### `pyfolds.network`
+Orquestração de múltiplos neurônios e estrutura de rede.
 
-    User[Usuário/Pesquisador] --> C1
-    User --> C2
-    User --> C3
-    C1 --> C4
-    C2 --> C1
-    C2 --> C4
-    C3 --> C1
-    C3 --> C4
-```
+### `pyfolds.advanced`
+Mecanismos complementares (STDP, refractory, inhibition, etc.).
 
----
+### `pyfolds.telemetry`
+Eventos estruturados de forward, commit e sono.
 
-## 3. C4 — Componentes do módulo `core` (C3)
+## 3) Component (C3) — `MPJRDNeuron`
 
-```mermaid
-classDiagram
-    class MPJRDNeuron {
-      +forward(x, reward, mode, collect_stats, dt)
-      +apply_plasticity(dt, reward)
-      +sleep(duration)
-      +get_metrics()
-      -_compute_R_endogenous(current_rate, saturation_ratio)
-      -_apply_online_plasticity(x, post_rate, R_tensor, dt, mode)
-    }
+Pipeline interno do `forward`:
+1. **Integração dendrítica local:** cada dendrito recebe `x[:, d, :]` e aplica não linearidade local.
+2. **Competição espacial (WTA):** apenas o ramo vencedor contribui para o soma.
+3. **Integração somática:** soma dos ramos após gating.
+4. **Disparo:** `spike = 1[u >= θ]`.
+5. **Homeostase:** atualização de taxa alvo (exceto inferência).
+6. **Neuromodulação:** sinal externo ou endógeno.
+7. **Acumulação batch:** grava estatísticas para atualização deferida.
+8. **Telemetria e logging:** emissão de eventos e rastreabilidade.
 
-    class MPJRDDendrite {
-      +forward(x)
-      +update_synapses_rate_based(pre_rate, post_rate, R, dt, mode)
-      +consolidate(dt)
-      +sleep_step(dt)
-      +N_mean
-      +I_mean
-      +W_mean
-    }
+## 4) Invariante arquitetural crítico
 
-    class MPJRDSynapse {
-      +N: int
-      +I: float
-      +W: float
-      +protection: bool
-      +sat_time: float
-      +update(pre_rate, post_rate, R, dt, mode)
-      +consolidate(dt)
-      +sleep_step(dt)
-      +reset()
-    }
+Para evitar degeneração para perceptron clássico:
+- A não linearidade deve ocorrer **dentro de cada dendrito** (compartimentalização).
+- A combinação global deve ocorrer **após** a transformação local.
 
-    class HomeostasisController {
-      +update(spike_rate)
-      +theta
-      +r_hat
-    }
+No desenho atual do PyFOLDS, isso é respeitado por:
+- `dend(x[:, d, :])` por ramo.
+- WTA em `v_dend`.
+- Soma somática depois do gating.
 
-    class Neuromodulator {
-      +forward(external_reward, current_rate, saturation_ratio, r_hat)
-      +mode
-    }
+## 5) Diagrama técnico
 
-    MPJRDNeuron --> MPJRDDendrite : compõe D dendritos
-    MPJRDDendrite --> MPJRDSynapse : compõe S sinapses
-    MPJRDNeuron --> HomeostasisController : atualiza theta/r_hat
-    MPJRDNeuron --> Neuromodulator : calcula R
-```
+Veja o fluxo em Mermaid em: `docs/diagrams/dendritic_processing_flow.mmd`.
 
----
+## 6) Padrões e robustez implementados
 
-## 4. Diagrama de sequência — `forward_pass`
-
-```mermaid
-sequenceDiagram
-    participant Client as Treinador/Loop
-    participant Neuron as MPJRDNeuron
-    participant D as MPJRDDendrite[*]
-    participant Syn as MPJRDSynapse[*]
-    participant H as HomeostasisController
-    participant N as Neuromodulator
-
-    Client->>Neuron: forward(x, reward, mode)
-    loop para cada dendrito d
-      Neuron->>D: forward(x[:, d, :])
-      D->>Syn: consulta W (derivado de N)
-      Syn-->>D: contribuição sináptica
-      D-->>Neuron: v_dend[:, d]
-    end
-
-    Neuron->>Neuron: gating/integração (WTA ou cooperativo)
-    Neuron->>Neuron: u = soma(v_dend_processado)
-    Neuron->>Neuron: spikes = 1[u >= theta]
-
-    alt modo != inference
-      Neuron->>H: update(spike_rate)
-      H-->>Neuron: theta, r_hat atualizados
-    end
-
-    Neuron->>N: forward(reward, spike_rate, saturation_ratio, r_hat)
-    N-->>Neuron: R
-
-    opt batch com defer_updates
-      Neuron->>Neuron: stats_acc.accumulate(x, gated, spikes)
-    end
-
-    Client<<--Neuron: {spikes, u, v_dend, theta, r_hat, R, ...}
-```
-
----
-
-## 5. Decisões arquiteturais
-
-- **Interpretabilidade por estado:** sinapse mantém `N` e `I` explícitos.
-- **Separação de escalas temporais:** aquisição online e consolidação/sleep offline.
-- **Extensibilidade:** v3.0 reutiliza o core e estende inferência com fase/frequência.
-- **Compatibilidade com PyTorch:** módulos `nn.Module`, buffers registrados e operações vetorizadas.
+- **Factory Pattern:** `pyfolds.core.factory` centraliza criação de neurônios (`NeuronFactory`, `NeuronType`) e permite extensibilidade por registro.
+- **Validação de entrada:** `pyfolds.utils.validation.validate_input` valida shape/tipo/faixa em `forward` de neurônios core/wave.
+- **Checkpoint versionado:** `pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint` inclui metadados (`version`, `git_hash`, `config`) e hash de integridade.
+- **Health checks:** `pyfolds.monitoring.health.NeuronHealthCheck` classifica saúde em `healthy/degraded/critical` para observabilidade operacional.

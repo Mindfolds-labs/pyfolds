@@ -93,6 +93,7 @@ For efficient onboarding and technical depth progression:
 
 - [`guide/core_concepts.md`](guide/core_concepts.md)
 - [`guide/neuron_architecture.md`](guide/neuron_architecture.md)
+- [`guide/engineering_patterns.md`](guide/engineering_patterns.md)
 - [`guide/plasticity.md`](guide/plasticity.md)
 - [`guide/homeostasis.md`](guide/homeostasis.md)
 - [`guide/neuromodulation.md`](guide/neuromodulation.md)
@@ -123,6 +124,7 @@ For efficient onboarding and technical depth progression:
 
 | Design Concern | Primary Artifact | Verification Surface |
 |---|---|---|
+| Engenharia operacional (Factory/Validation/Checkpoint/Health) | `guide/engineering_patterns.md` | testes unitários + contratos de uso |
 | Core neuron pipeline | `guide/neuron_architecture.md`, `api/core/neuron.md` | forward outputs (`u`, `v_dend`, `spikes`) |
 | Structural plasticity (`N`, `I`, `W`) | `guide/plasticity.md`, `api/core/synapse.md` | state transitions and thresholds |
 | Homeostatic stability | `guide/homeostasis.md`, `api/core/homeostasis.md` | `theta`, `r_hat`, target rate dynamics |
