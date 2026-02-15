@@ -32,6 +32,8 @@ from .telemetry import (
     TelemetryConfig,
     
     # Sinks
+    Sink,
+    NoOpSink,
     MemorySink,
     ConsoleSink,
     JSONLinesSink,
@@ -81,6 +83,8 @@ __all__ = [
     # Telemetry (para MindMetrics/MindAudit)
     "TelemetryController",
     "TelemetryConfig",
+    "Sink",
+    "NoOpSink",
     "MemorySink",
     "ConsoleSink",
     "JSONLinesSink",

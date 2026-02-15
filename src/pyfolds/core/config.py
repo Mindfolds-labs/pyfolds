@@ -132,9 +132,9 @@ class MPJRDConfig:
         """Validações pós-inicialização."""
         try:
             import torch
-            self._torch = torch
+            object.__setattr__(self, '_torch', torch)
         except ImportError:
-            self._torch = None
+            object.__setattr__(self, '_torch', None)
             warnings.warn("PyTorch não encontrado", RuntimeWarning)
         
         # Resolve device

@@ -13,6 +13,16 @@ def small_config():
         plastic=True
     )
 
+
+@pytest.fixture
+def full_config():
+    """Configuração completa para testes de mecanismos avançados."""
+    return MPJRDConfig(
+        n_dendrites=4,
+        n_synapses_per_dendrite=8,
+        plastic=True
+    )
+
 @pytest.fixture
 def tiny_config():
     """Configuração mínima para testes de unidade."""
