@@ -1,4 +1,4 @@
-# PyFolds
+# PyFolds - Core Neural Computation Framework
 
 <div align="center">
   
@@ -177,6 +177,7 @@ Issues: github.com/Mindfolds-labs/pyfolds/issues
 | **Técnico** | Foco no código e na arquitetura |
 
 **Pronto para colar!** 🚀
+
 
 
 
