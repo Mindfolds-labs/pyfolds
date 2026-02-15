@@ -1,0 +1,106 @@
+classDiagram
+    direction TB
+
+    class MPJRDConfig {
+      +int n_dendrites
+      +int n_synapses_per_dendrite
+      +int n_min
+      +int n_max
+      +float w_scale
+      +float i_eta
+      +float i_gamma
+      +float i_ltp_th
+      +float i_ltd_th
+      +float theta_init
+      +float theta_min
+      +float theta_max
+      +str neuromod_mode
+      +bool plastic
+      +bool defer_updates
+      +get_ts(param_name) float
+      +get_decay_rate(tau, dt) float
+      +to_dict() Dict
+      +from_dict(data) MPJRDConfig
+    }
+
+    class MPJRDSynapse {
+      +Tensor N
+      +Tensor I
+      +Tensor u
+      +Tensor R
+      +Tensor protection
+      +Tensor sat_time
+      +Tensor eligibility
+      +W() Tensor
+      +update(pre_rate, post_rate, R, dt, mode) None
+      +consolidate(dt) None
+      +sleep_step(dt) None
+      +reset() None
+      +to_dict() Dict
+      +from_dict(data) None
+    }
+
+    class MPJRDDendrite {
+      +cfg: MPJRDConfig
+      +synapses: ModuleList~MPJRDSynapse~
+      +forward(x) Tensor
+      +update_synapses_rate_based(pre_rate, post_rate, R, dt, mode) None
+      +consolidate(dt) None
+      +sleep_step(dt) None
+      +reset() None
+      +N_mean() float
+      +I_mean() float
+      +W_mean() float
+    }
+
+    class StatisticsAccumulator {
+      +accumulate(x, gated, spikes) None
+      +reset() None
+      +get_averages() Dict
+      +has_data() bool
+      +n_samples: int
+    }
+
+    class HomeostasisController {
+      +cfg: MPJRDConfig
+      +theta: Tensor
+      +r_hat: Tensor
+      +update(spike_rate) None
+      +get_state() Dict
+      +set_state(theta, r_hat) None
+    }
+
+    class Neuromodulator {
+      +cfg: MPJRDConfig
+      +forward(external_reward, current_rate, saturation_ratio, r_hat) float
+    }
+
+    class MPJRDNeuron {
+      +cfg: MPJRDConfig
+      +dendrites: ModuleList~MPJRDDendrite~
+      +homeostasis: HomeostasisController
+      +neuromodulator: Neuromodulator
+      +stats_acc: StatisticsAccumulator
+      +theta: Tensor
+      +r_hat: Tensor
+      +forward(x, reward, mode, collect_stats, dt) Dict
+      +apply_plasticity(dt, reward) None
+      +sleep(duration) None
+      +reset_state() None
+      +set_learning_mode(mode) None
+      +get_metrics() Dict
+      -_compute_R_endogenous(current_rate, saturation_ratio) float
+      -_apply_online_plasticity(x, post_rate, R_tensor, dt, mode) None
+    }
+
+    MPJRDConfig <.. MPJRDSynapse : configura
+    MPJRDConfig <.. MPJRDDendrite : configura
+    MPJRDConfig <.. HomeostasisController : configura
+    MPJRDConfig <.. Neuromodulator : configura
+    MPJRDConfig <.. MPJRDNeuron : configura
+
+    MPJRDDendrite *-- MPJRDSynapse
+    MPJRDNeuron *-- MPJRDDendrite
+    MPJRDNeuron *-- HomeostasisController
+    MPJRDNeuron *-- Neuromodulator
+    MPJRDNeuron *-- StatisticsAccumulator

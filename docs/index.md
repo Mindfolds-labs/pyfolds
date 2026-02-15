@@ -1,216 +1,151 @@
-# PyFolds - Core Neural Computation Framework
+# PyFolds Documentation Index
 
-<div align="center">
-  
-  
-  [![PyPI](https://img.shields.io/pypi/v/pyfolds?style=flat-square&logo=pypi)](https://pypi.org/project/pyfolds/)
-  [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-orange?style=flat-square&logo=pytorch)](https://pytorch.org)
-  [![Docs](https://img.shields.io/badge/docs-latest-blue?style=flat-square)](https://pyfolds.readthedocs.io)
-  [![PyPI version](https://badge.fury.io/py/pyfolds.svg)](https://badge.fury.io/py/pyfolds)
-  [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![GitHub](https://img.shields.io/badge/GitHub-Mindfolds--labs%2Fpyfolds-blue)](https://github.com/Mindfolds-labs/pyfolds)
-
-  ---
-  [📚 Documentação](#-documentação) • 
-  [🚀 Instalação](#-instalação) • 
-  [🔥 Quick Start](#-quick-start) • 
-  [🧪 Exemplos](#-exemplos) • 
-  [🤝 Contribuir](#-contribuindo)
-  
-  ---
-  
-  
-</div>
+> **Document Status:** Stable  
+> **Audience:** Researchers, ML Engineers, Systems Engineers  
+> **Standard Orientation:** IEEE-style technical documentation (structured, traceable, reproducible)
 
 ---
 
-## 📋 Tabela de Conteúdos
+## Abstract
 
-- [Visão Geral](#-visão-geral)
-- [Arquitetura](#-arquitetura)
-- [Instalação](#-instalação)
-- [Quick Start](#-quick-start)
-- [Componentes](#-componentes)
-- [Exemplos](#-exemplos)
-- [Documentação](#-documentação)
-- [Performance](#-performance)
-- [Contribuição](#-contribuindo)
-- [Licença](#-licença)
-- [Citação](#-citação)
-- [Contato](#-contato)
+This documentation set defines the technical and scientific baseline for **PyFolds v2.0/v3.0**, a bio-inspired neural computation framework centered on the **MPJRD (Multi-Pathway Joint-Resource Dendritic)** model. The goal is to provide both operational guidance (*how to use*) and mechanistic rationale (*why it works*), with explicit traceability from architecture to API and runtime behavior.
 
 ---
 
+## 1. Purpose and Scope
 
-## 📋 Visão Geral
+### 1.1 Purpose
 
-**PyFolds** é um framework Python para simulação de neurônios e redes neurais com 9 mecanismos biologicamente inspirados. O modelo MPJRD (Multi-Pathway Joint-Resource Dendritic) implementa plasticidade estrutural explícita, consolidação offline e processamento dendrítico multi-compartimental.
+This index is the canonical entry point for project documentation. It organizes content to support:
 
-## Arquitetura
+- onboarding and setup,
+- architecture and design understanding,
+- API-level implementation and integration,
+- scientific interpretation of model behavior.
 
-```
-pyfolds/
-├── core/          # Núcleo: neurônio MPJRD, sinapses, dendritos
-├── advanced/      # Mecanismos: STDP, adaptação, inibição, backprop
-├── layers/        # Camadas de neurônios para redes
-├── network/       # Redes neurais com conectividade topológica
-├── telemetry/     # Sistema de monitoramento e logging
-└── utils/         # Utilitários: math, device, tipos, logging
+### 1.2 Scope
+
+The documentation covers:
+
+- core MPJRD computation pipeline,
+- advanced mechanisms (STDP, adaptation, inhibition, refractory, short-term dynamics),
+- telemetry/observability surfaces,
+- scientific logic and theoretical references.
+
+---
+
+## 2. Document Architecture (C4-Aligned)
+
+PyFolds documentation is structured in layers, aligned with C4 communication practices:
+
+- **Level 1 — Context:** PyFolds in research/engineering workflows.
+- **Level 2 — Containers:** `core`, `advanced`, `layers`, `network`, `telemetry`, `utils`.
+- **Level 3 — Components:** Synapse → Dendrite → Soma → Axon.
+- **Level 4 — Code:** classes, methods, data contracts, runtime outputs.
+
+```mermaid
+flowchart LR
+    A[Context\nResearch / Engineering] --> B[Containers\ncore | advanced | layers | network | telemetry | utils]
+    B --> C[Components\nSynapse -> Dendrite -> Soma -> Axon]
+    C --> D[Code\nClasses | Methods | Contracts]
 ```
 
-## 🧬 Mecanismos
+---
 
-| # | Mecanismo | Descrição | Fonte |
-|---|-----------|-----------|-------|
-| 1 | Força Sináptica (N) | Memória estrutural (0-31) | `core/synapse.py` |
-| 2 | Potencial interno (I) | Memória volátil | `core/synapse.py` |
-| 3 | Dinâmica de curto prazo | Facilitação/Depressão | `advanced/short_term.py` |
-| 4 | Homeostase | Theta adaptativo | `core/homeostasis.py` |
-| 5 | Neuromodulação | 3 modos: external, capacity, surprise | `core/neuromodulation.py` |
-| 6 | Backpropagação dendrítica | Comunicação soma → dendrito | `advanced/backprop.py` |
-| 7 | Adaptação (SFA) | Spike-frequency adaptation | `advanced/adaptation.py` |
-| 8 | STDP | Spike-timing dependent plasticity | `advanced/stdp.py` |
-| 9 | Consolidação two-factor | Sono para transferência I → N | `core/synapse.py` |
+## 3. Runtime Processing View
+
+The operational flow below emphasizes traceability and observability of model decisions.
+
+```mermaid
+flowchart LR
+    X[Input Tensor\nB x D x S] --> S[Synapse State\nN, I, W]
+    S --> D[Dendritic Integration\nv_dend]
+    D --> G[Somatic Gating\ncompetitive in current implementation]
+    G --> U[Somatic Potential\nu]
+    U --> K[Spike Decision\ntheta]
+    K --> T[Telemetry / Logs\nforward, commit, sleep]
+    T --> P[Plasticity / Consolidation]
+```
 
 ---
 
-## ⚡ Quick Start
+## 4. Recommended Reading Sequence
 
-```python
-import torch
-import pyfolds
+For efficient onboarding and technical depth progression:
 
-# Configuração
-cfg = pyfolds.MPJRDConfig(n_dendrites=4)
-neuron = pyfolds.MPJRDNeuron(cfg)
-
-# Dados
-x = torch.randn(16, 4, 32)
-
-# Forward
-out = neuron(x)
-print(f"Spike rate: {out['spike_rate'].item():.2%}")
-
-# Batch learning
-neuron.set_mode(pyfolds.LearningMode.BATCH)
-for _ in range(10):
-    out = neuron(x, collect_stats=True)
-neuron.apply_plasticity()
-
-# Consolidação (sono)
-neuron.set_mode(pyfolds.LearningMode.SLEEP)
-neuron.sleep(duration=100.0)
-
-📦 Instalação
-
-# Usuário final
-pip install pyfolds
-
-# Desenvolvedor
-git clone https://github.com/Mindfolds-labs/pyfolds.git
-cd pyfolds
-pip install -e ".[dev,docs]"
-
-Dependências:
-
-Core: torch>=2.0.0, torchvision>=0.15.0, numpy>=1.19.0
-
-Dev: pytest, black, mypy, pre-commit
-
-Docs: sphinx, sphinx-rtd-theme
-
-📊 Documentação
-Seção	Descrição
-Instalação	Requisitos e setup
-Quick Start	Primeiros passos
-Guias	Conceitos e arquitetura
-API	Referência completa
-Tutoriais	Exemplos práticos
-Contribuição	Guia para desenvolvedores
-
-🧪 Exemplos
-
-# Básico
-python examples/basic_neuron.py
-
-# Batch learning
-python examples/batch_learning.py
-
-# Rede neural
-python examples/network_example.py
-
-# Telemetria
-python examples/telemetry_example.py
-
-📈 Performance
-Operação	CPU (i9)	GPU (RTX 4090)
-Forward (batch=64)	0.12 ms	0.08 ms
-Batch learning (100 steps)	2.3 s	0.18 s
-Sono (1000 replay)	4.1 s	0.32 s
-🤝 Contribuição
-Fork o repositório
-
-Crie uma branch: git checkout -b feature/nova-funcionalidade
-
-Commit: git commit -m '✨ feat: adiciona funcionalidade'
-
-Push: git push origin feature/nova-funcionalidade
-
-Abra um Pull Request
-
-Padrões:
-
-✨ feat: nova funcionalidade
-
-🐛 fix: correção de bug
-
-📚 docs: documentação
-
-🎨 style: formatação
-
-♻️ refactor: refatoração
-
-🧪 test: testes
-
-📄 Licença
-MIT License © 2025 Mindfolds Labs
-
-📬 Contato
-Autor: Antônio Carlos — jrduraes90@gmail.com
-
-GitHub: github.com/Mindfolds-labs/pyfolds
-
-Issues: github.com/Mindfolds-labs/pyfolds/issues
-
+1. [`installation.md`](installation.md)
+2. [`quickstart.md`](quickstart.md)
+3. [`guide/core_concepts.md`](guide/core_concepts.md)
+4. [`guide/neuron_architecture.md`](guide/neuron_architecture.md)
+5. [`api/core.md`](api/core.md)
+6. [`SCIENTIFIC_LOGIC.md`](SCIENTIFIC_LOGIC.md)
 
 ---
 
-## 🎯 **Características desta versão:**
+## 5. Documentation Map
 
-| Aspecto | Implementação |
-|---------|---------------|
-| **Clean** | Sem emojis excessivos, formatação limpa |
-| **Profissional** | Badges informativos, estrutura clara |
-| **Escalável** | Links absolutos, pronto para tradução |
-| **Completo** | Visão geral, mecanismos, instalação, exemplos |
-| **Técnico** | Foco no código e na arquitetura |
+### 5.1 Getting Started
 
-**Pronto para colar!** 🚀
+- [`installation.md`](installation.md)
+- [`quickstart.md`](quickstart.md)
 
+### 5.2 Guides (Conceptual and Operational)
 
+- [`guide/core_concepts.md`](guide/core_concepts.md)
+- [`guide/neuron_architecture.md`](guide/neuron_architecture.md)
+- [`guide/engineering_patterns.md`](guide/engineering_patterns.md)
+- [`guide/plasticity.md`](guide/plasticity.md)
+- [`guide/homeostasis.md`](guide/homeostasis.md)
+- [`guide/neuromodulation.md`](guide/neuromodulation.md)
+- [`guide/advanced_mechanisms.md`](guide/advanced_mechanisms.md)
+- [`guide/telemetry.md`](guide/telemetry.md)
+- [`guide/logging.md`](guide/logging.md)
 
+### 5.3 API Reference
 
+- [`api/core.md`](api/core.md)
+- [`api/network.md`](api/network.md)
+- [`api/layers.md`](api/layers.md)
+- [`api/advanced.md`](api/advanced.md)
+- [`api/utils.md`](api/utils.md)
+- [`api/telemetry.md`](api/telemetry.md)
 
+### 5.4 Theory and Scientific Logic
 
+- [`SCIENTIFIC_LOGIC.md`](SCIENTIFIC_LOGIC.md)
+- [`theory/mpjrd_model.md`](theory/mpjrd_model.md)
+- [`theory/three_factor_learning.md`](theory/three_factor_learning.md)
+- [`theory/two_factor_consolidation.md`](theory/two_factor_consolidation.md)
+- [`theory/stdp_mechanism.md`](theory/stdp_mechanism.md)
 
+---
 
+## 6. Traceability Matrix (Design → Artifact)
 
+| Design Concern | Primary Artifact | Verification Surface |
+|---|---|---|
+| Engenharia operacional (Factory/Validation/Checkpoint/Health) | `guide/engineering_patterns.md` | testes unitários + contratos de uso |
+| Core neuron pipeline | `guide/neuron_architecture.md`, `api/core/neuron.md` | forward outputs (`u`, `v_dend`, `spikes`) |
+| Structural plasticity (`N`, `I`, `W`) | `guide/plasticity.md`, `api/core/synapse.md` | state transitions and thresholds |
+| Homeostatic stability | `guide/homeostasis.md`, `api/core/homeostasis.md` | `theta`, `r_hat`, target rate dynamics |
+| Neuromodulatory control | `guide/neuromodulation.md`, `api/core/neuromodulation.md` | `R` behavior across modes |
+| Batch/sleep consolidation | `api/core/accumulator.md`, theory docs | commit/sleep phase outputs |
+| Observability and auditability | `guide/telemetry.md`, `api/telemetry.md` | event stream and sink outputs |
 
+---
 
+## 7. Documentation Quality Principles
 
+This documentation follows engineering-oriented principles:
 
+- **Consistency:** terminology and naming aligned with source code.
+- **Scannability:** tables, section numbering, and concise subsections.
+- **Reproducibility:** runnable examples and explicit mode semantics.
+- **Traceability:** each conceptual statement maps to concrete artifacts.
+- **Non-ambiguity:** explicit distinction between current behavior and roadmap.
 
+---
 
+## 8. Versioning Note
 
-
+This index is maintained for the `v2.0/v3.0` documentation track. Behavioral details marked as roadmap should not be interpreted as current runtime guarantees unless explicitly implemented in code.

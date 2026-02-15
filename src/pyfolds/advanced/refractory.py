@@ -1,7 +1,7 @@
 """Mixin para período refratário."""
 
 import torch
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 from .time_mixin import TimedMixin
 
 
@@ -32,19 +32,28 @@ class RefractoryMixin(TimedMixin):
             )
     
     def _check_refractory_batch(self, current_time: float, 
-                                 batch_size: int) -> tuple[torch.Tensor, torch.Tensor]:
+                                 batch_size: int) -> Tuple[torch.Tensor, torch.Tensor]:
         time_since = current_time - self.last_spike_time
-        blocked = time_since < self.t_refrac_abs
-        in_relative = (~blocked) & (time_since < self.t_refrac_rel)
-        theta_boost = torch.where(
-            in_relative,
-            torch.full_like(time_since, self.refrac_rel_strength),
-            torch.zeros_like(time_since)
-        )
-        return blocked, theta_boost
+        # Refratário absoluto: bloqueia spikes imediatamente após disparo
+    in_absolute = time_since <= self.t_refrac_abs
+
+ # Refratário relativo: threshold elevado
+        in_relative = (
+    (time_since > self.t_refrac_abs) &
+    (time_since <= self.t_refrac_rel)
+)
+
+   blocked = in_absolute | in_relative
+
+theta_boost = torch.where(
+    in_relative,
+    torch.full_like(time_since, self.refrac_rel_strength),
+    torch.zeros_like(time_since),
+)
+
+return in_absolute, theta_boost
     
     def _update_refractory_batch(self, spikes: torch.Tensor, dt: float = 1.0):
-        self._increment_time(dt)
         current_time = self.time_counter.item()
         spike_mask = spikes > 0.5
         self.last_spike_time = torch.where(
@@ -52,6 +61,7 @@ class RefractoryMixin(TimedMixin):
             torch.full_like(self.last_spike_time, current_time),
             self.last_spike_time
         )
+        self._increment_time(dt)
     
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         batch_size = x.shape[0]
@@ -67,7 +77,11 @@ class RefractoryMixin(TimedMixin):
         spikes = output['spikes'].clone()
         
         spikes = torch.where(blocked, torch.zeros_like(spikes), spikes)
-        theta_eff = output['theta'] + theta_boost.unsqueeze(1)
+        # theta_eff deve permanecer 1-D ([B]) para preservar a semântica
+        # ponto-a-ponto do refratário por amostra. O unsqueeze(1) induzia
+        # broadcasting para [B, B], corrompendo spikes e o estado dos
+        # mecanismos subsequentes (ex.: adaptação).
+        theta_eff = output['theta'] + theta_boost
         spikes_rel = (output['u'] >= theta_eff).float()
         
         final_spikes = torch.where(blocked, torch.zeros_like(spikes), spikes_rel)

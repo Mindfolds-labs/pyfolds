@@ -1,0 +1,18 @@
+flowchart TD
+    A[Input x[B,D,S]] --> B[For each dendrite d: v_d = dendrite(x[:,d,:])]
+    B --> C[Winner-Take-All across D]
+    C --> D[gated_d only for argmax]
+    D --> E[Somatic potential u = sum(gated)]
+    E --> F{u >= theta?}
+    F -->|Yes| G[Spike = 1]
+    F -->|No| H[Spike = 0]
+    G --> I[Stats: spike_rate, saturation]
+    H --> I
+    I --> J[Homeostasis update]
+    I --> K[Neuromodulation R]
+    J --> L{Mode == BATCH and defer_updates?}
+    K --> L
+    L -->|Yes| M[Accumulate x, gated, spikes]
+    L -->|No| N[Skip accumulate]
+    M --> O[Emit telemetry + return dict]
+    N --> O

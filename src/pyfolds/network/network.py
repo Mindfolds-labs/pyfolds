@@ -225,21 +225,20 @@ class MPJRDNetwork(nn.Module):
         # spikes * weights -> [B, to]
         weighted = spikes @ weights  # [B, to]
         
-        # ✅ DISTRIBUIÇÃO REALISTA ENTRE DENDRITOS
-        # Cria tensor de entrada [B, to, D, S]
+        # Distribui em padrão esparso e estável entre dendritos/sinapses
         input_tensor = torch.zeros(B, to_layer_obj.n_neurons, D, S, device=device)
-        
-        # Dendrito principal recebe 40% da ativação
-        main_dendrite = 0
-        input_tensor[:, :, main_dendrite, 0] = weighted * 0.4
-        
-        # Dendritos secundários recebem o restante distribuído
-        remaining = weighted * 0.6  # [B, to]
-        for d in range(1, D):
-            # Cada dendrito secundário recebe uma fração
-            # A primeira sinapse de cada dendrito recebe a ativação
-            input_tensor[:, :, d, 0] = remaining / (D - 1)
-        
+
+        # Gerador determinístico para reprodutibilidade
+        generator = torch.Generator(device='cpu')
+        generator.manual_seed(42)
+
+        active_synapses = max(1, S // 4)
+        for d_idx in range(D):
+            syn_indices = torch.randperm(S, generator=generator)[:active_synapses]
+            input_tensor[:, :, d_idx, syn_indices] = (
+                weighted.unsqueeze(-1) / float(active_synapses)
+            )
+
         return input_tensor
 
     def build(self) -> 'MPJRDNetwork':
@@ -268,9 +267,10 @@ class MPJRDNetwork(nn.Module):
         self.built = True
         return self
 
-    def forward(self, x: torch.Tensor, 
+    def forward(self, x: torch.Tensor,
                 reward: Optional[float] = None,
-                mode: LearningMode = LearningMode.ONLINE) -> Dict[str, torch.Tensor]:
+                mode: LearningMode = LearningMode.ONLINE,
+                layer_kwargs: Optional[Dict[str, Dict[str, object]]] = None) -> Dict[str, torch.Tensor]:
         """
         Forward pass da rede com ordenação topológica real.
         
@@ -292,12 +292,19 @@ class MPJRDNetwork(nn.Module):
         # ✅ USA ORDENAÇÃO TOPOLÓGICA CACHEADA
         layer_order = self._layer_order
         
+        layer_kwargs = layer_kwargs or {}
+
         # Dicionário para armazenar saídas de cada camada
         outputs = {}
         
         # Forward da primeira camada
         first_layer = layer_order[0]
-        outputs[first_layer] = self.layers[first_layer](x, reward=reward, mode=mode)
+        outputs[first_layer] = self.layers[first_layer](
+            x,
+            reward=reward,
+            mode=mode,
+            **layer_kwargs.get(first_layer, {}),
+        )
         
         # Processa camadas restantes em ordem
         for layer_name in layer_order[1:]:
@@ -330,7 +337,10 @@ class MPJRDNetwork(nn.Module):
             
             # Forward da camada
             outputs[layer_name] = self.layers[layer_name](
-                combined_input, reward=reward, mode=mode
+                combined_input,
+                reward=reward,
+                mode=mode,
+                **layer_kwargs.get(layer_name, {}),
             )
         
         # Resultado final

@@ -70,20 +70,20 @@ class ShortTermDynamicsMixin:
         decay_rec = math.exp(-dt / self.tau_rec)
         
         # Atualiza facilitação (u)
-        # u = u * decay + U * (1 - u) * pre_spikes
-        self.u_stp.mul_(decay_fac).add_(self.U * (1 - self.u_stp) * pre_spikes)
+        # u = u_prev * decay + U * (1 - u_prev) * pre_spikes
+        u_prev = self.u_stp.clone()
+        self.u_stp.copy_(u_prev * decay_fac + self.U * (1 - u_prev) * pre_spikes)
         self.u_stp.clamp_(0.0, 1.0)
         
-        # Atualiza recursos (R)
-        # R = R * decay + (1 - R) * (1 - decay) - u * R * pre_spikes
-        self.R_stp.mul_(decay_rec)
-        
-        # Termo de recuperação: (1 - R) * (1 - decay)
-        recovery = (1 - self.R_stp) * (1 - decay_rec)
-        self.R_stp.add_(recovery)
+        # Atualiza recursos (R) - Tsodyks-Markram (1997)
+        # R_new = R_old * decay + (1 - R_old) * (1 - decay)
+        R_prev = self.R_stp.clone()
+        self.R_stp.copy_(
+            decay_rec * R_prev + (1 - decay_rec) * (1 - R_prev)
+        )
         
         # Termo de depressão: -u * R * pre_spikes
-        depression = -self.u_stp * self.R_stp * pre_spikes
+        depression = -self.u_stp * R_prev * pre_spikes
         self.R_stp.add_(depression)
         
         self.R_stp.clamp_(0.0, 1.0)

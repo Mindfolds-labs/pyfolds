@@ -40,7 +40,8 @@ class MPJRDDendrite(nn.Module):
         if not self._cache_invalid and self._cached_states is not None:
             return
         
-        device = next(self.parameters()).device
+        first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
+        device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
         
         # ✅ ÚNICO LOOP sobre sinapses (coleta tudo de uma vez)
         N_list = []
@@ -148,7 +149,7 @@ class MPJRDDendrite(nn.Module):
                                   R: torch.Tensor,
                                   dt: float = 1.0,
                                   mode=None) -> None:
-        """Atualiza sinapses."""
+        """Atualiza sinapses de forma indexada (pré-sináptico por sinapse)."""
         if pre_rate.dim() == 2 and pre_rate.shape[1] == 1:
             pre_rate = pre_rate.squeeze(1)
         

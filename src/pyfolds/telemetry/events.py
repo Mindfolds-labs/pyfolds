@@ -60,8 +60,9 @@ def forward_event(step_id: int, mode: str, neuron_id: Optional[str] = None,
     )
 
 
-def forward_event_lazy(step_id: int, mode: str, neuron_id: Optional[str] = None,
-                       payload_fn: Callable[[], Dict[str, Any]]) -> TelemetryEvent:
+def forward_event_lazy(step_id: int, mode: str,
+                       payload_fn: Callable[[], Dict[str, Any]],
+                       neuron_id: Optional[str] = None) -> TelemetryEvent:
     """
     Cria evento de forward pass com lazy evaluation (economia de CPU).
     
@@ -102,8 +103,9 @@ def commit_event(step_id: int, mode: str, neuron_id: Optional[str] = None,
     )
 
 
-def commit_event_lazy(step_id: int, mode: str, neuron_id: Optional[str] = None,
-                      payload_fn: Callable[[], Dict[str, Any]]) -> TelemetryEvent:
+def commit_event_lazy(step_id: int, mode: str,
+                      payload_fn: Callable[[], Dict[str, Any]],
+                      neuron_id: Optional[str] = None) -> TelemetryEvent:
     """Cria evento de commit com lazy evaluation."""
     return TelemetryEvent(
         step_id=step_id,
@@ -126,8 +128,9 @@ def sleep_event(step_id: int, mode: str, neuron_id: Optional[str] = None,
     )
 
 
-def sleep_event_lazy(step_id: int, mode: str, neuron_id: Optional[str] = None,
-                     payload_fn: Callable[[], Dict[str, Any]]) -> TelemetryEvent:
+def sleep_event_lazy(step_id: int, mode: str,
+                     payload_fn: Callable[[], Dict[str, Any]],
+                     neuron_id: Optional[str] = None) -> TelemetryEvent:
     """Cria evento de sleep com lazy evaluation."""
     return TelemetryEvent(
         step_id=step_id,

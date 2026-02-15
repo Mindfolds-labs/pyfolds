@@ -18,7 +18,15 @@ Basic usage:
         telem.emit(forward_event(step_id, mode="online", spike_rate=0.15))
 """
 
-from .events import TelemetryEvent, forward_event, commit_event, sleep_event
+from .events import (
+    TelemetryEvent,
+    forward_event,
+    forward_event_lazy,
+    commit_event,
+    commit_event_lazy,
+    sleep_event,
+    sleep_event_lazy,
+)
 from .ringbuffer import RingBuffer
 from .sinks import Sink, NoOpSink, MemorySink, ConsoleSink, JSONLinesSink, DistributorSink
 from .controller import TelemetryController, TelemetryConfig, Profile
@@ -33,6 +41,9 @@ __all__ = [
     "forward_event",
     "commit_event",
     "sleep_event",
+    "forward_event_lazy",
+    "commit_event_lazy",
+    "sleep_event_lazy",
     
     # Buffer
     "RingBuffer",

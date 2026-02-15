@@ -17,11 +17,13 @@ import torch
 import torch.nn as nn
 from typing import Optional, Dict, Any
 from .config import MPJRDConfig
+from .base import BaseNeuron
 from .dendrite import MPJRDDendrite
 from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator, AccumulatedStats
 from ..utils.types import LearningMode
+from ..utils.validation import validate_input
 
 # ✅ LOGGING - Adicionado
 from ..utils.logging import get_logger
@@ -34,7 +36,7 @@ except ImportError:
     TELEMETRY_AVAILABLE = False
 
 
-class MPJRDNeuron(nn.Module):
+class MPJRDNeuron(BaseNeuron):
     """
     Neurônio MPJRD completo.
     
@@ -162,9 +164,41 @@ class MPJRDNeuron(nn.Module):
 
     # ========== FORWARD PASS ==========
 
+    @torch.no_grad()
+    def _apply_online_plasticity(
+        self,
+        x: torch.Tensor,
+        post_rate: float,
+        R_tensor: torch.Tensor,
+        dt: float,
+        mode: LearningMode,
+    ) -> None:
+        """Aplica regra local imediatamente (modo ONLINE sem defer)."""
+        cfg = self.cfg
+        post_rate_t = torch.tensor([max(0.0, min(1.0, post_rate))], device=self.theta.device)
+
+        for d_idx, dend in enumerate(self.dendrites):
+            active_mask = (x[:, d_idx, :] > cfg.activity_threshold).float()
+            active_count = active_mask.sum(dim=0).clamp_min(1.0)
+            pre_rate = (x[:, d_idx, :] * active_mask).sum(dim=0) / active_count
+            pre_rate = pre_rate.clamp(0.0, 1.0)
+
+            dend.update_synapses_rate_based(
+                pre_rate=pre_rate,
+                post_rate=post_rate_t,
+                R=R_tensor,
+                dt=dt,
+                mode=mode,
+            )
+
+    @validate_input(
+        expected_ndim=3,
+        expected_shape_fn=lambda self: (self.cfg.n_dendrites, self.cfg.n_synapses_per_dendrite),
+    )
     def forward(self, x: torch.Tensor, reward: Optional[float] = None,
                 mode: Optional[LearningMode] = None,
-                collect_stats: bool = True) -> Dict[str, torch.Tensor]:
+                collect_stats: bool = True,
+                dt: float = 1.0) -> Dict[str, torch.Tensor]:
         """
         Forward pass do neurônio.
         
@@ -181,13 +215,7 @@ class MPJRDNeuron(nn.Module):
         
         device = self.theta.device
         x = x.to(device)
-        B, D, S = x.shape
-
-        # Valida dimensões
-        if D != self.cfg.n_dendrites or S != self.cfg.n_synapses_per_dendrite:
-            self.logger.error(f"❌ Dimensão inválida: esperado ({self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}), recebido ({D}, {S})")
-            raise ValueError(f"Esperado ({self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}), "
-                             f"recebido ({D}, {S})")
+        B, D, _ = x.shape
 
         # ===== 1. INTEGRAÇÃO DENDRÍTICA =====
         v_dend = torch.zeros(B, D, device=device)
@@ -224,6 +252,21 @@ class MPJRDNeuron(nn.Module):
         # ===== 8. ACUMULAÇÃO (BATCH MODE) =====
         if collect_stats and effective_mode == LearningMode.BATCH and self.cfg.defer_updates:
             self.stats_acc.accumulate(x.detach(), gated.detach(), spikes.detach())
+
+        # ===== 8b. ATUALIZAÇÃO IMEDIATA (ONLINE) =====
+        if (
+            collect_stats
+            and effective_mode == LearningMode.ONLINE
+            and self.cfg.plastic
+            and not self.cfg.defer_updates
+        ):
+            self._apply_online_plasticity(
+                x=x.detach(),
+                post_rate=spike_rate,
+                R_tensor=R_tensor,
+                dt=dt,
+                mode=effective_mode,
+            )
 
         # ===== 9. TELEMETRIA =====
         self.step_id.add_(1)
@@ -276,6 +319,23 @@ class MPJRDNeuron(nn.Module):
             "I_mean": self.I.float().mean().to(device),
             "mode": self.mode.value,
         }
+
+    def step(
+        self,
+        x: torch.Tensor,
+        reward: Optional[float] = None,
+        dt: float = 1.0,
+        mode: Optional[LearningMode] = None,
+        collect_stats: bool = True,
+    ) -> Dict[str, torch.Tensor]:
+        """API explícita de passo temporal (compatível com README)."""
+        return self.forward(
+            x=x,
+            reward=reward,
+            mode=mode,
+            collect_stats=collect_stats,
+            dt=dt,
+        )
 
     # ========== APLICAÇÃO DE PLASTICIDADE (BATCH) ==========
 

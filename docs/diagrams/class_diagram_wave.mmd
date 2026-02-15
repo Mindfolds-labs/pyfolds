@@ -1,0 +1,68 @@
+classDiagram
+    direction TB
+
+    class MPJRDConfig {
+      <<core>>
+    }
+
+    class MPJRDWaveConfig {
+      +bool wave_enabled
+      +float base_frequency
+      +float frequency_step
+      +Tuple~float~ class_frequencies
+      +float phase_decay
+      +int phase_buffer_size
+      +float phase_sensitivity
+      +float phase_plasticity_gain
+      +float dendritic_threshold
+      +float latency_scale
+      +float amplitude_eps
+    }
+
+    class MPJRDNeuron {
+      <<core>>
+      +forward(...)
+      +apply_plasticity(...)
+    }
+
+    class MPJRDWaveNeuron {
+      +Tensor wave_time
+      +Tensor phase_pointer
+      +Tensor phase_history
+      +Tensor last_phase_sync
+      +forward(x, reward, mode, collect_stats, target_class) Dict
+      +apply_plasticity(dt, reward) None
+      -_frequency_for_class(class_idx) float
+      -_compute_phase(u) Tensor
+      -_compute_latency(amplitude) Tensor
+      -_generate_wave_output(amplitude, phase, frequency_hz, t) Dict
+    }
+
+    class MPJRDLayer {
+      <<core>>
+      +forward(x, reward, mode, neuron_kwargs) Dict
+      +sleep(duration)
+      +get_metrics()
+    }
+
+    class MPJRDWaveLayer {
+      +__init__(n_neurons, cfg, name, enable_telemetry, telemetry_profile, device)
+    }
+
+    class MPJRDNetwork {
+      <<core>>
+      +add_layer(name, layer)
+      +forward(x, reward, mode) Dict
+    }
+
+    class MPJRDWaveNetwork {
+      +add_wave_layer(name, n_neurons, cfg) MPJRDWaveNetwork
+    }
+
+    MPJRDConfig <|-- MPJRDWaveConfig
+    MPJRDNeuron <|-- MPJRDWaveNeuron
+    MPJRDLayer <|-- MPJRDWaveLayer
+    MPJRDNetwork <|-- MPJRDWaveNetwork
+
+    MPJRDWaveLayer *-- MPJRDWaveNeuron : contém N neurônios
+    MPJRDWaveNetwork *-- MPJRDWaveLayer : contém camadas

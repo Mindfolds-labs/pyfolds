@@ -24,19 +24,25 @@ Uso básico:
 """
 
 from .config import MPJRDConfig, NeuromodMode
+from .base import BaseNeuron, BasePlasticityRule
 from .neuron import MPJRDNeuron
+from .neuron_v2 import MPJRDNeuronV2
 from .dendrite import MPJRDDendrite
 from .synapse import MPJRDSynapse
 from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator, create_accumulator_from_config  # ✅ Adicionado
+from .factory import NeuronFactory, NeuronType, register_neuron, register_default_neurons, infer_neuron_type
 
 __version__ = "2.0.0"  # ✅ Atualizado para versão 2.0.0
 
 __all__ = [
     # Classes principais
+    "BaseNeuron",
+    "BasePlasticityRule",
     "MPJRDConfig",
     "MPJRDNeuron",
+    "MPJRDNeuronV2",
     "MPJRDDendrite",
     "MPJRDSynapse",
     "HomeostasisController",
@@ -48,8 +54,12 @@ __all__ = [
     
     # Factory functions
     "create_neuron",
+    "create_neuron_v2",
     "create_accumulator",
     "create_accumulator_from_config",  # ✅ Adicionado
+    "NeuronFactory",
+    "NeuronType",
+    "register_neuron",
     
     # Metadados
     "__version__",
@@ -79,7 +89,17 @@ def create_neuron(cfg=None, **kwargs):
     """
     if cfg is None:
         cfg = MPJRDConfig(**kwargs)
-    return MPJRDNeuron(cfg)
+    register_default_neurons()
+    neuron_type = infer_neuron_type(cfg)
+    return NeuronFactory.create(neuron_type, cfg)
+
+
+def create_neuron_v2(cfg=None, **kwargs):
+    """Cria neurônio MPJRD V2 (integração cooperativa)."""
+    if cfg is None:
+        cfg = MPJRDConfig(**kwargs)
+    register_default_neurons()
+    return NeuronFactory.create(NeuronType.V2, cfg)
 
 
 def create_accumulator(cfg, track_extra: bool = False):
