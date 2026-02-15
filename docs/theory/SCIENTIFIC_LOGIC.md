@@ -54,3 +54,7 @@ O PyFolds implementa um modelo de neurônio artificial baseado em descobertas re
 2. Eficiência amostral.
 3. Consolidação offline.
 4. Processamento temporal por fase.
+
+
+## 6. Documento Técnico Completo
+- Ver `docs/theory/mpjrd_model.md` para o artigo técnico com equações e diagrama de funcionamento.
