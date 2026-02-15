@@ -77,7 +77,11 @@ return in_absolute, theta_boost
         spikes = output['spikes'].clone()
         
         spikes = torch.where(blocked, torch.zeros_like(spikes), spikes)
-        theta_eff = output['theta'] + theta_boost.unsqueeze(1)
+        # theta_eff deve permanecer 1-D ([B]) para preservar a semântica
+        # ponto-a-ponto do refratário por amostra. O unsqueeze(1) induzia
+        # broadcasting para [B, B], corrompendo spikes e o estado dos
+        # mecanismos subsequentes (ex.: adaptação).
+        theta_eff = output['theta'] + theta_boost
         spikes_rel = (output['u'] >= theta_eff).float()
         
         final_spikes = torch.where(blocked, torch.zeros_like(spikes), spikes_rel)
