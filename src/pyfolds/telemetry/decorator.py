@@ -39,7 +39,7 @@ def telemetry(
             
             # Amostragem probabilística
             if sample_rate is not None and not telem.should_emit_sample(sample_rate):
-                return func(self, *args, **kwargs)
+                return None
             
             # Executa função
             start_time = time.perf_counter()
