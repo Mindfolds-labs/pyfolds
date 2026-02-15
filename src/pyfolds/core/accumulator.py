@@ -2,9 +2,10 @@
 
 import torch
 import torch.nn as nn
-from typing import Optional, Tuple, Dict, List, Union
+from typing import Optional, Tuple, Dict, List, Union, Deque
 from dataclasses import dataclass, field
 import warnings
+from collections import deque
 
 
 @dataclass
@@ -48,13 +49,15 @@ class StatisticsAccumulator(nn.Module):
                  n_dendrites: int, 
                  n_synapses: int, 
                  eps: float = 1e-8,
-                 track_extra: bool = False):
+                 track_extra: bool = False,
+                 max_history_len: int = 10000):
         super().__init__()
         
         self.n_dendrites = n_dendrites
         self.n_synapses = n_synapses
         self.eps = eps
         self.track_extra = track_extra
+        self.max_history_len = max_history_len
 
         # Buffers principais
         self.register_buffer("acc_x", torch.zeros(n_dendrites, n_synapses))
@@ -73,7 +76,7 @@ class StatisticsAccumulator(nn.Module):
         self.register_buffer("initialized", torch.tensor(False))
         
         # Histórico (lazy evaluation)
-        self._history: Dict[str, List[float]] = {}
+        self._history: Dict[str, Deque[float]] = {}
         self._history_enabled = False
 
     @property
@@ -88,10 +91,10 @@ class StatisticsAccumulator(nn.Module):
         self._history_enabled = enable
         if enable and not self._history:
             self._history = {
-                'spike_rate': [],
-                'sparsity': [],
-                'theta': [],
-                'r_hat': []
+                'spike_rate': deque(maxlen=self.max_history_len),
+                'sparsity': deque(maxlen=self.max_history_len),
+                'theta': deque(maxlen=self.max_history_len),
+                'r_hat': deque(maxlen=self.max_history_len)
             }
 
     def reset(self) -> None:
