@@ -28,6 +28,9 @@ from .layers import MPJRDLayer
 from .network import MPJRDNetwork
 from .utils.types import LearningMode, ConnectionType
 from .wave import MPJRDWaveConfig, MPJRDWaveNeuron
+from .core.factory import NeuronFactory, NeuronType
+from .serialization import VersionedCheckpoint
+from .monitoring import HealthStatus, NeuronHealthCheck
 
 # ===== TELEMETRY (para MindMetrics/MindAudit) =====
 from .telemetry import (
@@ -91,6 +94,11 @@ __all__ = [
     "MPJRDWaveNetwork",
     "MPJRDWaveConfig",
     "MPJRDWaveNeuron",
+    "NeuronFactory",
+    "NeuronType",
+    "VersionedCheckpoint",
+    "HealthStatus",
+    "NeuronHealthCheck",
     
     # Types
     "LearningMode",

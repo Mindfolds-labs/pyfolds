@@ -61,3 +61,10 @@ No desenho atual do PyFOLDS, isso é respeitado por:
 ## 5) Diagrama técnico
 
 Veja o fluxo em Mermaid em: `docs/diagrams/dendritic_processing_flow.mmd`.
+
+## 6) Padrões e robustez implementados
+
+- **Factory Pattern:** `pyfolds.core.factory` centraliza criação de neurônios (`NeuronFactory`, `NeuronType`) e permite extensibilidade por registro.
+- **Validação de entrada:** `pyfolds.utils.validation.validate_input` valida shape/tipo/faixa em `forward` de neurônios core/wave.
+- **Checkpoint versionado:** `pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint` inclui metadados (`version`, `git_hash`, `config`) e hash de integridade.
+- **Health checks:** `pyfolds.monitoring.health.NeuronHealthCheck` classifica saúde em `healthy/degraded/critical` para observabilidade operacional.
