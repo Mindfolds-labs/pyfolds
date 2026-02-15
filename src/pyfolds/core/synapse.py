@@ -46,6 +46,10 @@ class MPJRDSynapse(nn.Module):
         # Potencial interno
         self.register_buffer("I", torch.zeros(1, dtype=torch.float32))
 
+        # Dinâmica de curto prazo
+        self.register_buffer("u", torch.tensor([cfg.u0], dtype=torch.float32))
+        self.register_buffer("R", torch.tensor([cfg.R0], dtype=torch.float32))
+
         # Proteção contra saturação
         self.register_buffer("protection", torch.tensor([False]))
         self.register_buffer("sat_time", torch.zeros(1, dtype=torch.float32))

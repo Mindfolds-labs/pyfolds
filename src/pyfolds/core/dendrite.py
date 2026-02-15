@@ -40,8 +40,8 @@ class MPJRDDendrite(nn.Module):
         if not self._cache_invalid and self._cached_states is not None:
             return
         
-        first_syn = self.synapses[0] if len(self.synapses) > 0 else None
-        device = first_syn.N.device if first_syn is not None else torch.device("cpu")
+        first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
+        device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
         
         # ✅ ÚNICO LOOP sobre sinapses (coleta tudo de uma vez)
         N_list = []

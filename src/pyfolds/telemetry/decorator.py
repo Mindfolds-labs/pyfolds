@@ -48,7 +48,8 @@ def telemetry(
             
             # ===== CORREÇÃO: Prioriza step_id do objeto =====
             # Tenta pegar step_id do próprio objeto, se não existir usa do controller
-            step_id = getattr(self, 'step_id', telem.step_count)
+            raw_step_id = getattr(self, 'step_id', telem.step_count)
+            step_id = int(raw_step_id.item()) if hasattr(raw_step_id, 'item') else int(raw_step_id)
             mode = getattr(self, 'mode', 'unknown')
             neuron_id = getattr(self, 'neuron_id', None)
             
@@ -81,7 +82,7 @@ def telemetry(
                 ))
             
             # Incrementa step_count do controller (mantém para fallback)
-            telem.step_count += 1
+            telem._increment_step()
             return result
         
         return wrapper

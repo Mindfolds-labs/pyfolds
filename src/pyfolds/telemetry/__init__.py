@@ -21,10 +21,10 @@ Basic usage:
 from .events import (
     TelemetryEvent,
     forward_event,
-    commit_event,
-    sleep_event,
     forward_event_lazy,
+    commit_event,
     commit_event_lazy,
+    sleep_event,
     sleep_event_lazy,
 )
 from .ringbuffer import RingBuffer
