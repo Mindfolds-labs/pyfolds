@@ -1,0 +1,26 @@
+flowchart TD
+    A[Entrada x: batch x dendritos x sinapses] --> B[Mapeamento sináptico]
+    B --> C[Peso W por sinapse: log2(1+N)/w_scale]
+    C --> D[Potencial dendrítico v_d]
+    D --> E[Não-linearidade local a_d]
+    E --> F[Integração somática u = Σ a_d]
+    F --> G{u >= θ?}
+    G -- Sim --> H[Spike = 1]
+    G -- Não --> I[Spike = 0]
+
+    H --> J[Atualiza estatísticas: spike_rate, r_hat]
+    I --> J
+    J --> K[Homeostase ajusta θ]
+    K --> L[Acumula elegibilidade plástica]
+
+    L --> M{apply_plasticity?}
+    M -- Sim --> N[ΔI por regra three-factor]
+    N --> O{I >= ltp/ltd thresholds?}
+    O -- LTP --> P[Promove N até n_max]
+    O -- LTD --> Q[Demove N até n_min]
+    O -- Nenhum --> R[Sem transição estrutural]
+
+    P --> S[Ciclo de sono/consolidação]
+    Q --> S
+    R --> S
+    S --> T[Persistência de memória estrutural]

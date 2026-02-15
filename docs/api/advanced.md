@@ -1,12 +1,12 @@
-# API — Advanced
+# API Reference - Módulo Advanced
 
-Módulos avançados (mixins e mecanismos):
+Mixins e mecanismos avançados para extensão do neurônio MPJRD.
 
-- Adaptação (`advanced/adaptation.py`)
-- Refratário (`advanced/refractory.py`)
-- Inibição (`advanced/inhibition.py`)
-- STDP (`advanced/stdp.py`)
-- Backprop dendrítica (`advanced/backprop.py`)
-- Dinâmica de curto prazo (`advanced/short_term.py`)
+## Componentes
+- `STDPMixin`
+- `RefractoryMixin`
+- `AdaptationMixin`
+- `InhibitionLayer`
 
-Esses componentes estendem o comportamento do core sem alterar o contrato básico de `MPJRDNeuron`.
+## Uso
+Use composição via mixins para adicionar mecanismos sem alterar o núcleo do modelo.
