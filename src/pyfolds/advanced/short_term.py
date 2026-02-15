@@ -83,7 +83,7 @@ class ShortTermDynamicsMixin:
         )
         
         # Termo de depressão: -u * R * pre_spikes
-        depression = -self.u_stp * self.R_stp * pre_spikes
+        depression = -self.u_stp * R_prev * pre_spikes
         self.R_stp.add_(depression)
         
         self.R_stp.clamp_(0.0, 1.0)

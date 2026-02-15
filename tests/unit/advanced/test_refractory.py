@@ -23,6 +23,19 @@ class TestRefractoryMixin:
             pytest.skip("Advanced module not available")
 
         neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
+        batch_size = 3
+        
+        neuron._ensure_last_spike_time(batch_size, torch.device('cpu'))
+        neuron.last_spike_time = torch.tensor([-10.0, 1.0, 3.0])
+        
+        blocked, theta_boost = neuron._check_refractory_batch(5.0, batch_size)
+        
+        # -10.0: 15ms ago → not refractory
+        # 1.0: 4ms ago → relative refractory (boost de limiar)
+        # 3.0: 2ms ago → absoluto (bloqueado)
+        assert blocked[2].item() is True
+        assert theta_boost[1].item() == neuron.refrac_rel_strength
+    
         neuron._ensure_last_spike_time(batch_size=1, device=torch.device("cpu"))
         neuron.last_spike_time = torch.tensor([0.0])
 

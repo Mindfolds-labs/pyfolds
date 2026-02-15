@@ -19,7 +19,7 @@ def test_layer_accepts_neuron_v2():
     assert layer.neuron_cls is MPJRDNeuronV2
 
 
-def test_layer_rejects_invalid_neuron_class():
+def test_layer_rejects_invalid_neuron_cls():
     cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
 
     with pytest.raises(TypeError):

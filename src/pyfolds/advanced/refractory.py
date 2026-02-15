@@ -34,23 +34,24 @@ class RefractoryMixin(TimedMixin):
     def _check_refractory_batch(self, current_time: float, 
                                  batch_size: int) -> Tuple[torch.Tensor, torch.Tensor]:
         time_since = current_time - self.last_spike_time
+        # Refratário absoluto: bloqueia spikes imediatamente após disparo
+    in_absolute = time_since <= self.t_refrac_abs
 
-        # Refratário absoluto: nenhum spike
-        in_absolute = time_since <= self.t_refrac_abs
-
-        # Refratário relativo: threshold elevado
+ # Refratário relativo: threshold elevado
         in_relative = (
-            (time_since > self.t_refrac_abs) &
-            (time_since <= self.t_refrac_rel)
-        )
+    (time_since > self.t_refrac_abs) &
+    (time_since <= self.t_refrac_rel)
+)
 
-        blocked = in_absolute | in_relative
-        theta_boost = torch.where(
-            in_relative,
-            torch.full_like(time_since, self.refrac_rel_strength),
-            torch.zeros_like(time_since)
-        )
-        return blocked, theta_boost
+   blocked = in_absolute | in_relative
+
+theta_boost = torch.where(
+    in_relative,
+    torch.full_like(time_since, self.refrac_rel_strength),
+    torch.zeros_like(time_since),
+)
+
+return in_absolute, theta_boost
     
     def _update_refractory_batch(self, spikes: torch.Tensor, dt: float = 1.0):
         current_time = self.time_counter.item()
