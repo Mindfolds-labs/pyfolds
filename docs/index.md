@@ -8,7 +8,7 @@
   [![Docs](https://img.shields.io/badge/docs-latest-blue?style=flat-square)](https://pyfolds.readthedocs.io)
   [![PyPI version](https://badge.fury.io/py/pyfolds.svg)](https://badge.fury.io/py/pyfolds)
   [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-  [!License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![GitHub](https://img.shields.io/badge/GitHub-Mindfolds--labs%2Fpyfolds-blue)](https://github.com/Mindfolds-labs/pyfolds)
   
   <br>
@@ -176,6 +176,7 @@ Issues: github.com/Mindfolds-labs/pyfolds/issues
 | **Técnico** | Foco no código e na arquitetura |
 
 **Pronto para colar!** 🚀
+
 
 
 
