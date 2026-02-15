@@ -28,16 +28,16 @@
 **PyFolds** é um framework Python para simulação de neurônios e redes neurais com 9 mecanismos biologicamente inspirados. O modelo MPJRD (Multi-Pathway Joint-Resource Dendritic) implementa plasticidade estrutural explícita, consolidação offline e processamento dendrítico multi-compartimental.
 
 ### Arquitetura
-****
-pyfolds/
-├── core/ # Núcleo: neurônio MPJRD, sinapses, dendritos
-├── advanced/ # Mecanismos: STDP, adaptação, inibição, backprop
-├── layers/ # Camadas de neurônios para redes
-├── network/ # Redes neurais com conectividade topológica
-├── telemetry/ # Sistema de monitoramento e logging
-└── utils/ # Utilitários: math, device, tipos, logging
----
 
+```
+pyfolds/
+├── core/          # Núcleo: neurônio MPJRD, sinapses, dendritos
+├── advanced/      # Mecanismos: STDP, adaptação, inibição, backprop
+├── layers/        # Camadas de neurônios para redes
+├── network/       # Redes neurais com conectividade topológica
+├── telemetry/     # Sistema de monitoramento e logging
+└── utils/         # Utilitários: math, device, tipos, logging
+```
 
 ## 🧬 Mecanismos
 
@@ -177,6 +177,7 @@ Issues: github.com/Mindfolds-labs/pyfolds/issues
 | **Técnico** | Foco no código e na arquitetura |
 
 **Pronto para colar!** 🚀
+
 
 
 
