@@ -23,6 +23,9 @@ from .core.config import MPJRDConfig
 from .core.neuron import MPJRDNeuron
 from .layers import MPJRDLayer, MPJRDWaveLayer
 from .network import MPJRDNetwork, MPJRDWaveNetwork
+from .core.neuron_v2 import MPJRDNeuronV2
+from .layers import MPJRDLayer
+from .network import MPJRDNetwork
 from .utils.types import LearningMode, ConnectionType
 from .wave import MPJRDWaveConfig, MPJRDWaveNeuron
 
@@ -81,6 +84,7 @@ __all__ = [
     # Core
     "MPJRDConfig",
     "MPJRDNeuron",
+    "MPJRDNeuronV2",
     "MPJRDLayer",
     "MPJRDNetwork",
     "MPJRDWaveLayer",

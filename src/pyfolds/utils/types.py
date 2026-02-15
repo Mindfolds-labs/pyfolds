@@ -24,15 +24,15 @@ class LearningMode(Enum):
         Multiplicador de learning rate para cada modo.
         
         Returns:
-            ONLINE: 1.0 (taxa normal)
-            BATCH: 0.8 (80% da taxa)
-            SLEEP: 0.1 (10% - consolidação)
+            ONLINE: 5.0 (aprendizado acelerado)
+            BATCH: 0.2 (atualização conservadora)
+            SLEEP: 0.0 (sem plasticidade ativa)
             INFERENCE: 0.0 (sem aprendizado)
         """
         multipliers = {
-            LearningMode.ONLINE: 1.0,
-            LearningMode.BATCH: 0.8,
-            LearningMode.SLEEP: 0.1,
+            LearningMode.ONLINE: 5.0,
+            LearningMode.BATCH: 0.2,
+            LearningMode.SLEEP: 0.0,
             LearningMode.INFERENCE: 0.0,
         }
         return multipliers[self]
@@ -65,6 +65,7 @@ class ConnectionType(Enum):
     EXCITATORY = "exc"       # Excitatório
     INHIBITORY = "inh"       # Inibitório
     MODULATORY = "mod"       # Modulatório (neuromodulador)
+    ENTANGLED = "entangled"  # Acoplamento recorrente/híbrido
 
 
 # ============================================================================
@@ -76,31 +77,47 @@ class ModeConfig:
     """
     Configurações específicas por modo de aprendizado.
     
-    Attributes:
-        name: Nome do modo
-        learning_rate_multiplier: Multiplicador para learning rate
-        description: Descrição do modo
+    Configuração global para escalonar parâmetros por `LearningMode`.
     """
-    name: str
-    learning_rate_multiplier: float = 1.0
-    description: str = ""
+    online_learning_rate_mult: float = 5.0
+    batch_learning_rate_mult: float = 0.2
+    sleep_consolidation_factor: float = 0.1
     
     def __post_init__(self):
         """Valida configuração."""
-        if not 0.0 <= self.learning_rate_multiplier <= 2.0:
-            raise ValueError(
-                f"learning_rate_multiplier deve estar em [0, 2], "
-                f"got {self.learning_rate_multiplier}"
-            )
+        if self.online_learning_rate_mult < 0.0:
+            raise ValueError("online_learning_rate_mult deve ser >= 0")
+        if self.batch_learning_rate_mult < 0.0:
+            raise ValueError("batch_learning_rate_mult deve ser >= 0")
+        if not 0.0 <= self.sleep_consolidation_factor <= 1.0:
+            raise ValueError("sleep_consolidation_factor deve estar em [0, 1]")
+
+    def get_learning_rate(self, base_lr: float, mode: LearningMode) -> float:
+        """Retorna learning rate efetivo para o modo."""
+        if mode == LearningMode.ONLINE:
+            return base_lr * self.online_learning_rate_mult
+        if mode == LearningMode.BATCH:
+            return base_lr * self.batch_learning_rate_mult
+        return 0.0
+
+    def get_consolidation_factor(self, mode: LearningMode) -> float:
+        """Retorna fator de consolidação no modo sono."""
+        if mode == LearningMode.SLEEP:
+            return self.sleep_consolidation_factor
+        return 0.0
     
     @classmethod
     def from_learning_mode(cls, mode: LearningMode) -> 'ModeConfig':
-        """Cria ModeConfig a partir de LearningMode."""
-        return cls(
-            name=mode.value,
-            learning_rate_multiplier=mode.learning_rate_multiplier,
-            description=mode.description
-        )
+        """Cria config com foco no modo informado (compatibilidade)."""
+        cfg = cls()
+        if mode == LearningMode.ONLINE:
+            cfg.batch_learning_rate_mult = 0.0
+        elif mode == LearningMode.BATCH:
+            cfg.online_learning_rate_mult = 0.0
+        elif mode in (LearningMode.SLEEP, LearningMode.INFERENCE):
+            cfg.online_learning_rate_mult = 0.0
+            cfg.batch_learning_rate_mult = 0.0
+        return cfg
 
 
 # ============================================================================
