@@ -38,8 +38,7 @@ def telemetry(
             telem: TelemetryController = self.telemetry
             
             # Amostragem probabilística
-            if sample_rate is not None and not telem.should_emit_sample(sample_rate):
-                return None
+            sampled = sample_rate is None or telem.should_emit_sample(sample_rate)
             
             # Executa função
             start_time = time.perf_counter()
@@ -53,8 +52,10 @@ def telemetry(
             mode = getattr(self, 'mode', 'unknown')
             neuron_id = getattr(self, 'neuron_id', None)
             
+            emitted = False
+
             # Coleta telemetria (se deve emitir baseado no step_id correto)
-            if telem.should_emit(step_id):
+            if sampled and telem.should_emit(step_id):
                 payload = {}
                 
                 if capture_args:
@@ -80,9 +81,11 @@ def telemetry(
                     neuron_id=neuron_id,
                     **payload
                 ))
-            
+                emitted = True
+
             # Incrementa step_count do controller (mantém para fallback)
-            telem._increment_step()
+            if not emitted:
+                telem._increment_step()
             return result
         
         return wrapper

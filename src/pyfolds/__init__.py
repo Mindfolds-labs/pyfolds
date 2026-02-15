@@ -26,6 +26,7 @@ from .layers import MPJRDLayer, MPJRDWaveLayer
 from .network import MPJRDNetwork, MPJRDWaveNetwork, NetworkBuilder
 from .core.neuron_v2 import MPJRDNeuronV2
 from .utils.types import LearningMode, ConnectionType
+from .utils.context import learning_mode
 from .wave import MPJRDWaveConfig, MPJRDWaveNeuron
 from .core.factory import NeuronFactory, NeuronType
 from .serialization import VersionedCheckpoint
@@ -74,7 +75,7 @@ try:
         MPJRDWaveLayerAdvanced,
     )
     ADVANCED_AVAILABLE = True
-except ImportError:
+except Exception:
     ADVANCED_AVAILABLE = False
     MPJRDNeuronAdvanced = None
     MPJRDLayerAdvanced = None
