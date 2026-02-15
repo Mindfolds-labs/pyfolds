@@ -36,9 +36,8 @@ pyfolds/
 ├── network/ # Redes neurais com conectividade topológica
 ├── telemetry/ # Sistema de monitoramento e logging
 └── utils/ # Utilitários: math, device, tipos, logging
-
-
 ---
+
 
 ## 🧬 Mecanismos
 
@@ -178,6 +177,7 @@ Issues: github.com/Mindfolds-labs/pyfolds/issues
 | **Técnico** | Foco no código e na arquitetura |
 
 **Pronto para colar!** 🚀
+
 
 
 
