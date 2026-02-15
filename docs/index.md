@@ -11,7 +11,7 @@
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![GitHub](https://img.shields.io/badge/GitHub-Mindfolds--labs%2Fpyfolds-blue)](https://github.com/Mindfolds-labs/pyfolds)
   
-    [📚 Documentação](#-documentação) • 
+     [📚 Documentação](#-documentação) • 
   [🚀 Instalação](#-instalação) • 
   [🔥 Quick Start](#-quick-start) • 
   [🧪 Exemplos](#-exemplos) • 
@@ -19,7 +19,6 @@
   
   ---
   
-  **Author:** Antônio Carlos ([jrduraes90@gmail.com](mailto:jrduraes90@gmail.com))
   
 </div>
 
@@ -41,6 +40,7 @@
 - [Contato](#-contato)
 
 ---
+
 
 ## 📋 Visão Geral
 
@@ -196,6 +196,7 @@ Issues: github.com/Mindfolds-labs/pyfolds/issues
 | **Técnico** | Foco no código e na arquitetura |
 
 **Pronto para colar!** 🚀
+
 
 
 
