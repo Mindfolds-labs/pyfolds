@@ -35,6 +35,7 @@ from .types import (
 
 # Logging
 from .logging import get_logger, PyFoldsLogger, trace, TRACE_LEVEL
+from .context import learning_mode
 
 __all__ = [
     # Math
@@ -62,4 +63,5 @@ __all__ = [
     "PyFoldsLogger",
     "trace",
     "TRACE_LEVEL",
+    "learning_mode",
 ]

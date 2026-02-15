@@ -20,14 +20,17 @@ __version__ = "2.0.0"
 
 # ===== CORE COMPONENTS =====
 from .core.config import MPJRDConfig
+from .core.base import BaseNeuron, BasePlasticityRule
 from .core.neuron import MPJRDNeuron
 from .layers import MPJRDLayer, MPJRDWaveLayer
-from .network import MPJRDNetwork, MPJRDWaveNetwork
+from .network import MPJRDNetwork, MPJRDWaveNetwork, NetworkBuilder
 from .core.neuron_v2 import MPJRDNeuronV2
 from .layers import MPJRDLayer
 from .network import MPJRDNetwork
 from .utils.types import LearningMode, ConnectionType
 from .wave import MPJRDWaveConfig, MPJRDWaveNeuron
+from .factory import NeuronFactory, NeuronType
+from .utils.context import learning_mode
 
 # ===== TELEMETRY (para MindMetrics/MindAudit) =====
 from .telemetry import (
@@ -82,6 +85,8 @@ except ImportError:
 # ===== EXPORTS =====
 __all__ = [
     # Core
+    "BaseNeuron",
+    "BasePlasticityRule",
     "MPJRDConfig",
     "MPJRDNeuron",
     "MPJRDNeuronV2",
@@ -89,12 +94,16 @@ __all__ = [
     "MPJRDNetwork",
     "MPJRDWaveLayer",
     "MPJRDWaveNetwork",
+    "NetworkBuilder",
     "MPJRDWaveConfig",
     "MPJRDWaveNeuron",
     
     # Types
     "LearningMode",
     "ConnectionType",
+    "NeuronFactory",
+    "NeuronType",
+    "learning_mode",
     
     # Telemetry (para MindMetrics/MindAudit)
     "TelemetryController",
