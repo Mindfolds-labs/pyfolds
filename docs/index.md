@@ -5,13 +5,12 @@
   
   [![PyPI](https://img.shields.io/pypi/v/pyfolds?style=flat-square&logo=pypi)](https://pypi.org/project/pyfolds/)
   [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-orange?style=flat-square&logo=pytorch)](https://pytorch.org)
-  [![License](https://img.shields.io/github/license/Mindfolds-labs/pyfolds?style=flat-square)](LICENSE)
   [![Docs](https://img.shields.io/badge/docs-latest-blue?style=flat-square)](https://pyfolds.readthedocs.io)
-  [![Tests](https://img.shields.io/github/actions/workflow/status/Mindfolds-labs/pyfolds/ci.yml?style=flat-square)](https://github.com/Mindfolds-labs/pyfolds/actions)
   [![PyPI version](https://badge.fury.io/py/pyfolds.svg)](https://badge.fury.io/py/pyfolds)
   [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
   License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![GitHub](https://img.shields.io/badge/GitHub-Mindfolds--labs%2Fpyfolds-blue)](https://github.com/Mindfolds-labs/pyfolds)
+  
   <br>
   [📚 Documentação](/#) •
   [🚀 Instalação](installation.md) •
@@ -177,6 +176,7 @@ Issues: github.com/Mindfolds-labs/pyfolds/issues
 | **Técnico** | Foco no código e na arquitetura |
 
 **Pronto para colar!** 🚀
+
 
 
 
