@@ -57,6 +57,12 @@ class MPJRDSynapse(nn.Module):
         # Traço para consolidação two-factor
         self.register_buffer("eligibility", torch.zeros(1, dtype=torch.float32))
 
+        # Estado de curto prazo (u, R) exposto para inspeção/telemetria.
+        # Nota: a dinâmica completa de STP é implementada em módulos avançados,
+        # mas mantemos as variáveis aqui para consistência de interface.
+        self.register_buffer("u", torch.tensor([cfg.u0], dtype=torch.float32))
+        self.register_buffer("R", torch.tensor([cfg.R0], dtype=torch.float32))
+
     @property
     def W(self) -> torch.Tensor:
         """Peso sináptico derivado do número de filamentos."""

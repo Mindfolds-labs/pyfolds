@@ -136,13 +136,21 @@ class MPJRDDendrite(nn.Module):
                                   R: torch.Tensor,
                                   dt: float = 1.0,
                                   mode=None) -> None:
-        """Atualiza sinapses."""
+        """Atualiza sinapses de forma indexada (pré-sináptico por sinapse)."""
         if pre_rate.dim() == 2 and pre_rate.shape[1] == 1:
             pre_rate = pre_rate.squeeze(1)
-        
-        for syn in self.synapses:
-            syn.update(pre_rate, post_rate, R, dt, mode)
-        
+
+        if pre_rate.dim() != 1 or pre_rate.numel() != self.n_synapses:
+            raise ValueError(
+                f"pre_rate deve ter shape [{self.n_synapses}], recebido {tuple(pre_rate.shape)}"
+            )
+
+        # Cada sinapse recebe sua própria taxa pré-sináptica escalar.
+        # Isso preserva a regra local de aprendizado (Hebb/three-factor),
+        # evitando que todas as sinapses usem a mesma média do vetor inteiro.
+        for idx, syn in enumerate(self.synapses):
+            syn.update(pre_rate[idx:idx + 1], post_rate, R, dt, mode)
+
         self._invalidate_cache()
 
     def consolidate(self, dt: float = 1.0) -> None:
