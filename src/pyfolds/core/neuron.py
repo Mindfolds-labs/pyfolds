@@ -17,6 +17,7 @@ import torch
 import torch.nn as nn
 from typing import Optional, Dict, Any
 from .config import MPJRDConfig
+from .base import BaseNeuron
 from .dendrite import MPJRDDendrite
 from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
@@ -35,7 +36,7 @@ except ImportError:
     TELEMETRY_AVAILABLE = False
 
 
-class MPJRDNeuron(nn.Module):
+class MPJRDNeuron(BaseNeuron):
     """
     Neurônio MPJRD completo.
     

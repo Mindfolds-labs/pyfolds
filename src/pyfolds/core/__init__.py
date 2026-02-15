@@ -24,6 +24,7 @@ Uso básico:
 """
 
 from .config import MPJRDConfig, NeuromodMode
+from .base import BaseNeuron, BasePlasticityRule
 from .neuron import MPJRDNeuron
 from .neuron_v2 import MPJRDNeuronV2
 from .dendrite import MPJRDDendrite
@@ -37,6 +38,8 @@ __version__ = "2.0.0"  # ✅ Atualizado para versão 2.0.0
 
 __all__ = [
     # Classes principais
+    "BaseNeuron",
+    "BasePlasticityRule",
     "MPJRDConfig",
     "MPJRDNeuron",
     "MPJRDNeuronV2",
