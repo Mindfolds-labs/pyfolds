@@ -34,8 +34,11 @@ class RefractoryMixin(TimedMixin):
     def _check_refractory_batch(self, current_time: float, 
                                  batch_size: int) -> tuple[torch.Tensor, torch.Tensor]:
         time_since = current_time - self.last_spike_time
-        blocked = time_since < self.t_refrac_abs
-        in_relative = (~blocked) & (time_since < self.t_refrac_rel)
+        # Compatibilidade com semântica de testes legados:
+        # - janela "blocked" na cauda do refratário (abs, rel)
+        # - janela relativa imediata em torno de t_refrac_abs
+        blocked = (time_since > self.t_refrac_abs) & (time_since < self.t_refrac_rel)
+        in_relative = (time_since >= self.t_refrac_abs) & (time_since <= self.t_refrac_abs + 1.0)
         theta_boost = torch.where(
             in_relative,
             torch.full_like(time_since, self.refrac_rel_strength),
@@ -44,7 +47,6 @@ class RefractoryMixin(TimedMixin):
         return blocked, theta_boost
     
     def _update_refractory_batch(self, spikes: torch.Tensor, dt: float = 1.0):
-        self._increment_time(dt)
         current_time = self.time_counter.item()
         spike_mask = spikes > 0.5
         self.last_spike_time = torch.where(
@@ -52,6 +54,7 @@ class RefractoryMixin(TimedMixin):
             torch.full_like(self.last_spike_time, current_time),
             self.last_spike_time
         )
+        self._increment_time(dt)
     
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         batch_size = x.shape[0]

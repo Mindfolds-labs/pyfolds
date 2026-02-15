@@ -12,6 +12,7 @@ Fornece mixins para:
 """
 
 import torch  # ✅ Necessário para as métricas
+from typing import Optional
 
 from .refractory import RefractoryMixin
 from .stdp import STDPMixin
@@ -21,6 +22,8 @@ from .backprop import BackpropMixin
 from .inhibition import InhibitionLayer, InhibitionMixin
 
 from ..core.neuron import MPJRDNeuron as MPJRDNeuronBase
+from ..wave import MPJRDWaveNeuron as MPJRDWaveNeuronBase
+from ..layers.layer import MPJRDLayer
 
 __all__ = [
     "RefractoryMixin",
@@ -31,6 +34,9 @@ __all__ = [
     "InhibitionLayer",
     "InhibitionMixin",
     "MPJRDNeuronAdvanced",
+    "MPJRDLayerAdvanced",
+    "MPJRDWaveNeuronAdvanced",
+    "MPJRDWaveLayerAdvanced",
 ]
 
 
@@ -135,3 +141,82 @@ class MPJRDNeuronAdvanced(
             self.reset_short_term_dynamics()
         if hasattr(self, 'reset_backprop'):
             self.reset_backprop()
+
+
+class MPJRDWaveNeuronAdvanced(
+    BackpropMixin,
+    ShortTermDynamicsMixin,
+    STDPMixin,
+    AdaptationMixin,
+    RefractoryMixin,
+    MPJRDWaveNeuronBase,
+):
+    """Versão avançada do neurônio wave com mixins de mecanismos v2.x."""
+
+    def __init__(self, cfg, **kwargs):
+        super().__init__(cfg, **kwargs)
+
+        if hasattr(self, '_init_refractory'):
+            self._init_refractory(
+                t_refrac_abs=cfg.t_refrac_abs,
+                t_refrac_rel=cfg.t_refrac_rel,
+                refrac_rel_strength=cfg.refrac_rel_strength,
+            )
+
+        if hasattr(self, '_init_stdp'):
+            self._init_stdp(
+                tau_pre=cfg.tau_pre,
+                tau_post=cfg.tau_post,
+                A_plus=cfg.A_plus,
+                A_minus=cfg.A_minus,
+                plasticity_mode=cfg.plasticity_mode,
+            )
+
+        if hasattr(self, '_init_adaptation'):
+            self._init_adaptation(cfg)
+
+        if hasattr(self, '_init_short_term'):
+            self._init_short_term(
+                u0=cfg.u0,
+                R0=cfg.R0,
+                U=cfg.U,
+                tau_fac=cfg.tau_fac,
+                tau_rec=cfg.tau_rec,
+            )
+
+        if hasattr(self, '_init_backprop'):
+            self._init_backprop(cfg)
+
+
+class MPJRDLayerAdvanced(MPJRDLayer):
+    """Camada que injeta automaticamente `MPJRDNeuronAdvanced`."""
+
+    def __init__(self, n_neurons: int, cfg, name: str = "",
+                 enable_telemetry: bool = False, telemetry_profile: str = "off",
+                 device: Optional[torch.device] = None):
+        super().__init__(
+            n_neurons=n_neurons,
+            cfg=cfg,
+            name=name,
+            neuron_cls=MPJRDNeuronAdvanced,
+            enable_telemetry=enable_telemetry,
+            telemetry_profile=telemetry_profile,
+            device=device,
+        )
+
+
+class MPJRDWaveLayerAdvanced(MPJRDLayer):
+    """Camada avançada para neurônios wave + mecanismos v2.x."""
+
+    def __init__(self, n_neurons: int, cfg, name: str = "",
+                 enable_telemetry: bool = False, telemetry_profile: str = "off",
+                 device: Optional[torch.device] = None):
+        super().__init__(
+            n_neurons=n_neurons,
+            cfg=cfg,
+            name=name,
+            neuron_cls=MPJRDWaveNeuronAdvanced,
+            enable_telemetry=enable_telemetry,
+            telemetry_profile=telemetry_profile,
+            device=device,
+        )

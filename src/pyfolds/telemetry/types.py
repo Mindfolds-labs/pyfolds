@@ -14,6 +14,9 @@ class ForwardPayload(TypedDict, total=False):
     N_mean: float
     I_mean: float
     W_mean: float
+    phase_mean: float
+    amplitude_mean: float
+    frequency_hz: float
     duration_ms: float
 
 
