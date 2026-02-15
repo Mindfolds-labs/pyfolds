@@ -18,13 +18,28 @@ class RefractoryMixin(TimedMixin):
     def _init_refractory(self, t_refrac_abs: float = 2.0,
                           t_refrac_rel: float = 5.0,
                           refrac_rel_strength: float = 3.0):
+        """
+        Inicializa parâmetros do período refratário.
+        
+        Args:
+            t_refrac_abs: Duração do refratário absoluto (ms)
+            t_refrac_rel: Duração do refratário relativo (ms)
+            refrac_rel_strength: Força do boost no threshold durante refratário relativo
+        """
         self.t_refrac_abs = t_refrac_abs
         self.t_refrac_rel = t_refrac_rel
         self.refrac_rel_strength = refrac_rel_strength
         self._ensure_time_counter()
-        self.last_spike_time = None 
+        self.last_spike_time = None
 
     def _ensure_last_spike_time(self, batch_size: int, device: torch.device):
+        """
+        Garante que last_spike_time existe com tamanho correto.
+        
+        Args:
+            batch_size: Tamanho do batch
+            device: Device onde o tensor deve ser alocado
+        """
         if (self.last_spike_time is None or 
             self.last_spike_time.shape[0] != batch_size):
             self.last_spike_time = torch.full(
@@ -33,61 +48,123 @@ class RefractoryMixin(TimedMixin):
     
     def _check_refractory_batch(self, current_time: float, 
                                  batch_size: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Verifica estado refratário para todas as amostras do batch.
+        
+        Args:
+            current_time: Tempo atual
+            batch_size: Tamanho do batch
+            
+        Returns:
+            Tuple com:
+                - in_absolute: [B] máscara para refratário absoluto
+                - theta_boost: [B] boost no threshold para refratário relativo
+        """
         time_since = current_time - self.last_spike_time
+        
         # Refratário absoluto: bloqueia spikes imediatamente após disparo
-    in_absolute = time_since <= self.t_refrac_abs
+        in_absolute = time_since <= self.t_refrac_abs
 
- # Refratário relativo: threshold elevado
+        # Refratário relativo: threshold elevado
         in_relative = (
-    (time_since > self.t_refrac_abs) &
-    (time_since <= self.t_refrac_rel)
-)
+            (time_since > self.t_refrac_abs) &
+            (time_since <= self.t_refrac_rel)
+        )
 
-   blocked = in_absolute | in_relative
+        # Boost no threshold durante refratário relativo
+        theta_boost = torch.where(
+            in_relative,
+            torch.full_like(time_since, self.refrac_rel_strength),
+            torch.zeros_like(time_since),
+        )
 
-theta_boost = torch.where(
-    in_relative,
-    torch.full_like(time_since, self.refrac_rel_strength),
-    torch.zeros_like(time_since),
-)
-
-return in_absolute, theta_boost
+        return in_absolute, theta_boost
     
     def _update_refractory_batch(self, spikes: torch.Tensor, dt: float = 1.0):
+        """
+        Atualiza estado refratário baseado nos spikes.
+        
+        Args:
+            spikes: [B] spikes do passo atual
+            dt: Passo de tempo (ms)
+        """
         current_time = self.time_counter.item()
         spike_mask = spikes > 0.5
+        
+        # Atualiza último spike time onde houve disparo
         self.last_spike_time = torch.where(
             spike_mask,
             torch.full_like(self.last_spike_time, current_time),
             self.last_spike_time
         )
+        
+        # Incrementa contador de tempo
         self._increment_time(dt)
     
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
+        """
+        Forward pass com período refratário.
+        
+        Args:
+            x: Tensor de entrada [B, D, S]
+            **kwargs: Argumentos adicionais (dt, etc.)
+            
+        Returns:
+            Dict com spikes após aplicação do refratário
+        """
         batch_size = x.shape[0]
         device = x.device
+        
+        # Garante que last_spike_time existe
         self._ensure_last_spike_time(batch_size, device)
         
+        # Forward da classe base
         output = super().forward(x, **kwargs)
         
+        # Verifica estado refratário
         current_time = self.time_counter.item()
-        blocked, theta_boost = self._check_refractory_batch(current_time, batch_size)
+        in_absolute, theta_boost = self._check_refractory_batch(current_time, batch_size)
         
-        # ✅ CORRIGIDO: de 'spights' para 'spikes'
-        spikes = output['spikes'].clone()
-        
-        spikes = torch.where(blocked, torch.zeros_like(spikes), spikes)
+        # Aplica refratário
         # theta_eff deve permanecer 1-D ([B]) para preservar a semântica
-        # ponto-a-ponto do refratário por amostra. O unsqueeze(1) induzia
-        # broadcasting para [B, B], corrompendo spikes e o estado dos
-        # mecanismos subsequentes (ex.: adaptação).
+        # ponto-a-ponto do refratário por amostra.
         theta_eff = output['theta'] + theta_boost
         spikes_rel = (output['u'] >= theta_eff).float()
         
-        final_spikes = torch.where(blocked, torch.zeros_like(spikes), spikes_rel)
+        # Bloqueia spikes durante refratário absoluto
+        final_spikes = torch.where(in_absolute, torch.zeros_like(spikes_rel), spikes_rel)
+        
+        # Atualiza output
         output['spikes'] = final_spikes
-        output['refrac_blocked'] = blocked
+        output['refrac_blocked'] = in_absolute
         output['theta_boost'] = theta_boost
         
+        # Atualiza estado refratário
         self._update_refractory_batch(final_spikes, dt=kwargs.get('dt', 1.0))
+        
         return output
+    
+    def reset_refractory(self):
+        """Reseta o estado refratário."""
+        self.last_spike_time = None
+        # Nota: time_counter NÃO é resetado aqui pois é compartilhado
+    
+    def get_refractory_metrics(self) -> dict:
+        """
+        Retorna métricas do período refratário.
+        
+        Returns:
+            dict: Dicionário com métricas
+        """
+        metrics = {
+            't_refrac_abs': self.t_refrac_abs,
+            't_refrac_rel': self.t_refrac_rel,
+            'refrac_rel_strength': self.refrac_rel_strength,
+        }
+        
+        if self.last_spike_time is not None:
+            metrics['last_spike_time_mean'] = self.last_spike_time.mean().item()
+            metrics['last_spike_time_min'] = self.last_spike_time.min().item()
+            metrics['last_spike_time_max'] = self.last_spike_time.max().item()
+        
+        return metrics

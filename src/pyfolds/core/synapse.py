@@ -15,6 +15,8 @@ Características:
     - Operações in-place para eficiência
     - Suporte a learning_rate_multiplier por modo
     - Usa constantes da config
+    - ✅ Filtro activity_threshold na plasticidade
+    - ✅ Uso minimizado de .item()
 """
 
 import torch
@@ -46,20 +48,14 @@ class MPJRDSynapse(nn.Module):
         # Potencial interno
         self.register_buffer("I", torch.zeros(1, dtype=torch.float32))
 
-        # Dinâmica de curto prazo
-        self.register_buffer("u", torch.tensor([cfg.u0], dtype=torch.float32))
-        self.register_buffer("R", torch.tensor([cfg.R0], dtype=torch.float32))
-
         # Proteção contra saturação
-        self.register_buffer("protection", torch.tensor([False]))
+        self.register_buffer("protection", torch.tensor([False], dtype=torch.bool))
         self.register_buffer("sat_time", torch.zeros(1, dtype=torch.float32))
 
         # Traço para consolidação two-factor
         self.register_buffer("eligibility", torch.zeros(1, dtype=torch.float32))
 
-        # Estado de curto prazo (u, R) exposto para inspeção/telemetria.
-        # Nota: a dinâmica completa de STP é implementada em módulos avançados,
-        # mas mantemos as variáveis aqui para consistência de interface.
+        # Estado de curto prazo (u, R) para compatibilidade
         self.register_buffer("u", torch.tensor([cfg.u0], dtype=torch.float32))
         self.register_buffer("R", torch.tensor([cfg.R0], dtype=torch.float32))
 
@@ -80,11 +76,12 @@ class MPJRDSynapse(nn.Module):
         
         ✅ OTIMIZADO: trabalha com tensores, evita .item() no caminho crítico
         ✅ MODOS: aplica multiplicador de learning rate baseado no modo
+        ✅ FILTRO: aplica activity_threshold para sinapses inativas
         
         Args:
-            pre_rate: Taxa pré-sináptica [0,1]
-            post_rate: Taxa pós-sináptica [0,1]
-            R: Sinal neuromodulador [-1,1]
+            pre_rate: Taxa pré-sináptica [B] ou [1]
+            post_rate: Taxa pós-sináptica [1]
+            R: Sinal neuromodulador [1]
             dt: Passo de tempo (ms)
             mode: Modo de aprendizado (para multiplicador de LR)
         """
@@ -101,28 +98,39 @@ class MPJRDSynapse(nn.Module):
         else:
             effective_eta = cfg.i_eta
 
-        # Termo Hebbiano normalizado (tensores)
-        pre_rate = clamp_rate(pre_rate)
-        post_rate = clamp_rate(post_rate)
-        R = clamp_R(R)
+        # Normaliza entradas
+        pre_rate = clamp_rate(pre_rate)  # [B] ou [1]
+        post_rate = clamp_rate(post_rate)  # [1]
+        R = clamp_R(R)  # [1]
 
-        # Hebb = pre * post (tensor)
-        hebb = (pre_rate * post_rate).clamp(0.0, 1.0)
+        # ✅ FILTRO: ignora sinapses inativas
+        # Se pre_rate < activity_threshold, considera como 0 para plasticidade
+        active_mask = (pre_rate > cfg.activity_threshold).float()  # [B]
+        pre_rate_filtered = pre_rate * active_mask  # [B]
+
+        # Hebb = pre * post (broadcast)
+        # post_rate é [1], pre_rate_filtered é [B] → resultado [B]
+        hebb = (pre_rate_filtered * post_rate).clamp(0.0, 1.0)  # [B]
 
         # Ganho dependente do peso (escalar)
-        gain = 1.0 + cfg.beta_w * self.W.item()
+        W_val = self.W.item()  # Único .item() necessário
+        gain = 1.0 + cfg.beta_w * W_val
 
-        # Delta de I (versão normalizada) - TRABALHA COM TENSORES
-        delta = effective_eta * (R * cfg.neuromod_scale) * hebb * gain * dt
+        # Delta de I (versão normalizada)
+        # R é [1], neuromod_scale é escalar
+        delta = effective_eta * (R * cfg.neuromod_scale) * hebb * gain * dt  # [B]
 
         # ✅ Atualização in-place (tensores)
-        self.I.mul_(cfg.i_gamma).add_(delta.mean())  # média do batch
+        # Usa média do batch para atualizar I (sinapse única)
+        delta_mean = delta.mean()  # []
+        self.I.mul_(cfg.i_gamma).add_(delta_mean)
         self.I.clamp_(cfg.i_min, cfg.i_max)
 
         # ✅ Eligibility in-place
-        self.eligibility.add_(delta.mean())
+        self.eligibility.add_(delta_mean)
 
-        # ===== LTP (Promoção) - USANDO TENSORES =====
+        # ===== LTP (Promoção) =====
+        # Usa comparação tensorial, evita .item() no caminho crítico
         if self.I >= cfg.i_ltp_th:
             if self.N < cfg.n_max:
                 self.N.add_(1)
@@ -135,7 +143,8 @@ class MPJRDSynapse(nn.Module):
                 self.I.zero_()
                 self.sat_time.zero_()
 
-        # ===== LTD (Demoção) - USANDO TENSORES =====
+        # ===== LTD (Demoção) =====
+        # Determina threshold baseado em proteção (precisa de .item() para condicional)
         ltd_th = cfg.ltd_threshold_saturated if self.protection.item() else cfg.i_ltd_th
         
         if self.I <= ltd_th:
@@ -163,7 +172,7 @@ class MPJRDSynapse(nn.Module):
         ✅ OTIMIZADO: usa i_decay_sleep da config
         """
         # Verifica se há elegibilidade
-        if self.eligibility.numel() == 0:
+        if self.eligibility.numel() == 0 or self.eligibility.item() == 0:
             return
         
         # Transfere elegibilidade para N
@@ -177,9 +186,33 @@ class MPJRDSynapse(nn.Module):
         # Reseta elegibilidade
         self.eligibility.zero_()
 
-        # ✅ Decaimento natural de I (usa i_decay_sleep da config)
+        # ✅ Decaimento natural de I
         if self.I.numel() > 0:
             self.I.mul_(self.cfg.i_decay_sleep)
+
+    def get_state(self) -> dict:
+        """Retorna estado completo da sinapse (sem .item() para tensores)."""
+        return {
+            'N': self.N.clone(),
+            'I': self.I.clone(),
+            'W': self.W.clone(),
+            'protection': self.protection.clone(),
+            'sat_time': self.sat_time.clone(),
+            'eligibility': self.eligibility.clone(),
+        }
+
+    def load_state(self, state: dict) -> None:
+        """Carrega estado na sinapse."""
+        if 'N' in state:
+            self.N.data = state['N'].to(self.N.device)
+        if 'I' in state:
+            self.I.data = state['I'].to(self.I.device)
+        if 'protection' in state:
+            self.protection.data = state['protection'].to(self.protection.device)
+        if 'sat_time' in state:
+            self.sat_time.data = state['sat_time'].to(self.sat_time.device)
+        if 'eligibility' in state:
+            self.eligibility.data = state['eligibility'].to(self.eligibility.device)
 
     def extra_repr(self) -> str:
         """Representação string da sinapse."""
