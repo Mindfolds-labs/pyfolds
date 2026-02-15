@@ -2,7 +2,7 @@
 
 <div align="center">
   
-  **Framework de Neurocomputação Biológica**
+  **Core Neural Computation Framework**
   
   [![PyPI](https://img.shields.io/pypi/v/pyfolds?style=flat-square&logo=pypi)](https://pypi.org/project/pyfolds/)
   [![Python](https://img.shields.io/pypi/pyversions/pyfolds?style=flat-square&logo=python)](https://python.org)
@@ -177,6 +177,7 @@ Issues: github.com/Mindfolds-labs/pyfolds/issues
 | **Técnico** | Foco no código e na arquitetura |
 
 **Pronto para colar!** 🚀
+
 
 
 
