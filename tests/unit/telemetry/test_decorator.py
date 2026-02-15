@@ -51,9 +51,11 @@ class TestTelemetryDecorator:
         for _ in range(1000):
             neuron.forward(10)
         
-        # Should have been called ~500 times
-        assert 400 < neuron.call_count < 600
-        assert len(neuron.telemetry.snapshot()) == neuron.call_count
+        # A função decorada sempre deve executar; amostragem só afeta emissão
+        assert neuron.call_count == 1000
+
+        emitted = len(neuron.telemetry.snapshot())
+        assert 400 < emitted < 600
     
     def test_decorator_lazy_evaluation(self):
         """Test that decorator works with lazy events."""
