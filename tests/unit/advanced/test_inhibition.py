@@ -1,0 +1,60 @@
+"""Tests for InhibitionLayer."""
+
+import pytest
+import torch
+import pyfolds
+
+
+class TestInhibitionLayer:
+    """Test inhibition layer."""
+    
+    def test_initialization(self):
+        """Test layer initialization."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+            
+        from pyfolds.advanced import InhibitionLayer
+        
+        layer = InhibitionLayer(
+            n_excitatory=10,
+            n_inhibitory=3,
+            lateral_strength=0.5
+        )
+        
+        assert layer.n_exc == 10
+        assert layer.n_inh == 3
+        assert layer.W_E2I.shape == (10, 3)
+        assert layer.lateral_kernel.shape == (10, 10)
+    
+    def test_lateral_kernel(self):
+        """Test lateral kernel properties."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+            
+        from pyfolds.advanced import InhibitionLayer
+        
+        layer = InhibitionLayer(n_excitatory=5, n_inhibitory=2)
+        kernel = layer.lateral_kernel
+        
+        # Diagonal should be zero (no self-inhibition)
+        assert torch.all(torch.diag(kernel) == 0)
+        
+        # Values between 0 and 1
+        assert torch.all(kernel >= 0)
+        assert torch.all(kernel <= 1)
+    
+    def test_forward_feedforward(self):
+        """Test feedforward E→I."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+            
+        from pyfolds.advanced import InhibitionLayer
+        
+        layer = InhibitionLayer(n_excitatory=5, n_inhibitory=2)
+        batch_size = 3
+        exc_spikes = torch.randint(0, 2, (batch_size, 5)).float()
+        
+        out = layer(exc_spikes)
+        
+        assert 'inh_spikes' in out
+        assert out['inh_potential'].shape == (2,)

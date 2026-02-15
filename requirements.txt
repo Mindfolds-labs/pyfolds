@@ -1,0 +1,11 @@
+# Core dependencies
+torch>=1.10.0
+numpy>=1.19.0
+
+# Development dependencies (opcional)
+pytest>=7.0
+pytest-cov>=4.0
+black>=24.0
+isort>=5.12
+flake8>=7.0
+mypy>=1.7

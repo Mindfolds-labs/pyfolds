@@ -1,0 +1,183 @@
+"""Dendrito MPJRD - Agregação vetorizada de sinapses - VERSÃO OTIMIZADA"""
+
+import torch
+import torch.nn as nn
+from typing import Optional, Dict, List
+from .config import MPJRDConfig
+from .synapse import MPJRDSynapse
+
+
+class MPJRDDendrite(nn.Module):
+    """
+    Dendrito MPJRD com processamento vetorizado e cache OTIMIZADO.
+    
+    ✅ OTIMIZAÇÃO CRÍTICA:
+        - Cache único que coleta estados UMA ÚNICA VEZ
+        - Evita loops múltiplos sobre as sinapses
+        - Propriedades retornam do cache, não recalculam
+    """
+    
+    def __init__(self, cfg: MPJRDConfig, dendrite_id: int):
+        super().__init__()
+        self.cfg = cfg
+        self.id = dendrite_id
+        self.n_synapses = cfg.n_synapses_per_dendrite
+        
+        # Sinapses como ModuleList
+        self.synapses = nn.ModuleList([
+            MPJRDSynapse(cfg) for _ in range(self.n_synapses)
+        ])
+        
+        # Cache único (dicionário)
+        self._cached_states = None
+        self._cache_invalid = True
+
+    def _ensure_cache_valid(self):
+        """
+        ✅ OTIMIZADO: Coleta estados UMA ÚNICA VEZ e cacheia tudo.
+        Propriedades individuais retornam do cache, não recalculam.
+        """
+        if not self._cache_invalid and self._cached_states is not None:
+            return
+        
+        device = next(self.parameters()).device
+        
+        # ✅ ÚNICO LOOP sobre sinapses (coleta tudo de uma vez)
+        N_list = []
+        I_list = []
+        u_list = []
+        R_list = []
+        
+        for syn in self.synapses:
+            N_list.append(syn.N.to(device))
+            I_list.append(syn.I.to(device))
+            u_list.append(syn.u.to(device))
+            R_list.append(syn.R.to(device))
+        
+        # ✅ Concatena de uma vez (operação vetorizada)
+        self._cached_states = {
+            'N': torch.cat(N_list).to(torch.int32),
+            'I': torch.cat(I_list),
+            'u': torch.cat(u_list),
+            'R': torch.cat(R_list)
+        }
+        
+        # ✅ W é derivado de N (calculado sob demanda, cacheado)
+        self._cached_W = torch.log2(1.0 + self._cached_states['N'].float()) / self.cfg.w_scale
+        
+        self._cache_invalid = False
+
+    def _invalidate_cache(self):
+        """Invalida o cache (chamar após modificar sinapses)."""
+        self._cache_invalid = True
+        self._cached_states = None
+        self._cached_W = None
+
+    @property
+    def N(self) -> torch.Tensor:
+        """Filamentos [S] - ✅ retorna do cache."""
+        self._ensure_cache_valid()
+        return self._cached_states['N']
+
+    @property
+    def I(self) -> torch.Tensor:
+        """Potencial interno [S] - ✅ retorna do cache."""
+        self._ensure_cache_valid()
+        return self._cached_states['I']
+
+    @property
+    def u(self) -> torch.Tensor:
+        """Facilitação [S] - ✅ retorna do cache."""
+        self._ensure_cache_valid()
+        return self._cached_states['u']
+
+    @property
+    def R(self) -> torch.Tensor:
+        """Recuperação [S] - ✅ retorna do cache."""
+        self._ensure_cache_valid()
+        return self._cached_states['R']
+
+    @property
+    def W(self) -> torch.Tensor:
+        """Pesos [S] derivados de N - ✅ cacheado."""
+        self._ensure_cache_valid()
+        if self._cached_W is None:
+            self._cached_W = torch.log2(1.0 + self.N.float()) / self.cfg.w_scale
+        return self._cached_W
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass vetorizado."""
+        # Normaliza entrada para [B, S]
+        if x.dim() == 2:
+            if x.shape[1] != self.n_synapses:
+                raise ValueError(f"Esperado {self.n_synapses} sinapses, recebido {x.shape[1]}")
+            x_flat = x
+        elif x.dim() == 3:
+            if x.shape[1] == 1:
+                x_flat = x.squeeze(1)
+            elif self.id < x.shape[1]:
+                x_flat = x[:, self.id, :]
+            else:
+                raise ValueError(f"Dendrite id {self.id} fora do range {x.shape[1]}")
+        else:
+            raise ValueError(f"Esperado 2 ou 3 dimensões, recebido {x.dim()}")
+
+        # Produto interno vetorizado
+        weights = self.W.to(x_flat.device)  # [S]
+        v_dend = torch.einsum('s,bs->b', weights, x_flat)  # [B]
+        
+        return v_dend
+
+    @torch.no_grad()
+    def update_synapses_rate_based(self, 
+                                  pre_rate: torch.Tensor,
+                                  post_rate: torch.Tensor,
+                                  R: torch.Tensor,
+                                  dt: float = 1.0,
+                                  mode=None) -> None:
+        """Atualiza sinapses."""
+        if pre_rate.dim() == 2 and pre_rate.shape[1] == 1:
+            pre_rate = pre_rate.squeeze(1)
+        
+        for syn in self.synapses:
+            syn.update(pre_rate, post_rate, R, dt, mode)
+        
+        self._invalidate_cache()
+
+    def consolidate(self, dt: float = 1.0) -> None:
+        """Consolida mudanças sinápticas."""
+        for syn in self.synapses:
+            syn.consolidate(dt)
+        self._invalidate_cache()
+
+    def get_states(self) -> Dict[str, torch.Tensor]:
+        """Retorna todos os estados."""
+        self._ensure_cache_valid()
+        return {
+            'N': self.N.clone(),
+            'W': self.W.clone(),
+            'I': self.I.clone(),
+            'u': self.u.clone(),
+            'R': self.R.clone()
+        }
+
+    def load_states(self, states: Dict[str, torch.Tensor]) -> None:
+        """Carrega estados."""
+        for idx, syn in enumerate(self.synapses):
+            if 'N' in states:
+                syn.N.data = states['N'][idx].view(1)
+            if 'I' in states:
+                syn.I.data = states['I'][idx].view(1)
+            if 'u' in states:
+                syn.u.data = states['u'][idx].view(1)
+            if 'R' in states:
+                syn.R.data = states['R'][idx].view(1)
+        self._invalidate_cache()
+
+    def extra_repr(self) -> str:
+        """Representação string."""
+        if self._cached_states is None:
+            return f"id={self.id}, synapses={self.n_synapses} (cache vazio)"
+        
+        return (f"id={self.id}, synapses={self.n_synapses}, "
+                f"N_mean={self.N.float().mean().item():.1f}")
