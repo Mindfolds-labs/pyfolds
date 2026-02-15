@@ -2,7 +2,7 @@
 
 import torch
 import torch.nn as nn
-from typing import Optional, Dict, List, Any, Union
+from typing import Optional, Dict, List, Any, Type
 from ..core.config import MPJRDConfig
 from ..core.neuron import MPJRDNeuron
 from ..utils.types import LearningMode
@@ -42,7 +42,8 @@ class MPJRDLayer(nn.Module):
         name: str = "",
         enable_telemetry: bool = False,
         telemetry_profile: str = "off",
-        device: Optional[torch.device] = None
+        device: Optional[torch.device] = None,
+        neuron_class: Type[MPJRDNeuron] = MPJRDNeuron,
     ):
         super().__init__()
         self.n_neurons = n_neurons
@@ -50,14 +51,20 @@ class MPJRDLayer(nn.Module):
         self.cfg = cfg
         self.device = device or torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+        if not issubclass(neuron_class, MPJRDNeuron):
+            raise TypeError("neuron_class deve herdar de MPJRDNeuron")
+
+        self.neuron_class = neuron_class
+
         # Cria neurônios com telemetria (se ativada)
         self.neurons = nn.ModuleList([
-            MPJRDNeuron(
+            neuron_class(
                 cfg,
                 enable_telemetry=enable_telemetry,
-                telemetry_profile=telemetry_profile
+                telemetry_profile=telemetry_profile,
+                name=f"{self.name}.n{i}",
             )
-            for _ in range(n_neurons)
+            for i in range(n_neurons)
         ])
 
         # Move para device
