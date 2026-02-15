@@ -1,0 +1,38 @@
+stateDiagram-v2
+    [*] --> N_0: init
+
+    state "Estado sináptico N" as NState {
+      state N_0
+      state N_1
+      state N_2
+      state N_k
+      state N_max
+    }
+
+    N_0 --> N_1: I >= i_ltp_th
+    N_1 --> N_2: I >= i_ltp_th
+    N_2 --> N_k: promoções sucessivas
+    N_k --> N_max: I >= i_ltp_th
+
+    N_max --> N_max: I >= i_ltp_th / protection=True
+    N_max --> N_k: I <= ltd_threshold_saturated
+
+    N_k --> N_2: I <= i_ltd_th
+    N_2 --> N_1: I <= i_ltd_th
+    N_1 --> N_0: I <= i_ltd_th
+
+    note right of N_max
+      Em saturação:
+      - protection = True
+      - sat_time acumula
+      - LTD usa limiar especial
+    end note
+
+    N_max --> N_max: sat_time += dt
+    N_max --> N_max: sat_time < saturation_recovery_time
+    N_max --> N_max: sat_time >= saturation_recovery_time / protection=False
+
+    N_0 --> N_0: I clamp [i_min, i_max]
+    N_1 --> N_1: I clamp [i_min, i_max]
+    N_k --> N_k: I clamp [i_min, i_max]
+    N_max --> N_max: I clamp [i_min, i_max]
