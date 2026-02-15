@@ -11,14 +11,34 @@
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![GitHub](https://img.shields.io/badge/GitHub-Mindfolds--labs%2Fpyfolds-blue)](https://github.com/Mindfolds-labs/pyfolds)
   
-  <br>
-  [📚 Documentação](/#) •
-  [🚀 Instalação](installation.md) •
-  [🔥 Quick Start](quickstart.md) •
-  [🧪 Exemplos](/#) •
-  [🤝 Contribuir](development/contributing.md)
-  <br><br>
+    [📚 Documentação](#-documentação) • 
+  [🚀 Instalação](#-instalação) • 
+  [🔥 Quick Start](#-quick-start) • 
+  [🧪 Exemplos](#-exemplos) • 
+  [🤝 Contribuir](#-contribuindo)
+  
+  ---
+  
+  **Author:** Antônio Carlos ([jrduraes90@gmail.com](mailto:jrduraes90@gmail.com))
+  
 </div>
+
+---
+
+## 📋 Tabela de Conteúdos
+
+- [Visão Geral](#-visão-geral)
+- [Arquitetura](#-arquitetura)
+- [Instalação](#-instalação)
+- [Quick Start](#-quick-start)
+- [Componentes](#-componentes)
+- [Exemplos](#-exemplos)
+- [Documentação](#-documentação)
+- [Performance](#-performance)
+- [Contribuição](#-contribuindo)
+- [Licença](#-licença)
+- [Citação](#-citação)
+- [Contato](#-contato)
 
 ---
 
@@ -176,6 +196,7 @@ Issues: github.com/Mindfolds-labs/pyfolds/issues
 | **Técnico** | Foco no código e na arquitetura |
 
 **Pronto para colar!** 🚀
+
 
 
 
