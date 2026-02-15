@@ -2,7 +2,7 @@
 
 import torch
 import torch.nn as nn
-from typing import Optional, Dict, List, Any, Type
+from typing import Optional, Dict, List, Any, Union, Type
 from ..core.config import MPJRDConfig
 from ..core.neuron import MPJRDNeuron
 from ..utils.types import LearningMode
@@ -40,6 +40,7 @@ class MPJRDLayer(nn.Module):
         n_neurons: int,
         cfg: MPJRDConfig,
         name: str = "",
+        neuron_cls: Type[MPJRDNeuron] = MPJRDNeuron,
         enable_telemetry: bool = False,
         telemetry_profile: str = "off",
         device: Optional[torch.device] = None,
@@ -57,8 +58,9 @@ class MPJRDLayer(nn.Module):
         self.neuron_class = neuron_class
 
         # Cria neurônios com telemetria (se ativada)
+        self.neuron_cls = neuron_cls
         self.neurons = nn.ModuleList([
-            neuron_class(
+            neuron_cls(
                 cfg,
                 enable_telemetry=enable_telemetry,
                 telemetry_profile=telemetry_profile,
@@ -102,7 +104,8 @@ class MPJRDLayer(nn.Module):
         self,
         x: torch.Tensor,
         reward: Optional[float] = None,
-        mode: Optional[LearningMode] = None
+        mode: Optional[LearningMode] = None,
+        neuron_kwargs: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, torch.Tensor]:
         """
         Forward pass da camada.
@@ -127,11 +130,18 @@ class MPJRDLayer(nn.Module):
         x = self._prepare_input(x)
         batch_size = x.shape[0]
 
+        neuron_kwargs = neuron_kwargs or {}
+
         # Pré-aloca tensores de saída
         spikes = torch.zeros(batch_size, self.n_neurons, device=self.device)
         rates = torch.zeros(self.n_neurons, device=self.device)
         thetas = torch.zeros(self.n_neurons, device=self.device)
         r_hats = torch.zeros(self.n_neurons, device=self.device)
+
+        wave_real = None
+        wave_imag = None
+        phase = None
+        frequency = None
 
         # ✅ CORRIGIDO: Context manager válido
         if self.training:
@@ -140,12 +150,24 @@ class MPJRDLayer(nn.Module):
                 out = neuron(
                     x[:, i, :, :],  # [batch, dendrites, synapses]
                     reward=reward,
-                    mode=mode
+                    mode=mode,
+                    **neuron_kwargs,
                 )
                 spikes[:, i] = out['spikes']
                 rates[i] = out['spike_rate']
                 thetas[i] = out['theta']
                 r_hats[i] = out['r_hat']
+
+                if 'wave_real' in out:
+                    if wave_real is None:
+                        wave_real = torch.zeros(batch_size, self.n_neurons, device=self.device)
+                        wave_imag = torch.zeros(batch_size, self.n_neurons, device=self.device)
+                        phase = torch.zeros(batch_size, self.n_neurons, device=self.device)
+                        frequency = torch.zeros(self.n_neurons, device=self.device)
+                    wave_real[:, i] = out['wave_real']
+                    wave_imag[:, i] = out['wave_imag']
+                    phase[:, i] = out['phase']
+                    frequency[i] = out['frequency']
         else:
             # Modo avaliação: sem gradientes (mais rápido)
             with torch.no_grad():
@@ -153,19 +175,41 @@ class MPJRDLayer(nn.Module):
                     out = neuron(
                         x[:, i, :, :],
                         reward=reward,
-                        mode=mode
+                        mode=mode,
+                        **neuron_kwargs,
                     )
                     spikes[:, i] = out['spikes']
                     rates[i] = out['spike_rate']
                     thetas[i] = out['theta']
                     r_hats[i] = out['r_hat']
 
-        return {
+                    if 'wave_real' in out:
+                        if wave_real is None:
+                            wave_real = torch.zeros(batch_size, self.n_neurons, device=self.device)
+                            wave_imag = torch.zeros(batch_size, self.n_neurons, device=self.device)
+                            phase = torch.zeros(batch_size, self.n_neurons, device=self.device)
+                            frequency = torch.zeros(self.n_neurons, device=self.device)
+                        wave_real[:, i] = out['wave_real']
+                        wave_imag[:, i] = out['wave_imag']
+                        phase[:, i] = out['phase']
+                        frequency[i] = out['frequency']
+
+        output = {
             'spikes': spikes,
             'rates': rates,
             'thetas': thetas,
             'r_hats': r_hats,
         }
+
+        if wave_real is not None and wave_imag is not None and phase is not None and frequency is not None:
+            output.update({
+                'wave_real': wave_real,
+                'wave_imag': wave_imag,
+                'phase': phase,
+                'frequency': frequency,
+            })
+
+        return output
 
     def _prepare_input(self, x: torch.Tensor) -> torch.Tensor:
         """

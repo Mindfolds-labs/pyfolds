@@ -70,8 +70,9 @@ class ShortTermDynamicsMixin:
         decay_rec = math.exp(-dt / self.tau_rec)
         
         # Atualiza facilitação (u)
-        # u = u * decay + U * (1 - u) * pre_spikes
-        self.u_stp.mul_(decay_fac).add_(self.U * (1 - self.u_stp) * pre_spikes)
+        # u = u_prev * decay + U * (1 - u_prev) * pre_spikes
+        u_prev = self.u_stp.clone()
+        self.u_stp.copy_(u_prev * decay_fac + self.U * (1 - u_prev) * pre_spikes)
         self.u_stp.clamp_(0.0, 1.0)
         
         # Atualiza recursos (R)

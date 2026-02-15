@@ -272,9 +272,10 @@ class MPJRDNetwork(nn.Module):
         self.built = True
         return self
 
-    def forward(self, x: torch.Tensor, 
+    def forward(self, x: torch.Tensor,
                 reward: Optional[float] = None,
-                mode: LearningMode = LearningMode.ONLINE) -> Dict[str, torch.Tensor]:
+                mode: LearningMode = LearningMode.ONLINE,
+                layer_kwargs: Optional[Dict[str, Dict[str, object]]] = None) -> Dict[str, torch.Tensor]:
         """
         Forward pass da rede com ordenação topológica real.
         
@@ -296,12 +297,19 @@ class MPJRDNetwork(nn.Module):
         # ✅ USA ORDENAÇÃO TOPOLÓGICA CACHEADA
         layer_order = self._layer_order
         
+        layer_kwargs = layer_kwargs or {}
+
         # Dicionário para armazenar saídas de cada camada
         outputs = {}
         
         # Forward da primeira camada
         first_layer = layer_order[0]
-        outputs[first_layer] = self.layers[first_layer](x, reward=reward, mode=mode)
+        outputs[first_layer] = self.layers[first_layer](
+            x,
+            reward=reward,
+            mode=mode,
+            **layer_kwargs.get(first_layer, {}),
+        )
         
         # Processa camadas restantes em ordem
         for layer_name in layer_order[1:]:
@@ -334,7 +342,10 @@ class MPJRDNetwork(nn.Module):
             
             # Forward da camada
             outputs[layer_name] = self.layers[layer_name](
-                combined_input, reward=reward, mode=mode
+                combined_input,
+                reward=reward,
+                mode=mode,
+                **layer_kwargs.get(layer_name, {}),
             )
         
         # Resultado final

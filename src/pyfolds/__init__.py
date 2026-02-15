@@ -21,10 +21,13 @@ __version__ = "2.0.0"
 # ===== CORE COMPONENTS =====
 from .core.config import MPJRDConfig
 from .core.neuron import MPJRDNeuron
+from .layers import MPJRDLayer, MPJRDWaveLayer
+from .network import MPJRDNetwork, MPJRDWaveNetwork
 from .core.neuron_v2 import MPJRDNeuronV2
 from .layers import MPJRDLayer
 from .network import MPJRDNetwork
 from .utils.types import LearningMode, ConnectionType
+from .wave import MPJRDWaveConfig, MPJRDWaveNeuron
 
 # ===== TELEMETRY (para MindMetrics/MindAudit) =====
 from .telemetry import (
@@ -62,12 +65,19 @@ from .telemetry import (
 
 # ===== ADVANCED (optional) =====
 try:
-    from .advanced import MPJRDNeuronAdvanced, MPJRDLayerAdvanced
+    from .advanced import (
+        MPJRDNeuronAdvanced,
+        MPJRDLayerAdvanced,
+        MPJRDWaveNeuronAdvanced,
+        MPJRDWaveLayerAdvanced,
+    )
     ADVANCED_AVAILABLE = True
 except ImportError:
     ADVANCED_AVAILABLE = False
     MPJRDNeuronAdvanced = None
     MPJRDLayerAdvanced = None
+    MPJRDWaveNeuronAdvanced = None
+    MPJRDWaveLayerAdvanced = None
 
 # ===== EXPORTS =====
 __all__ = [
@@ -77,6 +87,10 @@ __all__ = [
     "MPJRDNeuronV2",
     "MPJRDLayer",
     "MPJRDNetwork",
+    "MPJRDWaveLayer",
+    "MPJRDWaveNetwork",
+    "MPJRDWaveConfig",
+    "MPJRDWaveNeuron",
     
     # Types
     "LearningMode",
@@ -109,4 +123,6 @@ if ADVANCED_AVAILABLE:
     __all__.extend([
         "MPJRDNeuronAdvanced",
         "MPJRDLayerAdvanced",
+        "MPJRDWaveNeuronAdvanced",
+        "MPJRDWaveLayerAdvanced",
     ])
