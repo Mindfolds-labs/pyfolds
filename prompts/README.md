@@ -1,312 +1,226 @@
-📚 PMBOK (Project Management Body of Knowledge)
-O QUÊ: Framework completo de gerenciamento de projetos
-FOCO: 10 áreas de conhecimento, 5 grupos de processos
+# ISSUE-[N] — [Título Completo]
 
-Grupos de Processos:
-1. INICIAÇÃO → CRIAR (você define)
-2. PLANEJAMENTO → ANALISAR (você aprova)
-3. EXECUÇÃO → EXECUTAR (Codex faz)
-4. MONITORAMENTO E CONTROLE → Validar (durante execução)
-5. ENCERRAMENTO → FINALIZAR (você aprova em PR)
-
-Origem: PMI (Project Management Institute)
-Uso: Projetos complexos, grandes empresas, compliance
-
-🔗 Integração: PMBOK + GitHub Pull Request
-┌─────────────────────────────────────────────────────────────┐
-│         WORKFLOW v5 — PMBOK + Pull Request                  │
-└─────────────────────────────────────────────────────────────┘
-
-1️⃣ CRIAR (Você)
-   ├─ PMBOK: Iniciação (escopo, objetivos)
-   ├─ Cria: ISSUE-[N]-[slug].md + LOG.md
-   ├─ Adiciona ao CSV
-   └─ STATUS: ⏳ Planejada
-
-2️⃣ ANALISAR (Você)
-   ├─ PMBOK: Planejamento (recursos, cronograma, riscos)
-   ├─ Lê e valida: artefatos, plano de ação
-   ├─ Cria: PULL REQUEST (draft)
-   └─ STATUS: ✅ Pronto para Executar
-
-3️⃣ EXECUTAR (Codex)
-   ├─ PMBOK: Execução + Monitoramento
-   ├─ Faz: mudanças nos artefatos
-   ├─ Valida: links, sintaxe, testes
-   ├─ Atualiza: PULL REQUEST com resultado
-   └─ STATUS: 🔄 Em Progresso (PR marcado como Ready for Review)
-
-4️⃣ FINALIZAR (Você)
-   ├─ PMBOK: Encerramento (aceitação, lições aprendidas)
-   ├─ Lê: feedback de Codex no PR
-   ├─ Aprova: "Approve" no GitHub
-   ├─ Merge: PR → main
-   └─ STATUS: ✅ Concluída
-
-📋 PROMPT MASTER v5 — Gera Tudo com PMBOK + PR
-markdown# PROMPT MASTER v5: PMBOK + Pull Request Workflow
-
-## 🎯 Contexto
-
-Este prompt estabelece o **workflow profissional completo** para issues do PyFolds,
-integrando PMBOK, ITIL, COBIT, SCRUM, Agile e GitHub Pull Request.
-
-Você (humano) aprova tudo via PR (não local).
-
----
-
-## 📊 Paradigma Formal
-````
-WORKFLOW v5: "PMBOK-Driven Agile with ITIL Controls"
-
-Frameworks Integrados:
-├─ PMBOK (Project Management — 5 Grupos de Processos)
-├─ ITIL (IT Service Management — Processos operacionais)
-├─ COBIT (Governança e Compliance — Controle)
-├─ SCRUM (Iteração — Sprints e backlogs)
-└─ AGILE (Mindset — Flexibilidade e feedback)
-
-Plataforma: GitHub (PR é ponto de aprovação único)
-````
-
----
-
-## 1️⃣ ESTÁGIO: CRIAR
-
-### PMBOK: Iniciação
-- Definir objetivo, escopo, restrições
-- Identificar stakeholders (você, Codex)
-- Documentar requisitos
-
-### 👤 Responsável
-**Você (Humano)**
-
-### 📝 Prompt de Criação
-````markdown
-# PROMPT: Criar ISSUE-[N] (Estágio 1 — CRIAR)
-
-## 📋 Você Precisa Fazer
-
-Defina os parâmetros da ISSUE:
-````
-Número: ISSUE-[N] (ex: ISSUE-006)
-Tema: [descrição em 1 frase]
-Objetivo: [por que fazer isso?]
-Escopo: [o que inclui/exclui]
-Área: [docs/código/testes]
-Prioridade: [Alta/Média/Baixa]
-Responsável: [seu nome ou "A definir"]
-Data: [YYYY-MM-DD]
-Riscos Identificados: [listar riscos]
-Dependências: [outras issues?]
-````
-
-## ✍️ Crie os Arquivos
-
-### Arquivo 1: Relatório Principal
-````
-prompts/relatorios/ISSUE-[N]-[slug].md
-Conteúdo:
-markdown# ISSUE-[N] — [Seu Tema]
-
-> **PMBOK Fase:** Iniciação  
-> **Status:** ⏳ Planejada  
-> **Área:** [docs/código]  
+> **Sistemas/Área:** [docs/código/testes]  
+> **Status:** [✅ Concluída | 🔄 Em Progresso | ⏳ Planejada | ❌ Bloqueada]  
+> **Sprint:** [1/3 ou N/A]  
 > **Data:** [YYYY-MM-DD]  
-> **Responsável:** [nome]  
-
-## 🎯 Objetivo (PMBOK: Charter)
-[Por que fazer isso? Valor de negócio]
-
-## 📋 Escopo (PMBOK: Escopo do Projeto)
-**Inclui:**
-- ✅ [item]
-
-**Exclui:**
-- ❌ [item]
-
-## 📊 Artefatos a Alterar (PMBOK: Deliverables)
-- `arquivo1.md` — [o que muda]
-- `arquivo2.py` — [o que muda]
-
-## ⏰ Cronograma (PMBOK: Schedule)
-- Sprint 1: [data] — [o que fazer]
-- Sprint 2: [data] — [o que fazer]
-
-## 🚨 Riscos (PMBOK: Risk)
-- [ ] Risco 1: [descrição] | Mitigação: [como evitar]
-- [ ] Risco 2: [descrição] | Mitigação: [como evitar]
-
-## 📌 Dependências (PMBOK: Stakeholders)
-- Depende de: [ISSUE-XXX]
-- Bloqueia: [ISSUE-YYY]
-
-## ✅ Critérios de Aceite
-- [ ] Critério 1
-- [ ] Critério 2
-
-## 📝 PROMPT:EXECUTAR
-<!-- PROMPT:EXECUTAR:INICIO -->
-[Seu prompt de execução]
-<!-- PROMPT:EXECUTAR:FIM -->
-````
-
-### Arquivo 2: Log de Execução
-````
-prompts/relatorios/ISSUE-[N]-[slug]-LOG.md
-Conteúdo:
-markdown# LOG — ISSUE-[N]
-
-## 1️⃣ CRIADO (Data/Hora)
-
-**PMBOK Fase:** Iniciação
-
-├─ Criador: [seu nome]
-├─ Data: [YYYY-MM-DD HH:MM]
-├─ Status: ⏳ Planejada
-├─ Arquivo Principal: ✅ Criado
-├─ Log: ✅ Criado
-├─ CSV: ✅ Atualizado
-├─ HUB: ✅ Sincronizado
-└─ Pull Request: ⏳ Será criado em ANALISAR
-🔧 Atualize Configurações
-bash# 1. Adicione ao CSV
-docs/development/execution_queue.csv
-````
-
-Linha:
-````
-ISSUE-[N],"[Tema]","Planejada","[seu nome]",[data],"prompts/relatorios/ISSUE-[N]-slug.md",,,Média,"[área]"
-✅ Sincronize
-bashpython tools/sync_hub.py
-python tools/sync_hub.py --check
-````
-
-## 🎯 Status Final
-````
-✅ CRIADO
-
-├─ Arquivo Principal: ✅
-├─ Log: ✅
-├─ CSV: ✅
-├─ HUB: ✅
-└─ Próximo: ANALISAR
-````
-````
+> **Responsável:** [Nome ou "A definir"]
 
 ---
 
-## 2️⃣ ESTÁGIO: ANALISAR
+## 📊 Status Executivo
 
-### PMBOK: Planejamento
-- Refinar escopo, cronograma, riscos
-- Preparar para execução
-- Criar PR (pull request)
+<div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; border-radius: 4px;">
 
-### 👤 Responsável
-**Você (Humano)**
+**O Que Já Está Pronto:**
+- ✅ [Item 1]
+- ✅ [Item 2]
 
-### 📝 Prompt de Análise
-````markdown
-# PROMPT: Analisar ISSUE-[N] (Estágio 2 — ANALISAR)
+**O Que Ainda Falta (Próximos Passos):**
+- ⏳ [Item 1]
+- ⏳ [Item 2]
 
-## 🔍 Você Precisa Fazer
+</div>
 
-### Passo 1: Leia a ISSUE
-```bash
-cat prompts/relatorios/ISSUE-[N]-[slug].md
+---
+
+## 🎯 1. Objetivo
+
+[Descrever claramente o objetivo desta issue]
+
+**Exemplo:**
+> Padronizar arquivos canônicos na raiz do repositório para melhorar onboarding e conformidade IEEE/ISO.
+
+---
+
+## 📋 2. Escopo
+
+**O que está INCLUÍDO:**
+- ✅ Criar `CONTRIBUTING.md` na raiz
+- ✅ Criar `CHANGELOG.md` na raiz
+- ✅ Preencher `release_process.md`
+
+**O que NÃO está incluído:**
+- ❌ Refatorar estrutura de `/docs` (é ISSUE-001)
+- ❌ Criar novos ADRs (é demanda diferente)
+
+---
+
+## ✅ 3. O Que Já Está Pronto
+
+### 3.1 Sprint 1 — Gaps Críticos (FECHADO)
+
+<div style="background-color: #d4edda; border-left: 4px solid #28a745; padding: 12px; border-radius: 4px;">
+
+**Arquivos Criados:**
+
+✅ **CONTRIBUTING.md** (raiz)
+```
+- Guia canônico de contribuição
+- Ponte para docs/development/CONTRIBUTING.md
+- 20 linhas, conciso e direto
 ```
 
-### Passo 2: Valide Cada Seção
+✅ **CHANGELOG.md** (raiz)
+```
+- Keep a Changelog format
+- Semver versionado
+- Seção [Unreleased] + [2.0.0]
+```
 
-**Objetivo:**
-- ✅ Claro e mensurável?
-- ✅ Traz valor?
+✅ **docs/development/DEVELOPMENT_HUB.md**
+```
+- Arquivo de compatibilidade
+- Links para HUB_CONTROLE.md
+```
 
-**Escopo:**
-- ✅ Completo?
-- ✅ Sem ambiguidades?
+✅ **docs/development/release_process.md**
+```
+- 6 seções: Objetivo, Escopo, Fluxo, Checklist
+- Procedimento auditável
+```
 
-**Artefatos:**
-- ✅ Corretos?
-- ✅ Sem faltantes?
+✅ **src/pyfolds/serialization/foldio.py**
+```
+- ADR-001/002/003 referenciadas no docstring
+- Rastreabilidade melhorada
+```
 
-**Cronograma:**
-- ✅ Realista?
-- ✅ Com dependências?
+✅ **pyproject.toml**
+```
+- Novo extra: [project.optional-dependencies] examples
+- torchvision>=0.15.0 declarado
+```
 
-**Riscos:**
-- ✅ Identificados?
-- ✅ Mitigações claras?
+✅ **docs/ARCHITECTURE.md**
+```
+- Referência de diagrama atualizada
+- docs/diagrams/ → docs/architecture/blueprints/
+```
 
-**PROMPT:**
-- ✅ Executável?
-- ✅ Sem ambiguidades?
+✅ **CI/CD**
+```
+- .github/workflows/validate-docs.yml criado
+- tools/validate_docs_links.py implementado
+```
 
-### Passo 3: Atualize o Log
-````
-prompts/relatorios/ISSUE-[N]-[slug]-LOG.md
-Adicione seção:
-markdown## 2️⃣ ANALISADO (Data/Hora)
+✅ **Sincronização**
+```
+- execution_queue.csv atualizado
+- HUB_CONTROLE.md regenerado
+- Links validados
+```
 
-**PMBOK Fase:** Planejamento
+</div>
 
-├─ Analisador: [seu nome]
-├─ Data: [YYYY-MM-DD HH:MM]
-├─ Status: ✅ Pronto para Executar
-├─ Validações:
-│  ├─ Objetivo: ✅ OK
-│  ├─ Escopo: ✅ OK
-│  ├─ Artefatos: ✅ OK
-│  ├─ Cronograma: ✅ OK
-│  ├─ Riscos: ✅ OK
-│  └─ PROMPT: ✅ OK
-├─ Mudanças Sugeridas: [se houver]
-└─ Aprovação: ✅ APROVADO
-Passo 4: Crie Pull Request
-bash# No GitHub, crie novo PR:
+---
 
-Título:
-[ISSUE-[N]] [Tema] — Planejado
+### 3.2 Sprint 2 — (EM PLANEJAMENTO)
 
-Descrição:
-````
-## PMBOK: Planejamento
+<div style="background-color: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px; border-radius: 4px;">
 
-**Status:** ⏳ Análise Completa
+⏳ Validação de docs em CI (melhorar)  
+⏳ Normalizar `tests/performance/` vs `tests/perf/`  
+⏳ Documentar decisão em `docs/development/testing.md`
 
-**O que será feito:**
-- [ ] Artefato 1
-- [ ] Artefato 2
+</div>
 
-**Cronograma:**
-- Sprint 1: [data]
-- Sprint 2: [data]
+---
 
-**Riscos:**
-- Risco 1: [descrição]
-- Risco 2: [descrição]
+### 3.3 Sprint 3 — (EM PLANEJAMENTO)
 
-**Aprovação:**
-- [ ] Analisor (você): Avaliar em EXECUTAR
-- [ ] Codex: Executar
-- [ ] Você: Aprovar em FINALIZAR
+<div style="background-color: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px; border-radius: 4px;">
 
-**Relatórios:**
-- Principal: [link]
-- Log: [link]
-````
+⏳ Consolidar diagramas em `docs/diagrams/` ou alias  
+⏳ Atualizar índices finais (`docs/index.md`, etc)
 
-Status: **DRAFT** (não pronto ainda)
+</div>
 
-### Passo 5: Reporte
-````
-✅ ANALISADO
+---
 
-├─ Log Atualizado: ✅
-├─ PR Criado: ✅ (DRAFT)
-├─ Status: ✅ Pronto para Executar
-└─ Próximo: EXECUTAR
-````
+## ⏳ 4. Próximos Passos
 
+### Para Sprint 2:
+- [ ] Expandir validação de docs em GitHub Actions
+- [ ] Decidir: `tests/performance/` ou `tests/perf/`?
+- [ ] Documentar em `docs/development/testing.md`
+- [ ] Atualizar `pyproject.toml` (se necessário)
+
+### Para Sprint 3:
+- [ ] Revisar estrutura de diagramas
+- [ ] Criar alias se necessário (`docs/diagrams/` → `docs/architecture/blueprints/`)
+- [ ] Atualizar `docs/index.md`
+- [ ] Publicar v0.1.0
+
+---
+
+## 📝 5. PROMPT PARA EXECUTAR
+
+<!-- PROMPT:INICIO -->
+
+### Contexto
+[Seu contexto aqui]
+
+### Instruções Para Codex
+
+Você é um assistente IA ajudando a executar ISSUE-[N].
+
+**Tarefa:** [Descrever o que fazer]
+
+**Arquivos a Alterar:**
+1. `arquivo1.md` — [o que fazer]
+2. `arquivo2.py` — [o que fazer]
+3. `docs/development/execution_queue.csv` — [o que fazer]
+
+**Validações Após Execução:**
+```bash
+python tools/sync_hub.py --check
+python tools/validate_docs_links.py
+git status
+```
+
+**Commit Final:**
+```bash
+git add [arquivos]
+git commit -m "ISSUE-[N]: [descrição]"
+```
+
+<!-- PROMPT:FIM -->
+
+---
+
+## 🔗 6. Referências
+
+| Tipo | Referência |
+|------|-----------|
+| **ADR** | [ADR-031](../docs/governance/adr/ADR-031-*.md) — Governança operacional |
+| **Related ISSUE** | [ISSUE-003](./ISSUE-003-auditoria-completa.md) — Auditoria |
+| **Documentation** | [HUB_CONTROLE.md](../docs/development/HUB_CONTROLE.md) |
+| **CSV** | [execution_queue.csv](../docs/development/execution_queue.csv) |
+
+---
+
+## 📌 7. Critérios de Aceite
+
+- [x] Objetivo alcançado
+- [x] Arquivos criados/atualizados
+- [x] Links validados
+- [x] Sincronização OK
+- [x] Sem erros de sintaxe
+- [x] Commit realizado
+
+---
+
+## 📝 Histórico
+
+| Data | Ação | Status |
+|------|------|--------|
+| 2026-02-16 | Sprint 1 iniciado | ✅ Concluído |
+| 2026-02-16 | Commit 2851338 | ✅ Mergeado |
+| TBD | Sprint 2 início | ⏳ Planejado |
+| TBD | Sprint 3 início | ⏳ Planejado |
+
+---
+
+**Mantido por:** Codex | **Última atualização:** 2026-02-16
 
