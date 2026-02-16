@@ -38,6 +38,21 @@ source .venv/bin/activate
 pip install -e .[dev]
 ```
 
+
+## Benchmarks de serialização
+
+Para medir throughput de escrita/leitura e taxa de compressão do formato `.fold`:
+
+```bash
+python scripts/run_benchmarks.py --output docs/assets/benchmarks_results.json
+python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/BENCHMARKS.md
+```
+
+Interpretação rápida:
+- **throughput (MiB/s)**: quanto maior, melhor.
+- **razão de compressão vs `none`**: valores menores que `1.0` indicam arquivo comprimido menor. O método pode ser `fold:zstd` (quando disponível) ou fallback `zlib(level=6)`.
+- O workflow `.github/workflows/benchmarks.yml` executa semanalmente e atualiza os artefatos automaticamente.
+
 ## Portal de documentação
 
 - 📚 Índice geral: `docs/README.md`

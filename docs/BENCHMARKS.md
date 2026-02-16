@@ -1,30 +1,32 @@
-# Benchmarks
+# Benchmarks de Serialização (FoldIO)
 
-Data da coleta (UTC): **2026-02-16T13:21:53.158903+00:00**
-
-## Configuração
-
-- Iterações: `2`
-- Tamanho do payload: `2 MB`
-- Nível ZSTD: `3`
-- Modo de compressão: `none`
-- Seed: `42`
+- Gerado em: `2026-02-16T13:33:21+00:00`
+- Seed: `1337`
+- Amostras por medição: `3`
+- Device: `cpu`
 - Python: `3.10.19`
-- Plataforma: `Linux-6.12.47-x86_64-with-glibc2.39`
+- PyTorch: `2.10.0+cu128`
+- Compressão Fold/ZSTD disponível: `False`
 
-## Métricas
+## Throughput de escrita
 
-| Métrica | Valor médio |
+| Cenário | none (MiB/s) | Arquivo none (bytes) |
+|---|---:|---:|
+| small (4x16, batch=16) | 1.454 | 149357 |
+| medium (8x32, batch=32) | 2.291 | 565173 |
+
+## Throughput de leitura
+
+| Cenário | none (MiB/s) |
 |---|---:|
-| Write speed | 174.43 MB/s |
-| Read speed | 396.90 MB/s |
-| Compress ratio | 1.0003 |
-| Write time | 0.0184 s |
-| Read time | 0.0062 s |
-| Compressed size | 2097760 bytes |
-| Uncompressed size | 2097152 bytes |
+| small (4x16, batch=16) | 0.778 |
+| medium (8x32, batch=32) | 0.732 |
 
-## Dependências opcionais
+## Taxa de compressão
 
-- zstandard: `missing`
-- google-crc32c: `installed`
+| Cenário | Método | Razão vs none | Redução de espaço (%) |
+|---|---|---:|---:|
+| small | zlib(level=6) | 0.147 | 85.269 |
+| medium | zlib(level=6) | 0.123 | 87.703 |
+
+Interpretação rápida: throughput maior é melhor; razão de compressão menor que 1.0 indica arquivo comprimido menor que o baseline `none`.
