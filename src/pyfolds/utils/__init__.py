@@ -35,7 +35,7 @@ from .types import (
 
 # Logging
 from .logging import get_logger, PyFoldsLogger, trace, TRACE_LEVEL
-from .validation import validate_input
+from .validation import validate_input, validate_device_consistency
 
 __all__ = [
     # Math
@@ -64,4 +64,5 @@ __all__ = [
     "trace",
     "TRACE_LEVEL",
     "validate_input",
+    "validate_device_consistency",
 ]

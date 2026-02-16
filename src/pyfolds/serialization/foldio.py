@@ -1,56 +1,58 @@
-"""Chunked .fold/.mind container with mmap-friendly index and optional ECC."""
+"""Container .fold/.mind com chunking, leitura parcial, integridade e ECC opcional."""
 
 from __future__ import annotations
 
+import hashlib
+import importlib
 import io
 import json
-import hashlib
 import mmap
 import os
+import platform
 import struct
+import subprocess
+import sys
 import time
 from dataclasses import asdict, is_dataclass
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
+import zlib
 
-from .ecc import NoECC, ecc_from_protection
+from .ecc import ECCCodec, NoECC, ReedSolomonECC, ecc_from_protection
 
-try:
-    import zstandard as zstd
-except Exception:  # pragma: no cover - optional dependency
-    zstd = None
+_zstd_spec = importlib.util.find_spec("zstandard")
+zstd = importlib.import_module("zstandard") if _zstd_spec else None
+_crc32c_spec = importlib.util.find_spec("google_crc32c")
+google_crc32c = importlib.import_module("google_crc32c") if _crc32c_spec else None
 
-MAGIC = b"FOLDSv1\0"
-HEADER_SIZE = 8192
-CHUNK_HDR_FMT = ">4sIQQII"  # ctype, flags, raw_len, comp_len, crc32, ecc_len
-CHUNK_HDR_SIZE = struct.calcsize(CHUNK_HDR_FMT)
+
+MAGIC = b"FOLDv1\0\0"
+HEADER_FMT = ">8sIQQ"
+CHUNK_HDR_FMT = ">4sIQQII"
 
 FLAG_COMP_NONE = 0
 FLAG_COMP_ZSTD = 1
 
 
-try:
-    import google_crc32c
+class FoldSecurityError(RuntimeError):
+    """Erro de segurança ao desserializar payload torch."""
 
-    def crc32c_u32(data: bytes) -> int:
+
+def crc32c_u32(data: bytes) -> int:
+    if google_crc32c is not None:
         return int.from_bytes(google_crc32c.value(data).to_bytes(4, "big"), "big")
+    return zlib.crc32(data) & 0xFFFFFFFF
 
-except Exception:  # pragma: no cover - optional dependency
-    import zlib
 
-    def crc32c_u32(data: bytes) -> int:
-        return zlib.crc32(data) & 0xFFFFFFFF
+def sha256_hex(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
 
 
 def _json_bytes(obj: Any) -> bytes:
     return json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-
-
-def _sha256_hex(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
 
 
 def _cfg_to_dict(cfg: Any) -> Any:
@@ -65,186 +67,142 @@ def _cfg_to_dict(cfg: Any) -> Any:
     return cfg
 
 
-def _compress(raw: bytes, enabled: bool) -> tuple[bytes, int]:
-    if not enabled:
-        return raw, FLAG_COMP_NONE
-
-    if zstd is None:
-        return raw, FLAG_COMP_NONE
-
-    return zstd.ZstdCompressor(level=3).compress(raw), FLAG_COMP_ZSTD
-
-
-def _decompress(comp: bytes, flags: int) -> bytes:
-    if flags == FLAG_COMP_ZSTD:
-        if zstd is None:
-            raise RuntimeError("zstandard is required to read compressed chunks")
-        return zstd.ZstdDecompressor().decompress(comp)
-    return comp
+def _safe_git_hash() -> str:
+    out = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if out.returncode == 0:
+        return out.stdout.strip()
+    return "unknown"
 
 
-def build_nuclear_npz(neuron: torch.nn.Module) -> bytes:
-    """Builds scientific-state chunk for partial reads independent of torch_state."""
+def _telemetry_snapshot(neuron: Any, max_events: int = 128) -> Dict[str, Any]:
+    telemetry = getattr(neuron, "telemetry", None)
+    if telemetry is None:
+        return {"enabled": False, "events": [], "stats": {}}
 
-    payload: Dict[str, np.ndarray] = {
-        "N": neuron.N.detach().cpu().numpy(),
-        "I": neuron.I.detach().cpu().numpy(),
-        "W": neuron.W.detach().cpu().numpy(),
-        "protection": neuron.protection.detach().cpu().numpy(),
-        "theta": np.array([float(neuron.theta.item())], dtype=np.float32),
-        "r_hat": np.array([float(neuron.r_hat.item())], dtype=np.float32),
-    }
+    events: List[Dict[str, Any]] = []
+    stats: Dict[str, Any] = {}
+    try:
+        stats = telemetry.get_stats()
+    except Exception:
+        stats = {}
+
+    try:
+        raw = telemetry.snapshot()
+        if raw:
+            events = raw[-max_events:]
+    except Exception:
+        events = []
+
+    return {"enabled": True, "events": events, "stats": stats}
+
+
+def _history_snapshot(neuron: Any) -> Optional[Dict[str, List[float]]]:
+    stats_acc = getattr(neuron, "stats_acc", None)
+    if stats_acc is None:
+        return None
+
+    if getattr(stats_acc, "_history_enabled", False) and hasattr(stats_acc, "_history"):
+        return {k: list(v) for k, v in stats_acc._history.items()}
+    return None
+
+
+def _build_nuclear_npz(neuron: Any) -> bytes:
+    payload: Dict[str, np.ndarray] = {}
+    for key in ("N", "I", "W", "protection"):
+        tensor = getattr(neuron, key, None)
+        if tensor is not None and hasattr(tensor, "detach"):
+            payload[key] = tensor.detach().cpu().numpy()
+
+    for key in ("theta", "r_hat"):
+        tensor = getattr(neuron, key, None)
+        if tensor is not None:
+            try:
+                payload[key] = np.array([float(tensor.item())], dtype=np.float32)
+            except Exception:
+                pass
+
+    if not payload:
+        return b""
 
     buf = io.BytesIO()
     np.savez_compressed(buf, **payload)
     return buf.getvalue()
 
 
-def serialize_manifest(
-    neuron: torch.nn.Module,
-    *,
-    kind: str,
-    protection: str,
-    tags: Optional[Dict[str, str]] = None,
-    extra: Optional[Dict[str, Any]] = None,
-) -> bytes:
-    mode = getattr(getattr(neuron, "mode", None), "value", None)
-    step = int(getattr(getattr(neuron, "step_id", None), "item", lambda: 0)())
+def read_nuclear_arrays(path: str, use_mmap: bool = True, verify: bool = True) -> Dict[str, np.ndarray]:
+    """Lê apenas o chunk `nuclear_arrays` para análises científicas parciais."""
 
-    manifest = {
-        "format": "folds",
-        "version": "1.1.0",
-        "kind": kind,
-        "model_type": neuron.__class__.__name__,
-        "created_at": datetime.utcnow().isoformat() + "Z",
-        "protection": protection,
-        "tags": tags or {},
-        "shape": {
-            "n_dendrites": int(len(neuron.dendrites)),
-            "n_synapses_per_dendrite": int(neuron.cfg.n_synapses_per_dendrite),
-            "total_synapses": int(neuron.N.numel()),
-        },
-        "expression": {
-            "theta": float(neuron.theta.item()),
-            "r_hat": float(neuron.r_hat.item()),
-            "N_mean": float(neuron.N.float().mean().item()),
-            "I_mean": float(neuron.I.float().mean().item()),
-            "mode": mode,
-            "step_id": step,
-        },
-        "routing": {
-            "resume_training": "torch_state",
-            "scientific": "nuclear_arrays",
-            "audit": ["manifest", "metrics", "history", "accumulator_state"],
-        },
-        "extra": extra or {},
-    }
-    return _json_bytes(manifest)
-
-
-def serialize_metrics(neuron: torch.nn.Module) -> Optional[bytes]:
-    if not hasattr(neuron, "get_metrics"):
-        return None
-
-    try:
-        metrics = neuron.get_metrics()
-    except Exception:
-        return None
-
-    return _json_bytes(metrics)
-
-
-def serialize_accumulator_state(neuron: torch.nn.Module) -> Optional[bytes]:
-    if not hasattr(neuron, "stats_acc"):
-        return None
-
-    acc = neuron.stats_acc
-    state: Dict[str, Any] = {
-        "track_extra": bool(getattr(acc, "track_extra", False)),
-        "history_enabled": bool(getattr(acc, "_history_enabled", False)),
-        "buffers": {},
-    }
-
-    for name in (
-        "acc_x",
-        "acc_gated",
-        "acc_spikes",
-        "acc_count",
-        "initialized",
-        "acc_v_dend",
-        "acc_u",
-        "acc_theta",
-        "acc_r_hat",
-        "acc_adaptation",
-    ):
-        if hasattr(acc, name):
-            t = getattr(acc, name).detach().cpu()
-            state["buffers"][name] = {
-                "dtype": str(t.dtype),
-                "shape": list(t.shape),
-                "data": t.reshape(-1).tolist(),
-            }
-
-    return _json_bytes(state)
-
-
-def serialize_history(neuron: torch.nn.Module) -> Optional[bytes]:
-    if not hasattr(neuron, "stats_acc"):
-        return None
-    acc = neuron.stats_acc
-    if not getattr(acc, "_history_enabled", False):
-        return None
-    if not hasattr(acc, "_history"):
-        return None
-
-    hist = {k: list(v) for k, v in acc._history.items()}
-    return _json_bytes(hist)
+    with FoldReader(path, use_mmap=use_mmap) as reader:
+        raw = reader.read_chunk_bytes("nuclear_arrays", verify=verify)
+    with np.load(io.BytesIO(raw)) as data:
+        return {k: data[k] for k in data.files}
 
 
 class FoldWriter:
-    """Writes .fold/.mind chunk container."""
+    """Writer do container .fold/.mind."""
 
-    def __init__(self, path: str, *, protection: str = "off"):
+    def __init__(
+        self,
+        path: str,
+        compress: str = "zstd",
+        zstd_level: int = 3,
+        ecc: Optional[ECCCodec] = None,
+    ):
         self.path = path
-        self.tmp_path = f"{path}.tmp"
-        self.ecc = ecc_from_protection(protection)
+        self.compress = compress
+        self.zstd_level = zstd_level
+        self.ecc = ecc or NoECC()
         self._chunks: List[Dict[str, Any]] = []
+        self._f = None
 
-    def __enter__(self):
-        os.makedirs(os.path.dirname(os.path.abspath(self.path)), exist_ok=True)
-        self._f = open(self.tmp_path, "wb")
-        self._f.write(MAGIC)
-        self._f.write(b"\0" * (HEADER_SIZE - len(MAGIC)))
+    def __enter__(self) -> "FoldWriter":
+        Path(self.path).parent.mkdir(parents=True, exist_ok=True)
+        self._f = open(self.path, "wb")
+        header_len = struct.calcsize(HEADER_FMT)
+        self._f.write(struct.pack(HEADER_FMT, MAGIC, header_len, 0, 0))
         return self
 
-    def __exit__(self, exc_type, exc, tb):
-        if hasattr(self, "_f") and self._f:
+    def __exit__(self, exc_type, exc, tb) -> None:
+        if self._f:
             self._f.close()
 
-    def add_chunk(self, name: str, ctype4: str, payload: bytes, *, compress: bool = True) -> None:
+    def _compress(self, raw: bytes) -> Tuple[bytes, int]:
+        if self.compress == "zstd":
+            if zstd is None:
+                raise RuntimeError("zstandard não instalado. Use compress='none' ou instale zstandard")
+            compressor = zstd.ZstdCompressor(level=self.zstd_level)
+            return compressor.compress(raw), FLAG_COMP_ZSTD
+        return raw, FLAG_COMP_NONE
+
+    def add_chunk(self, name: str, ctype4: str, payload: bytes) -> None:
         if len(ctype4) != 4:
-            raise ValueError("ctype4 must have exactly 4 chars")
+            raise ValueError("ctype precisa ter 4 chars")
 
-        comp, flags = _compress(payload, enabled=compress)
+        comp, flags = self._compress(payload)
+        ecc_result = self.ecc.encode(comp)
 
-        ecc_res = self.ecc.encode(comp)
         crc = crc32c_u32(comp)
-        sha = _sha256_hex(comp)
-
+        sha = sha256_hex(comp)
         offset = self._f.tell()
-        hdr = struct.pack(
+
+        header = struct.pack(
             CHUNK_HDR_FMT,
             ctype4.encode("ascii"),
             flags,
             len(payload),
             len(comp),
             crc,
-            len(ecc_res.ecc_bytes),
+            len(ecc_result.ecc_bytes),
         )
-        self._f.write(hdr)
+        self._f.write(header)
         self._f.write(comp)
-        if ecc_res.ecc_bytes:
-            self._f.write(ecc_res.ecc_bytes)
+        if ecc_result.ecc_bytes:
+            self._f.write(ecc_result.ecc_bytes)
 
         self._chunks.append(
             {
@@ -252,246 +210,331 @@ class FoldWriter:
                 "ctype": ctype4,
                 "flags": flags,
                 "offset": offset,
-                "header_len": CHUNK_HDR_SIZE,
+                "header_len": struct.calcsize(CHUNK_HDR_FMT),
                 "comp_len": len(comp),
                 "uncomp_len": len(payload),
                 "crc32c": crc,
                 "sha256": sha,
-                "ecc_algo": ecc_res.algo,
-                "ecc_len": len(ecc_res.ecc_bytes),
+                "ecc_algo": ecc_result.ecc_algo,
+                "ecc_len": len(ecc_result.ecc_bytes),
             }
         )
 
     def finalize(self, metadata: Dict[str, Any]) -> None:
         index = {
-            "format": "folds",
-            "version": "1.1.0",
+            "format": "fold",
+            "version": "1.2.0",
             "created_at_unix": time.time(),
             "metadata": metadata,
             "chunks": self._chunks,
         }
         index_bytes = _json_bytes(index)
-        self.add_chunk("__index__", "INDX", index_bytes, compress=False)
-        idx = self._chunks[-1]
+        index_off = self._f.tell()
+        self._f.write(index_bytes)
 
-        header = {
-            "format": "folds",
-            "version": "1.1.0",
-            "index_offset": idx["offset"],
-            "index_len": idx["uncomp_len"],
-            "metadata": metadata,
-        }
-
+        self._f.seek(0)
+        header_len = struct.calcsize(HEADER_FMT)
+        self._f.write(struct.pack(HEADER_FMT, MAGIC, header_len, index_off, len(index_bytes)))
         self._f.flush()
-        self._f.close()
-
-        with open(self.tmp_path, "rb") as f:
-            file_sha = _sha256_hex(f.read())
-
-        header["file_sha256"] = file_sha
-        raw = _json_bytes(header)
-
-        if len(raw) > (HEADER_SIZE - len(MAGIC)):
-            raise RuntimeError("header exceeded fixed HEADER_SIZE")
-
-        with open(self.tmp_path, "r+b") as f:
-            f.seek(len(MAGIC))
-            f.write(raw)
-            f.write(b"\0" * ((HEADER_SIZE - len(MAGIC)) - len(raw)))
-
-        os.replace(self.tmp_path, self.path)
 
 
 class FoldReader:
-    """Reads .fold/.mind chunk container with optional mmap."""
+    """Reader do container .fold/.mind com suporte a mmap."""
 
-    def __init__(self, path: str, *, use_mmap: bool = True):
+    def __init__(self, path: str, use_mmap: bool = True):
         self.path = path
         self.use_mmap = use_mmap
+        self._f = None
+        self._mm = None
         self.header: Dict[str, Any] = {}
         self.index: Dict[str, Any] = {}
 
-    def __enter__(self):
+    def __enter__(self) -> "FoldReader":
         self._f = open(self.path, "rb")
-        self._mm = mmap.mmap(self._f.fileno(), 0, access=mmap.ACCESS_READ) if self.use_mmap else None
-        self._read_header()
-        self._read_index()
+        if self.use_mmap:
+            self._mm = mmap.mmap(self._f.fileno(), 0, access=mmap.ACCESS_READ)
+        self._read_header_and_index()
         return self
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, exc_type, exc, tb) -> None:
         if self._mm is not None:
             self._mm.close()
-        if hasattr(self, "_f") and self._f:
+        if self._f:
             self._f.close()
 
-    def _read_at(self, off: int, size: int) -> bytes:
+    def _read_at(self, offset: int, length: int) -> bytes:
         if self._mm is not None:
-            return self._mm[off : off + size]
-        self._f.seek(off)
-        return self._f.read(size)
+            return self._mm[offset:offset + length]
+        self._f.seek(offset)
+        return self._f.read(length)
 
-    def _read_header(self) -> None:
-        raw = self._read_at(0, HEADER_SIZE)
-        if raw[: len(MAGIC)] != MAGIC:
-            raise ValueError("invalid .fold/.mind magic")
-        header_json = raw[len(MAGIC) :].rstrip(b"\0")
-        self.header = json.loads(header_json.decode("utf-8"))
+    def _read_header_and_index(self) -> None:
+        raw = self._read_at(0, struct.calcsize(HEADER_FMT))
+        magic, hlen, index_off, index_len = struct.unpack(HEADER_FMT, raw)
+        if magic != MAGIC:
+            raise ValueError("Arquivo .fold/.mind inválido (magic mismatch)")
 
-    def _read_index(self) -> None:
-        idx_off = int(self.header["index_offset"])
-        hdr = self._read_at(idx_off, CHUNK_HDR_SIZE)
-        _ctype, flags, _uncomp, comp_len, _crc, _ecc_len = struct.unpack(CHUNK_HDR_FMT, hdr)
-        comp = self._read_at(idx_off + CHUNK_HDR_SIZE, comp_len)
-        raw = _decompress(comp, flags)
-        self.index = json.loads(raw.decode("utf-8"))
+        self.header = {"header_len": hlen, "index_off": index_off, "index_len": index_len}
+        index_raw = self._read_at(index_off, index_len)
+        self.index = json.loads(index_raw.decode("utf-8"))
 
     def list_chunks(self) -> List[str]:
-        return [c["name"] for c in self.index["chunks"]]
+        return [chunk["name"] for chunk in self.index.get("chunks", [])]
 
-    def _chunk_by_name(self, name: str) -> Dict[str, Any]:
-        for chunk in self.index["chunks"]:
-            if chunk["name"] == name:
-                return chunk
-        raise KeyError(f"chunk '{name}' does not exist")
+    def _decompress(self, comp: bytes, flags: int) -> bytes:
+        if flags == FLAG_COMP_ZSTD:
+            if zstd is None:
+                raise RuntimeError("zstandard não instalado para leitura")
+            dec = zstd.ZstdDecompressor()
+            return dec.decompress(comp)
+        return comp
 
-    def read_chunk(self, name: str, *, verify: bool = True) -> bytes:
-        chunk = self._chunk_by_name(name)
-        off = int(chunk["offset"])
+    def _ecc_codec(self, algo: str) -> ECCCodec:
+        if algo == "none":
+            return NoECC()
+        if algo.startswith("rs(") and algo.endswith(")"):
+            symbols = int(algo[3:-1])
+            return ReedSolomonECC(symbols=symbols)
+        raise RuntimeError(f"Codec ECC não suportado: {algo}")
 
-        hdr = self._read_at(off, CHUNK_HDR_SIZE)
-        _ctype, flags, raw_len, comp_len, crc, ecc_len = struct.unpack(CHUNK_HDR_FMT, hdr)
-        comp_off = off + CHUNK_HDR_SIZE
+    def read_chunk_bytes(self, name: str, verify: bool = True) -> bytes:
+        chunk = next((c for c in self.index.get("chunks", []) if c["name"] == name), None)
+        if chunk is None:
+            raise KeyError(f"Chunk '{name}' não existe")
+
+        offset = chunk["offset"]
+        hdr_size = struct.calcsize(CHUNK_HDR_FMT)
+        hdr = self._read_at(offset, hdr_size)
+        _ctype, flags, uncomp_len, comp_len, crc, ecc_len = struct.unpack(CHUNK_HDR_FMT, hdr)
+
+        comp_off = offset + hdr_size
         comp = self._read_at(comp_off, comp_len)
         ecc_bytes = self._read_at(comp_off + comp_len, ecc_len) if ecc_len else b""
 
         ecc_algo = chunk.get("ecc_algo", "none")
         if ecc_algo != "none" and ecc_bytes:
-            if ecc_algo.startswith("rs(") and ecc_algo.endswith(")"):
-                symbols = int(ecc_algo[3:-1])
-                if symbols == 16:
-                    codec = ecc_from_protection("low")
-                elif symbols == 32:
-                    codec = ecc_from_protection("med")
-                else:
-                    codec = ecc_from_protection("high")
-                comp = codec.decode(comp, ecc_bytes)
-            else:
-                comp = NoECC().decode(comp, ecc_bytes)
+            codec = self._ecc_codec(ecc_algo)
+            comp = codec.decode(comp, ecc_bytes)
 
         if verify:
             if crc32c_u32(comp) != crc:
-                raise RuntimeError(f"CRC mismatch in chunk '{name}'")
-            if _sha256_hex(comp) != chunk["sha256"]:
-                raise RuntimeError(f"SHA256 mismatch in chunk '{name}'")
+                raise RuntimeError(f"CRC32C inválido no chunk '{name}'")
+            if sha256_hex(comp) != chunk["sha256"]:
+                raise RuntimeError(f"SHA256 inválido no chunk '{name}'")
 
-        raw = _decompress(comp, flags)
-        if len(raw) != raw_len:
-            raise RuntimeError(f"invalid decompressed size in chunk '{name}'")
+        raw = self._decompress(comp, flags)
+        if len(raw) != uncomp_len:
+            raise RuntimeError(f"Tamanho inconsistente no chunk '{name}'")
         return raw
 
-    def read_json(self, name: str, *, verify: bool = True) -> Dict[str, Any]:
-        return json.loads(self.read_chunk(name, verify=verify).decode("utf-8"))
+    def read_json(self, name: str, verify: bool = True) -> Dict[str, Any]:
+        return json.loads(self.read_chunk_bytes(name, verify=verify).decode("utf-8"))
 
-    def read_torch(self, name: str = "torch_state", *, map_location: str = "cpu", verify: bool = True) -> Any:
-        return torch.load(io.BytesIO(self.read_chunk(name, verify=verify)), map_location=map_location)
+    def read_torch(self, name: str, map_location: str = "cpu", verify: bool = True) -> Any:
+        payload = self.read_chunk_bytes(name, verify=verify)
+        kwargs: Dict[str, Any] = {"map_location": map_location}
+        try:
+            kwargs["weights_only"] = True
+            return torch.load(io.BytesIO(payload), **kwargs)
+        except Exception as exc:
+            raise FoldSecurityError(
+                "Falha ao carregar chunk torch em modo seguro (weights_only=True). "
+                "Se o arquivo for confiável, use load_fold_or_mind(..., trusted_torch_payload=True)."
+            ) from exc
+
+
+class _TrustedFoldReader(FoldReader):
+    """Reader dedicado para ambientes de confiança explícita."""
+
+    def read_torch(self, name: str, map_location: str = "cpu", verify: bool = True) -> Any:
+        payload = self.read_chunk_bytes(name, verify=verify)
+        return torch.load(io.BytesIO(payload), map_location=map_location)
+
+
+def _expression_summary(neuron: Any) -> Dict[str, Any]:
+    def _tensor_scalar(attr: str) -> Optional[float]:
+        tensor = getattr(neuron, attr, None)
+        if tensor is None:
+            return None
+        try:
+            return float(tensor.item())
+        except Exception:
+            return None
+
+    def _mean(attr: str) -> Optional[float]:
+        tensor = getattr(neuron, attr, None)
+        if tensor is None:
+            return None
+        try:
+            return float(tensor.detach().float().mean().item())
+        except Exception:
+            return None
+
+    mode = getattr(getattr(neuron, "mode", None), "value", None)
+    step = int(getattr(getattr(neuron, "step_id", None), "item", lambda: 0)())
+
+    return {
+        "mode": mode,
+        "step_id": step,
+        "theta": _tensor_scalar("theta"),
+        "r_hat": _tensor_scalar("r_hat"),
+        "mean_N": _mean("N"),
+        "mean_I": _mean("I"),
+        "mean_u": _mean("u"),
+        "mean_R": _mean("R"),
+    }
+
+
+def _reproducibility_metadata() -> Dict[str, Any]:
+    return {
+        "python_version": sys.version.split()[0],
+        "platform": platform.platform(),
+        "torch_version": torch.__version__,
+        "git_hash": _safe_git_hash(),
+        "torch_initial_seed": int(torch.initial_seed()),
+    }
 
 
 def save_fold_or_mind(
-    neuron: torch.nn.Module,
+    neuron: Any,
     path: str,
-    *,
-    kind: str = "fold",
-    protection: str = "off",
     tags: Optional[Dict[str, str]] = None,
-    include_accumulator: bool = True,
     include_history: bool = True,
+    include_telemetry: bool = True,
+    include_nuclear_arrays: bool = True,
+    compress: str = "zstd",
+    ecc: Optional[ECCCodec] = None,
+    protection: str = "off",
     extra_manifest: Optional[Dict[str, Any]] = None,
 ) -> None:
-    """Saves MPJRD neuron to chunked .fold/.mind file."""
+    """Salva neurônio MPJRD em container .fold/.mind único e extensível."""
 
+    selected_ecc = ecc if ecc is not None else ecc_from_protection(protection)
+
+    cfg = _cfg_to_dict(getattr(neuron, "cfg", None))
     mode = getattr(getattr(neuron, "mode", None), "value", None)
-    step_id = int(getattr(getattr(neuron, "step_id", None), "item", lambda: 0)())
+    step = int(getattr(getattr(neuron, "step_id", None), "item", lambda: 0)())
 
     torch_payload = {
         "state_dict": neuron.state_dict(),
-        "config": _cfg_to_dict(getattr(neuron, "cfg", None)),
+        "config": cfg,
         "mode": mode,
-        "step_id": step_id,
+        "step_id": step,
     }
-    buf = io.BytesIO()
-    torch.save(torch_payload, buf)
+    torch_buffer = io.BytesIO()
+    torch.save(torch_payload, torch_buffer)
 
-    meta = {
-        "kind": kind,
+    expression = _expression_summary(neuron)
+    metrics = None
+    if hasattr(neuron, "get_metrics"):
+        try:
+            metrics = neuron.get_metrics()
+        except Exception:
+            metrics = None
+
+    history = _history_snapshot(neuron) if include_history else None
+    telemetry = _telemetry_snapshot(neuron) if include_telemetry else None
+    nuclear_arrays = _build_nuclear_npz(neuron) if include_nuclear_arrays else b""
+
+    manifest = {
+        "format": "fold",
+        "version": "1.2.0",
+        "created_at_unix": time.time(),
         "model_type": neuron.__class__.__name__,
-        "protection": protection,
         "tags": tags or {},
+        "expression": expression,
+        "reproducibility": _reproducibility_metadata(),
+        "routing": {
+            "resume_training": "torch_state",
+            "audit": ["llm_manifest", "metrics", "history", "telemetry", "nuclear_arrays"],
+        },
+        "chunks_expected": [
+            "torch_state",
+            "llm_manifest",
+            "metrics",
+            "history",
+            "telemetry",
+            "nuclear_arrays",
+        ],
+    }
+    if extra_manifest:
+        manifest["extra"] = extra_manifest
+
+    metadata = {
+        "model_type": neuron.__class__.__name__,
+        "tags": tags or {},
+        "expression": expression,
+        "reproducibility": manifest["reproducibility"],
+        "protection": protection,
     }
 
-    with FoldWriter(path, protection=protection) as w:
-        w.add_chunk(
-            "manifest",
-            "JSN0",
-            serialize_manifest(
-                neuron,
-                kind=kind,
-                protection=protection,
-                tags=tags,
-                extra=extra_manifest,
-            ),
-            compress=False,
-        )
-        w.add_chunk("nuclear_arrays", "NPZ0", build_nuclear_npz(neuron), compress=True)
-        w.add_chunk("torch_state", "TSAV", buf.getvalue(), compress=True)
-
-        metrics = serialize_metrics(neuron)
+    tmp_path = f"{path}.tmp"
+    with FoldWriter(tmp_path, compress=compress, ecc=selected_ecc) as writer:
+        writer.add_chunk("torch_state", "TSAV", torch_buffer.getvalue())
+        writer.add_chunk("llm_manifest", "JSON", _json_bytes(manifest))
         if metrics is not None:
-            w.add_chunk("metrics", "JSN0", metrics, compress=False)
+            writer.add_chunk("metrics", "JSON", _json_bytes(metrics))
+        if history is not None:
+            writer.add_chunk("history", "JSON", _json_bytes(history))
+        if telemetry is not None:
+            writer.add_chunk("telemetry", "JSON", _json_bytes(telemetry))
+        if nuclear_arrays:
+            writer.add_chunk("nuclear_arrays", "NPZ0", nuclear_arrays)
+        writer.finalize(metadata=metadata)
 
-        if include_accumulator:
-            acc_state = serialize_accumulator_state(neuron)
-            if acc_state is not None:
-                w.add_chunk("accumulator_state", "JSN0", acc_state, compress=True)
-
-        if include_history:
-            hist = serialize_history(neuron)
-            if hist is not None:
-                w.add_chunk("history", "JSN0", hist, compress=False)
-
-        w.finalize(meta)
+    os.replace(tmp_path, path)
 
 
-def load_fold_or_mind(path: str, neuron_class: Any, *, map_location: str = "cpu") -> torch.nn.Module:
-    """Restores neuron from torch_state chunk."""
+def peek_fold_or_mind(path: str, use_mmap: bool = True) -> Dict[str, Any]:
+    """Inspeção rápida (header + índice + manifesto), sem carregar state_dict."""
 
-    with FoldReader(path, use_mmap=True) as reader:
+    with FoldReader(path, use_mmap=use_mmap) as reader:
+        output = {
+            "header": reader.header,
+            "metadata": reader.index.get("metadata", {}),
+            "chunks": reader.list_chunks(),
+        }
+        if "llm_manifest" in output["chunks"]:
+            output["llm_manifest"] = reader.read_json("llm_manifest")
+        output["is_mind"] = is_mind_chunks(output["chunks"])
+        return output
+
+
+def peek_mind(path: str, use_mmap: bool = True) -> Dict[str, Any]:
+    """Alias semântico para fluxos .mind."""
+
+    return peek_fold_or_mind(path, use_mmap=use_mmap)
+
+
+def load_fold_or_mind(
+    path: str,
+    neuron_class: Any,
+    map_location: str = "cpu",
+    trusted_torch_payload: bool = False,
+) -> Any:
+    """Carrega neurônio pelo chunk `torch_state` com validação por chunk."""
+
+    reader_class = _TrustedFoldReader if trusted_torch_payload else FoldReader
+    with reader_class(path, use_mmap=True) as reader:
         payload = reader.read_torch("torch_state", map_location=map_location)
 
-    cfg_obj = payload.get("config")
-    if isinstance(cfg_obj, dict):
-        try:
-            from pyfolds.core import MPJRDConfig
+    cfg = payload.get("config")
+    if isinstance(cfg, dict):
+        from ..core.config import MPJRDConfig
 
-            cfg_obj = MPJRDConfig(**cfg_obj)
-        except Exception:
-            pass
+        cfg = MPJRDConfig.from_dict(cfg)
 
-    neuron = neuron_class(cfg_obj)
+    neuron = neuron_class(cfg)
     neuron.load_state_dict(payload["state_dict"])
     return neuron
 
 
-def peek_fold_or_mind(path: str) -> Dict[str, Any]:
-    """Reads container header/index and manifest without loading tensors."""
+def is_mind(path: str) -> bool:
+    """Regra de branding: arquivo com chunks IA explícitos é `.mind`."""
 
     with FoldReader(path, use_mmap=True) as reader:
-        out = {
-            "header": reader.header,
-            "chunks": reader.list_chunks(),
-            "metadata": reader.index.get("metadata", {}),
-        }
+        return is_mind_chunks(reader.list_chunks())
 
-        if "manifest" in out["chunks"]:
-            out["manifest"] = reader.read_json("manifest", verify=False)
 
-        return out
+def is_mind_chunks(chunks: List[str]) -> bool:
+    return any(name in set(chunks) for name in ("ai_graph", "ai_vectors"))
