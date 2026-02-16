@@ -26,20 +26,18 @@ class STDPMixin:
     ----------
     Bi, G. Q., & Poo, M. M. (1998).
     "Synaptic modifications in cultured hippocampal neurons".
-    """
-    Mixin para STDP (Spike-Timing Dependent Plasticity).
-    
-    ✅ VETORIZADO: sem loops Python
-    ✅ SEMÂNTICA: POR AMOSTRA (batch independente)
-    ℹ️ NOTA: O spike pós-sináptico é broadcast para todos os dendritos
-       da amostra; não há seleção de dendrito pós-sináptico específica.
-    
-    Implementa plasticidade baseada em temporização de spikes:
-        - LTP: spike pré antes do pós
-        - LTD: spike pós antes do pré
-    
-    Baseado em:
-        - Bi & Poo (1998) - Synaptic modifications in cultured hippocampal neurons
+
+    Semântica implementada (determinística):
+
+    - Traços pré/pós são mantidos por amostra, com shape ``[B, D, S]``.
+    - O spike pós-sináptico é global por amostra e é broadcast para
+      todos os dendritos/sinapses.
+    - Quando um neurônio dispara, todos os dendritos da mesma amostra
+      recebem a mesma modulação plástica.
+
+    Se for necessário STDP por dendrito específico, ``_update_stdp_traces``
+    deve ser ajustado para aplicar máscara condicional por dendrito em vez
+    do broadcast global.
     """
     
     def _init_stdp(self, tau_pre: float = 20.0, tau_post: float = 20.0,
