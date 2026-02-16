@@ -219,7 +219,7 @@ jobs:
 ### 6.1 Atualização recomendada da fila (`execution_queue.csv`)
 
 ```csv
-ISSUE-003,"Auditoria completa do repositório (docs + src + .github + examples + tests)",Concluída,Codex,2026-02-16,"TODO o repositório; prompts/relatorios/ISSUE-003-auditoria-completa.md",,,Alta,all
+ISSUE-003,"Auditoria completa do repositório (docs + src + .github + examples + tests)",Concluída,Codex,2026-02-16,"TODO o repositório; docs/development/prompts/relatorios/ISSUE-003-auditoria-completa.md",,,Alta,all
 ISSUE-005,"Consolidação total: implementar plano de ação da auditoria (3 sprints)",Planejada,A definir,2026-02-16,"src/pyfolds/__init__.py; src/pyfolds/advanced/*; docs/api/*; docs/README.md; .github/workflows/*; examples/*",,,Alta,all
 ```
 

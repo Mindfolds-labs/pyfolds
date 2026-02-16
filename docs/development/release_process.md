@@ -1,15 +1,19 @@
 # Release Process (PyFolds)
 
 ## Objetivo
-Padronizar o fluxo de release com rastreabilidade e checklist operacional.
+Padronizar o fluxo de release com rastreabilidade e checklist operacional auditável.
 
 ## Escopo
 Aplica-se a releases de código, documentação e artefatos de benchmark.
 
+## Papéis
+- **Executor:** prepara versão, validações e evidências.
+- **Maintainer:** revisa checklist e aprova publicação.
+
 ## Pré-condições
-- Branch alvo atualizada.
-- CI verde (testes, validações de docs e HUB sync).
-- Changelog atualizado para impactos externos.
+- Branch alvo atualizada e sem conflitos.
+- CI verde (testes, docstrings públicas, links e HUB sync).
+- `CHANGELOG.md` atualizado com impactos externos.
 
 ## Fluxo de release
 1. **Planejamento**
@@ -25,12 +29,30 @@ Aplica-se a releases de código, documentação e artefatos de benchmark.
    - Criar tag de release.
    - Publicar artefatos (quando aplicável).
 5. **Pós-release**
-   - Registrar eventuais incidentes e ações corretivas.
+   - Registrar incidentes e ações corretivas.
+   - Atualizar rastreabilidade no HUB/fila.
 
-## Checklist de release
-- [ ] Versionamento semântico validado.
+## Checklist auditável de release
+
+### A. Validações técnicas
+- [ ] `python -m compileall src/`
+- [ ] `python tools/check_api_docs.py --strict`
+- [ ] `python tools/check_links.py docs README.md`
+- [ ] `python tools/sync_hub.py --check`
+- [ ] `pytest tests/ -v`
+
+### B. Artefatos e governança
 - [ ] `CHANGELOG.md` atualizado.
-- [ ] Testes automatizados verdes.
-- [ ] `python tools/sync_hub.py --check` verde.
-- [ ] Links de docs validados.
-- [ ] Tag criada e release publicada.
+- [ ] ADRs impactadas registradas/referenciadas.
+- [ ] Fila `docs/development/execution_queue.csv` atualizada.
+- [ ] HUB sincronizado (`docs/development/HUB_CONTROLE.md`).
+
+### C. Publicação
+- [ ] Versão semântica validada (tag).
+- [ ] Release publicada com notas.
+- [ ] Registro pós-release concluído.
+
+## Evidências mínimas por release
+- Hash do commit de release.
+- Resultado dos comandos da seção A.
+- Link da PR aprovada e tag publicada.

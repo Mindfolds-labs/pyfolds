@@ -4,13 +4,10 @@ Portal de documentação do PyFolds v2.0/v3.0.
 
 ## 🚀 Comece por aqui
 
-**[👉 DEVELOPMENT_HUB.md](DEVELOPMENT_HUB.md)**
-
-Navegue por perfil:
-- 👨‍💻 Desenvolvedor(a)
-- 🏛️ Arquiteto(a)
-- 🔬 Pesquisador(a)
-- 👥 PM / Maintainer
+- **[HUB de Desenvolvimento](development/HUB_CONTROLE.md)**
+- **[Índice principal de documentação](index.md)**
+- **[Guia de desenvolvimento](development/README.md)**
+- **[Portal de prompts operacionais](development/prompts/README.md)**
 
 ## 📑 Seções
 
