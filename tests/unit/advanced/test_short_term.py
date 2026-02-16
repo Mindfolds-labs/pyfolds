@@ -42,6 +42,10 @@ class TestShortTermDynamicsMixin:
         
         expected_u = torch.ones(D, S) * 0.5 * decay_fac
         assert torch.allclose(neuron.u_stp, expected_u, rtol=1e-4)
+
+        decay_rec = math.exp(-1.0 / neuron.tau_rec)
+        expected_R = torch.ones(D, S) * (0.8 * decay_rec + (1 - 0.8) * (1 - decay_rec))
+        assert torch.allclose(neuron.R_stp, expected_R, rtol=1e-4)
     
     def test_update_with_spikes(self, full_config):
         """Test facilitation with spikes."""

@@ -159,7 +159,11 @@ class VersionedCheckpoint:
         Raises:
             ValueError: Se hash ou versão não coincidirem
         """
-        ckpt = torch.load(path, map_location=map_location)
+        try:
+            ckpt = torch.load(path, map_location=map_location, weights_only=False)
+        except TypeError:
+            # Compatibilidade com versões do PyTorch sem argumento weights_only
+            ckpt = torch.load(path, map_location=map_location)
         
         model_state = ckpt["model_state"]
         metadata = ckpt.get("metadata", {})

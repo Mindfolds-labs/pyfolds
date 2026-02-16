@@ -8,6 +8,31 @@ from typing import Callable, Optional, Tuple
 import torch
 
 
+def validate_device_consistency(*tensors: torch.Tensor) -> torch.device:
+    """Valida se todos os tensores informados estão no mesmo device.
+
+    Args:
+        *tensors: Tensors opcionais a serem validados.
+
+    Returns:
+        O ``torch.device`` compartilhado pelos tensores válidos.
+
+    Raises:
+        ValueError: Se nenhum tensor for informado.
+        RuntimeError: Se houver inconsistência de devices.
+    """
+
+    valid_tensors = [t for t in tensors if t is not None]
+    if not valid_tensors:
+        raise ValueError("É necessário informar ao menos um tensor para validação de device")
+
+    devices = {tensor.device for tensor in valid_tensors}
+    if len(devices) > 1:
+        raise RuntimeError(f"Tensores em devices diferentes: {devices}")
+
+    return valid_tensors[0].device
+
+
 def validate_input(
     *,
     expected_ndim: Optional[int] = None,
