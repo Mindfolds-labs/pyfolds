@@ -93,6 +93,12 @@ class STDPMixin:
         post_expanded = post_spike.view(-1, 1, 1)  # [B, 1, 1]
         
         # LTD: onde trace_post > threshold
+        # Nota técnica:
+        #   Nesta formulação, LTP e LTD são ambos modulados por post_expanded
+        #   no passo atual. A interpretação é "ajuste condicionado ao spike
+        #   pós-sináptico", e não uma implementação canônica por Δt explícito
+        #   (pre-before-post vs post-before-pre). Para equivalência estrita com
+        #   STDP pair-based clássico, recomenda-se validar com curvas Δw(Δt).
         ltd_mask = (self.trace_post > 0.01).float()
         delta_ltd = -self.A_minus * self.trace_post * ltd_mask * post_expanded
         

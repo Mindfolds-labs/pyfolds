@@ -32,7 +32,7 @@ class TelemetryConfig:
     
     profile: Profile = "off"
     sample_every: int = 1
-    memory_capacity: int = 512
+    memory_capacity: int = 2048
     
     def __post_init__(self) -> None:
         """Validate configuration eagerly."""
