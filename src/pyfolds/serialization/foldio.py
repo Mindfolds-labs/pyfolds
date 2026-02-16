@@ -48,6 +48,7 @@ CHUNK_HDR_FMT = ">4sIQQII"
 
 FLAG_COMP_NONE = 0
 FLAG_COMP_ZSTD = 1
+MAX_INDEX_SIZE = 100 * 1024 * 1024
 
 # Tabela CRC32C (Castagnoli) para fallback sem dependência externa.
 _CRC32C_POLY = 0x82F63B78
@@ -235,6 +236,16 @@ class FoldWriter:
         return raw, FLAG_COMP_NONE
 
     def add_chunk(self, name: str, ctype4: str, payload: bytes) -> None:
+        """Adiciona chunk com compressão, integridade e ECC opcional.
+
+        Ordem de escrita:
+            1. compressão (se habilitada)
+            2. checksum (CRC32C/SHA256) do conteúdo comprimido
+            3. codificação ECC do conteúdo comprimido
+            4. persistência: [header | comp | ecc]
+
+        Na leitura a ordem é invertida: leitura -> ECC -> verificação -> descompressão.
+        """
         if len(ctype4) != 4:
             raise ValueError("ctype precisa ter 4 chars")
 
@@ -284,13 +295,21 @@ class FoldWriter:
             "chunks": self._chunks,
         }
         index_bytes = _json_bytes(index)
+
+        self._f.flush()
         index_off = self._f.tell()
         self._f.write(index_bytes)
-
-        self._f.seek(0)
-        header_len = struct.calcsize(HEADER_FMT)
-        self._f.write(struct.pack(HEADER_FMT, MAGIC, header_len, index_off, len(index_bytes)))
         self._f.flush()
+        os.fsync(self._f.fileno())
+
+        try:
+            self._f.seek(0)
+            header_len = struct.calcsize(HEADER_FMT)
+            self._f.write(struct.pack(HEADER_FMT, MAGIC, header_len, index_off, len(index_bytes)))
+            self._f.flush()
+            os.fsync(self._f.fileno())
+        except Exception as exc:
+            raise RuntimeError(f"Falha ao escrever header do arquivo fold: {exc}") from exc
 
 
 class FoldReader:
@@ -312,26 +331,107 @@ class FoldReader:
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
+        close_errors: List[str] = []
         if self._mm is not None:
-            self._mm.close()
+            try:
+                self._mm.close()
+            except Exception as mm_exc:
+                msg = f"Erro ao fechar mmap de '{self.path}': {mm_exc}"
+                close_errors.append(msg)
+                warnings.warn(msg, RuntimeWarning, stacklevel=2)
+            finally:
+                self._mm = None
         if self._f:
-            self._f.close()
+            try:
+                self._f.close()
+            except Exception as file_exc:
+                msg = f"Erro ao fechar arquivo '{self.path}': {file_exc}"
+                close_errors.append(msg)
+                warnings.warn(msg, RuntimeWarning, stacklevel=2)
+            finally:
+                self._f = None
+
+        if close_errors and exc_type is None:
+            raise RuntimeError("; ".join(close_errors))
 
     def _read_at(self, offset: int, length: int) -> bytes:
+        if offset < 0 or length < 0:
+            raise ValueError(f"offset e length devem ser >= 0, obtido offset={offset}, length={length}")
+
         if self._mm is not None:
-            return self._mm[offset:offset + length]
+            file_size = len(self._mm)
+            if offset > file_size:
+                raise EOFError(f"offset {offset} >= tamanho do arquivo {file_size}")
+            if offset + length > file_size:
+                raise EOFError(
+                    "Tentativa de ler além do arquivo: "
+                    f"offset={offset}, length={length}, tamanho={file_size}"
+                )
+            return bytes(self._mm[offset:offset + length])
         self._f.seek(offset)
-        return self._f.read(length)
+        data = self._f.read(length)
+        if len(data) < length:
+            raise EOFError(
+                "Fim de arquivo inesperado: "
+                f"esperado {length} bytes, obtido {len(data)}"
+            )
+        return data
 
     def _read_header_and_index(self) -> None:
-        raw = self._read_at(0, struct.calcsize(HEADER_FMT))
-        magic, hlen, index_off, index_len = struct.unpack(HEADER_FMT, raw)
+        header_size = struct.calcsize(HEADER_FMT)
+
+        try:
+            raw = self._read_at(0, header_size)
+        except (OSError, IOError, EOFError) as exc:
+            raise ValueError(f"Arquivo .fold/.mind inacessível ou truncado: {exc}") from exc
+
+        if len(raw) < header_size:
+            raise ValueError(
+                f"Arquivo truncado: esperado {header_size} bytes no header, obtido {len(raw)}"
+            )
+
+        try:
+            magic, hlen, index_off, index_len = struct.unpack(HEADER_FMT, raw)
+        except struct.error as exc:
+            raise ValueError(f"Falha ao interpretar header .fold/.mind: {exc}") from exc
+
         if magic != MAGIC:
-            raise ValueError("Arquivo .fold/.mind inválido (magic mismatch)")
+            expected = MAGIC.decode("latin1", errors="replace")
+            got = magic.decode("latin1", errors="replace")
+            raise ValueError(
+                "Arquivo .fold/.mind inválido. "
+                f"Magic esperado: {expected!r}, obtido: {got!r}."
+            )
+
+        if hlen != header_size:
+            raise ValueError(
+                f"Header inconsistente: tamanho informado {hlen}, esperado {header_size}"
+            )
+
+        if index_off < hlen:
+            raise ValueError(
+                f"Index offset inválido: {index_off} < tamanho do header {hlen}"
+            )
+
+        if index_len > MAX_INDEX_SIZE:
+            raise ValueError(
+                f"Index muito grande: {index_len} bytes (máximo permitido {MAX_INDEX_SIZE})"
+            )
 
         self.header = {"header_len": hlen, "index_off": index_off, "index_len": index_len}
-        index_raw = self._read_at(index_off, index_len)
-        self.index = json.loads(index_raw.decode("utf-8"))
+        try:
+            index_raw = self._read_at(index_off, index_len)
+        except EOFError as exc:
+            raise ValueError(
+                f"Index truncado: não foi possível ler {index_len} bytes no offset {index_off}"
+            ) from exc
+
+        try:
+            self.index = json.loads(index_raw.decode("utf-8"))
+        except UnicodeDecodeError as exc:
+            raise ValueError(f"Index contém encoding inválido: {exc}") from exc
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Index JSON corrompido: {exc}") from exc
 
     def list_chunks(self) -> List[str]:
         return [chunk["name"] for chunk in self.index.get("chunks", [])]
