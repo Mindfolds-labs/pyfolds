@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧠 PyFolds
+#  PyFolds
 
 [![PyPI](https://img.shields.io/badge/PyPI-pyfolds-blue)](https://pypi.org/project/pyfolds/)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
@@ -8,35 +8,48 @@
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![Docs](https://img.shields.io/badge/Docs-Organized-success)](docs/README.md)
 
-Framework neurocomputacional bioinspirado para computação dendrítica não-linear, plasticidade estrutural e codificação por fase/frequência.
+PyFolds é uma biblioteca de alta performance para Computação Bioinspirada construída
+sobre o PyTorch. Ela permite a modelagem de redes neurais com computação dendrítica não-
+linear, oferecendo uma alternativa robusta e interpretável aos neurônios pontuais tradicionais.
 
 </div>
 
 ---
 
-## Visão geral
+## 🏗️ Visão Geral
 
-O PyFolds implementa o modelo MPJRD (v2.0) e sua extensão MPJRD-Wave (v3.0), com pipeline explícito:
+O framework abstrai a complexidade da computação dendrítica em um pipeline modular,
+permitindo que pesquisadores e engenheiros foquem na topologia e na dinâmica de fase
+(Wave) sem se preocupar com a implementação de baixo nível dos tensores.
 
-**Sinapse (`N`, `I`, `W`) → Dendrito (`v_dend`) → Soma (`u`, `theta`) → Saída (`spikes` ou `wave`)**.
+Por que usar o PyFolds?
+Modularidade Extensível: Componentes baseados em Mixins para plasticidade e dinâmica de curto prazo (STP).
 
-Isso facilita auditoria e pesquisa porque os estados internos são interpretáveis e mensuráveis.
+Eficiência Nativa: Totalmente integrado ao ecossistema PyTorch para aceleração via GPU.
 
-## Instalação
+Transparência Científica: Pipeline explícito que separa Sinapse, Dendrito e Soma para auditoria total de estados.
 
-```bash
+⚡ Instalação Rápida
+Bash
 pip install pyfolds
-```
+💻 Começando em 30 segundos
+O PyFolds segue a filosofia de design do PyTorch: defina sua configuração e instancie o módulo.
 
-Para desenvolvimento:
+Python
+import torch
+from pyfolds import MPJRDConfig, MPJRDNeuron
 
-```bash
-git clone https://github.com/Mindfolds-labs/pyfolds.git
-cd pyfolds
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .[dev]
-```
+# Define a arquitetura do neurônio
+config = MPJRDConfig(n_dendrites=4, n_synapses_per_dendrite=8)
+model = MPJRDNeuron(config)
+
+# Entrada: (Batch, Dendritos, Sinapses)
+x = torch.randn(32, 4, 8)
+output = model(x)
+
+# Acesso direto aos spikes e estados internos
+print(output["spikes"])
+📚 Documentação Técnica
 
 
 ## Benchmarks de serialização
