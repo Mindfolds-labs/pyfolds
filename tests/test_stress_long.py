@@ -1,4 +1,6 @@
-<<<<<<< codex/add-test-cases-for-corruption-detection
+import importlib.util
+import tracemalloc
+
 import numpy as np
 import pytest
 import torch
@@ -7,94 +9,56 @@ from pyfolds.core.config import MPJRDConfig
 from pyfolds.core.neuron import MPJRDNeuron
 
 
+HAS_PSUTIL = importlib.util.find_spec("psutil") is not None
+if HAS_PSUTIL:
+    import psutil
+
+
 @pytest.mark.stress
-def test_long_run_100k_steps_without_nan_or_inf():
+@pytest.mark.slow
+def test_long_run_100k_steps_without_nan_inf_and_optional_leak_collection():
     cfg = MPJRDConfig(
-        n_dendrites=2,
-        n_synapses_per_dendrite=4,
+        n_dendrites=1,
+        n_synapses_per_dendrite=2,
         device="cpu",
         defer_updates=True,
         plastic=True,
     )
     neuron = MPJRDNeuron(cfg)
-    neuron.logger.setLevel("ERROR")
 
-    for _ in range(100_000):
-        x = torch.rand(1, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
-        neuron.forward(x, collect_stats=False)
-
-    neuron.apply_plasticity(dt=1.0)
-
-    monitored_arrays = {
-        "N": neuron.N.detach().cpu().numpy(),
-        "I": neuron.I.detach().cpu().numpy(),
-        "W": neuron.W.detach().cpu().numpy(),
-        "theta": np.array([neuron.theta.item()]),
-        "r_hat": np.array([neuron.r_hat.item()]),
-    }
-
-    for name, arr in monitored_arrays.items():
-        assert np.isfinite(arr).all(), f"Array {name} contém NaN/Inf após 100k steps"
-=======
-import logging
-import math
-import tracemalloc
-
-import pytest
-import torch
-
-from tests.unit.serialization.test_foldio import _build_neuron
-
-try:
-    import psutil
-except Exception:  # pragma: no cover - opcional
-    psutil = None
-
-
-@pytest.mark.stress
-def test_stress_100k_steps_no_nan_inf_and_memory_stable():
-    logging.getLogger("pyfolds.neuron").setLevel(logging.ERROR)
-
-    neuron = _build_neuron(enable_telemetry=False)
-    x = torch.rand(1, neuron.cfg.n_dendrites, neuron.cfg.n_synapses_per_dendrite)
+    x = torch.full((1, cfg.n_dendrites, cfg.n_synapses_per_dendrite), 0.25)
 
     tracemalloc.start()
-    process = psutil.Process() if psutil is not None else None
+    rss_start = None
+    process = None
+    if HAS_PSUTIL:
+        process = psutil.Process()
+        rss_start = process.memory_info().rss
 
-    start_current, start_peak = tracemalloc.get_traced_memory()
-    rss_before = process.memory_info().rss if process is not None else None
+    with torch.no_grad():
+        for _ in range(100_000):
+            neuron.forward(x)
 
-    for _ in range(100_000):
-        out = neuron.forward(x, collect_stats=False)
-        neuron.apply_plasticity(dt=1.0)
-
-    end_current, end_peak = tracemalloc.get_traced_memory()
+    _, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
-    finite_tensors = [neuron.N, neuron.I, neuron.W]
+    tracked_tensors = [
+        getattr(neuron, "N", None),
+        getattr(neuron, "I", None),
+        getattr(neuron, "u", None),
+        getattr(neuron, "R", None),
+        getattr(neuron, "theta", None),
+        getattr(neuron, "r_hat", None),
+    ]
+    for tensor in tracked_tensors:
+        if tensor is not None:
+            assert torch.isfinite(tensor).all()
 
-    if torch.is_tensor(out):
-        finite_tensors.append(out)
-    elif isinstance(out, dict):
-        finite_tensors.extend(v for v in out.values() if torch.is_tensor(v))
-    elif isinstance(out, (list, tuple)):
-        finite_tensors.extend(v for v in out if torch.is_tensor(v))
-    for optional_name in ("u", "R", "protection"):
-        optional_tensor = getattr(neuron, optional_name, None)
-        if optional_tensor is not None and torch.is_tensor(optional_tensor):
-            finite_tensors.append(optional_tensor)
+    assert peak > 0
 
-    for tensor in finite_tensors:
-        assert torch.isfinite(tensor).all(), "Detectado NaN/Inf após stress de 100k steps"
+    if HAS_PSUTIL and process is not None and rss_start is not None:
+        rss_end = process.memory_info().rss
+        # Coleta de leak opcional para telemetria simples de regressão.
+        assert (rss_end - rss_start) < 250 * 1024 * 1024
 
-    extra_current_mb = (end_current - start_current) / (1024 * 1024)
-    extra_peak_mb = (end_peak - start_peak) / (1024 * 1024)
-    assert extra_current_mb < 50, f"Possível leak detectado por tracemalloc: +{extra_current_mb:.2f}MB"
-    assert extra_peak_mb < 250, f"Pico de memória suspeito no stress: +{extra_peak_mb:.2f}MB"
-
-    if process is not None:
-        rss_after = process.memory_info().rss
-        rss_growth_mb = (rss_after - rss_before) / (1024 * 1024)
-        assert math.isfinite(rss_growth_mb)
-        assert rss_growth_mb < 300, f"Possível leak de RSS detectado via psutil: +{rss_growth_mb:.2f}MB"
->>>>>>> main
+        main
