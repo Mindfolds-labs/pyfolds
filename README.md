@@ -18,24 +18,31 @@ linear, oferecendo uma alternativa robusta e interpretável aos neurônios pontu
 
 ## 🏗️ Visão Geral
 
-O framework abstrai a complexidade da computação dendrítica em um pipeline modular,
+O framework abstrai a complexidade da computação dendrítica em um pipeline modular, 
 permitindo que pesquisadores e engenheiros foquem na topologia e na dinâmica de fase
 (Wave) sem se preocupar com a implementação de baixo nível dos tensores.
 
-Por que usar o PyFolds?
-Modularidade Extensível: Componentes baseados em Mixins para plasticidade e dinâmica de curto prazo (STP).
 
-Eficiência Nativa: Totalmente integrado ao ecossistema PyTorch para aceleração via GPU.
+### Por que usar o PyFolds?
+* **Modularidade Extensível**: Componentes baseados em Mixins para plasticidade e dinâmica de curto prazo (STP).
+* **Eficiência Nativa**: Totalmente integrado ao ecossistema PyTorch para aceleração via GPU.
+* **Transparência Científica**: Pipeline explícito que separa Sinapse, Dendrito e Soma para auditoria total de estados.
 
-Transparência Científica: Pipeline explícito que separa Sinapse, Dendrito e Soma para auditoria total de estados.
+---
 
-⚡ Instalação Rápida
-Bash
+## ⚡ Instalação Rápida
+
+```bash
 pip install pyfolds
-💻 Começando em 30 segundos
+```
+
+---
+
+## 💻 Começando em 30 segundos
+
 O PyFolds segue a filosofia de design do PyTorch: defina sua configuração e instancie o módulo.
 
-Python
+```python
 import torch
 from pyfolds import MPJRDConfig, MPJRDNeuron
 
@@ -49,8 +56,9 @@ output = model(x)
 
 # Acesso direto aos spikes e estados internos
 print(output["spikes"])
-📚 Documentação Técnica
+```
 
+---
 
 ## Benchmarks de serialização
 
