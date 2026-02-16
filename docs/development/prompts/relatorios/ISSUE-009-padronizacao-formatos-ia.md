@@ -41,6 +41,7 @@ A meta é garantir consistência estrutural, executabilidade de prompts, rastrea
 | Verificador de links | `tools/check_issue_links.py` | Valida links e referências entre ISSUEs | `.py` |
 | Inventário de conformidade | `docs/inventory/issues-conformity.csv` | Mapeia conformidade dos ISSUEs atuais | `.csv` |
 | CI de validação | `.github/workflows/validate-issues.yml` | Executa validações em push/PR | `.yml` |
+| Workflow integrado | `docs/development/WORKFLOW_INTEGRADO.md` | Fluxo operacional conectado com execução real | `.md` |
 
 ## 4. Riscos
 
@@ -59,6 +60,7 @@ A meta é garantir consistência estrutural, executabilidade de prompts, rastrea
 - [ ] `tools/check_issue_links.py` detecta referências inválidas entre ISSUEs.
 - [ ] Workflow `.github/workflows/validate-issues.yml` está configurado para PR/push.
 - [ ] `docs/development/execution_queue.csv` e `docs/development/HUB_CONTROLE.md` refletem ISSUE-009.
+- [ ] Há orientação operacional prática em `docs/development/prompts/README.md` e `docs/development/WORKFLOW_INTEGRADO.md`.
 
 ## 6. PROMPT:EXECUTAR
 
@@ -88,6 +90,14 @@ acoes_imediatas:
   - task: "Implementar verificador de links e referências entre ISSUEs"
     output: "tools/check_issue_links.py"
     prazo: "2h"
+
+  - task: "Atualizar textos operacionais (prompts, contribuição e release)"
+    output: "docs/development/prompts/README.md"
+    prazo: "2h"
+
+  - task: "Publicar workflow integrado da issue até execução real"
+    output: "docs/development/WORKFLOW_INTEGRADO.md"
+    prazo: "1h"
 
   - task: "Atualizar fila de execução e sincronizar HUB"
     output: "docs/development/execution_queue.csv"

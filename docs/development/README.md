@@ -9,6 +9,7 @@
 - [TESTING.md](TESTING.md)
 - [benchmarking.md](benchmarking.md)
 - [release_process.md](release_process.md)
+- [WORKFLOW_INTEGRADO.md](WORKFLOW_INTEGRADO.md)
 
 
 ## Padronização de ISSUEs para IA

@@ -1,58 +1,64 @@
 # Release Process (PyFolds)
 
+> Integrado ao fluxo de issues em `docs/development/HUB_CONTROLE.md`.
+
 ## Objetivo
-Padronizar o fluxo de release com rastreabilidade e checklist operacional auditável.
-
-## Escopo
-Aplica-se a releases de código, documentação e artefatos de benchmark.
-
-## Papéis
-- **Executor:** prepara versão, validações e evidências.
-- **Maintainer:** revisa checklist e aprova publicação.
+Formalizar o processo de release com critérios técnicos e de governança verificáveis.
 
 ## Pré-condições
-- Branch alvo atualizada e sem conflitos.
-- CI verde (testes, docstrings públicas, links e HUB sync).
-- `CHANGELOG.md` atualizado com impactos externos.
+1. Issues do escopo da release com status apropriado em `docs/development/execution_queue.csv`.
+2. HUB sincronizado (`python tools/sync_hub.py --check`).
+3. ADRs novas/impactadas registradas no índice (`docs/governance/adr/INDEX.md`) quando aplicável.
+4. `CHANGELOG.md` atualizado com mudanças externas relevantes.
 
 ## Fluxo de release
-1. **Planejamento**
-   - Confirmar escopo (features/fixes/docs).
-   - Confirmar ADRs relacionadas (quando aplicável).
-2. **Hardening**
-   - Rodar suíte local e checks obrigatórios.
-   - Validar links de documentação.
-3. **Versionamento**
-   - Definir versão semântica.
-   - Atualizar `CHANGELOG.md`.
-4. **Publicação**
-   - Criar tag de release.
-   - Publicar artefatos (quando aplicável).
-5. **Pós-release**
-   - Registrar incidentes e ações corretivas.
-   - Atualizar rastreabilidade no HUB/fila.
 
-## Checklist auditável de release
+### Fase 1 — Preparação
+1. Confirmar escopo da release (features/fixes/docs).
+2. Consolidar evidências de PRs aprovadas.
+3. Atualizar `CHANGELOG.md`.
 
-### A. Validações técnicas
-- [ ] `python -m compileall src/`
-- [ ] `python tools/check_api_docs.py --strict`
-- [ ] `python tools/check_links.py docs README.md`
-- [ ] `python tools/sync_hub.py --check`
-- [ ] `pytest tests/ -v`
+### Fase 2 — Validação técnica
+Executar:
 
-### B. Artefatos e governança
+```bash
+python -m compileall src/
+python tools/check_api_docs.py --strict
+python tools/check_links.py docs/ README.md
+PYTHONPATH=src pytest tests/ -v --maxfail=1
+python tools/sync_hub.py --check
+```
+
+### Fase 3 — Versionamento e publicação
+1. Definir versão semântica.
+2. Criar tag (`vX.Y.Z`).
+3. Publicar release com notas alinhadas ao `CHANGELOG.md`.
+
+### Fase 4 — Pós-release
+1. Registrar conclusão de sprint/entregas no fluxo de governança.
+2. Planejar próxima janela de execução.
+
+## Checklist de release
+
+### A. Técnicos
+- [ ] `python -m compileall src/`.
+- [ ] `python tools/check_api_docs.py --strict`.
+- [ ] `python tools/check_links.py docs/ README.md`.
+- [ ] `PYTHONPATH=src pytest tests/ -v --maxfail=1`.
+- [ ] `python tools/sync_hub.py --check`.
+
+### B. Governança
 - [ ] `CHANGELOG.md` atualizado.
-- [ ] ADRs impactadas registradas/referenciadas.
-- [ ] Fila `docs/development/execution_queue.csv` atualizada.
-- [ ] HUB sincronizado (`docs/development/HUB_CONTROLE.md`).
+- [ ] `docs/development/execution_queue.csv` refletindo escopo da release.
+- [ ] `docs/development/HUB_CONTROLE.md` consistente.
+- [ ] ADRs impactadas atualizadas (se houver).
 
 ### C. Publicação
-- [ ] Versão semântica validada (tag).
+- [ ] Tag semântica criada.
 - [ ] Release publicada com notas.
-- [ ] Registro pós-release concluído.
+- [ ] Evidências arquivadas (PRs, checks, tag).
 
-## Evidências mínimas por release
-- Hash do commit de release.
-- Resultado dos comandos da seção A.
-- Link da PR aprovada e tag publicada.
+## Evidências mínimas
+- Commit/tag da release.
+- Comandos executados e respectivos resultados.
+- Referências às PRs aprovadas no ciclo.
