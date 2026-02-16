@@ -1,7 +1,7 @@
 # PyFolds Documentation Index
 
 > **Document Status:** Stable  
-> **Audience:** Researchers, ML Engineers, Systems Engineers  
+> **Audience:** Researchers, ML Engineers, Systems Engineers, Maintainers  
 > **Standard Orientation:** IEEE-style technical documentation (structured, traceable, reproducible)
 
 ---
@@ -21,7 +21,8 @@ This index is the canonical entry point for project documentation. It organizes 
 - onboarding and setup,
 - architecture and design understanding,
 - API-level implementation and integration,
-- scientific interpretation of model behavior.
+- scientific interpretation of model behavior,
+- internal governance and development control.
 
 ### 1.2 Scope
 
@@ -30,11 +31,29 @@ The documentation covers:
 - core MPJRD computation pipeline,
 - advanced mechanisms (STDP, adaptation, inhibition, refractory, short-term dynamics),
 - telemetry/observability surfaces,
-- scientific logic and theoretical references.
+- scientific logic and theoretical references,
+- governance and development workflows.
 
 ---
 
-## 2. Document Architecture (C4-Aligned)
+## 2. Audience Navigation
+
+### 2.1 Public (user-facing)
+- [`installation.md`](installation.md)
+- [`quickstart.md`](quickstart.md)
+- [`public/guides/getting_started.md`](public/guides/getting_started.md)
+- [`API_REFERENCE.md`](API_REFERENCE.md)
+
+### 2.2 Internal (development and governance)
+- [`development/DEVELOPMENT.md`](development/DEVELOPMENT.md)
+- [`development/HUB_CONTROLE.md`](development/HUB_CONTROLE.md)
+- [`development/CONTRIBUTING.md`](development/CONTRIBUTING.md)
+- [`governance/MASTER_PLAN.md`](governance/MASTER_PLAN.md)
+- [`governance/adr/INDEX.md`](governance/adr/INDEX.md)
+
+---
+
+## 3. Document Architecture (C4-Aligned)
 
 PyFolds documentation is structured in layers, aligned with C4 communication practices:
 
@@ -42,30 +61,6 @@ PyFolds documentation is structured in layers, aligned with C4 communication pra
 - **Level 2 — Containers:** `core`, `advanced`, `layers`, `network`, `telemetry`, `utils`.
 - **Level 3 — Components:** Synapse → Dendrite → Soma → Axon.
 - **Level 4 — Code:** classes, methods, data contracts, runtime outputs.
-
-```mermaid
-flowchart LR
-    A[Context\nResearch / Engineering] --> B[Containers\ncore | advanced | layers | network | telemetry | utils]
-    B --> C[Components\nSynapse -> Dendrite -> Soma -> Axon]
-    C --> D[Code\nClasses | Methods | Contracts]
-```
-
----
-
-## 3. Runtime Processing View
-
-The operational flow below emphasizes traceability and observability of model decisions.
-
-```mermaid
-flowchart LR
-    X[Input Tensor\nB x D x S] --> S[Synapse State\nN, I, W]
-    S --> D[Dendritic Integration\nv_dend]
-    D --> G[Somatic Gating\ncompetitive in current implementation]
-    G --> U[Somatic Potential\nu]
-    U --> K[Spike Decision\ntheta]
-    K --> T[Telemetry / Logs\nforward, commit, sleep]
-    T --> P[Plasticity / Consolidation]
-```
 
 ---
 
@@ -75,8 +70,8 @@ For efficient onboarding and technical depth progression:
 
 1. [`installation.md`](installation.md)
 2. [`quickstart.md`](quickstart.md)
-3. [`guide/core_concepts.md`](guide/core_concepts.md)
-4. [`guide/neuron_architecture.md`](guide/neuron_architecture.md)
+3. [`public/guides/core_concepts.md`](public/guides/core_concepts.md)
+4. [`public/guides/neuron_architecture.md`](public/guides/neuron_architecture.md)
 5. [`api/core.md`](api/core.md)
 6. [`SCIENTIFIC_LOGIC.md`](SCIENTIFIC_LOGIC.md)
 
@@ -85,24 +80,22 @@ For efficient onboarding and technical depth progression:
 ## 5. Documentation Map
 
 ### 5.1 Getting Started
-
 - [`installation.md`](installation.md)
 - [`quickstart.md`](quickstart.md)
+- [`public/guides/getting_started.md`](public/guides/getting_started.md)
 
 ### 5.2 Guides (Conceptual and Operational)
-
-- [`guide/core_concepts.md`](guide/core_concepts.md)
-- [`guide/neuron_architecture.md`](guide/neuron_architecture.md)
-- [`guide/engineering_patterns.md`](guide/engineering_patterns.md)
-- [`guide/plasticity.md`](guide/plasticity.md)
-- [`guide/homeostasis.md`](guide/homeostasis.md)
-- [`guide/neuromodulation.md`](guide/neuromodulation.md)
-- [`guide/advanced_mechanisms.md`](guide/advanced_mechanisms.md)
-- [`guide/telemetry.md`](guide/telemetry.md)
-- [`guide/logging.md`](guide/logging.md)
+- [`public/guides/core_concepts.md`](public/guides/core_concepts.md)
+- [`public/guides/neuron_architecture.md`](public/guides/neuron_architecture.md)
+- [`public/guides/engineering_patterns.md`](public/guides/engineering_patterns.md)
+- [`public/guides/plasticity.md`](public/guides/plasticity.md)
+- [`public/guides/homeostasis.md`](public/guides/homeostasis.md)
+- [`public/guides/neuromodulation.md`](public/guides/neuromodulation.md)
+- [`public/guides/advanced_mechanisms.md`](public/guides/advanced_mechanisms.md)
+- [`public/guides/telemetry.md`](public/guides/telemetry.md)
+- [`public/guides/logging.md`](public/guides/logging.md)
 
 ### 5.3 API Reference
-
 - [`api/core.md`](api/core.md)
 - [`api/network.md`](api/network.md)
 - [`api/layers.md`](api/layers.md)
@@ -111,12 +104,18 @@ For efficient onboarding and technical depth progression:
 - [`api/telemetry.md`](api/telemetry.md)
 
 ### 5.4 Theory and Scientific Logic
-
 - [`SCIENTIFIC_LOGIC.md`](SCIENTIFIC_LOGIC.md)
-- [`theory/mpjrd_model.md`](theory/mpjrd_model.md)
-- [`theory/three_factor_learning.md`](theory/three_factor_learning.md)
-- [`theory/two_factor_consolidation.md`](theory/two_factor_consolidation.md)
-- [`theory/stdp_mechanism.md`](theory/stdp_mechanism.md)
+- [`research/mpjrd/mpjrd_model.md`](research/mpjrd/mpjrd_model.md)
+- [`research/mpjrd/three_factor_learning.md`](research/mpjrd/three_factor_learning.md)
+- [`research/mpjrd/two_factor_consolidation.md`](research/mpjrd/two_factor_consolidation.md)
+- [`research/mpjrd/stdp_mechanism.md`](research/mpjrd/stdp_mechanism.md)
+
+### 5.5 Development and Governance
+- [`development/HUB_CONTROLE.md`](development/HUB_CONTROLE.md)
+- [`development/TESTING.md`](development/TESTING.md)
+- [`development/release_process.md`](development/release_process.md)
+- [`governance/QUALITY_ASSURANCE.md`](governance/QUALITY_ASSURANCE.md)
+- [`governance/RISK_REGISTER.md`](governance/RISK_REGISTER.md)
 
 ---
 
@@ -124,13 +123,14 @@ For efficient onboarding and technical depth progression:
 
 | Design Concern | Primary Artifact | Verification Surface |
 |---|---|---|
-| Engenharia operacional (Factory/Validation/Checkpoint/Health) | `guide/engineering_patterns.md` | testes unitários + contratos de uso |
-| Core neuron pipeline | `guide/neuron_architecture.md`, `api/core/neuron.md` | forward outputs (`u`, `v_dend`, `spikes`) |
-| Structural plasticity (`N`, `I`, `W`) | `guide/plasticity.md`, `api/core/synapse.md` | state transitions and thresholds |
-| Homeostatic stability | `guide/homeostasis.md`, `api/core/homeostasis.md` | `theta`, `r_hat`, target rate dynamics |
-| Neuromodulatory control | `guide/neuromodulation.md`, `api/core/neuromodulation.md` | `R` behavior across modes |
+| Engenharia operacional (Factory/Validation/Checkpoint/Health) | `public/guides/engineering_patterns.md` | testes unitários + contratos de uso |
+| Core neuron pipeline | `public/guides/neuron_architecture.md`, `api/core/neuron.md` | forward outputs (`u`, `v_dend`, `spikes`) |
+| Structural plasticity (`N`, `I`, `W`) | `public/guides/plasticity.md`, `api/core/synapse.md` | state transitions and thresholds |
+| Homeostatic stability | `public/guides/homeostasis.md`, `api/core/homeostasis.md` | `theta`, `r_hat`, target rate dynamics |
+| Neuromodulatory control | `public/guides/neuromodulation.md`, `api/core/neuromodulation.md` | `R` behavior across modes |
 | Batch/sleep consolidation | `api/core/accumulator.md`, theory docs | commit/sleep phase outputs |
-| Observability and auditability | `guide/telemetry.md`, `api/telemetry.md` | event stream and sink outputs |
+| Observability and auditability | `public/guides/telemetry.md`, `api/telemetry.md` | event stream and sink outputs |
+| Governança de documentação interna | `development/HUB_CONTROLE.md`, `governance/adr/INDEX.md` | update log + ADR consistency |
 
 ---
 
