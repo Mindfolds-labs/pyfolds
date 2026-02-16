@@ -1,6 +1,1 @@
-VISUAL FINAL
-
-Este arquivo foi versionado na raiz do projeto para manter alinhamento entre plano e código.
-
-- Caminho canônico: ./VISUAL_FINAL.txt
-- Status: placeholder inicial; atualizar conteúdo com o time.
+PACOTE FINAL DE GOVERNANÇA (RAIZ)

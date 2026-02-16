@@ -80,6 +80,19 @@ Para evitar divergência entre plano e código, os documentos abaixo ficam versi
 - [`solucoes_fold_mind.py`](solucoes_fold_mind.py)
 - [`VISUAL_FINAL.txt`](VISUAL_FINAL.txt)
 
+## Pacote de governança (canônico)
+
+Para evitar divergência futura entre plano e artefatos de referência, os documentos canônicos estão na raiz do projeto:
+
+- `SUMARIO_COMPLETO.md`
+- `analise_bugs.md`
+- `revisao_fold_mind.md`
+- `tarefas_pendentes.md`
+- `solucoes_fold_mind.py`
+- `VISUAL_FINAL.txt`
+
+Referência de consolidação atual: branch `work` e sem tags locais publicadas.
+
 ## Exemplo rápido
 
 ```python
