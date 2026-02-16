@@ -175,7 +175,10 @@ class MPJRDSynapse(nn.Module):
         ✅ OTIMIZADO: usa i_decay_sleep da config
         """
         # Verifica se há elegibilidade
-        if self.eligibility.numel() == 0 or self.eligibility.item() == 0:
+        if self.eligibility.numel() == 0:
+            return
+
+        if self.eligibility.item() == 0:
             return
         
         # Transfere elegibilidade para N

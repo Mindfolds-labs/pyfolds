@@ -65,45 +65,34 @@ class MPJRDNeuronAdvanced(
     
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
-        
-        # ===== INICIALIZAÇÃO DOS MIXINS =====
-        # ✅ CORRIGIDO: passa cfg para os mixins que dependem dele
-        
-        # Refractory (usa parâmetros individuais)
-        if hasattr(self, '_init_refractory'):
-            self._init_refractory(
+
+        try:
+            RefractoryMixin._init_refractory(
+                self,
                 t_refrac_abs=cfg.t_refrac_abs,
                 t_refrac_rel=cfg.t_refrac_rel,
-                refrac_rel_strength=cfg.refrac_rel_strength
+                refrac_rel_strength=cfg.refrac_rel_strength,
             )
-        
-        # STDP (usa parâmetros individuais)
-        if hasattr(self, '_init_stdp'):
-            self._init_stdp(
+            STDPMixin._init_stdp(
+                self,
                 tau_pre=cfg.tau_pre,
                 tau_post=cfg.tau_post,
                 A_plus=cfg.A_plus,
                 A_minus=cfg.A_minus,
-                plasticity_mode=cfg.plasticity_mode
+                plasticity_mode=cfg.plasticity_mode,
             )
-        
-        # Adaptation (cfg-based)
-        if hasattr(self, '_init_adaptation'):
-            self._init_adaptation(cfg)  # ✅ passa cfg completo
-        
-        # Short-term (usa parâmetros individuais)
-        if hasattr(self, '_init_short_term'):
-            self._init_short_term(
+            AdaptationMixin._init_adaptation(self, cfg)
+            ShortTermDynamicsMixin._init_short_term(
+                self,
                 u0=cfg.u0,
                 R0=cfg.R0,
                 U=cfg.U,
                 tau_fac=cfg.tau_fac,
-                tau_rec=cfg.tau_rec
+                tau_rec=cfg.tau_rec,
             )
-        
-        # Backprop (cfg-based)
-        if hasattr(self, '_init_backprop'):
-            self._init_backprop(cfg)  # ✅ passa cfg completo
+            BackpropMixin._init_backprop(self, cfg)
+        except AttributeError as exc:
+            raise RuntimeError(f"Falha na inicialização dos mixins avançados: {exc}") from exc
     
     def get_all_advanced_metrics(self) -> dict:
         """
@@ -156,36 +145,33 @@ class MPJRDWaveNeuronAdvanced(
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
 
-        if hasattr(self, '_init_refractory'):
-            self._init_refractory(
+        try:
+            RefractoryMixin._init_refractory(
+                self,
                 t_refrac_abs=cfg.t_refrac_abs,
                 t_refrac_rel=cfg.t_refrac_rel,
                 refrac_rel_strength=cfg.refrac_rel_strength,
             )
-
-        if hasattr(self, '_init_stdp'):
-            self._init_stdp(
+            STDPMixin._init_stdp(
+                self,
                 tau_pre=cfg.tau_pre,
                 tau_post=cfg.tau_post,
                 A_plus=cfg.A_plus,
                 A_minus=cfg.A_minus,
                 plasticity_mode=cfg.plasticity_mode,
             )
-
-        if hasattr(self, '_init_adaptation'):
-            self._init_adaptation(cfg)
-
-        if hasattr(self, '_init_short_term'):
-            self._init_short_term(
+            AdaptationMixin._init_adaptation(self, cfg)
+            ShortTermDynamicsMixin._init_short_term(
+                self,
                 u0=cfg.u0,
                 R0=cfg.R0,
                 U=cfg.U,
                 tau_fac=cfg.tau_fac,
                 tau_rec=cfg.tau_rec,
             )
-
-        if hasattr(self, '_init_backprop'):
-            self._init_backprop(cfg)
+            BackpropMixin._init_backprop(self, cfg)
+        except AttributeError as exc:
+            raise RuntimeError(f"Falha na inicialização dos mixins avançados (wave): {exc}") from exc
 
 
 class MPJRDLayerAdvanced(MPJRDLayer):

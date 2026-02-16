@@ -169,14 +169,15 @@ class MPJRDDendrite(nn.Module):
         self._ensure_cache_valid()
         u_state = self.u
         r_state = self.R
-        return {
+        states = {
             'N': self.N.clone(),
             'W': self.W.clone(),
             'I': self.I.clone(),
-            **({'u': u_state.clone(), 'R': r_state.clone()} if u_state is not None and r_state is not None else {})
         }
-        if self.u is not None and self.R is not None:
-            states.update({'u': self.u.clone(), 'R': self.R.clone()})
+
+        if u_state is not None and r_state is not None:
+            states.update({'u': u_state.clone(), 'R': r_state.clone()})
+
         return states
 
     def load_states(self, states: Dict[str, torch.Tensor]) -> None:

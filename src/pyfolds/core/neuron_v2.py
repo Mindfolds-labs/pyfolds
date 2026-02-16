@@ -14,18 +14,10 @@ class MPJRDNeuronV2(MPJRDNeuron):
     
     ✅ CORRIGIDO:
         - Herda todas as melhorias do MPJRDNeuron (validação de devices, logging, etc.)
-        - Adiciona validação de input device
+        - Reutiliza validação de input device da classe base
         - Mantém consistência com a versão base
         - Preserva semântica do acumulador
     """
-
-    def _validate_input_device(self, x: torch.Tensor) -> None:
-        """Valida se input está no device correto (override do método da base)."""
-        if x.device != self.theta.device:
-            raise RuntimeError(
-                f"Input device {x.device} != neuron device {self.theta.device}. "
-                "Use .to(device) no input ou mova o neurônio."
-            )
 
     def forward(
         self,

@@ -141,22 +141,27 @@ class JSONLinesSink(Sink):
             self.path.parent.mkdir(parents=True, exist_ok=True)
             self._file = open(self.path, mode, encoding='utf-8')
     
-    def _make_serializable(self, obj):
+    def _make_serializable(self, obj, _depth: int = 0, _max_depth: int = 10):
         """Convert objects to JSON-serializable formats."""
+        if _depth > _max_depth:
+            return str(obj)
+
         if TORCH_AVAILABLE and isinstance(obj, torch.Tensor):
             if obj.numel() == 1:
                 return obj.item()
-            else:
-                return obj.detach().cpu().tolist()
-        elif isinstance(obj, (list, tuple)):
-            return [self._make_serializable(item) for item in obj]
-        elif isinstance(obj, dict):
-            return {key: self._make_serializable(value) for key, value in obj.items()}
-        elif isinstance(obj, (int, float, str, bool, type(None))):
+            return obj.detach().cpu().tolist()
+        if isinstance(obj, (list, tuple)):
+            return [self._make_serializable(item, _depth + 1, _max_depth) for item in obj]
+        if isinstance(obj, dict):
+            return {
+                key: self._make_serializable(value, _depth + 1, _max_depth)
+                for key, value in obj.items()
+            }
+        if isinstance(obj, (int, float, str, bool, type(None))):
             return obj
-        else:
-            # Fallback to string
-            return str(obj)
+
+        # Fallback to string
+        return str(obj)
     
     def emit(self, event: TelemetryEvent) -> None:
         """Emit event to file."""
