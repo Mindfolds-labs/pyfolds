@@ -1,118 +1,140 @@
-# FOLD Specification (`.fold/.mind`) — v1.2.0
+# FOLD Binary Specification (`.fold/.mind`)
 
-## 1. Escopo e objetivo
+## 1. Objetivo
+Especificar o layout binário completo do container `.fold/.mind` para garantir interoperabilidade, validação defensiva e resistência básica a ataques de negação de serviço (DoS).
 
-Este documento formaliza o formato binário do container `.fold/.mind` usado no PyFolds para checkpoints científicos, inspeção parcial, validação de integridade e recuperação operacional.
+> Fonte normativa de implementação atual: `src/pyfolds/serialization/foldio.py`.
 
-- `.fold` e `.mind` têm **layout físico idêntico**;
-- `.mind` é uma convenção semântica quando o índice declara chunks de IA (`ai_graph` e/ou `ai_vectors`).
+---
 
-## 2. Convenções binárias
+## 2. Convenções
+- **Endianness:** `big-endian` para todos os campos binários (`struct` com prefixo `>`).
+- **Unidades:** offsets e tamanhos em **bytes**.
+- **Codificação textual:** UTF-8 para JSON.
 
-### 2.1 Endianness
+### 2.1 Constantes de segurança (anti-DoS)
+- `MAX_INDEX_SIZE = 100 * 1024 * 1024` (100 MiB) — limite rígido para o índice JSON.
+- `MAX_CHUNK_SIZE = 1 * 1024 * 1024 * 1024` (1 GiB) — limite operacional recomendado por chunk (comprimido e descomprimido) para leitores em ambiente não-confiável.
 
-Todos os campos binários usam **big-endian** (network byte order), conforme os formatos:
+> `MAX_INDEX_SIZE` está aplicado no leitor atual. `MAX_CHUNK_SIZE` é requisito de política para hardening adicional e para implementações externas compatíveis.
 
-- Header do arquivo: `>8sIQQ`
-- Header de chunk: `>4sIQQII`
+---
 
-### 2.2 Header principal (28 bytes)
+## 3. Layout físico do arquivo
 
-| Offset (hex) | Tamanho | Tipo | Campo | Descrição |
-|---|---:|---|---|---|
-| `0x00` | 8 | `8s` | `magic` | Assinatura fixa `b"FOLDv1\\0\\0"` |
-| `0x08` | 4 | `uint32` | `header_len` | Tamanho do header principal; na v1.2.0 = `28` |
-| `0x0C` | 8 | `uint64` | `index_off` | Offset absoluto do índice JSON |
-| `0x14` | 8 | `uint64` | `index_len` | Tamanho do índice JSON em bytes |
-
-### 2.3 Header de chunk (32 bytes)
-
-Cada chunk inicia em `chunk.offset` (registrado no índice), seguido por payload comprimido e bytes ECC opcionais.
-
-| Offset relativo | Tamanho | Tipo | Campo | Descrição |
-|---|---:|---|---|---|
-| `+0x00` | 4 | `4s` | `ctype` | Tipo fixo de 4 bytes ASCII (`TSAV`, `JSON`, `NPZ0`, etc.) |
-| `+0x04` | 4 | `uint32` | `flags` | Compressão (`0=none`, `1=zstd`) |
-| `+0x08` | 8 | `uint64` | `uncomp_len` | Tamanho original (descomprimido) |
-| `+0x10` | 8 | `uint64` | `comp_len` | Tamanho comprimido |
-| `+0x18` | 4 | `uint32` | `crc32c` | CRC32C (Castagnoli) do payload comprimido |
-| `+0x1C` | 4 | `uint32` | `ecc_len` | Tamanho do bloco ECC (0 se ausente) |
-
-Layout físico completo por chunk:
-
-```text
-[ chunk_header(32) ][ compressed_payload(comp_len) ][ ecc_bytes(ecc_len) ]
+```
++----------------------+  offset 0
+| Header fixo          |  28 bytes
++----------------------+  offset = index_off
+| Região de chunks     |  repetição [chunk_header + payload + ecc]
+| ...                  |
++----------------------+  offset = index_off
+| Índice JSON          |  index_len bytes
++----------------------+  EOF
 ```
 
-### 2.4 Índice JSON (tail index)
+### 3.1 Header global (`HEADER_FMT = ">8sIQQ"`)
+Tamanho fixo: **28 bytes**.
 
-O índice JSON é gravado no final do arquivo e seu endereço é referenciado no header principal (`index_off`, `index_len`). Estrutura mínima esperada:
+| Campo       | Tipo binário | Offset | Tamanho | Descrição |
+|-------------|--------------|--------|---------|-----------|
+| `magic`     | `8s`         | 0      | 8       | Assinatura fixa `b"FOLDv1\0\0"`. |
+| `header_len`| `uint32`     | 8      | 4       | Deve ser `28`. |
+| `index_off` | `uint64`     | 12     | 8       | Offset absoluto do índice JSON. |
+| `index_len` | `uint64`     | 20     | 8       | Tamanho do índice JSON em bytes. |
 
-- `format`: string (`"fold"`)
-- `version`: string semântica (ex.: `"1.2.0"`)
-- `created_at_unix`: `float`
-- `metadata`: objeto (inclui `chunk_hashes` e `manifest_hash`)
-- `chunks`: array de objetos com descritores por chunk:
-  - `name`, `ctype`, `flags`, `offset`, `header_len`, `comp_len`, `uncomp_len`, `crc32c`, `sha256`, `ecc_algo`, `ecc_len`
+### 3.2 Chunk (`CHUNK_HDR_FMT = ">4sIQQII"`)
+Cada chunk começa com header fixo de **32 bytes**.
 
-## 3. Regras de validação e limites anti-DoS
+| Campo        | Tipo binário | Offset relativo ao chunk | Tamanho | Descrição |
+|--------------|--------------|--------------------------|---------|-----------|
+| `ctype`      | `4s`         | 0                        | 4       | Código ASCII de 4 bytes (ex.: `TSAV`, `JSON`, `NPZ0`). |
+| `flags`      | `uint32`     | 4                        | 4       | Flags de compressão (`0=none`, `1=zstd`). |
+| `uncomp_len` | `uint64`     | 8                        | 8       | Tamanho esperado após descompressão. |
+| `comp_len`   | `uint64`     | 16                       | 8       | Tamanho da carga comprimida. |
+| `crc32c`     | `uint32`     | 24                       | 4       | CRC32C da carga comprimida. |
+| `ecc_len`    | `uint32`     | 28                       | 4       | Tamanho do bloco ECC anexado. |
 
-A implementação de leitura **deve falhar de forma explícita** sob qualquer inconsistência estrutural.
+Após o header:
+1. `comp_payload` com `comp_len` bytes.
+2. `ecc_payload` com `ecc_len` bytes.
 
-### 3.1 Header e índice
+---
 
-1. `magic` deve ser exatamente `FOLDv1\0\0`.
-2. `header_len` deve ser igual a `28` (`struct.calcsize(">8sIQQ")`).
-3. `index_off >= header_len`.
-4. `index_len <= MAX_INDEX_SIZE`.
-5. `index_off + index_len` deve estar dentro do tamanho físico do arquivo.
-6. Índice deve ser UTF-8 e JSON válido.
+## 4. Índice JSON (trailer)
+O índice JSON fica ao final do arquivo, no offset `index_off`, e possui `index_len` bytes.
 
-### 3.2 Limites anti-DoS
+Estrutura canônica:
+- `format`: `"fold"`
+- `version`: versão de formato (atual `"1.2.0"`)
+- `created_at_unix`: timestamp UNIX
+- `metadata`: metadados de alto nível (inclui `chunk_hashes` e `manifest_hash`)
+- `chunks`: lista de descritores por chunk
 
-- `MAX_INDEX_SIZE = 100 * 1024 * 1024` (100 MiB).
-- `MAX_CHUNK_SIZE = 1 * 1024 * 1024 * 1024` (1 GiB) para `comp_len` e `uncomp_len`.
+Cada item em `chunks` inclui, no mínimo:
+- `name`, `ctype`, `flags`, `offset`, `header_len`, `comp_len`, `uncomp_len`, `crc32c`, `sha256`, `ecc_algo`, `ecc_len`.
 
-Observação: `MAX_CHUNK_SIZE` é aplicado como limite de defesa para evitar alocação excessiva, offsets maliciosos e tentativas de amplificação de memória.
+---
 
-### 3.3 Integridade e consistência por chunk
+## 5. Regras de escrita
+Para cada chunk:
+1. Gerar payload bruto.
+2. Comprimir (opcional).
+3. Calcular `crc32c` e `sha256` sobre o payload comprimido.
+4. Aplicar ECC opcional sobre o payload comprimido.
+5. Persistir: `chunk_header + comp_payload + ecc_payload`.
+6. Registrar entrada correspondente no índice.
 
-Para cada chunk solicitado:
+Finalize:
+1. Serializar e gravar índice JSON no final do arquivo.
+2. Regravar header global com `index_off` e `index_len` finais.
 
-1. Ler header de chunk em `offset`.
-2. Validar limites (`comp_len`, `uncomp_len`) contra `MAX_CHUNK_SIZE`.
-3. Ler `comp` e `ecc_bytes` sem ultrapassar o tamanho do arquivo.
-4. Se `ecc_algo != none`, decodificar ECC antes da validação criptográfica.
-5. Validar `crc32c(comp)` contra `crc32c` do header.
-6. Validar `sha256(comp)` contra `sha256` do índice.
-7. Validar consistência opcional `metadata.chunk_hashes[name] == chunk.sha256`.
-8. Descomprimir conforme `flags`.
-9. Validar `len(raw) == uncomp_len`.
+---
 
-## 4. Algoritmo de leitura passo a passo
+## 6. Regras de validação multicamada (leitura)
+Ordem recomendada para leitores não-confiáveis:
 
-### 4.1 Procedimento normativo
+1. **Validação estrutural do arquivo**
+   - arquivo legível;
+   - header completo (28 bytes);
+   - `magic` correto;
+   - `header_len == 28`;
+   - `index_off >= header_len`.
 
-1. Abrir arquivo em modo binário (`rb`) e opcionalmente mapear via `mmap`.
-2. Ler 28 bytes iniciais (header principal).
-3. Fazer `unpack('>8sIQQ')`.
-4. Aplicar validações de header e limite de índice.
-5. Ler `index_len` bytes a partir de `index_off`.
-6. Decodificar UTF-8 e parsear JSON.
-7. Para listar chunks, retornar `chunks[*].name`.
-8. Para leitura de um chunk por nome:
-   - localizar objeto no array `chunks`;
-   - ler header do chunk em `chunk.offset` (`'>4sIQQII'`);
-   - ler payload comprimido e ECC;
-   - aplicar validações de integridade;
-   - descomprimir (se necessário);
-   - retornar bytes descomprimidos.
-9. Para payload JSON: `json.loads(bytes.decode('utf-8'))`.
-10. Para payload `torch_state`: carregar em modo seguro (`weights_only=True`) por padrão; modo confiável (`trusted`) somente sob decisão explícita.
+2. **Limites anti-DoS**
+   - `index_len <= MAX_INDEX_SIZE`;
+   - para cada chunk: `comp_len <= MAX_CHUNK_SIZE` e `uncomp_len <= MAX_CHUNK_SIZE`.
 
-## 5. Compatibilidade e governança
+3. **Validação de bounds/EOF**
+   - toda leitura deve garantir `offset + length <= file_size`.
 
-- Versão atual: `1.2.0`.
-- Alterações incompatíveis exigem novo `magic` ou política formal de migração.
-- Alterações compatíveis aditivas devem preservar leitura de versões anteriores.
-- Decisões arquiteturais e operacionais relacionadas ao formato são registradas em `docs/adr/`.
+4. **Validação de integridade por chunk**
+   - aplicar decode ECC (quando presente);
+   - comparar `crc32c`;
+   - comparar `sha256` do índice;
+   - validar hash hierárquico em `metadata.chunk_hashes`.
+
+5. **Validação de manifesto/metadados**
+   - recomputar e comparar `metadata.manifest_hash` (aviso ou erro conforme política).
+
+6. **Validação semântica de payload**
+   - descompressão conforme `flags`;
+   - tamanho descomprimido deve casar com `uncomp_len`;
+   - desserialização de objetos em modo seguro (ex.: `torch.load(..., weights_only=True)`).
+
+---
+
+## 7. Chunks padrão (v1.2)
+- `torch_state` (`TSAV`) — estado de treino para retomada.
+- `llm_manifest` (`JSON`) — manifesto para auditoria/tooling.
+- `metrics` (`JSON`) — métricas agregadas.
+- `history` (`JSON`, opcional) — histórico de accumulator.
+- `telemetry` (`JSON`, opcional) — snapshot de eventos/estatísticas.
+- `nuclear_arrays` (`NPZ0`, opcional) — arrays científicos parciais.
+
+---
+
+## 8. Compatibilidade e extensibilidade
+- Extensões `.fold` e `.mind` compartilham layout físico.
+- Novos chunks são permitidos sem quebrar leitores antigos (desde que preservem header e índice).
+- Recomendado manter versionamento semântico no campo `version` do índice.

@@ -1,39 +1,43 @@
-# ADR Index — FOLD
+# ADR Index — Architecture Decision Records
 
-## Lista de ADRs
+Este índice organiza as decisões de arquitetura e suas dependências.
 
-- [ADR-001 — Governança de decisões para formato FOLD](ADR-001-governanca-decisoes-fold.md) *(Accepted)*
-- [ADR-002 — Container `.fold/.mind` para checkpoints científicos](ADR-002-container-fold-mind.md) *(Accepted)*
-- [ADR-003 — Integridade e ECC por chunk](ADR-003-integridade-ecc-por-chunk.md) *(Accepted)*
-- [ADR-004 — Correções de regressão em refratário, serialização e API de camada](ADR-004-correcao-regressoes-refratario-serializacao-api.md) *(Accepted)*
-- [ADR-006 — Limite anti-DoS para índice (`MAX_INDEX_SIZE`)](ADR-006-limite-max-index-size.md) *(Accepted)*
-- [ADR-007 — Proposta de limite anti-DoS por chunk (`MAX_CHUNK_SIZE`)](ADR-007-proposta-max-chunk-size.md) *(Proposed)*
-- [ADR-008 — Leitura parcial com índice + `mmap`](ADR-008-leitura-parcial-e-mmap.md) *(Accepted)*
-- [ADR-009 — Segurança na desserialização Torch](ADR-009-seguranca-desserializacao-torch.md) *(Accepted)*
+## Núcleo de serialização `.fold/.mind`
 
-## Mapa de dependências
+1. [ADR-001 — Formato binário `.fold/.mind` com índice no trailer](./ADR-001-formato-binario-fold-mind.md)
+2. [ADR-002 — Compressão ZSTD por chunk](./ADR-002-compressao-zstd-por-chunk.md)
+3. [ADR-003 — ECC opcional por chunk](./ADR-003-ecc-opcional-por-chunk.md)
+4. [ADR-004 — Validação multicamada para leitura segura](./ADR-004-validacao-multicamada.md)
 
-```text
-ADR-001
-  └─ ADR-002
-      ├─ ADR-003
-      │   └─ ADR-004
-      ├─ ADR-006
-      │   └─ ADR-007 (Proposed)
-      └─ ADR-008
-          └─ ADR-009
+### Mapa de dependências (serialização)
 
-Dependência adicional:
-ADR-009 também depende de ADR-003 (integridade antes de decode).
+```mermaid
+graph TD
+  ADR001[ADR-001\nFormato binário] --> ADR002[ADR-002\nCompressão ZSTD]
+  ADR001 --> ADR003[ADR-003\nECC opcional]
+  ADR001 --> ADR004[ADR-004\nValidação multicamada]
+  ADR002 --> ADR004
+  ADR003 --> ADR004
 ```
 
-## Leitura recomendada
+## Trilha matemática e estabilidade numérica
 
-1. ADR-001
-2. ADR-002
-3. ADR-003
-4. ADR-006
-5. ADR-008
-6. ADR-009
-7. ADR-004
-8. ADR-007 (proposta futura)
+6. [ADR-006 — Safe Weight Law](./ADR-006-safe-weight-law.md)
+7. [ADR-007 — Monitoramento de invariantes](./ADR-007-monitoramento-de-invariantes.md)
+8. [ADR-008 — Homeostase com anti-windup](./ADR-008-homeostase-com-anti-windup.md)
+9. [ADR-009 — Testes de propriedades matemáticas](./ADR-009-testes-de-propriedades-matematicas.md)
+
+### Mapa de dependências (matemática)
+
+```mermaid
+graph TD
+  ADR006[ADR-006\nSafe Weight Law] --> ADR007[ADR-007\nMonitoramento de invariantes]
+  ADR006 --> ADR008[ADR-008\nHomeostase anti-windup]
+  ADR007 --> ADR009[ADR-009\nTestes property-based]
+  ADR008 --> ADR009
+```
+
+## Links cruzados úteis
+- Especificação binária detalhada: [docs/FOLD_SPECIFICATION.md](../FOLD_SPECIFICATION.md)
+- Documento de formato teórico prévio: [docs/theory/FOLD_MIND_FORMAT.md](../theory/FOLD_MIND_FORMAT.md)
+- ADR legado relacionado ao container: [docs/developments/adr/ADR-0002-fold-mind-container.md](../developments/adr/ADR-0002-fold-mind-container.md)

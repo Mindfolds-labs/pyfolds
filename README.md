@@ -42,6 +42,8 @@ pip install -e .[dev]
 
 - 📚 Índice geral: `docs/README.md`
 - 🧪 Lógica científica: `docs/SCIENTIFIC_LOGIC.md`
+- 📦 Especificação binária `.fold/.mind`: `docs/FOLD_SPECIFICATION.md`
+- 🧾 ADRs (mapa e dependências): `docs/adr/INDEX.md`
 - 🏗️ Arquitetura (C4 + sequência): `docs/ARCHITECTURE.md`
 - 📦 Especificação formal do formato `.fold/.mind`: `docs/FOLD_SPECIFICATION.md`
 - 🧾 Índice de ADRs (governança): `docs/adr/INDEX.md`
