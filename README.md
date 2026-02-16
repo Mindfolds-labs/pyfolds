@@ -94,3 +94,34 @@ Referências relevantes no repositório:
 python scripts/run_benchmarks.py
 python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/BENCHMARKS.md
 ```
+
+## 8. Workflow v6 (CRIAR → ANALISAR → EXECUTAR → FINALIZAR)
+
+Fluxo operacional canônico para governança e execução de issues:
+
+1. **CRIAR**
+   - Criar relatório em `docs/development/prompts/relatorios/ISSUE-XXX-slug.md`.
+   - Criar log em `docs/development/prompts/logs/ISSUE-XXX-slug-LOG.md`.
+2. **ANALISAR**
+   - Validar escopo, riscos, critérios de aceite e artefatos afetados.
+3. **EXECUTAR**
+   - Implementar mudanças e manter rastreabilidade em `docs/development/execution_queue.csv`.
+4. **FINALIZAR**
+   - Sincronizar HUB, rodar validações e abrir PR com evidências.
+
+Comandos mínimos:
+
+```bash
+python -m compileall src/
+python tools/validate_docs_links.py
+python tools/sync_hub.py --check
+PYTHONPATH=src pytest tests/ -v
+```
+
+## 9. Links importantes (desenvolvimento)
+
+- 📁 [Portal de Prompts Operacionais](docs/development/prompts/README.md)
+- 🧾 [Relatórios canônicos](docs/development/prompts/relatorios/)
+- 🗂️ [Logs canônicos](docs/development/prompts/logs/)
+- 🛠️ [HUB de Controle](docs/development/HUB_CONTROLE.md)
+- 📌 [Fila de Execução](docs/development/execution_queue.csv)

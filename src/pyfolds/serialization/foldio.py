@@ -80,6 +80,7 @@ class FoldSecurityError(RuntimeError):
 
 
 def crc32c_u32(data: bytes) -> int:
+    """Retorna CRC32C (Castagnoli) como inteiro unsigned de 32 bits."""
     if google_crc32c is not None:
         try:
             return int.from_bytes(google_crc32c.value(data).to_bytes(4, "big"), "big")
@@ -106,6 +107,7 @@ def crc32c_u32(data: bytes) -> int:
 
 
 def sha256_hex(data: bytes) -> str:
+    """Retorna digest SHA-256 em formato hexadecimal."""
     return hashlib.sha256(data).hexdigest()
 
 
@@ -330,19 +332,22 @@ class FoldWriter:
 
             phase = "write_header"
             self._f.seek(0)
-
-            phase = "header write"
             header_len = struct.calcsize(HEADER_FMT)
             self._f.write(struct.pack(HEADER_FMT, MAGIC, header_len, index_off, len(index_bytes)))
 
             phase = "fsync_header"
             self._f.flush()
-
-            phase = "header fsync"
             os.fsync(self._f.fileno())
         except Exception as exc:
+            phase_labels = {
+                "write_index": "escrita do índice",
+                "fsync_index": "persistência do arquivo fold (index fsync)",
+                "write_header": "escrita do header",
+                "fsync_header": "persistência do arquivo fold (header fsync)",
+            }
+            label = phase_labels.get(phase, phase)
             raise RuntimeError(
-                f"Falha ao finalizar arquivo fold na fase '{phase}': {exc}"
+                f"Falha ao finalizar arquivo fold na fase '{phase}' ({label}): {exc}"
             ) from exc
 
 
@@ -763,4 +768,5 @@ def is_mind(path: str) -> bool:
 
 
 def is_mind_chunks(chunks: List[str]) -> bool:
+    """Indica se um conjunto de chunks representa conteúdo com extensão `.mind`."""
     return any(name in set(chunks) for name in ("ai_graph", "ai_vectors"))

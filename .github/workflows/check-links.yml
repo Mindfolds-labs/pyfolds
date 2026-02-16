@@ -1,14 +1,15 @@
-name: Validate docstrings
+name: Check links
 
 on:
   pull_request:
     paths:
-      - src/**
-      - tools/check_api_docs.py
-      - .github/workflows/validate-docs.yml
+      - docs/**
+      - README.md
+      - tools/check_links.py
+      - .github/workflows/check-links.yml
 
 jobs:
-  api-docstrings:
+  markdown-links:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,5 +20,5 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Validate public API docstrings (strict)
-        run: python tools/check_api_docs.py --strict
+      - name: Validate local markdown links
+        run: python tools/check_links.py docs README.md

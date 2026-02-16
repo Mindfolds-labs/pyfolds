@@ -36,7 +36,9 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-002 | Concluída | Unificação e serialização da série de ADRs | Codex | 2026-02-16 |
 | ISSUE-003 | Concluída | Auditoria completa do repositório (docs + src + .github + examples + tests) | Codex | 2026-02-16 |
 | ISSUE-004 | Concluída | Consolidação do hub interno e navegação em docs/development | Codex | 2026-02-16 |
-| ISSUE-005 | Em progresso (parcial) | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Codex | 2026-02-16 |
+| ISSUE-005 | Em progresso | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Codex | 2026-02-16 |
+| ISSUE-007 | Em progresso | Consolidação final do workflow e normalização total de prompts | Codex | 2026-02-16 |
+| ISSUE-008 | Planejada | Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar | Neto | 2026-02-16 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
@@ -47,7 +49,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 
 Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 
-📄 [Ver relatório completo](../../prompts/relatorios/README.md)
+📄 [Ver relatório completo](./prompts/relatorios/README.md)
 
 </div>
 
@@ -59,7 +61,7 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 
 Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 
-📄 [Ver relatório completo](../../prompts/relatorios/README.md)
+📄 [Ver relatório completo](./prompts/relatorios/README.md)
 
 </div>
 
@@ -71,7 +73,7 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 
 Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 
-📄 [Ver relatório completo](../../prompts/relatorios/ISSUE-003-auditoria-completa.md)
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-003-auditoria-completa.md)
 
 > Diagnóstico e plano de consolidação que originou a ISSUE-005.
 
@@ -85,7 +87,7 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 
 Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 
-📄 [Ver relatório completo](../../prompts/relatorios/README.md)
+📄 [Ver relatório completo](./prompts/relatorios/README.md)
 
 </div>
 
@@ -95,10 +97,10 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 **ISSUE-005** — Consolidação Total: Implementar Plano de Ação da Auditoria  
 *Desenvolvimento / Multi-área (3 sprints)*
 
-Status: 🔄 Em Progresso (Parcial) | Responsável: Codex | Data: 2026-02-16  
-Sprint: 1/3 ✅
+Status: 🔄 Em Progresso | Responsável: Codex | Data: 2026-02-16  
+Sprint: 2/3 🔄
 
-📄 [Ver relatório completo](../../prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md)
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md)
 
 > Sprint 1 (fechado): gaps críticos.  
 > Sprint 2 (planejado): validação de docs + testes.  
@@ -106,7 +108,31 @@ Sprint: 1/3 ✅
 
 </div>
 
-### 4.6 Padrão de Cores
+### 4.6 ISSUE-007
+<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+
+**ISSUE-007** — Consolidação final do workflow e normalização total de prompts  
+*Desenvolvimento / Processo*
+
+Status: 🔄 Em Progresso | Responsável: Codex | Data: 2026-02-16  
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-007-consolidacao-final.md)
+
+</div>
+
+### 4.7 ISSUE-008
+<div style="background: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px;">
+
+**ISSUE-008** — Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar  
+*Desenvolvimento / Processo*
+
+Status: ⏳ Planejada | Responsável: Neto | Data: 2026-02-16  
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-008-melhoria-workflow-prompts.md)
+
+</div>
+
+### 4.8 Padrão de Cores
 
 - ✅ Concluída → `#d4edda` (fundo) | `#28a745` (borda esquerda)
 - 🔄 Progresso → `#fff3cd` (fundo) | `#ffc107` (borda esquerda)

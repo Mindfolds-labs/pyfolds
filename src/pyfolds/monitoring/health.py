@@ -9,6 +9,8 @@ import torch
 
 
 class HealthStatus(Enum):
+    """Estados de saúde operacional calculados pelo monitoramento."""
+
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     CRITICAL = "critical"
