@@ -71,10 +71,17 @@ Interpretação rápida:
 - 📝 Histórico de versões: `CHANGELOG.md`
 - 📈 Benchmarks automatizados: `docs/BENCHMARKS.md` (dados em `docs/assets/benchmarks_results.json`)
 
-## Benchmarks
+---
+## 📚 Portal de Documentação
+Nossa base de conhecimento técnica está organizada no Índice de Documentação:
 
+🚀 Desenvolvedores: Referência de API e Guia MNIST.
+
+🧪 Pesquisadores: Lógica Científica e Arquitetura de Sistema.
+
+📦 Especificações: Protocolo FOLD e Registro de Decisões (ADRs).
 Os resultados de benchmark ficam em:
-
+---
 - `docs/BENCHMARKS.md`
 - `docs/assets/benchmarks_results.json`
 
