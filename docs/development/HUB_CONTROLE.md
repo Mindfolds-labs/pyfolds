@@ -25,12 +25,16 @@ Este HUB **não é documentação de usuário final**. Ele deve ser usado apenas
 
 ## 4. Fila de Execução
 
+A fila abaixo é gerada automaticamente a partir de `docs/development/execution_queue.csv`.
+
+<!-- HUB:QUEUE:BEGIN -->
 | ID | Tema | Status | Responsável | Data | Artefatos |
-| :-- | :--- | :----- | :---------- | :--- | :-------- |
-| ISSUE-001 | Reestruturação sistêmica de `/docs` e raiz (governança v1.0.0) | ✅ Concluída | Codex | 2026-02-16 | `docs/governance/*`, `docs/architecture/*`, `docs/public/guides/*` |
-| ISSUE-002 | Unificação e serialização da série de ADRs | ✅ Concluída | Codex | 2026-02-16 | `docs/governance/adr/*`, `docs/governance/adr/INDEX.md` |
-| ISSUE-003 | Revisão final de links cruzados e documentação pública | 🟡 Planejada | A definir | - | `README.md`, `docs/README.md` |
-| ISSUE-004 | Consolidação do hub interno e navegação em `docs/development` | ✅ Concluída | Codex | 2026-02-16 | `docs/development/HUB_CONTROLE.md`, `docs/README.md`, `docs/index.md` |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| ISSUE-001 | Reestruturação sistêmica de /docs e raiz (governança v1.0.0) | Concluída | Codex | 2026-02-16 | docs/governance/*; docs/architecture/*; docs/public/guides/* |
+| ISSUE-002 | Unificação e serialização da série de ADRs | Concluída | Codex | 2026-02-16 | docs/governance/adr/*; docs/governance/adr/INDEX.md |
+| ISSUE-003 | Revisão final de links cruzados e documentação pública | Planejada | A definir | - | README.md; docs/README.md |
+| ISSUE-004 | Consolidação do hub interno e navegação em docs/development | Concluída | Codex | 2026-02-16 | docs/development/HUB_CONTROLE.md; docs/README.md; docs/index.md |
+<!-- HUB:QUEUE:END -->
 
 ## 5. Fluxo Padrão para Novas Issues
 1. Registrar issue na tabela acima.
@@ -49,3 +53,14 @@ Este HUB **não é documentação de usuário final**. Ele deve ser usado apenas
 - ISO/IEC 12207 — Software Life Cycle Processes.
 - IEEE 828 — Software Configuration Management Plans.
 - IEEE 730 — Software Quality Assurance.
+
+## 8. Como atualizar a fila manualmente
+
+```bash
+python tools/sync_hub.py
+python tools/sync_hub.py --check
+```
+
+> Nota GitHub Actions: para o workflow de sincronização abrir PR automaticamente, habilite
+> **Settings > Actions > General > Workflow permissions > Allow GitHub Actions to create and approve pull requests**.
+

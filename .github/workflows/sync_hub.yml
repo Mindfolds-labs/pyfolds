@@ -1,0 +1,41 @@
+name: Sync HUB from execution queue
+
+on:
+  push:
+    paths:
+      - docs/development/execution_queue.csv
+      - tools/sync_hub.py
+      - docs/development/HUB_CONTROLE.md
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Sync HUB block
+        run: python tools/sync_hub.py
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: automation/sync-hub
+          title: "docs: sync HUB queue from CSV"
+          commit-message: "docs: sync HUB queue from CSV"
+          body: |
+            Automated update of `docs/development/HUB_CONTROLE.md` from
+            `docs/development/execution_queue.csv` using `tools/sync_hub.py`.
+
+            > Repository setting required:
+            > Settings > Actions > General > Workflow permissions >
+            > Allow GitHub Actions to create and approve pull requests.
