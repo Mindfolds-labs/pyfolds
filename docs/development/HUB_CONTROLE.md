@@ -30,11 +30,11 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 <!-- HUB:QUEUE:BEGIN -->
 | ID | Tema | Status | Responsável | Data | Artefatos |
 | :-- | :-- | :-- | :-- | :-- | :-- |
-| ISSUE-001 | Reestruturação sistêmica de /docs e raiz (governança v1.0.0) | Concluída | Codex | 2026-02-16 | docs/governance/*; docs/architecture/*; docs/public/guides/* |
-| ISSUE-002 | Unificação e serialização da série de ADRs | Concluída | Codex | 2026-02-16 | docs/governance/adr/*; docs/governance/adr/INDEX.md |
-| ISSUE-003 | Auditoria completa do repositório (docs + src + .github + examples + tests) | Concluída | Codex | 2026-02-16 | TODO o repositório; prompts/relatorios/ISSUE-003-auditoria-completa.md |
-| ISSUE-004 | Consolidação do hub interno e navegação em docs/development | Concluída | Codex | 2026-02-16 | docs/development/HUB_CONTROLE.md; docs/README.md; docs/index.md |
-| ISSUE-005 | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Planejada | A definir | 2026-02-16 | src/pyfolds/__init__.py; src/pyfolds/core/*; src/pyfolds/advanced/*; docs/api/*; docs/README.md; .github/workflows/*; examples/*; prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md |
+| ISSUE-001 | Reestruturação sistêmica de /docs e raiz (governança v1.0.0) | Concluída | Codex | 2026-02-16 | docs/governance/*<br>docs/architecture/*<br>docs/public/guides/* |
+| ISSUE-002 | Unificação e serialização da série de ADRs | Concluída | Codex | 2026-02-16 | docs/governance/adr/*<br>docs/governance/adr/INDEX.md |
+| ISSUE-003 | Auditoria completa do repositório (docs + src + .github + examples + tests) | Concluída | Codex | 2026-02-16 | TODO o repositório<br>prompts/relatorios/ISSUE-003-auditoria-completa.md |
+| ISSUE-004 | Consolidação do hub interno e navegação em docs/development | Concluída | Codex | 2026-02-16 | docs/development/HUB_CONTROLE.md<br>docs/README.md<br>docs/index.md |
+| ISSUE-005 | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Em progresso (parcial) | Codex | 2026-02-16 | CONTRIBUTING.md<br>CHANGELOG.md<br>docs/development/DEVELOPMENT_HUB.md<br>docs/development/release_process.md<br>src/pyfolds/serialization/foldio.py<br>pyproject.toml<br>docs/ARCHITECTURE.md<br>prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md |
 <!-- HUB:QUEUE:END -->
 
 ## 5. Fluxo Padrão para Novas Issues

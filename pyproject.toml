@@ -40,6 +40,9 @@ dev = [
   "isort>=5.0.0",
   "mypy>=1.0.0",
 ]
+examples = [
+  "torchvision>=0.15.0",
+]
 
 [tool.black]
 line-length = 88
