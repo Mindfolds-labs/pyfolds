@@ -7,6 +7,14 @@ from pyfolds.serialization import FoldReader, save_fold_or_mind
 
 
 def _build_neuron() -> MPJRDNeuron:
+from pyfolds.core.config import MPJRDConfig
+from pyfolds.core.neuron import MPJRDNeuron
+from pyfolds.serialization import FoldReader, save_fold_or_mind
+
+
+@pytest.mark.concurrency
+def test_parallel_reads_same_fold_file(tmp_path):
+ main
     cfg = MPJRDConfig(
         n_dendrites=2,
         n_synapses_per_dendrite=4,
@@ -47,3 +55,5 @@ def test_concurrent_reads_same_fold_file_consistent(tmp_path):
         assert result["chunks"] == baseline["chunks"]
         assert result["torch_state"] == baseline["torch_state"]
         assert result["manifest"] == baseline["manifest"]
+
+        main

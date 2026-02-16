@@ -1,6 +1,7 @@
 import importlib.util
 import tracemalloc
 
+import numpy as np
 import pytest
 import torch
 
@@ -59,3 +60,5 @@ def test_long_run_100k_steps_without_nan_inf_and_optional_leak_collection():
         rss_end = process.memory_info().rss
         # Coleta de leak opcional para telemetria simples de regressão.
         assert (rss_end - rss_start) < 250 * 1024 * 1024
+
+        main
