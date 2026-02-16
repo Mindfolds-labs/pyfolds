@@ -2,28 +2,53 @@ name: Benchmarks
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "benchmarks/**"
-      - "src/pyfolds/serialization/**"
-      - "tests/**"
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: write
 
 jobs:
-  benchmark:
+  run-benchmarks:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install
+
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
-      - name: Run benchmark suite
-        run: pytest benchmarks --benchmark-only --benchmark-json=benchmark.json
-      - name: Upload artifact
+          pip install -e .
+          pip install zstandard
+
+      - name: Run benchmarks
+        run: python scripts/run_benchmarks.py --iterations 30
+
+      - name: Upload benchmark artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: benchmark-json
-          path: benchmark.json
+          name: benchmark-results
+          path: |
+            docs/assets/benchmarks_results.json
+            docs/BENCHMARKS.md
+
+      - name: Commit benchmark artifacts
+        run: |
+          if git diff --quiet -- docs/assets/benchmarks_results.json docs/BENCHMARKS.md; then
+            echo "No benchmark changes to commit"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/assets/benchmarks_results.json docs/BENCHMARKS.md
+          git commit -m "chore(benchmarks): update benchmark artifacts"
+          git push
