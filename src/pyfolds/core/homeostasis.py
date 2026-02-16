@@ -23,6 +23,8 @@ class HomeostasisController(nn.Module):
         self.register_buffer("theta", torch.tensor([cfg.theta_init]))
         self.register_buffer("r_hat", torch.tensor([cfg.target_spike_rate]))
         self.register_buffer("step_count", torch.tensor(0, dtype=torch.long))
+        self.register_buffer("integral_error", torch.zeros(1, dtype=torch.float32))
+        self.register_buffer("last_error", torch.zeros(1, dtype=torch.float32))
         
         self.dead_neuron_threshold = cfg.dead_neuron_threshold
         self.dead_neuron_penalty_factor = cfg.dead_neuron_penalty
@@ -35,6 +37,11 @@ class HomeostasisController(nn.Module):
         
         # Estado de estabilidade
         self._was_stable = False
+
+        # Ganhos PID-like para estabilizar convergência
+        self.kp = cfg.homeostasis_eta
+        self.ki = cfg.homeostasis_eta * 0.1
+        self.kd = cfg.homeostasis_eta * 0.01
 
     def update(self, 
                current_rate: Union[float, torch.Tensor], 
@@ -61,8 +68,20 @@ class HomeostasisController(nn.Module):
         # 1. Erro homeostático
         error = rate - cfg.target_spike_rate
 
-        # 2. Ajuste do limiar
-        delta_theta = cfg.homeostasis_eta * error
+        # 2. Ajuste robusto do limiar (PID-like)
+        delta_p = self.kp * error
+
+        self.integral_error.add_(error * cfg.dt)
+        self.integral_error.clamp_(-1.0, 1.0)
+        delta_i = self.ki * self.integral_error
+
+        d_error = error - float(self.last_error.item())
+        delta_d = self.kd * d_error / max(cfg.dt, 1e-6)
+        self.last_error.fill_(error)
+
+        delta_theta = torch.tensor([delta_p], device=self.theta.device)
+        delta_theta.add_(delta_i).add_(delta_d)
+        delta_theta.clamp_(-0.5, 0.5)
         self.theta.add_(delta_theta)
 
         # 3. Mecanismo de resgate
@@ -116,6 +135,8 @@ class HomeostasisController(nn.Module):
         self.theta.fill_(self.cfg.theta_init)
         self.r_hat.fill_(self.cfg.target_spike_rate)
         self.step_count.zero_()
+        self.integral_error.zero_()
+        self.last_error.zero_()
         self._was_stable = False
 
     @property

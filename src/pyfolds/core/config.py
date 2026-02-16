@@ -137,6 +137,11 @@ class MPJRDConfig:
     eps: float = 1e-8
     dt: float = 1.0
     device: str = "auto"
+
+    # ===== ESTABILIDADE NUMÉRICA =====
+    max_log_weight: float = 10.0
+    float_precision: str = "float32"
+    numerical_stability_checks: bool = True
     
     def __post_init__(self):
         """Validações pós-inicialização."""
@@ -196,6 +201,34 @@ class MPJRDConfig:
             warnings.warn(
                 f"homeostasis_eta={self.homeostasis_eta} pode causar instabilidade",
                 RuntimeWarning
+            )
+
+        self.validate_numerical_safety()
+
+    def validate_numerical_safety(self) -> None:
+        """Valida parâmetros críticos para segurança numérica."""
+        if self.w_scale <= 0:
+            raise ValueError(f"w_scale deve ser > 0, recebido {self.w_scale}")
+
+        if self.n_max > 2**30:
+            raise ValueError(f"n_max={self.n_max} pode causar overflow numérico em log2")
+
+        if self.max_log_weight <= 0:
+            raise ValueError(
+                f"max_log_weight deve ser > 0, recebido {self.max_log_weight}"
+            )
+
+        if self.float_precision not in {"float32", "float64"}:
+            raise ValueError(
+                "float_precision deve ser 'float32' ou 'float64', "
+                f"recebido {self.float_precision}"
+            )
+
+        max_w = math.log2(1.0 + self.n_max) / self.w_scale
+        if max_w > 100.0:
+            warnings.warn(
+                f"W pode atingir {max_w:.1f}; risco de gradiente instável.",
+                RuntimeWarning,
             )
     
     def get_ts(self, param_name: str) -> float:

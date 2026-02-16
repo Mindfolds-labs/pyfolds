@@ -287,6 +287,12 @@ class FoldWriter:
         )
 
     def finalize(self, metadata: Dict[str, Any]) -> None:
+        chunk_hashes = {chunk["name"]: chunk["sha256"] for chunk in self._chunks}
+        metadata = dict(metadata)
+        metadata["chunk_hashes"] = chunk_hashes
+        manifest_source = json.dumps(metadata, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        metadata["manifest_hash"] = sha256_hex(manifest_source)
+
         index = {
             "format": "fold",
             "version": "1.2.0",
@@ -476,6 +482,27 @@ class FoldReader:
                 raise RuntimeError(f"CRC32C inválido no chunk '{name}'")
             if sha256_hex(comp) != chunk["sha256"]:
                 raise RuntimeError(f"SHA256 inválido no chunk '{name}'")
+
+            metadata = self.index.get("metadata", {})
+            expected_chunk_hash = metadata.get("chunk_hashes", {}).get(name)
+            if expected_chunk_hash and expected_chunk_hash != chunk["sha256"]:
+                raise RuntimeError(
+                    f"Hash hierárquico inválido no chunk '{name}': "
+                    "metadado e índice divergem"
+                )
+
+            expected_manifest = metadata.get("manifest_hash")
+            if expected_manifest:
+                manifest_data = {k: v for k, v in metadata.items() if k != "manifest_hash"}
+                actual_manifest = sha256_hex(
+                    json.dumps(manifest_data, sort_keys=True, separators=(",", ":")).encode("utf-8")
+                )
+                if actual_manifest != expected_manifest:
+                    warnings.warn(
+                        "Manifest hash divergente: metadados podem estar corrompidos.",
+                        RuntimeWarning,
+                        stacklevel=2,
+                    )
 
         raw = self._decompress(comp, flags)
         if len(raw) != uncomp_len:

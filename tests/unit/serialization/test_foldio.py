@@ -132,6 +132,27 @@ def test_detects_corruption(tmp_path):
             reader.read_chunk_bytes("torch_state", verify=True)
 
 
+def test_hierarchical_hashes_present_in_metadata(tmp_path):
+    neuron = _build_neuron()
+    file_path = tmp_path / "hashes.fold"
+
+    save_fold_or_mind(
+        neuron,
+        str(file_path),
+        include_history=False,
+        include_telemetry=False,
+        include_nuclear_arrays=False,
+        compress="none",
+    )
+
+    with FoldReader(str(file_path), use_mmap=False) as reader:
+        metadata = reader.index.get("metadata", {})
+
+    assert "chunk_hashes" in metadata
+    assert "manifest_hash" in metadata
+    assert "torch_state" in metadata["chunk_hashes"]
+
+
 def test_ecc_from_protection_mapping():
     assert ecc_from_protection("off").name == "none"
 

@@ -5,6 +5,38 @@ import torch
 from typing import Union, Tuple
 
 
+def safe_weight_law(
+    N: torch.Tensor,
+    w_scale: float,
+    max_log_val: float = 10.0,
+    enforce_checks: bool = True,
+) -> torch.Tensor:
+    """Lei logarítmica estável para conversão de filamentos em peso.
+
+    Implementa a regra Bartol com proteção numérica:
+        W = log2(1 + N) / w_scale
+
+    Proteções:
+      1) clip de ``N`` antes do log2
+      2) saturação do resultado final
+      3) checagens opcionais de NaN/Inf
+    """
+    if w_scale <= 0:
+        raise ValueError(f"w_scale deve ser > 0, recebido {w_scale}")
+
+    n_clipped = torch.clamp(N.float(), min=0.0, max=float(2**30))
+    w = torch.log2(1.0 + n_clipped) / w_scale
+    w_stable = torch.clamp(w, min=0.0, max=max_log_val)
+
+    if enforce_checks:
+        if torch.isnan(w_stable).any():
+            raise RuntimeError("NaN detectado em safe_weight_law")
+        if torch.isinf(w_stable).any():
+            raise RuntimeError("Inf detectado em safe_weight_law")
+
+    return w_stable
+
+
 def safe_div(x: torch.Tensor, y: torch.Tensor, eps: float = 1e-8) -> torch.Tensor:
     """
     Divisão segura com epsilon para evitar divisão por zero.

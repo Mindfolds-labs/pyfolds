@@ -43,3 +43,11 @@ class TestMPJRDConfig:
         cfg = pyfolds.MPJRDConfig()
         with pytest.raises(ValueError):
             cfg.get_decay_rate(10.0, dt=-0.1)
+
+    def test_numerical_safety_validation(self):
+        """Config deve validar parâmetros numéricos críticos."""
+        with pytest.raises(ValueError):
+            pyfolds.MPJRDConfig(w_scale=0)
+
+        with pytest.raises(ValueError):
+            pyfolds.MPJRDConfig(float_precision="float16")
