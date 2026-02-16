@@ -1,0 +1,23 @@
+name: Validate HUB queue sync
+
+on:
+  pull_request:
+    paths:
+      - docs/development/execution_queue.csv
+      - tools/sync_hub.py
+      - docs/development/HUB_CONTROLE.md
+
+jobs:
+  validate-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate HUB synchronization
+        run: python tools/sync_hub.py --check
