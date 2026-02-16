@@ -72,35 +72,39 @@ Interpretação rápida:
 - 📈 Benchmarks automatizados: `docs/BENCHMARKS.md` (dados em `docs/assets/benchmarks_results.json`)
 
 ---
-📚 Documentação Técnica
+## 📚 Documentação Técnica
+
 Nossa documentação é organizada para facilitar a navegação por níveis de interesse:
 
-🚀 Para Desenvolvedores
-Guia de Introdução: Instalação e conceitos básicos.
+### 🚀 Para Desenvolvedores
+* **Guia de Introdução**: [Instalação e conceitos básicos](docs/guides/QUICKSTART.md).
+* **Referência da API**: [Detalhamento de classes e métodos](docs/API_REFERENCE.md).
+* **Exemplos Práticos**: [Implementações reais (MNIST)](examples/).
 
-Referência da API: Detalhamento de classes e métodos.
+### 🧪 Para Pesquisadores
+* **Lógica Científica**: [Fundamentação do modelo MPJRD](docs/SCIENTIFIC_LOGIC.md).
+* **Especificação FOLD**: [Protocolo de serialização binária](docs/FOLD_SPECIFICATION.md).
+* **Architecture Decision Records (ADRs)**: [Por que tomamos essas decisões?](docs/adr/INDEX.md).
 
-Exemplos Práticos: Implementações reais (MNIST).
+---
 
-🧪 Para Pesquisadores
-Lógica Científica: Fundamentação do modelo MPJRD.
+## 🛡️ Governança e Qualidade
 
-Especificação FOLD: Protocolo de serialização binária.
-
-Architecture Decision Records (ADRs): Por que tomamos essas decisões?.
-
-🛡️ Governança e Qualidade
 Mantemos um plano de qualidade rigoroso para garantir a estabilidade do framework:
 
-Testes: Cobertura automatizada para cada módulo do core.
+* **Testes**: Cobertura automatizada para cada módulo do core.
+* **Benchmarks**: [Relatórios de performance e throughput](docs/BENCHMARKS.md).
+* **Riscos**: [Monitoramento de inconsistências e débitos](RISK_REGISTER.md).
 
-Benchmarks: Relatórios de performance e throughput.
+---
 
-Riscos: Monitoramento de inconsistências e débitos.
+## 🤝 Contribuição
 
-🤝 Contribuição
-O desenvolvimento é regido por padrões de engenharia de software de elite. Se você deseja contribuir, por favor leia nosso Manual de Desenvolvimento Interno.
+O desenvolvimento é regido por padrões de engenharia de software de elite. Se você deseja contribuir, por favor leia nosso **[Manual de Desenvolvimento Interno](SUMARIO_COMPLETO.md)**.
 
+<div align="center">
+<sub>Uma iniciativa <strong>Mindfolds Labs</strong>.</sub>
+</div>
 
 - `docs/BENCHMARKS.md`
 - `docs/assets/benchmarks_results.json`
