@@ -42,6 +42,8 @@ pip install -e .[dev]
 
 - 📚 Índice geral: `docs/README.md`
 - 🧪 Lógica científica: `docs/SCIENTIFIC_LOGIC.md`
+- 📦 Especificação binária `.fold/.mind`: `docs/FOLD_SPECIFICATION.md`
+- 🧾 ADRs (mapa e dependências): `docs/adr/INDEX.md`
 - 🏗️ Arquitetura (C4 + sequência): `docs/ARCHITECTURE.md`
 - 🔌 Referência de API: `docs/API_REFERENCE.md`
 - 🧭 Guia MNIST: `docs/guides/mnist_example.md`
