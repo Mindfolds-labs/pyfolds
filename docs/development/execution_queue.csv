@@ -1,5 +1,6 @@
 id,tema,status,responsavel,data,artefatos,github_issue,pr,prioridade,area
 ISSUE-001,"Reestruturação sistêmica de /docs e raiz (governança v1.0.0)","Concluída",Codex,2026-02-16,"docs/governance/*; docs/architecture/*; docs/public/guides/*",,,Alta,"Documentação/Governança"
 ISSUE-002,"Unificação e serialização da série de ADRs","Concluída",Codex,2026-02-16,"docs/governance/adr/*; docs/governance/adr/INDEX.md",,,Alta,"Governança/ADR"
-ISSUE-003,"Revisão final de links cruzados e documentação pública","Planejada","A definir",,"README.md; docs/README.md",,,Média,"Documentação Pública"
+ISSUE-003,"Auditoria completa do repositório (docs + src + .github + examples + tests)","Concluída",Codex,2026-02-16,"TODO o repositório; prompts/relatorios/ISSUE-003-auditoria-completa.md",,,Alta,"Documentação/Governança"
 ISSUE-004,"Consolidação do hub interno e navegação em docs/development","Concluída",Codex,2026-02-16,"docs/development/HUB_CONTROLE.md; docs/README.md; docs/index.md",,,Alta,"Desenvolvimento/Processo"
+ISSUE-005,"Consolidação total: implementar plano de ação da auditoria (3 sprints)","Planejada","A definir",2026-02-16,"src/pyfolds/__init__.py; src/pyfolds/core/*; src/pyfolds/advanced/*; docs/api/*; docs/README.md; .github/workflows/*; examples/*; prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md",,,Alta,"all"
