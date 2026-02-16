@@ -79,9 +79,14 @@ O processo documental e técnico segue princípios de padronização e rastreabi
 - **IEEE 730** (garantia de qualidade).
 
 Referências relevantes no repositório:
-- `docs/governance/QUALITY_ASSURANCE.md`
-- `docs/governance/RISK_REGISTER.md`
-- `docs/governance/adr/INDEX.md`
+- [QUALITY_ASSURANCE.md](./docs/governance/QUALITY_ASSURANCE.md)
+- [RISK_REGISTER.md](./docs/governance/RISK_REGISTER.md)
+- [adr/INDEX.md](./docs/governance/adr/INDEX.md)
+- [analise_bugs.md](./docs/governance/analise_bugs.md)
+- [revisao_fold_mind.md](./docs/governance/revisao_fold_mind.md)
+- [tarefas_pendentes.md](./docs/governance/tarefas_pendentes.md)
+- [solucoes_fold_mind.py](./docs/governance/solucoes_fold_mind.py)
+- [VISUAL_FINAL.txt](./docs/governance/VISUAL_FINAL.txt)
 
 ## 7. Validação local
 
