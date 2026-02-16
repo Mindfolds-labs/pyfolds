@@ -27,15 +27,91 @@ Este HUB **não é documentação de usuário final**. Ele deve ser usado apenas
 
 A fila abaixo é gerada automaticamente a partir de `docs/development/execution_queue.csv`.
 
+### 4.0 Tabela Resumida
+
 <!-- HUB:QUEUE:BEGIN -->
-| ID | Tema | Status | Responsável | Data | Artefatos |
-| :-- | :-- | :-- | :-- | :-- | :-- |
-| ISSUE-001 | Reestruturação sistêmica de /docs e raiz (governança v1.0.0) | Concluída | Codex | 2026-02-16 | docs/governance/*<br>docs/architecture/*<br>docs/public/guides/* |
-| ISSUE-002 | Unificação e serialização da série de ADRs | Concluída | Codex | 2026-02-16 | docs/governance/adr/*<br>docs/governance/adr/INDEX.md |
-| ISSUE-003 | Auditoria completa do repositório (docs + src + .github + examples + tests) | Concluída | Codex | 2026-02-16 | TODO o repositório<br>prompts/relatorios/ISSUE-003-auditoria-completa.md |
-| ISSUE-004 | Consolidação do hub interno e navegação em docs/development | Concluída | Codex | 2026-02-16 | docs/development/HUB_CONTROLE.md<br>docs/README.md<br>docs/index.md |
-| ISSUE-005 | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Em progresso (parcial) | Codex | 2026-02-16 | CONTRIBUTING.md<br>CHANGELOG.md<br>docs/development/DEVELOPMENT_HUB.md<br>docs/development/release_process.md<br>src/pyfolds/serialization/foldio.py<br>pyproject.toml<br>docs/ARCHITECTURE.md<br>prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md |
+| ID | Status | Tema | Responsável | Data |
+| :-- | :-- | :-- | :-- | :-- |
+| ISSUE-001 | Concluída | Reestruturação sistêmica de /docs e raiz (governança v1.0.0) | Codex | 2026-02-16 |
+| ISSUE-002 | Concluída | Unificação e serialização da série de ADRs | Codex | 2026-02-16 |
+| ISSUE-003 | Concluída | Auditoria completa do repositório (docs + src + .github + examples + tests) | Codex | 2026-02-16 |
+| ISSUE-004 | Concluída | Consolidação do hub interno e navegação em docs/development | Codex | 2026-02-16 |
+| ISSUE-005 | Em progresso (parcial) | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Codex | 2026-02-16 |
 <!-- HUB:QUEUE:END -->
+
+### 4.1 ISSUE-001
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-001** — Reestruturação Sistêmica de /docs e Raiz  
+*Governança v1.0.0*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
+
+📄 [Ver relatório completo](../../prompts/relatorios/README.md)
+
+</div>
+
+### 4.2 ISSUE-002
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-002** — Unificação e Serialização da Série de ADRs  
+*Governança / ADR*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
+
+📄 [Ver relatório completo](../../prompts/relatorios/README.md)
+
+</div>
+
+### 4.3 ISSUE-003
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-003** — Auditoria Completa do Repositório  
+*Documentação / Governança*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
+
+📄 [Ver relatório completo](../../prompts/relatorios/ISSUE-003-auditoria-completa.md)
+
+> Diagnóstico e plano de consolidação que originou a ISSUE-005.
+
+</div>
+
+### 4.4 ISSUE-004
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-004** — Consolidação do Hub Interno  
+*Desenvolvimento / Processo*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
+
+📄 [Ver relatório completo](../../prompts/relatorios/README.md)
+
+</div>
+
+### 4.5 ISSUE-005
+<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+
+**ISSUE-005** — Consolidação Total: Implementar Plano de Ação da Auditoria  
+*Desenvolvimento / Multi-área (3 sprints)*
+
+Status: 🔄 Em Progresso (Parcial) | Responsável: Codex | Data: 2026-02-16  
+Sprint: 1/3 ✅
+
+📄 [Ver relatório completo](../../prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md)
+
+> Sprint 1 (fechado): gaps críticos.  
+> Sprint 2 (planejado): validação de docs + testes.  
+> Sprint 3 (planejado): consolidação final.
+
+</div>
+
+### 4.6 Padrão de Cores
+
+- ✅ Concluída → `#d4edda` (fundo) | `#28a745` (borda esquerda)
+- 🔄 Progresso → `#fff3cd` (fundo) | `#ffc107` (borda esquerda)
+- ⏳ Planejada → `#e2e3e5` (fundo) | `#6c757d` (borda esquerda)
+- ❌ Bloqueada → `#f8d7da` (fundo) | `#dc3545` (borda esquerda)
 
 ## 5. Fluxo Padrão para Novas Issues
 1. Registrar issue na tabela acima.
@@ -64,4 +140,3 @@ python tools/sync_hub.py --check
 
 > Nota GitHub Actions: para o workflow de sincronização abrir PR automaticamente, habilite
 > **Settings > Actions > General > Workflow permissions > Allow GitHub Actions to create and approve pull requests**.
-

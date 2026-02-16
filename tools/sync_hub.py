@@ -104,18 +104,8 @@ def read_rows(csv_path: Path) -> list[dict[str, str]]:
 
 
 def build_table(rows: list[dict[str, str]]) -> str:
-    include_issue = any(_norm(row.get("github_issue")) for row in rows)
-    include_pr = any(_norm(row.get("pr")) for row in rows)
-
-    headers = ["ID", "Tema", "Status", "Responsável", "Data", "Artefatos"]
-    keys = ["id", "tema", "status", "responsavel", "data", "artefatos"]
-
-    if include_issue:
-        headers.append("GitHub Issue")
-        keys.append("github_issue")
-    if include_pr:
-        headers.append("PR")
-        keys.append("pr")
+    headers = ["ID", "Status", "Tema", "Responsável", "Data"]
+    keys = ["id", "status", "tema", "responsavel", "data"]
 
     lines = [
         "| " + " | ".join(headers) + " |",
