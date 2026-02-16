@@ -1,21 +1,30 @@
 # Benchmarks
 
-Resultados automáticos gerados por `scripts/run_benchmarks.py`.
+Data da coleta (UTC): **2026-02-16T13:21:53.158903+00:00**
 
-- Tamanho do payload: `16 MB`
-- Iterações por codec: `5`
-- Codecs avaliados: `none`
+## Configuração
 
-| Codec | Write speed (MB/s) | Read speed (MB/s) | Compress ratio | Payload size (bytes) | File size (bytes) |
-|---|---:|---:|---:|---:|---:|
-| none | 156.1964 | 245.8661 | 0.999963 | 16777216 | 16777841 |
+- Iterações: `2`
+- Tamanho do payload: `2 MB`
+- Nível ZSTD: `3`
+- Modo de compressão: `none`
+- Seed: `42`
+- Python: `3.10.19`
+- Plataforma: `Linux-6.12.47-x86_64-with-glibc2.39`
 
-## Reprodução local
+## Métricas
 
-```bash
-python scripts/run_benchmarks.py
-```
+| Métrica | Valor médio |
+|---|---:|
+| Write speed | 174.43 MB/s |
+| Read speed | 396.90 MB/s |
+| Compress ratio | 1.0003 |
+| Write time | 0.0184 s |
+| Read time | 0.0062 s |
+| Compressed size | 2097760 bytes |
+| Uncompressed size | 2097152 bytes |
 
-Este comando atualiza:
-- `docs/assets/benchmarks_results.json`
-- `docs/BENCHMARKS.md`
+## Dependências opcionais
+
+- zstandard: `missing`
+- google-crc32c: `installed`
