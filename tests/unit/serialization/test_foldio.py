@@ -192,12 +192,49 @@ def test_fold_reader_bounds_validation_with_mmap(tmp_path):
         reader.__exit__(None, None, None)
 
 
+def test_fold_reader_bounds_validation_negative_values(tmp_path):
+    file_path = tmp_path / "bounds-neg.fold"
+    file_path.write_bytes(b"X" * 32)
+
+    reader = FoldReader(str(file_path), use_mmap=False)
+    reader._f = open(file_path, "rb")
+    try:
+        with pytest.raises(ValueError, match="offset e length devem ser >= 0"):
+            reader._read_at(-1, 4)
+        with pytest.raises(ValueError, match="offset e length devem ser >= 0"):
+            reader._read_at(0, -4)
+    finally:
+        reader.__exit__(None, None, None)
+
+
 def test_fold_reader_index_size_validation(tmp_path):
     file_path = tmp_path / "huge-index.fold"
     fake_header = struct.pack(HEADER_FMT, MAGIC, struct.calcsize(HEADER_FMT), 28, 2_000_000_000)
     file_path.write_bytes(fake_header + (b"\x00" * 128))
 
     with pytest.raises(ValueError, match="Index muito grande"):
+        with FoldReader(str(file_path), use_mmap=False):
+            pass
+
+
+def test_fold_reader_index_offset_validation(tmp_path):
+    file_path = tmp_path / "bad-index-offset.fold"
+    header_size = struct.calcsize(HEADER_FMT)
+    fake_header = struct.pack(HEADER_FMT, MAGIC, header_size, header_size - 1, 0)
+    file_path.write_bytes(fake_header)
+
+    with pytest.raises(ValueError, match="Index offset inválido"):
+        with FoldReader(str(file_path), use_mmap=False):
+            pass
+
+
+def test_fold_reader_header_len_validation(tmp_path):
+    file_path = tmp_path / "bad-header-len.fold"
+    header_size = struct.calcsize(HEADER_FMT)
+    fake_header = struct.pack(HEADER_FMT, MAGIC, header_size + 1, header_size, 0)
+    file_path.write_bytes(fake_header)
+
+    with pytest.raises(ValueError, match="Header inconsistente"):
         with FoldReader(str(file_path), use_mmap=False):
             pass
 
