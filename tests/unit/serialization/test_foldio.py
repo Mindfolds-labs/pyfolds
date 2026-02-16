@@ -1,5 +1,6 @@
 import mmap
 import struct
+from types import MethodType
 
 import numpy as np
 import pytest
@@ -9,6 +10,7 @@ from pyfolds.core.config import MPJRDConfig
 from pyfolds.core.neuron import MPJRDNeuron
 from pyfolds.serialization import (
     FoldReader,
+    FoldWriter,
     ReedSolomonECC,
     ecc_from_protection,
     is_mind,
@@ -17,7 +19,7 @@ from pyfolds.serialization import (
     read_nuclear_arrays,
     save_fold_or_mind,
 )
-from pyfolds.serialization.foldio import HEADER_FMT, MAGIC, crc32c_u32
+from pyfolds.serialization.foldio import HEADER_FMT, MAGIC, MAX_CHUNK_SIZE, FoldWriter, crc32c_u32
 
 
 try:
@@ -260,6 +262,23 @@ def test_fold_reader_header_len_validation(tmp_path):
             pass
 
 
+def test_fold_writer_finalize_wraps_io_failure_with_phase_context(tmp_path, monkeypatch):
+    file_path = tmp_path / "finalize-fail.fold"
+
+    def _fail_fsync(_fd):
+        raise OSError("disk full")
+
+    monkeypatch.setattr("pyfolds.serialization.foldio.os.fsync", _fail_fsync)
+
+    with FoldWriter(str(file_path), compress="none") as writer:
+        writer.add_chunk("meta", "JSON", b"{}")
+
+        with pytest.raises(RuntimeError, match=r"persistência do arquivo fold \(index fsync\)") as exc_info:
+            writer.finalize({"source": "unit-test"})
+
+    assert isinstance(exc_info.value.__cause__, OSError)
+
+
 def test_fold_reader_reports_magic_values(tmp_path):
     file_path = tmp_path / "wrong-magic.fold"
     bad_magic = b"NOTFOLD!"
@@ -288,3 +307,81 @@ def test_fold_reader_exit_closes_file_even_if_mmap_close_fails(tmp_path):
 
     assert reader._f is None
     assert reader._mm is None
+
+
+@pytest.mark.parametrize(
+    ("phase", "expected_error"),
+    [
+        ("capturar index_off", OSError("tell failed")),
+        ("escrever index", OSError("write index failed")),
+        ("persistir index (flush)", OSError("flush index failed")),
+        ("persistir index (fsync)", OSError("fsync index failed")),
+        ("reposicionar para header", OSError("seek failed")),
+        ("reescrever header", OSError("write header failed")),
+        ("persistir header (flush)", OSError("flush header failed")),
+        ("persistir header (fsync)", OSError("fsync header failed")),
+    ],
+)
+def test_fold_writer_finalize_io_errors_raise_runtimeerror_with_context(tmp_path, monkeypatch, phase, expected_error):
+    from pyfolds.serialization.foldio import FoldWriter
+
+    file_path = tmp_path / "finalize-io.fold"
+
+    with FoldWriter(str(file_path), compress="none") as writer:
+        writer.add_chunk("meta", "JSON", b"{}")
+
+        original_tell = writer._f.tell
+        original_write = writer._f.write
+        original_flush = writer._f.flush
+        original_seek = writer._f.seek
+
+        state = {"write_calls": 0, "flush_calls": 0, "fsync_calls": 0}
+
+        def fail_tell(_self):
+            raise expected_error
+
+        def fail_write(_self, data):
+            state["write_calls"] += 1
+            if phase == "escrever index" and state["write_calls"] == 1:
+                raise expected_error
+            if phase == "reescrever header" and state["write_calls"] == 2:
+                raise expected_error
+            return original_write(data)
+
+        def fail_flush(_self):
+            state["flush_calls"] += 1
+            if phase == "persistir index (flush)" and state["flush_calls"] == 1:
+                raise expected_error
+            if phase == "persistir header (flush)" and state["flush_calls"] == 2:
+                raise expected_error
+            return original_flush()
+
+        def fail_seek(_self, pos, whence=0):
+            if phase == "reposicionar para header":
+                raise expected_error
+            return original_seek(pos, whence)
+
+        def fail_fsync(_):
+            state["fsync_calls"] += 1
+            if phase == "persistir index (fsync)" and state["fsync_calls"] == 1:
+                raise expected_error
+            if phase == "persistir header (fsync)" and state["fsync_calls"] == 2:
+                raise expected_error
+            return None
+
+        if phase == "capturar index_off":
+            writer._f.tell = MethodType(fail_tell, writer._f)
+        writer._f.write = MethodType(fail_write, writer._f)
+        writer._f.flush = MethodType(fail_flush, writer._f)
+        writer._f.seek = MethodType(fail_seek, writer._f)
+        monkeypatch.setattr("pyfolds.serialization.foldio.os.fsync", fail_fsync)
+
+        with pytest.raises(RuntimeError, match="Falha ao finalizar arquivo fold na fase") as err:
+            writer.finalize({"kind": "test"})
+
+    message = str(err.value)
+    assert str(file_path) in message
+    assert str(expected_error) in message
+
+    expected_phase = phase.split(" (")[0]
+    assert expected_phase in message

@@ -1,0 +1,47 @@
+{
+  "collected_at_utc": "2026-02-16T13:21:53.158903+00:00",
+  "benchmark": {
+    "iterations": 2,
+    "payload_size_mb": 2,
+    "zstd_level": 3,
+    "compression_mode": "none",
+    "seed": 42
+  },
+  "environment": {
+    "python": "3.10.19",
+    "platform": "Linux-6.12.47-x86_64-with-glibc2.39",
+    "optional_dependencies": {
+      "zstandard": "missing",
+      "google-crc32c": "installed"
+    }
+  },
+  "results": {
+    "avg_write_speed_mb_s": 174.4263828902007,
+    "avg_read_speed_mb_s": 396.8951784082991,
+    "avg_compress_ratio": 1.0002899169921875,
+    "avg_write_seconds": 0.01844310050000786,
+    "avg_read_seconds": 0.006189662999986467,
+    "avg_compressed_size_bytes": 2097760.0,
+    "avg_uncompressed_size_bytes": 2097152.0
+  },
+  "runs": [
+    {
+      "write_seconds": 0.029786666999996214,
+      "read_seconds": 0.008858278999980485,
+      "write_mb_s": 67.14413532740183,
+      "read_mb_s": 225.77749018792545,
+      "compressed_size_bytes": 2097760,
+      "uncompressed_size_bytes": 2097152,
+      "compress_ratio": 1.0002899169921875
+    },
+    {
+      "write_seconds": 0.007099534000019503,
+      "read_seconds": 0.00352104699999245,
+      "write_mb_s": 281.70863045299956,
+      "read_mb_s": 568.0128666286728,
+      "compressed_size_bytes": 2097760,
+      "uncompressed_size_bytes": 2097152,
+      "compress_ratio": 1.0002899169921875
+    }
+  ]
+}
