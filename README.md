@@ -48,6 +48,20 @@ pip install -e .[dev]
 - 🌊 Tutorial Wave v3.0: `docs/guides/wave_tutorial.md`
 - 🤝 Contribuição: `CONTRIBUTING.md`
 - 📝 Histórico de versões: `CHANGELOG.md`
+- 📈 Benchmarks automatizados: `docs/BENCHMARKS.md` (dados em `docs/assets/benchmarks_results.json`)
+
+## Benchmarks
+
+Os resultados de benchmark ficam em:
+
+- `docs/BENCHMARKS.md`
+- `docs/assets/benchmarks_results.json`
+
+Para reproduzir localmente:
+
+```bash
+python scripts/run_benchmarks.py
+```
 
 ## Exemplo rápido
 
