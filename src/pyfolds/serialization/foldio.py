@@ -1,4 +1,9 @@
-"""Container .fold/.mind com chunking, leitura parcial, integridade e ECC opcional."""
+"""Container .fold/.mind com chunking, leitura parcial, integridade e ECC opcional.
+
+Dependências opcionais:
+- zstandard: compressão/descompressão ZSTD.
+- google-crc32c: cálculo CRC32C acelerado (recomendado para integridade).
+"""
 
 from __future__ import annotations
 
@@ -13,6 +18,7 @@ import struct
 import subprocess
 import sys
 import time
+import warnings
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -50,16 +56,17 @@ class FoldSecurityError(RuntimeError):
 
 def crc32c_u32(data: bytes) -> int:
     if google_crc32c is not None:
-        return int(google_crc32c.value(data))
+        try:
+            return int.from_bytes(google_crc32c.value(data).to_bytes(4, "big"), "big")
+        except Exception:
+            pass
 
-    # Fallback puro-Python para CRC32C (Castagnoli).
-    crc = 0xFFFFFFFF
-    poly = 0x82F63B78
-    for byte in data:
-        crc ^= byte
-        for _ in range(8):
-            crc = (crc >> 1) ^ poly if (crc & 1) else (crc >> 1)
-    return (~crc) & 0xFFFFFFFF
+    warnings.warn(
+        "google-crc32c não instalado/disponível. Fallback para CRC32 (não CRC32C).",
+        RuntimeWarning,
+        stacklevel=2,
+    )
+    return zlib.crc32(data) & 0xFFFFFFFF
 
 
 def sha256_hex(data: bytes) -> str:
