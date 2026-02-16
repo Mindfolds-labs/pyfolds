@@ -325,6 +325,14 @@ class MPJRDNeuron(nn.Module):
             # Taxas pré: média sobre sinapses ativas
             active_mask = (x_mean[d_idx] > cfg.activity_threshold).float()
             n_active = active_mask.sum().clamp_min(1.0)
+            # Nota técnica:
+            #   pre_rate é normalizado por n_active, logo representa uma
+            #   distribuição relativa de atividade (massa ~1) em vez da taxa
+            #   absoluta por sinapse. Isso melhora estabilidade numérica em
+            #   lotes densos, mas reduz magnitude efetiva do termo Hebbiano
+            #   conforme a quantidade de sinapses ativas cresce.
+            #   Qualquer ajuste dessa regra deve preservar o domínio [0, 1]
+            #   e ser reavaliado com testes de convergência de longo prazo.
             pre_rate = (x_mean[d_idx] * active_mask) / n_active
             pre_rate = pre_rate.clamp(0.0, 1.0)
 
