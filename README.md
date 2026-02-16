@@ -101,10 +101,7 @@ Riscos: Monitoramento de inconsistências e débitos.
 🤝 Contribuição
 O desenvolvimento é regido por padrões de engenharia de software de elite. Se você deseja contribuir, por favor leia nosso Manual de Desenvolvimento Interno.
 
-<div align="center">
-<sub>Uma iniciativa <strong>Mindfolds Labs</strong>.</sub>
-</div>
----
+
 - `docs/BENCHMARKS.md`
 - `docs/assets/benchmarks_results.json`
 
