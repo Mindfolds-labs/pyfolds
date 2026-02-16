@@ -16,6 +16,15 @@ A4|TODO|||||git restore benchmarks .github/workflows
 - **A3 = tests**
 - **A4 = benchmarks + .github**
 
+## Validação de caminhos oficiais (repo)
+- Fontes consultadas no repositório: `README.md` (portal de docs), `docs/README.md` (índice), estrutura atual de arquivos.
+- Caminhos canônicos confirmados para este plano:
+  - `docs/spec/FOLD_SPECIFICATION.md`
+  - `tests/test_fold_corruption.py`
+  - `tests/test_fold_fuzz.py`
+  - `benchmarks/bench_foldio.py`
+  - `.github/workflows/benchmarks.yml`
+
 ## A1
 - **Objetivo:** lint / tipos / segurança
 - **Branch sugerida:** `audit/src-structure`

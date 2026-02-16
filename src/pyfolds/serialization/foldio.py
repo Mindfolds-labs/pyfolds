@@ -328,6 +328,16 @@ class FoldWriter:
             _raise_finalize_error("fsync", exc)
 
         try:
+            index_off = self._f.tell()
+
+            phase = "escrever index"
+            self._f.write(index_bytes)
+
+            phase = "persistir index"
+            self._f.flush()
+            os.fsync(self._f.fileno())
+
+            phase = "reposicionar para header"
             self._f.seek(0)
         except Exception as exc:
             _raise_finalize_error("seek", exc)
