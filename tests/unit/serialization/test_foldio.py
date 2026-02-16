@@ -1,7 +1,9 @@
-from pyfolds.serialization.foldio import crc32c_u32
+import mmap
+import struct
+
 import numpy as np
-import torch
 import pytest
+import torch
 
 from pyfolds.core.config import MPJRDConfig
 from pyfolds.core.neuron import MPJRDNeuron
@@ -15,7 +17,7 @@ from pyfolds.serialization import (
     read_nuclear_arrays,
     save_fold_or_mind,
 )
-from pyfolds.serialization.foldio import crc32c_u32
+from pyfolds.serialization.foldio import HEADER_FMT, MAGIC, crc32c_u32
 
 
 try:
@@ -174,3 +176,57 @@ def test_ecc_roundtrip_if_available(tmp_path):
 
 def test_crc32c_matches_known_vector():
     assert crc32c_u32(b"123456789") == 0xE3069283
+
+
+def test_fold_reader_bounds_validation_with_mmap(tmp_path):
+    file_path = tmp_path / "bounds.fold"
+    file_path.write_bytes(b"X" * 64)
+
+    reader = FoldReader(str(file_path), use_mmap=True)
+    reader._f = open(file_path, "rb")
+    reader._mm = mmap.mmap(reader._f.fileno(), 0, access=mmap.ACCESS_READ)
+    try:
+        with pytest.raises(EOFError, match="além do arquivo"):
+            reader._read_at(32, 40)
+    finally:
+        reader.__exit__(None, None, None)
+
+
+def test_fold_reader_index_size_validation(tmp_path):
+    file_path = tmp_path / "huge-index.fold"
+    fake_header = struct.pack(HEADER_FMT, MAGIC, struct.calcsize(HEADER_FMT), 28, 2_000_000_000)
+    file_path.write_bytes(fake_header + (b"\x00" * 128))
+
+    with pytest.raises(ValueError, match="Index muito grande"):
+        with FoldReader(str(file_path), use_mmap=False):
+            pass
+
+
+def test_fold_reader_reports_magic_values(tmp_path):
+    file_path = tmp_path / "wrong-magic.fold"
+    bad_magic = b"NOTFOLD!"
+    header = struct.pack(HEADER_FMT, bad_magic, struct.calcsize(HEADER_FMT), 24, 0)
+    file_path.write_bytes(header)
+
+    with pytest.raises(ValueError, match="Magic esperado"):
+        with FoldReader(str(file_path), use_mmap=False):
+            pass
+
+
+def test_fold_reader_exit_closes_file_even_if_mmap_close_fails(tmp_path):
+    class FailingMM:
+        def close(self):
+            raise RuntimeError("forced close error")
+
+    file_path = tmp_path / "cleanup.fold"
+    file_path.write_bytes(b"abc")
+
+    reader = FoldReader(str(file_path), use_mmap=True)
+    reader._f = open(file_path, "rb")
+    reader._mm = FailingMM()
+
+    with pytest.raises(RuntimeError, match="forced close error"):
+        reader.__exit__(None, None, None)
+
+    assert reader._f is None
+    assert reader._mm is None
