@@ -300,7 +300,6 @@ class FoldWriter:
             "metadata": metadata,
             "chunks": self._chunks,
         }
-        index_bytes = _json_bytes(index)
 
         index_off = self._f.tell()
 
