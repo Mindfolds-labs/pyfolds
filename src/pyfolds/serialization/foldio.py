@@ -287,35 +287,44 @@ class FoldWriter:
         )
 
     def finalize(self, metadata: Dict[str, Any]) -> None:
-        chunk_hashes = {chunk["name"]: chunk["sha256"] for chunk in self._chunks}
-        metadata = dict(metadata)
-        metadata["chunk_hashes"] = chunk_hashes
-        manifest_source = json.dumps(metadata, sort_keys=True, separators=(",", ":")).encode("utf-8")
-        metadata["manifest_hash"] = sha256_hex(manifest_source)
-
-        index = {
-            "format": "fold",
-            "version": "1.2.0",
-            "created_at_unix": time.time(),
-            "metadata": metadata,
-            "chunks": self._chunks,
-        }
-        index_bytes = _json_bytes(index)
-
-        self._f.flush()
-        index_off = self._f.tell()
-        self._f.write(index_bytes)
-        self._f.flush()
-        os.fsync(self._f.fileno())
-
+        phase = "prepare_index"
         try:
+            chunk_hashes = {chunk["name"]: chunk["sha256"] for chunk in self._chunks}
+            metadata = dict(metadata)
+            metadata["chunk_hashes"] = chunk_hashes
+            manifest_source = json.dumps(metadata, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            metadata["manifest_hash"] = sha256_hex(manifest_source)
+
+            index = {
+                "format": "fold",
+                "version": "1.2.0",
+                "created_at_unix": time.time(),
+                "metadata": metadata,
+                "chunks": self._chunks,
+            }
+            index_bytes = _json_bytes(index)
+
+            phase = "write_index"
+            self._f.flush()
+            index_off = self._f.tell()
+            self._f.write(index_bytes)
+
+            phase = "fsync_index"
+            self._f.flush()
+            os.fsync(self._f.fileno())
+
+            phase = "write_header"
             self._f.seek(0)
             header_len = struct.calcsize(HEADER_FMT)
             self._f.write(struct.pack(HEADER_FMT, MAGIC, header_len, index_off, len(index_bytes)))
+
+            phase = "fsync_header"
             self._f.flush()
             os.fsync(self._f.fileno())
         except Exception as exc:
-            raise RuntimeError(f"Falha ao escrever header do arquivo fold: {exc}") from exc
+            raise RuntimeError(
+                f"Falha ao finalizar arquivo fold na fase '{phase}': {exc}"
+            ) from exc
 
 
 class FoldReader:
