@@ -2,13 +2,19 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
+<<<<<<< codex/add-test-cases-for-corruption-detection
 from pyfolds.core.config import MPJRDConfig
 from pyfolds.core.neuron import MPJRDNeuron
 from pyfolds.serialization import FoldReader, save_fold_or_mind
+=======
+from pyfolds.serialization import FoldReader, save_fold_or_mind
+from tests.unit.serialization.test_foldio import _build_neuron
+>>>>>>> main
 
 
 @pytest.mark.concurrency
 def test_parallel_reads_same_fold_file(tmp_path):
+<<<<<<< codex/add-test-cases-for-corruption-detection
     cfg = MPJRDConfig(
         n_dendrites=2,
         n_synapses_per_dendrite=4,
@@ -39,3 +45,23 @@ def test_parallel_reads_same_fold_file(tmp_path):
 
     assert len(results) == 10
     assert len(set(results)) == 1
+=======
+    neuron = _build_neuron()
+    file_path = tmp_path / "shared.fold"
+
+    save_fold_or_mind(neuron, str(file_path), compress="none", include_history=False, include_telemetry=False)
+
+    def read_once() -> tuple[set[str], int]:
+        with FoldReader(str(file_path), use_mmap=True) as reader:
+            chunks = set(reader.list_chunks())
+            payload = reader.read_chunk_bytes("torch_state", verify=True)
+            return chunks, len(payload)
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        results = list(executor.map(lambda _: read_once(), range(10)))
+
+    for chunks, payload_len in results:
+        assert "torch_state" in chunks
+        assert "llm_manifest" in chunks
+        assert payload_len > 0
+>>>>>>> main
