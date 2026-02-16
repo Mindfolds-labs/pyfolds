@@ -103,13 +103,10 @@ class STDPMixin:
         # ✅ VETORIZADO: aplica a TODAS as sinapses de uma vez
         # Requer que self.I exista (tensor consolidado)
         if hasattr(self, 'I'):
-            # I é [D, S] - expande para batch
-            I_expanded = self.I.unsqueeze(0).expand(batch_size, -1, -1)  # [B, D, S]
-            I_updated = I_expanded + delta_ltd + delta_ltp
-            I_updated = I_updated.clamp(self.cfg.i_min, self.cfg.i_max)
-            
-            # Atualiza I (média sobre batch para manter [D, S])
-            self.I.copy_(I_updated.mean(dim=0))
+            # Soma contribuições locais de cada amostra sem colapsar estado
+            delta_total = (delta_ltd + delta_ltp).sum(dim=0)
+            self.I.add_(delta_total)
+            self.I.clamp_(self.cfg.i_min, self.cfg.i_max)
         
         # Adiciona traço pós
         self.trace_post.add_(post_expanded)

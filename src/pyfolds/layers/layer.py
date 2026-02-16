@@ -44,7 +44,7 @@ class MPJRDLayer(nn.Module):
         enable_telemetry: bool = False,
         telemetry_profile: str = "off",
         device: Optional[torch.device] = None,
-        neuron_class: Type[MPJRDNeuron] = MPJRDNeuron,
+        **kwargs,
     ):
         super().__init__()
         self.n_neurons = n_neurons
@@ -52,13 +52,22 @@ class MPJRDLayer(nn.Module):
         self.cfg = cfg
         self.device = device or torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        if not issubclass(neuron_class, MPJRDNeuron):
-            raise TypeError("neuron_class deve herdar de MPJRDNeuron")
+        legacy_neuron_class = kwargs.pop("neuron_class", None)
+        if kwargs:
+            unexpected = ", ".join(sorted(kwargs.keys()))
+            raise TypeError(f"Argumentos não reconhecidos: {unexpected}")
 
-        self.neuron_class = neuron_class
+        if legacy_neuron_class is not None:
+            if neuron_cls is not MPJRDNeuron and legacy_neuron_class is not neuron_cls:
+                raise ValueError("Use apenas um parâmetro de classe de neurônio")
+            neuron_cls = legacy_neuron_class
+
+        if not issubclass(neuron_cls, MPJRDNeuron):
+            raise TypeError("neuron_cls deve herdar de MPJRDNeuron")
 
         # Cria neurônios com telemetria (se ativada)
         self.neuron_cls = neuron_cls
+        self.neuron_class = neuron_cls  # compatibilidade retroativa
         self.neurons = nn.ModuleList([
             neuron_cls(
                 cfg,

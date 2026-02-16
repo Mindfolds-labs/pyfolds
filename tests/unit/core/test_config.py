@@ -29,3 +29,10 @@ class TestMPJRDConfig:
         """Test validation."""
         with pytest.raises(ValueError):
             pyfolds.MPJRDConfig(n_min=10, n_max=5)
+
+
+    def test_get_decay_rate_validation(self):
+        """Tau inválido deve gerar erro explícito."""
+        cfg = pyfolds.MPJRDConfig()
+        with pytest.raises(ValueError):
+            cfg.get_decay_rate(-1.0)
