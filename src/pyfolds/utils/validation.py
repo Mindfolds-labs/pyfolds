@@ -55,3 +55,36 @@ def validate_input(
 
     return decorator
 
+
+def validate_device_consistency(*tensors: torch.Tensor) -> torch.device:
+    """Valida se todos os tensores informados estão no mesmo device.
+
+    Args:
+        *tensors: Tensores a serem verificados.
+
+    Returns:
+        Device comum encontrado.
+
+    Raises:
+        ValueError: Se nenhum tensor for informado.
+        TypeError: Se algum item não for ``torch.Tensor``.
+        RuntimeError: Se existir inconsistência entre devices.
+    """
+    if not tensors:
+        raise ValueError("Pelo menos um tensor deve ser informado")
+
+    ref_device: Optional[torch.device] = None
+    for tensor in tensors:
+        if not isinstance(tensor, torch.Tensor):
+            raise TypeError("Todos os argumentos devem ser torch.Tensor")
+
+        if ref_device is None:
+            ref_device = tensor.device
+            continue
+
+        if tensor.device != ref_device:
+            raise RuntimeError(
+                f"Inconsistência de devices detectada: esperado {ref_device}, recebido {tensor.device}"
+            )
+
+    return ref_device

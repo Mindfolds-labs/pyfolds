@@ -29,7 +29,21 @@ from .utils.types import LearningMode, ConnectionType
 from .utils.context import learning_mode
 from .wave import MPJRDWaveConfig, MPJRDWaveNeuron
 from .core.factory import NeuronFactory, NeuronType
-from .serialization import VersionedCheckpoint
+from .serialization import (
+    VersionedCheckpoint,
+    FoldReader,
+    FoldWriter,
+    FoldSecurityError,
+    save_fold_or_mind,
+    load_fold_or_mind,
+    peek_fold_or_mind,
+    peek_mind,
+    read_nuclear_arrays,
+    is_mind,
+    NoECC,
+    ReedSolomonECC,
+    ecc_from_protection,
+)
 from .monitoring import HealthStatus, NeuronHealthCheck
 
 # ===== TELEMETRY (para MindMetrics/MindAudit) =====
@@ -100,6 +114,18 @@ __all__ = [
     "NeuronFactory",
     "NeuronType",
     "VersionedCheckpoint",
+    "FoldReader",
+    "FoldWriter",
+    "FoldSecurityError",
+    "save_fold_or_mind",
+    "load_fold_or_mind",
+    "peek_fold_or_mind",
+    "peek_mind",
+    "read_nuclear_arrays",
+    "is_mind",
+    "NoECC",
+    "ReedSolomonECC",
+    "ecc_from_protection",
     "HealthStatus",
     "NeuronHealthCheck",
     
