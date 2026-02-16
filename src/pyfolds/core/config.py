@@ -77,6 +77,7 @@ class MPJRDConfig:
     backprop_trace_tau: float = 10.0
     backprop_max_amp: float = 0.4
     backprop_max_gain: float = 2.0
+    backprop_active_threshold: float = 0.1
     
     # ===== MECANISMO 6: ADAPTAÇÃO (SFA) =====
     adaptation_enabled: bool = True
@@ -106,6 +107,15 @@ class MPJRDConfig:
     tau_post: float = 20.0
     A_plus: float = 0.01
     A_minus: float = 0.012
+    stdp_trace_threshold: float = 0.01
+
+    # ===== THRESHOLDS E REPRODUTIBILIDADE =====
+    spike_threshold: float = 0.5
+    random_seed: Optional[int] = None
+    active_synapses_ratio: float = 0.25
+
+    # ===== INIBIÇÃO =====
+    inhibition_trainable_i2e: bool = False
     
     # ===== NEUROMODULAÇÃO =====
     neuromod_mode: NeuromodMode = "external"
@@ -169,6 +179,11 @@ class MPJRDConfig:
         
         if self.homeostasis_eps <= 0:
             raise ValueError(f"homeostasis_eps must be > 0, got {self.homeostasis_eps}")
+
+        if not (0.0 < self.active_synapses_ratio <= 1.0):
+            raise ValueError(
+                f"active_synapses_ratio must be in (0, 1], got {self.active_synapses_ratio}"
+            )
         
         # Warnings
         if self.ltd_threshold_saturated > self.i_ltd_th:

@@ -16,7 +16,7 @@ Baseado em:
 import logging
 import torch
 import torch.nn as nn
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict
 
 
 class InhibitionLayer(nn.Module):
@@ -53,6 +53,8 @@ class InhibitionLayer(nn.Module):
         feedforward_strength: float = 0.3,
         feedback_strength: float = 0.4,
         lateral_sigma: float = 5.0,
+        trainable_i2e: Optional[bool] = None,
+        seed: Optional[int] = None,
     ):
         """
         Args:
@@ -62,6 +64,8 @@ class InhibitionLayer(nn.Module):
             feedforward_strength: Força da inibição feedforward (0.0-1.0)
             feedback_strength: Força da inibição feedback (0.0-1.0)
             lateral_sigma: Largura do kernel gaussiano para inibição lateral
+            trainable_i2e: Se True, pesos I→E viram nn.Parameter treinável
+            seed: Seed opcional para inicialização de conectividade
         """
         super().__init__()
         
@@ -72,6 +76,7 @@ class InhibitionLayer(nn.Module):
         self.feedforward_strength = feedforward_strength
         self.feedback_strength = feedback_strength
         self.lateral_sigma = lateral_sigma
+        self.seed = torch.initial_seed() if seed is None else int(seed)
         
         # ===== PESOS E→I (Feedforward) =====
         # Matriz [n_exc, n_inh] - esparsa
@@ -79,7 +84,11 @@ class InhibitionLayer(nn.Module):
         
         # ===== PESOS I→E (Feedback) =====
         # Matriz [n_inh, n_exc] - broadcast com decay espacial
-        self.register_buffer("W_I2E", self._init_I2E_weights())
+        i2e_weights = self._init_I2E_weights()
+        if trainable_i2e:
+            self.W_I2E = nn.Parameter(i2e_weights)
+        else:
+            self.register_buffer("W_I2E", i2e_weights)
         
         # ===== KERNEL GAUSSIANO (Lateral) =====
         self.register_buffer("lateral_kernel", self._create_lateral_kernel())
@@ -92,10 +101,10 @@ class InhibitionLayer(nn.Module):
     def _init_E2I_weights(self) -> torch.Tensor:
         """Inicializa pesos E→I com conectividade esparsa determinística."""
         generator = torch.Generator(device='cpu')
-        generator.manual_seed(42)
+        generator.manual_seed(self.seed)
 
         with torch.random.fork_rng(devices=[]):
-            torch.manual_seed(42)
+            torch.manual_seed(self.seed)
             dense_weights = torch.nn.init.xavier_uniform_(
                 torch.empty(self.n_exc, self.n_inh)
             )
@@ -300,6 +309,8 @@ class InhibitionMixin:
         feedforward_strength: float = 0.3,
         feedback_strength: float = 0.4,
         lateral_sigma: float = 5.0,
+        trainable_i2e: Optional[bool] = None,
+        seed: Optional[int] = None,
     ):
         """
         Inicializa camada inibitória.
@@ -310,7 +321,15 @@ class InhibitionMixin:
             feedforward_strength: Força da inibição feedforward
             feedback_strength: Força da inibição feedback
             lateral_sigma: Largura do kernel gaussiano
+            trainable_i2e: Define se I→E é treinável (default usa cfg)
+            seed: Seed opcional para conectividade
         """
+        cfg = getattr(self, "cfg", None)
+        if trainable_i2e is None:
+            trainable_i2e = bool(getattr(cfg, "inhibition_trainable_i2e", False))
+        if seed is None and cfg is not None:
+            seed = getattr(cfg, "random_seed", None)
+
         self.inhibition = InhibitionLayer(
             n_excitatory=self.n_neurons,
             n_inhibitory=n_inhibitory,
@@ -318,6 +337,8 @@ class InhibitionMixin:
             feedforward_strength=feedforward_strength,
             feedback_strength=feedback_strength,
             lateral_sigma=lateral_sigma,
+            trainable_i2e=trainable_i2e,
+            seed=seed,
         )
     
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:

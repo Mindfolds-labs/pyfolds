@@ -32,19 +32,31 @@ class TestBackpropMixin:
         assert neuron.backprop_queue[0]['time'] == 10.0
     
     def test_dendrite_amplification_decay(self, full_config):
-        """Test amplification decay."""
+        """Test amplification decay when there are pending events."""
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
-            
+
         neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
         neuron.dendrite_amplification.fill_(0.5)
-        
-        import math
-        expected_decay = math.exp(-1.0 / neuron.backprop_amp_tau)
-        
+
+        # Sem eventos pendentes, não deve aplicar decaimento.
         neuron._process_backprop_queue(1.0)
-        
         assert torch.allclose(
             neuron.dendrite_amplification,
-            torch.ones_like(neuron.dendrite_amplification) * 0.5 * expected_decay
+            torch.ones_like(neuron.dendrite_amplification) * 0.5,
+        )
+
+        # Com evento pendente, aplica decaimento por tempo desde último processamento.
+        v_dend = torch.zeros(2, full_config.n_dendrites)
+        neuron._schedule_backprop(100.0, v_dend)
+
+        import math
+
+        expected_decay = math.exp(-(11.0 - 0.0) / neuron.backprop_amp_tau)
+        neuron._process_backprop_queue(11.0)
+
+        assert torch.allclose(
+            neuron.dendrite_amplification,
+            torch.ones_like(neuron.dendrite_amplification) * 0.5 * expected_decay,
+            atol=1e-5,
         )

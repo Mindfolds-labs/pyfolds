@@ -2,7 +2,7 @@
 
 import math
 import torch
-from typing import Dict, Any, Optional
+from typing import Dict, Optional
 from ..utils.types import LearningMode
 
 
@@ -84,7 +84,8 @@ class STDPMixin:
         self.trace_post.mul_(decay_post)
         
         # Spikes pré (detectados por amostra)
-        pre_spikes = (x > 0.5).float()  # [B, D, S]
+        spike_threshold = getattr(self.cfg, 'spike_threshold', 0.5)
+        pre_spikes = (x > spike_threshold).float()  # [B, D, S]
         
         # Adiciona aos traços pré
         self.trace_pre.add_(pre_spikes)
@@ -93,11 +94,12 @@ class STDPMixin:
         post_expanded = post_spike.view(-1, 1, 1)  # [B, 1, 1]
         
         # LTD: onde trace_post > threshold
-        ltd_mask = (self.trace_post > 0.01).float()
+        trace_threshold = getattr(self.cfg, 'stdp_trace_threshold', 0.01)
+        ltd_mask = (self.trace_post > trace_threshold).float()
         delta_ltd = -self.A_minus * self.trace_post * ltd_mask * post_expanded
         
         # LTP: onde trace_pre > threshold
-        ltp_mask = (self.trace_pre > 0.01).float()
+        ltp_mask = (self.trace_pre > trace_threshold).float()
         delta_ltp = self.A_plus * self.trace_pre * ltp_mask * post_expanded
         
         # ✅ VETORIZADO: aplica a TODAS as sinapses de uma vez
