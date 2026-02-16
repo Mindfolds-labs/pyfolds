@@ -10,6 +10,7 @@ from pyfolds.core.config import MPJRDConfig
 from pyfolds.core.neuron import MPJRDNeuron
 from pyfolds.serialization import (
     FoldReader,
+    FoldWriter,
     ReedSolomonECC,
     ecc_from_protection,
     is_mind,
@@ -259,6 +260,23 @@ def test_fold_reader_header_len_validation(tmp_path):
     with pytest.raises(ValueError, match="Header inconsistente"):
         with FoldReader(str(file_path), use_mmap=False):
             pass
+
+
+def test_fold_writer_finalize_wraps_io_failure_with_phase_context(tmp_path, monkeypatch):
+    file_path = tmp_path / "finalize-fail.fold"
+
+    def _fail_fsync(_fd):
+        raise OSError("disk full")
+
+    monkeypatch.setattr("pyfolds.serialization.foldio.os.fsync", _fail_fsync)
+
+    with FoldWriter(str(file_path), compress="none") as writer:
+        writer.add_chunk("meta", "JSON", b"{}")
+
+        with pytest.raises(RuntimeError, match=r"persistência do arquivo fold \(index fsync\)") as exc_info:
+            writer.finalize({"source": "unit-test"})
+
+    assert isinstance(exc_info.value.__cause__, OSError)
 
 
 def test_fold_reader_reports_magic_values(tmp_path):
