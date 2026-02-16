@@ -7,7 +7,7 @@ include requirements.txt
 include Makefile
 
 recursive-include src/pyfolds *.py
-
+recursive-include src/pyfolds py.typed
 
 
 

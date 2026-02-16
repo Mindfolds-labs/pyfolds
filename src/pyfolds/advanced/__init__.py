@@ -13,6 +13,7 @@ Fornece mixins para:
 
 import torch  # ✅ Necessário para as métricas
 from typing import Optional
+import logging
 
 from .refractory import RefractoryMixin
 from .stdp import STDPMixin
@@ -25,6 +26,8 @@ from ..core.neuron import MPJRDNeuron as MPJRDNeuronBase
 from ..wave import MPJRDWaveNeuron as MPJRDWaveNeuronBase
 from ..layers.layer import MPJRDLayer
 from ..utils.logging import get_logger
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "RefractoryMixin",
@@ -43,16 +46,16 @@ __all__ = [
 
 class MPJRDNeuronAdvanced(
     # ✅ ORDEM CORRETA:
-    BackpropMixin,          # 1º: amplifica entrada (antes de tudo)
-    ShortTermDynamicsMixin, # 2º: modula entrada (temporário)
-    STDPMixin,              # 3º: atualiza traços (não afeta forward)
-    AdaptationMixin,        # 4º: modifica u (antes de refratário)
-    RefractoryMixin,        # 5º: bloqueia spikes (deve ser ÚLTIMO)
-    MPJRDNeuronBase
+    BackpropMixin,  # 1º: amplifica entrada (antes de tudo)
+    ShortTermDynamicsMixin,  # 2º: modula entrada (temporário)
+    STDPMixin,  # 3º: atualiza traços (não afeta forward)
+    AdaptationMixin,  # 4º: modifica u (antes de refratário)
+    RefractoryMixin,  # 5º: bloqueia spikes (deve ser ÚLTIMO)
+    MPJRDNeuronBase,
 ):
     """
     Neurônio MPJRD com TODOS os mecanismos avançados.
-    
+
     ✅ ORDEM CORRETA DE EXECUÇÃO:
         1. Backpropagation: amplifica entrada baseado em spikes anteriores
         2. Short-term dynamics: modula entrada (facilitação/depressão)
@@ -60,10 +63,10 @@ class MPJRDNeuronAdvanced(
         4. Adaptation: modifica u (corrente de adaptação)
         5. Refractory: bloqueia spikes (deve ser o último)
         6. Base: forward base (WTA, homeostase, etc)
-    
+
     Para inibição, use MPJRDLayerAdvanced em conjunto.
     """
-    
+
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
         self._init_advanced_mixins(cfg, is_wave=False)
@@ -128,38 +131,42 @@ class MPJRDNeuronAdvanced(
     def get_all_advanced_metrics(self) -> dict:
         """
         Retorna métricas de TODOS os mecanismos avançados.
-        
+
         Returns:
             dict: Dicionário com métricas de todos os mecanismos
         """
         metrics = super().get_metrics()
-        
-        if hasattr(self, 'get_refractory_metrics'):
+
+        if hasattr(self, "get_refractory_metrics"):
             metrics.update(self.get_refractory_metrics())
-        if hasattr(self, 'get_adaptation_metrics'):
+        if hasattr(self, "get_adaptation_metrics"):
             metrics.update(self.get_adaptation_metrics())
-        if hasattr(self, 'get_short_term_metrics'):
+        if hasattr(self, "get_short_term_metrics"):
             metrics.update(self.get_short_term_metrics())
-        if hasattr(self, 'get_backprop_metrics'):
+        if hasattr(self, "get_backprop_metrics"):
             metrics.update(self.get_backprop_metrics())
-        
+
         # Métricas STDP
-        metrics['trace_pre_mean'] = getattr(self, 'trace_pre', torch.tensor(0.0)).mean().item()
-        metrics['trace_post_mean'] = getattr(self, 'trace_post', torch.tensor(0.0)).mean().item()
-        
+        metrics["trace_pre_mean"] = (
+            getattr(self, "trace_pre", torch.tensor(0.0)).mean().item()
+        )
+        metrics["trace_post_mean"] = (
+            getattr(self, "trace_post", torch.tensor(0.0)).mean().item()
+        )
+
         return metrics
-    
+
     def reset_all_mechanisms(self):
         """Reseta todos os mecanismos avançados."""
-        if hasattr(self, 'reset_refractory'):
+        if hasattr(self, "reset_refractory"):
             self.reset_refractory()
-        if hasattr(self, 'reset_stdp_traces'):
+        if hasattr(self, "reset_stdp_traces"):
             self.reset_stdp_traces()
-        if hasattr(self, 'reset_adaptation'):
+        if hasattr(self, "reset_adaptation"):
             self.reset_adaptation()
-        if hasattr(self, 'reset_short_term_dynamics'):
+        if hasattr(self, "reset_short_term_dynamics"):
             self.reset_short_term_dynamics()
-        if hasattr(self, 'reset_backprop'):
+        if hasattr(self, "reset_backprop"):
             self.reset_backprop()
 
 
@@ -181,9 +188,15 @@ class MPJRDWaveNeuronAdvanced(
 class MPJRDLayerAdvanced(MPJRDLayer):
     """Camada que injeta automaticamente `MPJRDNeuronAdvanced`."""
 
-    def __init__(self, n_neurons: int, cfg, name: str = "",
-                 enable_telemetry: bool = False, telemetry_profile: str = "off",
-                 device: Optional[torch.device] = None):
+    def __init__(
+        self,
+        n_neurons: int,
+        cfg,
+        name: str = "",
+        enable_telemetry: bool = False,
+        telemetry_profile: str = "off",
+        device: Optional[torch.device] = None,
+    ):
         super().__init__(
             n_neurons=n_neurons,
             cfg=cfg,
@@ -198,9 +211,15 @@ class MPJRDLayerAdvanced(MPJRDLayer):
 class MPJRDWaveLayerAdvanced(MPJRDLayer):
     """Camada avançada para neurônios wave + mecanismos v2.x."""
 
-    def __init__(self, n_neurons: int, cfg, name: str = "",
-                 enable_telemetry: bool = False, telemetry_profile: str = "off",
-                 device: Optional[torch.device] = None):
+    def __init__(
+        self,
+        n_neurons: int,
+        cfg,
+        name: str = "",
+        enable_telemetry: bool = False,
+        telemetry_profile: str = "off",
+        device: Optional[torch.device] = None,
+    ):
         super().__init__(
             n_neurons=n_neurons,
             cfg=cfg,
