@@ -1,3 +1,4 @@
+from pyfolds.serialization.foldio import crc32c_u32
 import numpy as np
 import torch
 import pytest

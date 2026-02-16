@@ -215,10 +215,13 @@ class MPJRDConfig:
         """Calcula taxa de decaimento exponencial."""
         if tau <= 0:
             raise ValueError(f"tau must be > 0, got {tau}")
+
         if dt is None:
             dt = self.dt
+
         if dt < 0:
             raise ValueError(f"dt must be >= 0, got {dt}")
+
         return math.exp(-dt / tau)
     
     def to_dict(self) -> Dict:
