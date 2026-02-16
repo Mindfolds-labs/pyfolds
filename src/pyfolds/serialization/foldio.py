@@ -25,14 +25,21 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
-import zlib
 
 from .ecc import ECCCodec, NoECC, ReedSolomonECC, ecc_from_protection
 
-_zstd_spec = importlib.util.find_spec("zstandard")
-zstd = importlib.import_module("zstandard") if _zstd_spec else None
-_crc32c_spec = importlib.util.find_spec("google_crc32c")
-google_crc32c = importlib.import_module("google_crc32c") if _crc32c_spec else None
+def _optional_import(module_name: str) -> Any:
+    spec = importlib.util.find_spec(module_name)
+    if spec is None:
+        return None
+    try:
+        return importlib.import_module(module_name)
+    except Exception:
+        return None
+
+
+zstd = _optional_import("zstandard")
+google_crc32c = _optional_import("google_crc32c")
 
 
 MAGIC = b"FOLDv1\0\0"
