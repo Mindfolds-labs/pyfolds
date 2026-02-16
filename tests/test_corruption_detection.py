@@ -65,13 +65,22 @@ def test_detects_huge_index_len_dos_guard(tmp_path):
 
 
 def test_partial_read_raises_eoferror(tmp_path):
-    file_path = tmp_path / "partial.bin"
-    file_path.write_bytes(b"abc")
+    class PartialReadFile:
+        def __init__(self, raw):
+            self._raw = raw
+
+        def seek(self, offset):
+            self._raw.seek(offset)
+
+        def read(self, length):
+            requested = max(length, 1)
+            return self._raw.read(max(1, requested // 2))
+
+    file_path = tmp_path / "partial-read.fold"
+    file_path.write_bytes(b"A" * 32)
 
     reader = FoldReader(str(file_path), use_mmap=False)
-    reader._f = open(file_path, "rb")
-    try:
+    with open(file_path, "rb") as raw_file:
+        reader._f = PartialReadFile(raw_file)
         with pytest.raises(EOFError, match="Fim de arquivo inesperado"):
-            reader._read_at(0, 10)
-    finally:
-        reader.__exit__(None, None, None)
+            reader._read_at(0, 16)
