@@ -1,86 +1,312 @@
-# 🚀 PROMPT GERAL DE EXECUÇÃO – PyFolds
+📚 PMBOK (Project Management Body of Knowledge)
+O QUÊ: Framework completo de gerenciamento de projetos
+FOCO: 10 áreas de conhecimento, 5 grupos de processos
 
-Você é um engenheiro de software sênior e mantenedor do projeto **PyFolds**.
-Seu papel é executar melhorias de forma incremental, segura e perfeitamente alinhada com as regras de governança do projeto.
+Grupos de Processos:
+1. INICIAÇÃO → CRIAR (você define)
+2. PLANEJAMENTO → ANALISAR (você aprova)
+3. EXECUÇÃO → EXECUTAR (Codex faz)
+4. MONITORAMENTO E CONTROLE → Validar (durante execução)
+5. ENCERRAMENTO → FINALIZAR (você aprova em PR)
 
-## 1. 📜 Contexto Obrigatório (Sempre Ler)
+Origem: PMI (Project Management Institute)
+Uso: Projetos complexos, grandes empresas, compliance
 
-Antes de começar, internalize estas regras. Elas não são negociáveis.
+🔗 Integração: PMBOK + GitHub Pull Request
+┌─────────────────────────────────────────────────────────────┐
+│         WORKFLOW v5 — PMBOK + Pull Request                  │
+└─────────────────────────────────────────────────────────────┘
 
-- **Rastreabilidade Total:** Toda mudança deve ser rastreada desde uma Issue até o PR, passando pela fila de execução.
-- **Fonte da Verdade:** A fila de execução é o arquivo `docs/development/execution_queue.csv`.
-- **Visualização da Fila:** O HUB (`docs/development/HUB_CONTROLE.md`) é uma *view* gerada a partir do CSV. A sincronização é feita pelo script `tools/sync_hub.py`.
-- **Mudanças Pequenas:** Prefira sempre PRs com escopo de, no máximo, 1 dia de trabalho. Isso facilita a revisão e reduz riscos.
-- **Testes Obrigatórios:** Qualquer alteração em código de produção deve ser acompanhada de testes. Correções de bugs exigem um teste de regressão.
-- **API Pública:** É sagrada. Qualquer mudança que a afete precisa ser justificada em um ADR (Arquitetural Decision Record).
-- **Formatos Críticos (`.fold`/`.mind`):** Qualquer alteração neles também exige um ADR.
-- **CHANGELOG:** Só deve ser atualizado se a mudança tiver impacto direto para o usuário final (nova funcionalidade, correção de bug, mudança de comportamento). Melhorias puramente internas (como aumento de cobertura de testes) não entram no CHANGELOG.
+1️⃣ CRIAR (Você)
+   ├─ PMBOK: Iniciação (escopo, objetivos)
+   ├─ Cria: ISSUE-[N]-[slug].md + LOG.md
+   ├─ Adiciona ao CSV
+   └─ STATUS: ⏳ Planejada
 
-## 2. 🎯 Objetivo da Tarefa
+2️⃣ ANALISAR (Você)
+   ├─ PMBOK: Planejamento (recursos, cronograma, riscos)
+   ├─ Lê e valida: artefatos, plano de ação
+   ├─ Cria: PULL REQUEST (draft)
+   └─ STATUS: ✅ Pronto para Executar
 
-**Instrução para o executor (Codex/ChatGPT):** Abaixo está a descrição da melhoria a ser implementada. Seu trabalho é pegar este objetivo e executar o fluxo completo de governança.
+3️⃣ EXECUTAR (Codex)
+   ├─ PMBOK: Execução + Monitoramento
+   ├─ Faz: mudanças nos artefatos
+   ├─ Valida: links, sintaxe, testes
+   ├─ Atualiza: PULL REQUEST com resultado
+   └─ STATUS: 🔄 Em Progresso (PR marcado como Ready for Review)
 
-**[COLE AQUI A DESCRIÇÃO DA TAREFA. EXEMPLOS:]**
-- *"Aumentar a cobertura de testes para o módulo `src/pyfolds/core/synapse.py", focando em limites numéricos e entradas inválidas."*
-- *"Criar um benchmark de performance para uma mini-rede com 10 neurônios e mixins de adaptação e inibição ativados."*
-- *"Revisar a estabilidade da API pública exportada por `src/pyfolds/__init__.py" e propor melhorias backward-compatible.*
+4️⃣ FINALIZAR (Você)
+   ├─ PMBOK: Encerramento (aceitação, lições aprendidas)
+   ├─ Lê: feedback de Codex no PR
+   ├─ Aprova: "Approve" no GitHub
+   ├─ Merge: PR → main
+   └─ STATUS: ✅ Concluída
 
-## 3. ⚙️ Fluxo de Execução Obrigatório (Ação)
+📋 PROMPT MASTER v5 — Gera Tudo com PMBOK + PR
+markdown# PROMPT MASTER v5: PMBOK + Pull Request Workflow
 
-Siga estas etapas em ordem. Se algo não for aplicável, pule a etapa, mas justifique brevemente.
+## 🎯 Contexto
 
-### Fase 1: Diagnóstico e Planejamento
-1.  **Diagnóstico Rápido:** Analise o objetivo e os módulos de código relacionados. Identifique o estado atual, possíveis riscos e o escopo ideal para uma PR de 1 dia.
-2.  **Verificação de Existência:** Confirme se já não existe uma Issue no GitHub ou um item na fila (`execution_queue.csv`) que cubra exatamente esta tarefa.
+Este prompt estabelece o **workflow profissional completo** para issues do PyFolds,
+integrando PMBOK, ITIL, COBIT, SCRUM, Agile e GitHub Pull Request.
 
-### Fase 2: Registro e Rastreabilidade
-3.  **Criar/Atualizar Issue no GitHub:** Crie uma Issue clara e objetiva.
-    - **Título:** `[tipo]: [módulo] - [descrição curta]` (ex: `test(core): aumentar cobertura de synapse.py`)
-    - **Corpo da Issue:**
-        - **Contexto:** Explique o "porquê".
-        - **O que fazer:** Liste as tarefas técnicas.
-        - **Critérios de Aceite:** Liste as condições para a Issue ser considerada resolvida.
-        - **Referências:** Link para arquivos relevantes no código.
+Você (humano) aprova tudo via PR (não local).
 
-4.  **Registrar na Fila (CSV):** Adicione uma nova linha ao arquivo `docs/development/execution_queue.csv` com as informações da Issue criada. As colunas são:
-    - `id`: Use o padrão `ISSUE-NNN`, onde `NNN` é o próximo número sequencial.
-    - `tema`: Título da Issue.
-    - `status`: `Planejada`.
-    - `responsavel`: `Codex` (ou seu nome).
-    - `data`: Data de hoje (formato `YYYY-MM-DD`).
-    - `artefatos`: Lista de arquivos que serão modificados (ex: `"src/pyfolds/core/synapse.py;tests/unit/core/test_synapse.py"`).
-    - `github_issue`: O link para a Issue recem-criada (ex: `#123`).
-    - `pr`: Deixe em branco por enquanto.
-    - `prioridade`: `Média` ou `Alta`, conforme o caso.
-    - `area`: O módulo principal afetado (ex: `core`, `serialization`, `api`).
+---
 
-5.  **Decisão Arquitetural (ADR):** A mudança proposta afeta a API pública ou o formato `.fold`? Se SIM, **pare aqui** e sinalize que um ADR precisa ser criado antes de prosseguir. Caso contrário, continue.
+## 📊 Paradigma Formal
+````
+WORKFLOW v5: "PMBOK-Driven Agile with ITIL Controls"
 
-### Fase 3: Implementação
-6.  **Criar Branch:** Crie uma branch com um nome descritivo (ex: `feat/issue-123-increase-synapse-coverage`).
-7.  **Escrever Código e Testes:**
-    - Implemente a melhoria.
-    - Escreva ou expanda os testes unitários/integração.
-    - Se encontrar um bug durante a implementação, corrija-o E adicione um teste de regressão.
+Frameworks Integrados:
+├─ PMBOK (Project Management — 5 Grupos de Processos)
+├─ ITIL (IT Service Management — Processos operacionais)
+├─ COBIT (Governança e Compliance — Controle)
+├─ SCRUM (Iteração — Sprints e backlogs)
+└─ AGILE (Mindset — Flexibilidade e feedback)
 
-### Fase 4: Finalização e Entrega
-8.  **Sincronizar o HUB:** Execute o comando `python tools/sync_hub.py` para que a tabela no `HUB_CONTROLE.md` seja atualizada com a nova entrada da fila.
-9.  **Atualizar o CHANGELOG (se necessário):** Se a mudança tiver impacto externo, adicione uma entrada na seção `[Unreleased]` do `CHANGELOG.md`, na categoria correta (`Added`, `Changed`, `Fixed`, etc.).
-10. **Executar Testes Localmente:** Rode `pytest` e garanta que todos os testes (antigos e novos) estejam passando.
-11. **Preparar o Pull Request (PR):** No corpo do PR, inclua:
-    - **O que mudou:** Lista de alterações.
-    - **Como testar:** Comandos e passos para validar a mudança.
-    - **Riscos / Rollback:** Possíveis impactos e como reverter.
-    - **Links:** Issue relacionada (ex: `Closes #123`), ADR (se houver).
+Plataforma: GitHub (PR é ponto de aprovação único)
+````
 
-## 4. 📤 Formato da Resposta (Obrigatório)
+---
 
-Sua resposta final deve ser um resumo organizado de tudo o que você fez, contendo:
+## 1️⃣ ESTÁGIO: CRIAR
 
-**A) Diagnóstico Inicial:**
-Breve análise do problema e do escopo.
+### PMBOK: Iniciação
+- Definir objetivo, escopo, restrições
+- Identificar stakeholders (você, Codex)
+- Documentar requisitos
 
-**B) Issue Criada/Atualizada:**
-```markdown
+### 👤 Responsável
+**Você (Humano)**
+
+### 📝 Prompt de Criação
+````markdown
+# PROMPT: Criar ISSUE-[N] (Estágio 1 — CRIAR)
+
+## 📋 Você Precisa Fazer
+
+Defina os parâmetros da ISSUE:
+````
+Número: ISSUE-[N] (ex: ISSUE-006)
+Tema: [descrição em 1 frase]
+Objetivo: [por que fazer isso?]
+Escopo: [o que inclui/exclui]
+Área: [docs/código/testes]
+Prioridade: [Alta/Média/Baixa]
+Responsável: [seu nome ou "A definir"]
+Data: [YYYY-MM-DD]
+Riscos Identificados: [listar riscos]
+Dependências: [outras issues?]
+````
+
+## ✍️ Crie os Arquivos
+
+### Arquivo 1: Relatório Principal
+````
+prompts/relatorios/ISSUE-[N]-[slug].md
+Conteúdo:
+markdown# ISSUE-[N] — [Seu Tema]
+
+> **PMBOK Fase:** Iniciação  
+> **Status:** ⏳ Planejada  
+> **Área:** [docs/código]  
+> **Data:** [YYYY-MM-DD]  
+> **Responsável:** [nome]  
+
+## 🎯 Objetivo (PMBOK: Charter)
+[Por que fazer isso? Valor de negócio]
+
+## 📋 Escopo (PMBOK: Escopo do Projeto)
+**Inclui:**
+- ✅ [item]
+
+**Exclui:**
+- ❌ [item]
+
+## 📊 Artefatos a Alterar (PMBOK: Deliverables)
+- `arquivo1.md` — [o que muda]
+- `arquivo2.py` — [o que muda]
+
+## ⏰ Cronograma (PMBOK: Schedule)
+- Sprint 1: [data] — [o que fazer]
+- Sprint 2: [data] — [o que fazer]
+
+## 🚨 Riscos (PMBOK: Risk)
+- [ ] Risco 1: [descrição] | Mitigação: [como evitar]
+- [ ] Risco 2: [descrição] | Mitigação: [como evitar]
+
+## 📌 Dependências (PMBOK: Stakeholders)
+- Depende de: [ISSUE-XXX]
+- Bloqueia: [ISSUE-YYY]
+
+## ✅ Critérios de Aceite
+- [ ] Critério 1
+- [ ] Critério 2
+
+## 📝 PROMPT:EXECUTAR
+<!-- PROMPT:EXECUTAR:INICIO -->
+[Seu prompt de execução]
+<!-- PROMPT:EXECUTAR:FIM -->
+````
+
+### Arquivo 2: Log de Execução
+````
+prompts/relatorios/ISSUE-[N]-[slug]-LOG.md
+Conteúdo:
+markdown# LOG — ISSUE-[N]
+
+## 1️⃣ CRIADO (Data/Hora)
+
+**PMBOK Fase:** Iniciação
+
+├─ Criador: [seu nome]
+├─ Data: [YYYY-MM-DD HH:MM]
+├─ Status: ⏳ Planejada
+├─ Arquivo Principal: ✅ Criado
+├─ Log: ✅ Criado
+├─ CSV: ✅ Atualizado
+├─ HUB: ✅ Sincronizado
+└─ Pull Request: ⏳ Será criado em ANALISAR
+🔧 Atualize Configurações
+bash# 1. Adicione ao CSV
+docs/development/execution_queue.csv
+````
+
+Linha:
+````
+ISSUE-[N],"[Tema]","Planejada","[seu nome]",[data],"prompts/relatorios/ISSUE-[N]-slug.md",,,Média,"[área]"
+✅ Sincronize
+bashpython tools/sync_hub.py
+python tools/sync_hub.py --check
+````
+
+## 🎯 Status Final
+````
+✅ CRIADO
+
+├─ Arquivo Principal: ✅
+├─ Log: ✅
+├─ CSV: ✅
+├─ HUB: ✅
+└─ Próximo: ANALISAR
+````
+````
+
+---
+
+## 2️⃣ ESTÁGIO: ANALISAR
+
+### PMBOK: Planejamento
+- Refinar escopo, cronograma, riscos
+- Preparar para execução
+- Criar PR (pull request)
+
+### 👤 Responsável
+**Você (Humano)**
+
+### 📝 Prompt de Análise
+````markdown
+# PROMPT: Analisar ISSUE-[N] (Estágio 2 — ANALISAR)
+
+## 🔍 Você Precisa Fazer
+
+### Passo 1: Leia a ISSUE
+```bash
+cat prompts/relatorios/ISSUE-[N]-[slug].md
+```
+
+### Passo 2: Valide Cada Seção
+
+**Objetivo:**
+- ✅ Claro e mensurável?
+- ✅ Traz valor?
+
+**Escopo:**
+- ✅ Completo?
+- ✅ Sem ambiguidades?
+
+**Artefatos:**
+- ✅ Corretos?
+- ✅ Sem faltantes?
+
+**Cronograma:**
+- ✅ Realista?
+- ✅ Com dependências?
+
+**Riscos:**
+- ✅ Identificados?
+- ✅ Mitigações claras?
+
+**PROMPT:**
+- ✅ Executável?
+- ✅ Sem ambiguidades?
+
+### Passo 3: Atualize o Log
+````
+prompts/relatorios/ISSUE-[N]-[slug]-LOG.md
+Adicione seção:
+markdown## 2️⃣ ANALISADO (Data/Hora)
+
+**PMBOK Fase:** Planejamento
+
+├─ Analisador: [seu nome]
+├─ Data: [YYYY-MM-DD HH:MM]
+├─ Status: ✅ Pronto para Executar
+├─ Validações:
+│  ├─ Objetivo: ✅ OK
+│  ├─ Escopo: ✅ OK
+│  ├─ Artefatos: ✅ OK
+│  ├─ Cronograma: ✅ OK
+│  ├─ Riscos: ✅ OK
+│  └─ PROMPT: ✅ OK
+├─ Mudanças Sugeridas: [se houver]
+└─ Aprovação: ✅ APROVADO
+Passo 4: Crie Pull Request
+bash# No GitHub, crie novo PR:
+
+Título:
+[ISSUE-[N]] [Tema] — Planejado
+
+Descrição:
+````
+## PMBOK: Planejamento
+
+**Status:** ⏳ Análise Completa
+
+**O que será feito:**
+- [ ] Artefato 1
+- [ ] Artefato 2
+
+**Cronograma:**
+- Sprint 1: [data]
+- Sprint 2: [data]
+
+**Riscos:**
+- Risco 1: [descrição]
+- Risco 2: [descrição]
+
+**Aprovação:**
+- [ ] Analisor (você): Avaliar em EXECUTAR
+- [ ] Codex: Executar
+- [ ] Você: Aprovar em FINALIZAR
+
+**Relatórios:**
+- Principal: [link]
+- Log: [link]
+````
+
+Status: **DRAFT** (não pronto ainda)
+
+### Passo 5: Reporte
+````
+✅ ANALISADO
+
+├─ Log Atualizado: ✅
+├─ PR Criado: ✅ (DRAFT)
+├─ Status: ✅ Pronto para Executar
+└─ Próximo: EXECUTAR
+````
 
 
