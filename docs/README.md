@@ -1,30 +1,18 @@
 # Documentação PyFolds
 
-A documentação foi organizada por categoria para facilitar navegação:
+Estrutura consolidada de documentação v1.0.0:
 
-- `blueprint/` → visão arquitetural e blueprint do framework.
-- `api/` → referência por módulos e classes.
-- `guides/` → tutoriais práticos passo a passo.
-- `research/` → fundamentos científicos e racional teórico.
-- `diagrams/` → diagramas Mermaid (C4, classes, estados, sequência).
+- `governance/` → governança técnica, qualidade e ADRs.
+- `architecture/` → blueprints, UML e especificações.
+- `research/` → base científica (MPJRD e Wave).
+- `development/` → fluxo de trabalho técnico e controle de issues.
+- `public/guides/` → guias de uso e materiais para usuários.
+- `api/` e `examples/` → referência técnica e exemplos práticos.
 
 ## Índice rápido
-
-- Arquitetura: `../docs/ARCHITECTURE.md`
-- Lógica científica: `../docs/SCIENTIFIC_LOGIC.md`
-- API central: `../docs/API_REFERENCE.md`
-- Guia MNIST: `../docs/guides/mnist_example.md`
-- Guia Wave: `../docs/guides/wave_tutorial.md`
-
-## Mapeamento de nomes esperados no plano
-
-| Nome esperado | Caminho real no repositório | Status |
-|---|---|---|
-| `docs/spec/FOLD_SPECIFICATION.md` | `docs/spec/FOLD_SPECIFICATION.md` | criado |
-| `docs/SCIENTIFIC_BASIS_V3.md` | `docs/SCIENTIFIC_BASIS_V3.md` | existente |
-| `docs/ARCHITECTURE.md` | `docs/ARCHITECTURE.md` | existente |
-| `docs/SCIENTIFIC_LOGIC.md` | `docs/SCIENTIFIC_LOGIC.md` | existente |
-
-> Nota: quando o plano citar uma referência histórica equivalente (ex.: formato `.fold`), priorize
-> o documento canônico em `docs/spec/FOLD_SPECIFICATION.md` e mantenha links para
-> `docs/theory/FOLD_MIND_FORMAT.md` para contexto teórico.
+- Hub de controle: `development/HUB_CONTROLE.md`
+- Índice de ADRs: `governance/adr/INDEX.md`
+- Governança de qualidade: `governance/quality/`
+- Blueprints de arquitetura: `architecture/blueprints/`
+- Especificações técnicas: `architecture/specs/`
+- Guias públicos: `public/guides/`
