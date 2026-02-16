@@ -1,6 +1,7 @@
 """Tests for StatisticsAccumulator."""
 
 import pytest
+from collections import deque
 import torch
 import pyfolds
 
@@ -48,3 +49,4 @@ class TestStatisticsAccumulator:
 
         assert len(acc.history['spike_rate']) == 5
         assert len(acc.history['sparsity']) == 5
+        assert isinstance(acc.history['spike_rate'], deque)
