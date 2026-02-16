@@ -1,43 +1,28 @@
-# ADR Index — Architecture Decision Records
+# ADR Index — Serialização `.fold/.mind` e qualidade
 
-Este índice organiza as decisões de arquitetura e suas dependências.
+## Índice
+- [ADR-001 — Container único `.fold/.mind`](./ADR-001-container-fold-mind.md)
+- [ADR-002 — Integridade por chunk com CRC32C/SHA256 e ECC opcional](./ADR-002-integridade-por-chunk-e-ecc.md)
+- [ADR-003 — Desserialização segura de payload Torch](./ADR-003-desserializacao-segura-torch.md)
+- [ADR-004 — Limites defensivos de I/O (`MAX_INDEX_SIZE`, `MAX_CHUNK_SIZE`)](./ADR-004-limites-defensivos-de-io.md)
+- [ADR-005 — Leitura parcial orientada a índice com `mmap`](./ADR-005-leitura-parcial-com-indice-e-mmap.md)
+- [ADR-006 — Manifesto, hashes hierárquicos e metadados de reprodutibilidade](./ADR-006-manifesto-e-reprodutibilidade.md)
+- [ADR-007 — Plano de testes para robustez de serialização](./ADR-007-plano-de-testes-robustez-serializacao.md)
+- [ADR-008 — Estabilidade de API e semântica refratária](./ADR-008-estabilidade-api-e-semantica-refrataria.md)
+- [ADR-009 — Quality gates (lint/tipos/segurança/testes/benchmark)](./ADR-009-quality-gates-ci-benchmark.md)
 
-## Núcleo de serialização `.fold/.mind`
+## Dependências
+- ADR-001 é base estrutural.
+- ADR-002 depende de ADR-001.
+- ADR-003 depende de ADR-001 e ADR-002.
+- ADR-004 depende de ADR-001.
+- ADR-005 depende de ADR-001 e ADR-004.
+- ADR-006 depende de ADR-001 e ADR-002.
+- ADR-007 depende de ADR-002, ADR-003 e ADR-004.
+- ADR-008 é transversal (API/comportamento) e complementa ADR-007.
+- ADR-009 integra e operacionaliza ADR-007 para CI/release.
 
-1. [ADR-001 — Formato binário `.fold/.mind` com índice no trailer](./ADR-001-formato-binario-fold-mind.md)
-2. [ADR-002 — Compressão ZSTD por chunk](./ADR-002-compressao-zstd-por-chunk.md)
-3. [ADR-003 — ECC opcional por chunk](./ADR-003-ecc-opcional-por-chunk.md)
-4. [ADR-004 — Validação multicamada para leitura segura](./ADR-004-validacao-multicamada.md)
-
-### Mapa de dependências (serialização)
-
-```mermaid
-graph TD
-  ADR001[ADR-001\nFormato binário] --> ADR002[ADR-002\nCompressão ZSTD]
-  ADR001 --> ADR003[ADR-003\nECC opcional]
-  ADR001 --> ADR004[ADR-004\nValidação multicamada]
-  ADR002 --> ADR004
-  ADR003 --> ADR004
-```
-
-## Trilha matemática e estabilidade numérica
-
-6. [ADR-006 — Safe Weight Law](./ADR-006-safe-weight-law.md)
-7. [ADR-007 — Monitoramento de invariantes](./ADR-007-monitoramento-de-invariantes.md)
-8. [ADR-008 — Homeostase com anti-windup](./ADR-008-homeostase-com-anti-windup.md)
-9. [ADR-009 — Testes de propriedades matemáticas](./ADR-009-testes-de-propriedades-matematicas.md)
-
-### Mapa de dependências (matemática)
-
-```mermaid
-graph TD
-  ADR006[ADR-006\nSafe Weight Law] --> ADR007[ADR-007\nMonitoramento de invariantes]
-  ADR006 --> ADR008[ADR-008\nHomeostase anti-windup]
-  ADR007 --> ADR009[ADR-009\nTestes property-based]
-  ADR008 --> ADR009
-```
-
-## Links cruzados úteis
-- Especificação binária detalhada: [docs/FOLD_SPECIFICATION.md](../FOLD_SPECIFICATION.md)
-- Documento de formato teórico prévio: [docs/theory/FOLD_MIND_FORMAT.md](../theory/FOLD_MIND_FORMAT.md)
-- ADR legado relacionado ao container: [docs/developments/adr/ADR-0002-fold-mind-container.md](../developments/adr/ADR-0002-fold-mind-container.md)
+## Fontes reaproveitadas
+- `docs/developments/adr/ADR-0002-fold-mind-container.md`
+- `docs/developments/adr/ADR-0003-test-failures-refractory-serialization-layer.md`
+- `FOLD_QUALITY_PLAN.md`

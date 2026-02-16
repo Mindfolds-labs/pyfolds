@@ -49,6 +49,7 @@ CHUNK_HDR_FMT = ">4sIQQII"
 FLAG_COMP_NONE = 0
 FLAG_COMP_ZSTD = 1
 MAX_INDEX_SIZE = 100 * 1024 * 1024
+MAX_CHUNK_SIZE = 2 * 1024 * 1024 * 1024
 
 # Tabela CRC32C (Castagnoli) para fallback sem dependência externa.
 _CRC32C_POLY = 0x82F63B78
@@ -248,8 +249,18 @@ class FoldWriter:
         """
         if len(ctype4) != 4:
             raise ValueError("ctype precisa ter 4 chars")
+        if len(payload) > MAX_CHUNK_SIZE:
+            raise ValueError(
+                f"Chunk '{name}' muito grande: {len(payload)} bytes "
+                f"(máximo permitido {MAX_CHUNK_SIZE})"
+            )
 
         comp, flags = self._compress(payload)
+        if len(comp) > MAX_CHUNK_SIZE:
+            raise ValueError(
+                f"Chunk comprimido '{name}' muito grande: {len(comp)} bytes "
+                f"(máximo permitido {MAX_CHUNK_SIZE})"
+            )
         ecc_result = self.ecc.encode(comp)
 
         crc = crc32c_u32(comp)
@@ -478,6 +489,22 @@ class FoldReader:
         hdr_size = struct.calcsize(CHUNK_HDR_FMT)
         hdr = self._read_at(offset, hdr_size)
         _ctype, flags, uncomp_len, comp_len, crc, ecc_len = struct.unpack(CHUNK_HDR_FMT, hdr)
+
+        if uncomp_len > MAX_CHUNK_SIZE:
+            raise ValueError(
+                f"Chunk '{name}' com tamanho descomprimido inválido: {uncomp_len} "
+                f"(máximo permitido {MAX_CHUNK_SIZE})"
+            )
+        if comp_len > MAX_CHUNK_SIZE:
+            raise ValueError(
+                f"Chunk '{name}' com tamanho comprimido inválido: {comp_len} "
+                f"(máximo permitido {MAX_CHUNK_SIZE})"
+            )
+        if ecc_len > MAX_CHUNK_SIZE:
+            raise ValueError(
+                f"Chunk '{name}' com tamanho ECC inválido: {ecc_len} "
+                f"(máximo permitido {MAX_CHUNK_SIZE})"
+            )
 
         comp_off = offset + hdr_size
         comp = self._read_at(comp_off, comp_len)

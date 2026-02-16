@@ -45,8 +45,8 @@ pip install -e .[dev]
 - 📦 Especificação binária `.fold/.mind`: `docs/FOLD_SPECIFICATION.md`
 - 🧾 ADRs (mapa e dependências): `docs/adr/INDEX.md`
 - 🏗️ Arquitetura (C4 + sequência): `docs/ARCHITECTURE.md`
-- 📦 Especificação formal do formato `.fold/.mind`: `docs/FOLD_SPECIFICATION.md`
-- 🧾 Índice de ADRs (governança): `docs/adr/INDEX.md`
+- 🧱 Especificação binária FOLD: `docs/FOLD_SPECIFICATION.md`
+- 🗂️ ADRs de serialização/qualidade: `docs/adr/INDEX.md`
 - 🔌 Referência de API: `docs/API_REFERENCE.md`
 - 📦 Especificação binária FOLD: `docs/FOLD_SPECIFICATION.md`
 - 🧩 ADRs de arquitetura FOLD: `docs/adr/INDEX.md`
