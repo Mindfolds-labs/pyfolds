@@ -92,6 +92,22 @@ class STDPMixin:
         # Spike pós (broadcast para [B, 1, 1])
         post_expanded = post_spike.view(-1, 1, 1)  # [B, 1, 1]
         
+        # LTD: onde trace_post > threshold
+        ltd_mask = (self.trace_post > 0.01).float()
+        delta_ltd = -self.A_minus * self.trace_post * ltd_mask * post_expanded
+        
+        # LTP: onde trace_pre > threshold
+        ltp_mask = (self.trace_pre > 0.01).float()
+        delta_ltp = self.A_plus * self.trace_pre * ltp_mask * post_expanded
+        
+        # ✅ VETORIZADO: aplica a TODAS as sinapses de uma vez
+        # Requer que self.I exista (tensor consolidado)
+        if hasattr(self, 'I'):
+            # Soma contribuições locais de cada amostra sem colapsar estado
+            delta_total = (delta_ltd + delta_ltp).sum(dim=0)
+            self.I.add_(delta_total)
+            self.I.clamp_(self.cfg.i_min, self.cfg.i_max)
+        
         # Adiciona traço pós
         self.trace_post.add_(post_expanded)
     
