@@ -1,226 +1,360 @@
-# ISSUE-[N] — [Título Completo]
+# 📊 Relatórios de Auditoria — PyFolds
 
-> **Sistemas/Área:** [docs/código/testes]  
-> **Status:** [✅ Concluída | 🔄 Em Progresso | ⏳ Planejada | ❌ Bloqueada]  
-> **Sprint:** [1/3 ou N/A]  
-> **Data:** [YYYY-MM-DD]  
-> **Responsável:** [Nome ou "A definir"]
+> Esta pasta contém relatórios gerados por prompts de auditoria antes da execução de melhorias.
 
----
+## 🎯 Objetivo
 
-## 📊 Status Executivo
+Manter um histórico de diagnósticos técnicos para:
 
-<div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; border-radius: 4px;">
-
-**O Que Já Está Pronto:**
-- ✅ [Item 1]
-- ✅ [Item 2]
-
-**O Que Ainda Falta (Próximos Passos):**
-- ⏳ [Item 1]
-- ⏳ [Item 2]
-
-</div>
+- ✅ Rastrear decisões
+- ✅ Documentar problemas encontrados
+- ✅ Basear futuras issues e PRs
+- ✅ Facilitar revisão humana antes da execução
 
 ---
 
-## 🎯 1. Objetivo
+## 📂 Estrutura dos Arquivos
 
-[Descrever claramente o objetivo desta issue]
+- `template_relatorio.md` → Modelo padrão para novos relatórios
+- `ISSUE-XXX-descricao.md` → Relatórios nomeados por issue relacionada
+
+---
+
+## 🚀 Como Usar
+
+### 1️⃣ PROMPT: SEGUIR (Acompanhar Issue Existente)
+
+<!-- PROMPT:SEGUIR:INICIO -->
+
+#### Contexto
+Você é um assistente IA ajudando a acompanhar o progresso de uma issue já criada.
+
+#### Tarefa: Visualizar Status de Uma Issue
+
+**Comando:**
+```bash
+# Passo 1: Ver qual issue acompanhar
+ls prompts/relatorios/ISSUE-*.md
+
+# Passo 2: Ler o relatório
+cat prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md
+
+# Passo 3: Verificar status no CSV
+grep "ISSUE-005" docs/development/execution_queue.csv
+```
+
+**Para Codex/IA:**
+```markdown
+Usuário quer acompanhar ISSUE-[N]. Faça:
+
+1. **Leia** `prompts/relatorios/ISSUE-[N]-*.md`
+2. **Extraia** (em formato tabela):
+   - Objetivo
+   - Status atual
+   - O que já foi feito (✅)
+   - O que falta (⏳)
+   - Próximos passos
+
+3. **Valide** em `docs/development/execution_queue.csv`:
+   - Status oficial
+   - Responsável
+   - Data
+
+4. **Mostre** ao usuário (resumo executivo)
+```
+
+**Exemplo de Saída:**
+```
+✅ ISSUE-005 — Consolidação Total
+
+Status Oficial: Em Progresso (Parcial)
+Sprint: 1/3
+Responsável: Codex
+Data: 2026-02-16
+
+✅ O Que Já Está Pronto:
+├─ CONTRIBUTING.md
+├─ CHANGELOG.md
+├─ docs/development/release_process.md
+└─ ... (8 artefatos)
+
+⏳ Próximos Passos:
+├─ Sprint 2: Validação de docs em CI
+├─ Sprint 2: Normalizar testes
+└─ Sprint 3: Consolidar diagramas
+```
+
+<!-- PROMPT:SEGUIR:FIM -->
+
+---
+
+### 2️⃣ PROMPT: CRIAR (Criar Nova Issue + Relatório)
+
+<!-- PROMPT:CRIAR:INICIO -->
+
+#### Contexto
+Você é um assistente IA ajudando a criar uma **nova ISSUE** no PyFolds.
+
+#### Tarefa: Planejar Nova Issue
+
+**Informações que Você (Humano) Deve Fornecer:**
+```
+- Número da issue: ISSUE-[N]
+- Tema/Título: [descrição clara]
+- Objetivo: [por que fazer isso?]
+- Área: [docs/código/testes/etc]
+- Prioridade: [Alta/Média/Baixa]
+- Responsável: [nome ou "A definir"]
+- Data: [YYYY-MM-DD]
+```
+
+**Para Codex/IA:**
+
+Você recebe as informações acima e faz:
+```bash
+# 1. Criar linha no CSV
+docs/development/execution_queue.csv
+├─ Adicione: ISSUE-[N],"Tema completo","Planejada","A definir",[data],"prompts/relatorios/ISSUE-[N]-slug.md"
+
+# 2. Criar relatório
+prompts/relatorios/ISSUE-[N]-slug.md
+├─ Copie template_relatorio.md
+├─ Preencha:
+│  ├─ Cabeçalho (ID, Status, Área, Data)
+│  ├─ Objetivo (1-2 parágrafos)
+│  ├─ Escopo (o que inclui/exclui)
+│  ├─ Artefatos a alterar (lista)
+│  ├─ Próximos passos (roadmap)
+│  └─ PROMPT:EXECUTAR (copiar de baixo)
+
+# 3. Sincronizar
+python tools/sync_hub.py
+python tools/sync_hub.py --check
+
+# 4. Validar
+python tools/validate_docs_links.py
+
+# 5. Commit
+git add docs/development/execution_queue.csv prompts/relatorios/ISSUE-[N]-slug.md
+git commit -m "ISSUE-[N]: criar planejamento"
+```
 
 **Exemplo:**
-> Padronizar arquivos canônicos na raiz do repositório para melhorar onboarding e conformidade IEEE/ISO.
+```markdown
+# ISSUE-006 — Normalizar Estrutura de Testes
+
+> **Área:** Desenvolvimento/Testes  
+> **Status:** ⏳ Planejada  
+> **Data:** 2026-02-16  
+> **Responsável:** A definir
+
+## 🎯 Objetivo
+Decidir e normalizar: tests/performance/ ou tests/perf/?
+
+## 📋 Escopo
+- Decidir padrão
+- Documentar em docs/development/testing.md
+- Refatorar diretório
+- Testes verdes
+
+[... resto do relatório ...]
+```
+
+<!-- PROMPT:CRIAR:FIM -->
 
 ---
 
-## 📋 2. Escopo
+### 3️⃣ PROMPT: EXECUTAR (Rodar Issue Planejada)
 
-**O que está INCLUÍDO:**
-- ✅ Criar `CONTRIBUTING.md` na raiz
-- ✅ Criar `CHANGELOG.md` na raiz
-- ✅ Preencher `release_process.md`
+<!-- PROMPT:EXECUTAR:INICIO -->
 
-**O que NÃO está incluído:**
-- ❌ Refatorar estrutura de `/docs` (é ISSUE-001)
-- ❌ Criar novos ADRs (é demanda diferente)
+#### Contexto
+Você é um assistente IA ajudando a **executar uma ISSUE planejada** no PyFolds.
 
----
+#### Tarefa: Executar Issue Passo-a-Passo
 
-## ✅ 3. O Que Já Está Pronto
-
-### 3.1 Sprint 1 — Gaps Críticos (FECHADO)
-
-<div style="background-color: #d4edda; border-left: 4px solid #28a745; padding: 12px; border-radius: 4px;">
-
-**Arquivos Criados:**
-
-✅ **CONTRIBUTING.md** (raiz)
+**Informações que Você (Humano) Deve Fornecer:**
 ```
-- Guia canônico de contribuição
-- Ponte para docs/development/CONTRIBUTING.md
-- 20 linhas, conciso e direto
+- Número da issue: ISSUE-[N]
+- Qual relatório: prompts/relatorios/ISSUE-[N]-*.md
+- Contexto adicional: [se houver]
 ```
 
-✅ **CHANGELOG.md** (raiz)
-```
-- Keep a Changelog format
-- Semver versionado
-- Seção [Unreleased] + [2.0.0]
-```
-
-✅ **docs/development/DEVELOPMENT_HUB.md**
-```
-- Arquivo de compatibilidade
-- Links para HUB_CONTROLE.md
-```
-
-✅ **docs/development/release_process.md**
-```
-- 6 seções: Objetivo, Escopo, Fluxo, Checklist
-- Procedimento auditável
-```
-
-✅ **src/pyfolds/serialization/foldio.py**
-```
-- ADR-001/002/003 referenciadas no docstring
-- Rastreabilidade melhorada
-```
-
-✅ **pyproject.toml**
-```
-- Novo extra: [project.optional-dependencies] examples
-- torchvision>=0.15.0 declarado
-```
-
-✅ **docs/ARCHITECTURE.md**
-```
-- Referência de diagrama atualizada
-- docs/diagrams/ → docs/architecture/blueprints/
-```
-
-✅ **CI/CD**
-```
-- .github/workflows/validate-docs.yml criado
-- tools/validate_docs_links.py implementado
-```
-
-✅ **Sincronização**
-```
-- execution_queue.csv atualizado
-- HUB_CONTROLE.md regenerado
-- Links validados
-```
-
-</div>
-
----
-
-### 3.2 Sprint 2 — (EM PLANEJAMENTO)
-
-<div style="background-color: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px; border-radius: 4px;">
-
-⏳ Validação de docs em CI (melhorar)  
-⏳ Normalizar `tests/performance/` vs `tests/perf/`  
-⏳ Documentar decisão em `docs/development/testing.md`
-
-</div>
-
----
-
-### 3.3 Sprint 3 — (EM PLANEJAMENTO)
-
-<div style="background-color: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px; border-radius: 4px;">
-
-⏳ Consolidar diagramas em `docs/diagrams/` ou alias  
-⏳ Atualizar índices finais (`docs/index.md`, etc)
-
-</div>
-
----
-
-## ⏳ 4. Próximos Passos
-
-### Para Sprint 2:
-- [ ] Expandir validação de docs em GitHub Actions
-- [ ] Decidir: `tests/performance/` ou `tests/perf/`?
-- [ ] Documentar em `docs/development/testing.md`
-- [ ] Atualizar `pyproject.toml` (se necessário)
-
-### Para Sprint 3:
-- [ ] Revisar estrutura de diagramas
-- [ ] Criar alias se necessário (`docs/diagrams/` → `docs/architecture/blueprints/`)
-- [ ] Atualizar `docs/index.md`
-- [ ] Publicar v0.1.0
-
----
-
-## 📝 5. PROMPT PARA EXECUTAR
-
-<!-- PROMPT:INICIO -->
-
-### Contexto
-[Seu contexto aqui]
-
-### Instruções Para Codex
-
-Você é um assistente IA ajudando a executar ISSUE-[N].
-
-**Tarefa:** [Descrever o que fazer]
-
-**Arquivos a Alterar:**
-1. `arquivo1.md` — [o que fazer]
-2. `arquivo2.py` — [o que fazer]
-3. `docs/development/execution_queue.csv` — [o que fazer]
-
-**Validações Após Execução:**
+**Para Codex/IA:**
 ```bash
+# 1. Ler o relatório
+cat prompts/relatorios/ISSUE-[N]-*.md
+
+# 2. Encontre a seção "PROMPT:EXECUTAR"
+# (está no próprio relatório, entre comentários HTML)
+
+# 3. Extraia e siga as instruções ali
+
+# 4. Estrutura típica:
+├─ Ler objetivo + escopo
+├─ Identificar artefatos a alterar
+├─ Executar mudanças
+├─ Validar (testes, links, sintaxe)
+├─ Atualizar CSV (status: "Em progresso" → "Concluída")
+├─ Sincronizar HUB
+└─ Commit final
+
+# 5. Exemplo de execução:
 python tools/sync_hub.py --check
 python tools/validate_docs_links.py
+pytest tests/ -v
 git status
+git add [arquivos alterados]
+git commit -m "ISSUE-[N]: [descrição do que foi feito]"
 ```
 
-**Commit Final:**
-```bash
-git add [arquivos]
-git commit -m "ISSUE-[N]: [descrição]"
+**Fluxo Esperado:**
+```
+ISSUE-[N] (Planejada)
+    ↓ (Humano copia PROMPT:EXECUTAR)
+Codex executa
+    ↓ (Humano revisa)
+Feedback humano
+    ↓ (Se OK)
+Commit + Merge
+    ↓ (Automation)
+CSV atualizado → "Concluída"
+HUB sincronizado automaticamente ✅
 ```
 
-<!-- PROMPT:FIM -->
+<!-- PROMPT:EXECUTAR:FIM -->
 
 ---
 
-## 🔗 6. Referências
+## 📊 Fluxo Completo (Visual)
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     CICLO DE UMA ISSUE                       │
+└─────────────────────────────────────────────────────────────┘
 
-| Tipo | Referência |
-|------|-----------|
-| **ADR** | [ADR-031](../docs/governance/adr/ADR-031-*.md) — Governança operacional |
-| **Related ISSUE** | [ISSUE-003](./ISSUE-003-auditoria-completa.md) — Auditoria |
-| **Documentation** | [HUB_CONTROLE.md](../docs/development/HUB_CONTROLE.md) |
-| **CSV** | [execution_queue.csv](../docs/development/execution_queue.csv) |
+1️⃣ CRIAR (Humano + Codex)
+   ├─ Humano fornece: número, tema, objetivo, área
+   ├─ Codex cria: CSV + relatório + sincroniza
+   └─ Resultado: ISSUE-[N] em "Planejada"
+
+2️⃣ REVISAR (Humano)
+   ├─ Humano lê: prompts/relatorios/ISSUE-[N]-*.md
+   ├─ Humano aprova: objetivo, escopo, artefatos
+   └─ Resultado: Issue aprovada (pronta para executar)
+
+3️⃣ EXECUTAR (Codex)
+   ├─ Humano copia: PROMPT:EXECUTAR do relatório
+   ├─ Codex executa: mudanças, testes, validações
+   ├─ Codex relata: o que foi feito, evidências
+   └─ Resultado: Artefatos alterados + validados
+
+4️⃣ AVALIAR (Humano)
+   ├─ Humano verifica: testes verdes, links OK, sintaxe OK
+   ├─ Humano aprova ou pede ajustes
+   └─ Resultado: ✅ Pronto para merge ou ❌ Voltar para step 3
+
+5️⃣ FINALIZAR (Automação)
+   ├─ Humano aprova merge
+   ├─ Automation: sincroniza HUB (CSV → atualiza status)
+   └─ Resultado: ISSUE-[N] em "Concluída"
+```
 
 ---
 
-## 📌 7. Critérios de Aceite
+## 🎯 Padrão de Nomes de Relatórios
+```
+ISSUE-[N]-[slug].md
 
-- [x] Objetivo alcançado
-- [x] Arquivos criados/atualizados
-- [x] Links validados
-- [x] Sincronização OK
-- [x] Sem erros de sintaxe
-- [x] Commit realizado
-
----
-
-## 📝 Histórico
-
-| Data | Ação | Status |
-|------|------|--------|
-| 2026-02-16 | Sprint 1 iniciado | ✅ Concluído |
-| 2026-02-16 | Commit 2851338 | ✅ Mergeado |
-| TBD | Sprint 2 início | ⏳ Planejado |
-| TBD | Sprint 3 início | ⏳ Planejado |
+Exemplos:
+├─ ISSUE-001-reestruturacao-docs.md
+├─ ISSUE-005-plano-acao-consolidacao.md
+├─ ISSUE-006-normalizar-testes.md
+└─ ISSUE-007-refactor-hub-visual.md
+```
 
 ---
 
-**Mantido por:** Codex | **Última atualização:** 2026-02-16
+## 🔗 Links Importantes
+
+- **Fila Principal:** [`docs/development/HUB_CONTROLE.md`](../docs/development/HUB_CONTROLE.md)
+- **CSV de Execução:** [`docs/development/execution_queue.csv`](../docs/development/execution_queue.csv)
+- **Template:** [`template_relatorio.md`](./template_relatorio.md)
+
+---
+
+## ✅ Checklist Pós-Criação/Execução
+
+- [ ] Relatório criado/atualizado
+- [ ] CSV sincronizado
+- [ ] HUB regenerado
+- [ ] Links validados
+- [ ] Sem erros de sintaxe
+- [ ] Commit realizado
+
+---
+
+**Última atualização:** 2026-02-16  
+**Mantido por:** Codex (PyFolds Team)
+```
+
+---
+
+## 🎯 **Feedback Externo (Meu Parecer como IA)**
+
+### ✅ O Que Está Ótimo
+```
+🟢 ESTRUTURA CLARA
+   └─ 3 prompts separados (Seguir, Criar, Executar)
+   └─ Cada um com contexto + tarefa + exemplo
+
+🟢 FLUXO INTUITIVO
+   └─ Humano → Codex → Humano → Merge
+   └─ Feedback loop bem definido
+
+🟢 ESCALÁVEL
+   └─ Funciona para ISSUE-006, 007, 008... sem mudanças
+   └─ Template reutilizável
+
+🟢 RASTREABILIDADE
+   └─ Cada ISSUE tem relatório próprio
+   └─ CSV é fonte de verdade
+   └─ HUB sincroniza automaticamente
+```
+
+---
+
+### ⚠️ Sugestões de Melhoria
+```
+🟡 ADICIONAR: Versionamento de Relatórios
+   └─ Quando executar, criar: ISSUE-005-v1.0.md, v1.1.md, etc
+
+🟡 ADICIONAR: Templates de Feedback
+   └─ Quando humano avalia, deixar espaço para: ✅/❌/🔴
+
+🟡 ADICIONAR: Checklist de Validação
+   └─ Pré-execução: verificar dependências
+   └─ Pós-execução: verificar critérios de aceite
+
+🟡 CONSIDERAR: Integração com GitHub Issues
+   └─ Adicionar link para PR/Issue oficial do GitHub
+```
+
+---
+
+### 💡 **Minha Recomendação**
+```
+PRÓXIMO PASSO IDEAL:
+
+1️⃣ Usar este novo README.md (com 3 prompts) ✅
+2️⃣ Criar ISSUE-006 usando PROMPT:CRIAR
+3️⃣ Executar ISSUE-005 Sprint 1 usando PROMPT:EXECUTAR
+4️⃣ Você avalia e aprova
+5️⃣ Codex faz ajustes se necessário
+6️⃣ Merge + Automation atualiza CSV
+
+GANHOS:
+├─ Workflow claro e repetível
+├─ Rastreabilidade 100%
+├─ Fácil de ensinar a novos contribuidores
+└─ Escalável para múltiplas issues simultâneas
 
