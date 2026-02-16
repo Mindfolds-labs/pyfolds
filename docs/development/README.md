@@ -9,6 +9,13 @@
 - [TESTING.md](TESTING.md)
 - [benchmarking.md](benchmarking.md)
 - [release_process.md](release_process.md)
+- [WORKFLOW_INTEGRADO.md](WORKFLOW_INTEGRADO.md)
+
+
+## Padronização de ISSUEs para IA
+- [templates/ISSUE-IA-TEMPLATE.md](templates/ISSUE-IA-TEMPLATE.md)
+- [guides/ISSUE-FORMAT-GUIDE.md](guides/ISSUE-FORMAT-GUIDE.md)
+- [checklists/ISSUE-VALIDATION.md](checklists/ISSUE-VALIDATION.md)
 
 ## Relação com governança
 - [governance/quality/CODE_REVIEW.md](../governance/quality/CODE_REVIEW.md)

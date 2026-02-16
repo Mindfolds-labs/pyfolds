@@ -39,6 +39,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-005 | Em progresso | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Codex | 2026-02-16 |
 | ISSUE-007 | Em progresso | Consolidação final do workflow e normalização total de prompts | Codex | 2026-02-16 |
 | ISSUE-008 | Planejada | Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar | Neto | 2026-02-16 |
+| ISSUE-009 | Em progresso | Padronização de formatos de ISSUEs para interação com IA | Codex | 2026-02-16 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
