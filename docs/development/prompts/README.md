@@ -18,6 +18,11 @@ Guia curto para usar o ciclo de issues com aprovação humana no PR.
 - `relatorios/` → plano completo da issue + prompts
 - `logs/` → evidência de execução
 
+Padronização de formato (ISSUE-009):
+- `../templates/ISSUE-IA-TEMPLATE.md`
+- `../guides/ISSUE-FORMAT-GUIDE.md`
+- `../checklists/ISSUE-VALIDATION.md`
+
 ---
 
 ## 🧩 Prompt curto — CRIAR + ANALISAR
@@ -37,6 +42,8 @@ Depois:
 1) registrar no docs/development/execution_queue.csv
 2) rodar python tools/sync_hub.py
 3) rodar python tools/sync_hub.py --check
+4) rodar python tools/validate_issue_format.py docs/development/prompts/relatorios/ISSUE-*.md
+5) rodar python tools/check_issue_links.py docs/development/prompts/relatorios
 ```
 
 ---

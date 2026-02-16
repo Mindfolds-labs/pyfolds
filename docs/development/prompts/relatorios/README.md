@@ -8,11 +8,18 @@ Cada relatório (`ISSUE-XXX-slug.md`) é a fonte única para execução da issue
 - Objetivo
 - Escopo (inclui/exclui)
 - Artefatos afetados
+- Riscos
 - Critérios de aceite
 - `PROMPT:EXECUTAR`
 
+Padrão canônico oficial:
+- [`../../templates/ISSUE-IA-TEMPLATE.md`](../../templates/ISSUE-IA-TEMPLATE.md)
+- [`../../guides/ISSUE-FORMAT-GUIDE.md`](../../guides/ISSUE-FORMAT-GUIDE.md)
+- [`../../checklists/ISSUE-VALIDATION.md`](../../checklists/ISSUE-VALIDATION.md)
+
 Template base:
 - [`ISSUE-000-template.md`](./ISSUE-000-template.md)
+- [`ISSUE-009-padronizacao-formatos-ia.md`](./ISSUE-009-padronizacao-formatos-ia.md)
 
 ---
 
@@ -47,6 +54,14 @@ Você é o Codex atuando como Executor Técnico.
 
 ## 📌 Convenção de nome
 - `ISSUE-XXX-slug.md`
+
+Validação recomendada:
+
+```bash
+python tools/validate_issue_format.py docs/development/prompts/relatorios/ISSUE-*.md
+python tools/check_issue_links.py docs/development/prompts/relatorios
+python tools/sync_hub.py --check
+```
 
 Exemplos:
 - `ISSUE-003-auditoria-completa.md`

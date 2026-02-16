@@ -1,0 +1,66 @@
+name: Validate ISSUE Format
+
+on:
+  pull_request:
+    paths:
+      - 'docs/development/prompts/relatorios/ISSUE-*.md'
+      - 'docs/development/templates/ISSUE-IA-TEMPLATE.md'
+      - 'docs/development/checklists/ISSUE-VALIDATION.md'
+      - 'docs/development/guides/ISSUE-FORMAT-GUIDE.md'
+      - 'tools/validate_issue_format.py'
+      - 'tools/check_issue_links.py'
+  push:
+    paths:
+      - 'docs/development/prompts/relatorios/ISSUE-*.md'
+      - 'tools/validate_issue_format.py'
+      - 'tools/check_issue_links.py'
+
+jobs:
+  validate-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Resolve changed ISSUE files
+        id: changed
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE_REF="origin/${{ github.base_ref }}"
+            git fetch origin "${{ github.base_ref }}" --depth=1
+            DIFF_FILES=$(git diff --name-only "$BASE_REF...HEAD" -- 'docs/development/prompts/relatorios/ISSUE-*.md' || true)
+          else
+            DIFF_FILES=$(git diff --name-only HEAD~1..HEAD -- 'docs/development/prompts/relatorios/ISSUE-*.md' || true)
+          fi
+
+          if [[ -z "$DIFF_FILES" ]]; then
+            echo "files=" >> "$GITHUB_OUTPUT"
+            echo "No changed ISSUE files detected"
+          else
+            echo "files<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$DIFF_FILES" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+            echo "Changed ISSUE files:"
+            echo "$DIFF_FILES"
+          fi
+
+      - name: Validate changed ISSUE files format
+        if: steps.changed.outputs.files != ''
+        shell: bash
+        run: |
+          while IFS= read -r file; do
+            [[ -z "$file" ]] && continue
+            python tools/validate_issue_format.py "$file"
+          done <<< "${{ steps.changed.outputs.files }}"
+
+      - name: Validate ISSUE references
+        run: python tools/check_issue_links.py docs/development/prompts/relatorios
+
+      - name: Verify hub sync consistency
+        run: python tools/sync_hub.py --check
