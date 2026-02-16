@@ -49,6 +49,17 @@ pip install -e .[dev]
 - 🤝 Contribuição: `CONTRIBUTING.md`
 - 📝 Histórico de versões: `CHANGELOG.md`
 
+## Documentos de acompanhamento (caminho canônico)
+
+Para evitar divergência entre plano e código, os documentos abaixo ficam versionados na raiz do repositório:
+
+- [`SUMARIO_COMPLETO.md`](SUMARIO_COMPLETO.md)
+- [`analise_bugs.md`](analise_bugs.md)
+- [`revisao_fold_mind.md`](revisao_fold_mind.md)
+- [`tarefas_pendentes.md`](tarefas_pendentes.md)
+- [`solucoes_fold_mind.py`](solucoes_fold_mind.py)
+- [`VISUAL_FINAL.txt`](VISUAL_FINAL.txt)
+
 ## Exemplo rápido
 
 ```python
