@@ -1,0 +1,20 @@
+{
+  "benchmark_version": 1,
+  "config": {
+    "codecs": [
+      "none"
+    ],
+    "iterations": 5,
+    "payload_size_mb": 16
+  },
+  "results": [
+    {
+      "codec": "none",
+      "compress_ratio": 0.999963,
+      "file_size_bytes": 16777841,
+      "payload_size_bytes": 16777216,
+      "read_speed_mb_s": 245.8661,
+      "write_speed_mb_s": 156.1964
+    }
+  ]
+}
