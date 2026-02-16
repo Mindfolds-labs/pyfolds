@@ -428,13 +428,13 @@ class MPJRDNeuron(BaseNeuron):
 
         x_mean = stats.x_mean
         gated_mean = stats.gated_mean
-        post_rate = stats.post_rate
+        post_rate_float = float(stats.post_rate)
 
         cfg = self.cfg
         device = self.theta.device
 
-        post_rate = max(0.0, min(1.0, post_rate))
-        post_rate_t = torch.tensor([post_rate], device=device)
+        post_rate_float = max(0.0, min(1.0, post_rate_float))
+        post_rate_t = torch.tensor([post_rate_float], device=device)
 
         saturation_ratio = (self.N == cfg.n_max).float().mean().item()
 
@@ -442,7 +442,7 @@ class MPJRDNeuron(BaseNeuron):
             R = float(reward) if reward is not None else 0.0
             R = max(-1.0, min(1.0, R))
         else:
-            R = self._compute_R_endogenous(post_rate, saturation_ratio)
+            R = self._compute_R_endogenous(post_rate_float, saturation_ratio)
         R_t = torch.tensor([R], device=device)
 
         # Atualiza cada dendrito
@@ -462,7 +462,7 @@ class MPJRDNeuron(BaseNeuron):
             )
 
         self.stats_acc.reset()
-        self.logger.debug(f"✅ Plasticidade aplicada, R={R:.3f}, post_rate={post_rate:.3f}")
+        self.logger.debug(f"✅ Plasticidade aplicada, R={R:.3f}, post_rate={post_rate_float:.3f}")
 
         if self.telemetry is not None and self.telemetry.enabled():
             sid = int(self.step_id.item())
@@ -470,7 +470,7 @@ class MPJRDNeuron(BaseNeuron):
                 step_id=sid,
                 mode=self.mode.value,
                 committed=True,
-                post_rate=post_rate,
+                post_rate=post_rate_float,
                 R=R,
             ))
 

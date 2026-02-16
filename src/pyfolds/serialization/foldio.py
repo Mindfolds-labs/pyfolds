@@ -166,9 +166,12 @@ def _history_snapshot(neuron: Any) -> Optional[Dict[str, List[float]]]:
 def _build_nuclear_npz(neuron: Any) -> bytes:
     payload: Dict[str, np.ndarray] = {}
     for key in ("N", "I", "W", "protection"):
-        tensor = getattr(neuron, key, None)
-        if tensor is not None and hasattr(tensor, "detach"):
-            payload[key] = tensor.detach().cpu().numpy()
+        try:
+            tensor = getattr(neuron, key, None)
+            if tensor is not None and hasattr(tensor, "detach"):
+                payload[key] = tensor.detach().cpu().numpy()
+        except Exception as exc:
+            warnings.warn(f"Falha ao serializar tensor '{key}': {exc}", RuntimeWarning)
 
     for key in ("theta", "r_hat"):
         tensor = getattr(neuron, key, None)

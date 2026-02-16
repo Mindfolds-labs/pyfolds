@@ -352,9 +352,14 @@ class InhibitionMixin:
         Returns:
             Dict com spikes após inibição
         """
+        if not hasattr(self, 'inhibition'):
+            raise RuntimeError(
+                "Inibição não foi inicializada. Chame _init_inhibition() antes de forward()."
+            )
+
         # Forward excitatório normal
         exc_output = super().forward(x, **kwargs)
-        
+
         # Processa inibitórios
         inh_output = self.inhibition(exc_output['spikes'])
         
