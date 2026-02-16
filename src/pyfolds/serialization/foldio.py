@@ -300,9 +300,33 @@ class FoldWriter:
             "metadata": metadata,
             "chunks": self._chunks,
         }
-        index_bytes = _json_bytes(index)
 
-        phase = "capturar index_off"
+        def _raise_finalize_error(stage: str, exc: Exception) -> None:
+            raise RuntimeError(
+                f"Falha na etapa '{stage}' ao persistir arquivo '{self.path}'."
+            ) from exc
+
+        try:
+            index_bytes = _json_bytes(index)
+            index_off = self._f.tell()
+        except Exception as exc:
+            _raise_finalize_error("index", exc)
+
+        try:
+            self._f.write(index_bytes)
+        except Exception as exc:
+            _raise_finalize_error("index", exc)
+
+        try:
+            self._f.flush()
+        except Exception as exc:
+            _raise_finalize_error("flush", exc)
+
+        try:
+            os.fsync(self._f.fileno())
+        except Exception as exc:
+            _raise_finalize_error("fsync", exc)
+
         try:
             index_off = self._f.tell()
 
@@ -315,18 +339,24 @@ class FoldWriter:
 
             phase = "reposicionar para header"
             self._f.seek(0)
+        except Exception as exc:
+            _raise_finalize_error("seek", exc)
 
-            phase = "reescrever header"
+        try:
             header_len = struct.calcsize(HEADER_FMT)
             self._f.write(struct.pack(HEADER_FMT, MAGIC, header_len, index_off, len(index_bytes)))
+        except Exception as exc:
+            _raise_finalize_error("header", exc)
 
-            phase = "persistir header"
+        try:
             self._f.flush()
+        except Exception as exc:
+            _raise_finalize_error("flush", exc)
+
+        try:
             os.fsync(self._f.fileno())
         except Exception as exc:
-            raise RuntimeError(
-                f"Falha ao finalizar arquivo fold na fase '{phase}' para '{self.path}': {exc}"
-            ) from exc
+            _raise_finalize_error("fsync", exc)
 
 
 class FoldReader:
