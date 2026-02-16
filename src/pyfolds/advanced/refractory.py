@@ -65,13 +65,13 @@ class RefractoryMixin(TimedMixin):
         # Refratário absoluto: bloqueia spikes imediatamente após disparo
         in_absolute = time_since <= self.t_refrac_abs
 
-        # Refratário relativo: também bloqueia spikes, mas com boost de threshold
+        # Refratário relativo: não bloqueia diretamente; aumenta threshold
         in_relative = (
             (time_since > self.t_refrac_abs) &
             (time_since <= self.t_refrac_rel)
         )
 
-        blocked = in_absolute | in_relative
+        blocked = in_absolute
 
         # Boost no threshold durante refratário relativo
         theta_boost = torch.where(
@@ -133,7 +133,7 @@ class RefractoryMixin(TimedMixin):
         theta_eff = output['theta'] + theta_boost
         spikes_rel = (output['u'] >= theta_eff).float()
         
-        # Bloqueia spikes durante refratário (absoluto + relativo)
+        # Bloqueia spikes apenas no refratário absoluto
         final_spikes = torch.where(blocked, torch.zeros_like(spikes_rel), spikes_rel)
         
         # Atualiza output

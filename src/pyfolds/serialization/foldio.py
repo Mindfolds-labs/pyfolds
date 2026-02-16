@@ -62,11 +62,22 @@ def crc32c_u32(data: bytes) -> int:
             pass
 
     warnings.warn(
-        "google-crc32c não instalado/disponível. Fallback para CRC32 (não CRC32C).",
+        "google-crc32c não instalado/disponível. Fallback para CRC32C em Python puro.",
         RuntimeWarning,
         stacklevel=2,
     )
-    return zlib.crc32(data) & 0xFFFFFFFF
+
+    # Fallback de CRC32C (Castagnoli) sem dependências externas.
+    # Implementação por bit refletido com polinômio reverso 0x82F63B78.
+    crc = 0xFFFFFFFF
+    for b in data:
+        crc ^= b
+        for _ in range(8):
+            if crc & 1:
+                crc = (crc >> 1) ^ 0x82F63B78
+            else:
+                crc >>= 1
+    return (~crc) & 0xFFFFFFFF
 
 
 def sha256_hex(data: bytes) -> str:
