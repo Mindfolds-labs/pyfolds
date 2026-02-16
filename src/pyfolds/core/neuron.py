@@ -17,22 +17,22 @@ Características:
 
 import torch
 import torch.nn as nn
-from typing import Optional, Dict, Any, Callable
+from typing import Optional, Dict, Any
 from .config import MPJRDConfig
 from .base import BaseNeuron
 from .dendrite import MPJRDDendrite
 from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
-from .accumulator import StatisticsAccumulator, AccumulatedStats
+from .accumulator import StatisticsAccumulator
 from ..utils.types import LearningMode
-from ..utils.validation import validate_input, validate_device_consistency
+from ..utils.validation import validate_input
 
 # ✅ LOGGING
 from ..utils.logging import get_logger
 
 # Telemetria (import opcional)
 try:
-    from ..telemetry import TelemetryController, TelemetryConfig, forward_event, commit_event, sleep_event
+    from ..telemetry import forward_event, commit_event, sleep_event
     TELEMETRY_AVAILABLE = True
 except ImportError:
     TELEMETRY_AVAILABLE = False
@@ -152,7 +152,7 @@ class MPJRDNeuron(BaseNeuron):
         return torch.stack([d.N for d in self.dendrites])
 
     @property
-    def I(self) -> torch.Tensor:
+    def I(self) -> torch.Tensor:  # noqa: E743
         """Potenciais internos [dendrites, synapses]."""
         return torch.stack([d.I for d in self.dendrites])
 
@@ -427,7 +427,6 @@ class MPJRDNeuron(BaseNeuron):
         )
 
         x_mean = stats.x_mean
-        gated_mean = stats.gated_mean
         post_rate_float = float(stats.post_rate)
 
         cfg = self.cfg
@@ -486,7 +485,7 @@ class MPJRDNeuron(BaseNeuron):
             self.logger.debug(f"   Dendrito {i}: consolidando...")
             dend.consolidate(dt=duration)
         
-        self.logger.info(f"✅ Sono concluído")
+        self.logger.info("✅ Sono concluído")
 
         if self.telemetry is not None and self.telemetry.enabled():
             sid = int(self.step_id.item())

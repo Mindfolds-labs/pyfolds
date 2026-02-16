@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 import warnings
 import math
-from typing import Literal, Dict, Optional, Tuple
+from typing import Literal, Dict, Optional
 
 # Literals para modos configuráveis
 NeuromodMode = Literal["external", "capacity", "surprise"]

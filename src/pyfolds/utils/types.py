@@ -1,7 +1,7 @@
 """Tipos de configuração para PyFolds - VERSÃO COMPLETA."""
 
 from dataclasses import dataclass
-from typing import NamedTuple, Dict, Optional
+from typing import NamedTuple, Dict
 from enum import Enum
 import torch
 from torch import Tensor

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Dict, Type
 import warnings
 
 from .config import MPJRDConfig
