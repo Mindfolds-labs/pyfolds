@@ -43,6 +43,8 @@ pip install -e .[dev]
 - 📚 Índice geral: `docs/README.md`
 - 🧪 Lógica científica: `docs/SCIENTIFIC_LOGIC.md`
 - 🏗️ Arquitetura (C4 + sequência): `docs/ARCHITECTURE.md`
+- 🧱 Especificação binária FOLD: `docs/FOLD_SPECIFICATION.md`
+- 🗂️ ADRs de serialização/qualidade: `docs/adr/INDEX.md`
 - 🔌 Referência de API: `docs/API_REFERENCE.md`
 - 🧭 Guia MNIST: `docs/guides/mnist_example.md`
 - 🌊 Tutorial Wave v3.0: `docs/guides/wave_tutorial.md`

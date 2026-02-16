@@ -17,7 +17,7 @@ from pyfolds.serialization import (
     read_nuclear_arrays,
     save_fold_or_mind,
 )
-from pyfolds.serialization.foldio import HEADER_FMT, MAGIC, crc32c_u32
+from pyfolds.serialization.foldio import HEADER_FMT, MAGIC, MAX_CHUNK_SIZE, FoldWriter, crc32c_u32
 
 
 try:
@@ -288,3 +288,47 @@ def test_fold_reader_exit_closes_file_even_if_mmap_close_fails(tmp_path):
 
     assert reader._f is None
     assert reader._mm is None
+
+
+def test_fold_writer_rejects_oversized_chunk(tmp_path):
+    file_path = tmp_path / "too-big.fold"
+    with FoldWriter(str(file_path), compress="none") as writer:
+        with pytest.raises(ValueError, match="muito grande"):
+            writer.add_chunk("big", "JSON", b"x" * (MAX_CHUNK_SIZE + 1))
+
+
+def test_fold_reader_rejects_invalid_chunk_lengths(tmp_path):
+    file_path = tmp_path / "bad-chunk-len.fold"
+    neuron = _build_neuron()
+    save_fold_or_mind(
+        neuron,
+        str(file_path),
+        include_history=False,
+        include_telemetry=False,
+        include_nuclear_arrays=False,
+        compress="none",
+    )
+
+    with FoldReader(str(file_path), use_mmap=False) as reader:
+        chunk = next(c for c in reader.index["chunks"] if c["name"] == "torch_state")
+        offset = chunk["offset"]
+
+    with open(file_path, "r+b") as f:
+        f.seek(offset)
+        header = f.read(struct.calcsize(">4sIQQII"))
+        ctype, flags, uncomp_len, comp_len, crc, ecc_len = struct.unpack(">4sIQQII", header)
+        bad_header = struct.pack(
+            ">4sIQQII",
+            ctype,
+            flags,
+            uncomp_len,
+            MAX_CHUNK_SIZE + 1,
+            crc,
+            ecc_len,
+        )
+        f.seek(offset)
+        f.write(bad_header)
+
+    with FoldReader(str(file_path), use_mmap=False) as reader:
+        with pytest.raises(ValueError, match="tamanho comprimido inválido"):
+            reader.read_chunk_bytes("torch_state", verify=False)
