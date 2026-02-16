@@ -70,3 +70,21 @@ class TestInhibitionLayer:
         layer_b = InhibitionLayer(n_excitatory=10, n_inhibitory=3)
 
         assert torch.allclose(layer_a.W_E2I, layer_b.W_E2I)
+
+
+class TestInhibitionMixin:
+    """Tests for InhibitionMixin guard clauses."""
+
+    def test_forward_requires_initialized_inhibition(self):
+        """Forward should fail fast when inhibition layer is missing."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        from pyfolds.advanced.inhibition import InhibitionMixin
+
+        class DummyLayer(InhibitionMixin):
+            pass
+
+        layer = DummyLayer()
+        with pytest.raises(RuntimeError, match="Inibição não foi inicializada"):
+            layer.forward(torch.zeros(1, 2, 3))

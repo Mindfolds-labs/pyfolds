@@ -24,6 +24,7 @@ from .inhibition import InhibitionLayer, InhibitionMixin
 from ..core.neuron import MPJRDNeuron as MPJRDNeuronBase
 from ..wave import MPJRDWaveNeuron as MPJRDWaveNeuronBase
 from ..layers.layer import MPJRDLayer
+from ..utils.logging import get_logger
 
 __all__ = [
     "RefractoryMixin",
@@ -65,14 +66,36 @@ class MPJRDNeuronAdvanced(
     
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
+        self._init_advanced_mixins(cfg, is_wave=False)
 
+    def _init_advanced_mixins(self, cfg, is_wave: bool = False) -> None:
+        """Inicializa mixins avançados com validações e logging de diagnóstico."""
+        logger = getattr(self, "logger", get_logger(f"pyfolds.advanced.{id(self)}"))
+        model_kind = "wave" if is_wave else "standard"
+
+        required_attrs = {
+            "t_refrac_abs", "t_refrac_rel", "refrac_rel_strength",
+            "tau_pre", "tau_post", "A_plus", "A_minus", "plasticity_mode",
+            "u0", "R0", "U", "tau_fac", "tau_rec",
+        }
+        missing = sorted(attr for attr in required_attrs if not hasattr(cfg, attr))
+        if missing:
+            raise RuntimeError(
+                f"Configuração incompleta para mixins avançados ({model_kind}): "
+                f"faltando atributos: {', '.join(missing)}"
+            )
+
+        logger.debug("🔧 Inicializando mixins avançados (%s)", model_kind)
         try:
+            logger.debug("   • RefractoryMixin")
             RefractoryMixin._init_refractory(
                 self,
                 t_refrac_abs=cfg.t_refrac_abs,
                 t_refrac_rel=cfg.t_refrac_rel,
                 refrac_rel_strength=cfg.refrac_rel_strength,
             )
+
+            logger.debug("   • STDPMixin")
             STDPMixin._init_stdp(
                 self,
                 tau_pre=cfg.tau_pre,
@@ -81,7 +104,11 @@ class MPJRDNeuronAdvanced(
                 A_minus=cfg.A_minus,
                 plasticity_mode=cfg.plasticity_mode,
             )
+
+            logger.debug("   • AdaptationMixin")
             AdaptationMixin._init_adaptation(self, cfg)
+
+            logger.debug("   • ShortTermDynamicsMixin")
             ShortTermDynamicsMixin._init_short_term(
                 self,
                 u0=cfg.u0,
@@ -90,8 +117,12 @@ class MPJRDNeuronAdvanced(
                 tau_fac=cfg.tau_fac,
                 tau_rec=cfg.tau_rec,
             )
+
+            logger.debug("   • BackpropMixin")
             BackpropMixin._init_backprop(self, cfg)
+            logger.info("✅ Mixins avançados inicializados (%s)", model_kind)
         except AttributeError as exc:
+            logger.exception("❌ Falha na inicialização dos mixins avançados (%s)", model_kind)
             raise RuntimeError(f"Falha na inicialização dos mixins avançados: {exc}") from exc
     
     def get_all_advanced_metrics(self) -> dict:
@@ -144,34 +175,7 @@ class MPJRDWaveNeuronAdvanced(
 
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
-
-        try:
-            RefractoryMixin._init_refractory(
-                self,
-                t_refrac_abs=cfg.t_refrac_abs,
-                t_refrac_rel=cfg.t_refrac_rel,
-                refrac_rel_strength=cfg.refrac_rel_strength,
-            )
-            STDPMixin._init_stdp(
-                self,
-                tau_pre=cfg.tau_pre,
-                tau_post=cfg.tau_post,
-                A_plus=cfg.A_plus,
-                A_minus=cfg.A_minus,
-                plasticity_mode=cfg.plasticity_mode,
-            )
-            AdaptationMixin._init_adaptation(self, cfg)
-            ShortTermDynamicsMixin._init_short_term(
-                self,
-                u0=cfg.u0,
-                R0=cfg.R0,
-                U=cfg.U,
-                tau_fac=cfg.tau_fac,
-                tau_rec=cfg.tau_rec,
-            )
-            BackpropMixin._init_backprop(self, cfg)
-        except AttributeError as exc:
-            raise RuntimeError(f"Falha na inicialização dos mixins avançados (wave): {exc}") from exc
+        MPJRDNeuronAdvanced._init_advanced_mixins(self, cfg, is_wave=True)
 
 
 class MPJRDLayerAdvanced(MPJRDLayer):

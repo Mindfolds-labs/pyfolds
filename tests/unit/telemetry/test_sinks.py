@@ -163,6 +163,23 @@ class TestJSONLinesSink:
         # 2D tensor becomes list of lists
         assert data['payload']['matrix_tensor'] == [[1.0, 1.0], [1.0, 1.0]]
     
+
+    def test_depth_limit_serialization(self, tmp_path):
+        """Nested payloads beyond max depth should fallback to string."""
+        path = tmp_path / "depth.jsonl"
+
+        class Terminal:
+            def __str__(self):
+                return "terminal"
+
+        nested = [[[[Terminal()]]]]
+
+        with pyfolds.JSONLinesSink(path, truncate=True) as sink:
+            serializable = sink._make_serializable(nested, _max_depth=2)
+
+        # Depois da profundidade máxima o valor é convertido para string.
+        assert isinstance(serializable[0][0][0], str)
+
     def test_non_serializable_fallback(self, tmp_path):
         """Test fallback for non-serializable objects."""
         path = tmp_path / "test.jsonl"

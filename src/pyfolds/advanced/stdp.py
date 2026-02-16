@@ -12,6 +12,8 @@ class STDPMixin:
     
     ✅ VETORIZADO: sem loops Python
     ✅ SEMÂNTICA: POR AMOSTRA (batch independente)
+    ℹ️ NOTA: O spike pós-sináptico é broadcast para todos os dendritos
+       da amostra; não há seleção de dendrito pós-sináptico específica.
     
     Implementa plasticidade baseada em temporização de spikes:
         - LTP: spike pré antes do pós
@@ -90,7 +92,8 @@ class STDPMixin:
         # Adiciona aos traços pré
         self.trace_pre.add_(pre_spikes)
         
-        # Spike pós (broadcast para [B, 1, 1])
+        # Spike pós é global por amostra e broadcast para [B, 1, 1]
+        # (mesma modulação para todos os dendritos/sinapses da amostra).
         post_expanded = post_spike.view(-1, 1, 1)  # [B, 1, 1]
         
         # LTD: onde trace_post > threshold
