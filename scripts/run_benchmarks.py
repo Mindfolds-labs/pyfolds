@@ -1,241 +1,186 @@
 #!/usr/bin/env python3
-"""Executa benchmarks de serialização e publica artefatos em docs/."""
+"""Run deterministic serialization benchmarks and emit JSON + Markdown report."""
 
 from __future__ import annotations
 
 import argparse
-import importlib.util
+import hashlib
 import json
-import platform
+import statistics
 import tempfile
 import time
-import zlib
-from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from dataclasses import dataclass
 from pathlib import Path
-from statistics import mean
 from typing import Any
 
-import torch
+import sys
 
-from pyfolds.core.config import MPJRDConfig
-from pyfolds.core.neuron import MPJRDNeuron
-from pyfolds.serialization.foldio import load_fold_or_mind, save_fold_or_mind
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_DIR = PROJECT_ROOT / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
+from pyfolds.serialization.foldio import FoldReader, FoldWriter, zstd
 
-@dataclass
-class BenchmarkStats:
-    avg_seconds: float
-    min_seconds: float
-    max_seconds: float
-    ops_per_second: float
-    mb_per_second: float
-
-
-def _build_neuron(seed: int) -> MPJRDNeuron:
-    torch.manual_seed(seed)
-    cfg = MPJRDConfig(n_dendrites=8, n_synapses_per_dendrite=256, random_seed=seed)
-    return MPJRDNeuron(cfg)
+DEFAULT_OUTPUT = Path("docs/assets/benchmarks_results.json")
+DEFAULT_DOC = Path("docs/BENCHMARKS.md")
+PAYLOAD_SIZE_MB = 16
+PAYLOAD_CHUNK_NAME = "benchmark_payload"
+PAYLOAD_CTYPE = "BENC"
 
 
-def _resolve_compression_mode() -> str:
-    return "zstd" if importlib.util.find_spec("zstandard") is not None else "none"
+@dataclass(frozen=True)
+class BenchmarkResult:
+    codec: str
+    payload_size_bytes: int
+    file_size_bytes: int
+    write_speed_mb_s: float
+    read_speed_mb_s: float
+    compress_ratio: float
 
 
-def _measure_write_speed(
-    neuron: MPJRDNeuron,
-    iterations: int,
-    workdir: Path,
-    compression_mode: str,
-) -> tuple[BenchmarkStats, int, int]:
-    elapsed: list[float] = []
-    sizes: list[int] = []
+def _build_payload(size_bytes: int) -> bytes:
+    # Deterministic pseudo-random payload using repeated SHA256 digest expansion.
+    seed = b"pyfolds-benchmark-payload-v1"
+    out = bytearray()
+    counter = 0
+    while len(out) < size_bytes:
+        digest = hashlib.sha256(seed + counter.to_bytes(8, "big")).digest()
+        out.extend(digest)
+        counter += 1
+    return bytes(out[:size_bytes])
 
-    for idx in range(iterations):
-        path = workdir / f"write_{idx}.fold"
-        start = time.perf_counter()
-        save_fold_or_mind(neuron, str(path), compress=compression_mode)
-        elapsed.append(time.perf_counter() - start)
-        sizes.append(path.stat().st_size)
 
-    avg_time = mean(elapsed)
-    avg_size = int(mean(sizes))
-    return (
-        BenchmarkStats(
-            avg_seconds=avg_time,
-            min_seconds=min(elapsed),
-            max_seconds=max(elapsed),
-            ops_per_second=1.0 / avg_time,
-            mb_per_second=(avg_size / (1024**2)) / avg_time,
-        ),
-        avg_size,
-        sizes[-1],
+def _measure_once(codec: str, payload: bytes, workdir: Path) -> BenchmarkResult:
+    bench_path = workdir / f"benchmark_{codec}.fold"
+
+    write_start = time.perf_counter()
+    with FoldWriter(str(bench_path), compress=codec) as writer:
+        writer.add_chunk(PAYLOAD_CHUNK_NAME, PAYLOAD_CTYPE, payload)
+        writer.finalize(metadata={"benchmark": True, "codec": codec})
+    write_seconds = max(time.perf_counter() - write_start, 1e-9)
+
+    read_start = time.perf_counter()
+    with FoldReader(str(bench_path), use_mmap=False) as reader:
+        restored = reader.read_chunk_bytes(PAYLOAD_CHUNK_NAME)
+    read_seconds = max(time.perf_counter() - read_start, 1e-9)
+
+    if restored != payload:
+        raise RuntimeError(f"Invalid roundtrip for codec={codec}")
+
+    payload_size = len(payload)
+    file_size = bench_path.stat().st_size
+    payload_mb = payload_size / (1024 * 1024)
+
+    return BenchmarkResult(
+        codec=codec,
+        payload_size_bytes=payload_size,
+        file_size_bytes=file_size,
+        write_speed_mb_s=round(payload_mb / write_seconds, 4),
+        read_speed_mb_s=round(payload_mb / read_seconds, 4),
+        compress_ratio=round(payload_size / file_size, 6),
     )
 
 
-def _measure_read_speed(path: Path, iterations: int) -> BenchmarkStats:
-    elapsed: list[float] = []
-    file_size = path.stat().st_size
+def _run_codec(codec: str, payload: bytes, iterations: int, workdir: Path) -> BenchmarkResult:
+    runs = [_measure_once(codec, payload, workdir) for _ in range(iterations)]
 
-    for _ in range(iterations):
-        start = time.perf_counter()
-        _ = load_fold_or_mind(str(path), neuron_class=MPJRDNeuron, trusted_torch_payload=True)
-        elapsed.append(time.perf_counter() - start)
-
-    avg_time = mean(elapsed)
-    return BenchmarkStats(
-        avg_seconds=avg_time,
-        min_seconds=min(elapsed),
-        max_seconds=max(elapsed),
-        ops_per_second=1.0 / avg_time,
-        mb_per_second=(file_size / (1024**2)) / avg_time,
+    return BenchmarkResult(
+        codec=codec,
+        payload_size_bytes=runs[0].payload_size_bytes,
+        file_size_bytes=runs[-1].file_size_bytes,
+        write_speed_mb_s=round(statistics.median(r.write_speed_mb_s for r in runs), 4),
+        read_speed_mb_s=round(statistics.median(r.read_speed_mb_s for r in runs), 4),
+        compress_ratio=round(statistics.median(r.compress_ratio for r in runs), 6),
     )
 
 
-def _measure_compression_ratio(neuron: MPJRDNeuron, workdir: Path, compression_mode: str) -> dict[str, Any]:
-    raw_path = workdir / "reference_raw.fold"
-    compressed_path = workdir / "reference_compressed.fold"
-
-    save_fold_or_mind(neuron, str(raw_path), compress="none")
-
-    method = "foldio-zstd"
-    if compression_mode == "zstd":
-        save_fold_or_mind(neuron, str(compressed_path), compress="zstd")
-        compressed_size = compressed_path.stat().st_size
-    else:
-        method = "zlib-fallback"
-        raw_bytes = raw_path.read_bytes()
-        compressed_size = len(zlib.compress(raw_bytes, level=6))
-
-    raw_size = raw_path.stat().st_size
-    ratio = raw_size / compressed_size if compressed_size else 0.0
-
+def _as_dict(result: BenchmarkResult) -> dict[str, Any]:
     return {
-        "raw_size_bytes": raw_size,
-        "compressed_size_bytes": compressed_size,
-        "compression_ratio": ratio,
-        "space_saving_percent": (1.0 - (compressed_size / raw_size)) * 100.0,
-        "method": method,
+        "codec": result.codec,
+        "payload_size_bytes": result.payload_size_bytes,
+        "file_size_bytes": result.file_size_bytes,
+        "write_speed_mb_s": result.write_speed_mb_s,
+        "read_speed_mb_s": result.read_speed_mb_s,
+        "compress_ratio": result.compress_ratio,
     }
 
 
-def _generate_markdown(report: dict[str, Any]) -> str:
-    ws = report["write_speed"]
-    rs = report["read_speed"]
-    cr = report["compression"]
+def _render_markdown(data: dict[str, Any]) -> str:
+    lines = [
+        "# Benchmarks",
+        "",
+        "Resultados automáticos gerados por `scripts/run_benchmarks.py`.",
+        "",
+        f"- Tamanho do payload: `{data['config']['payload_size_mb']} MB`",
+        f"- Iterações por codec: `{data['config']['iterations']}`",
+        f"- Codecs avaliados: `{', '.join(data['config']['codecs'])}`",
+        "",
+        "| Codec | Write speed (MB/s) | Read speed (MB/s) | Compress ratio | Payload size (bytes) | File size (bytes) |",
+        "|---|---:|---:|---:|---:|---:|",
+    ]
 
-    return "\n".join(
+    for result in data["results"]:
+        lines.append(
+            "| {codec} | {write_speed_mb_s:.4f} | {read_speed_mb_s:.4f} | {compress_ratio:.6f} | {payload_size_bytes} | {file_size_bytes} |".format(
+                **result
+            )
+        )
+
+    lines.extend(
         [
-            "# Benchmarks",
             "",
-            "Relatório gerado automaticamente por `scripts/run_benchmarks.py`.",
+            "## Reprodução local",
             "",
-            "## Resumo",
+            "```bash",
+            "python scripts/run_benchmarks.py",
+            "```",
             "",
-            f"- Data (UTC): `{report['generated_at_utc']}`",
-            f"- Iterações: `{report['iterations']}`",
-            f"- Python: `{report['environment']['python_version']}`",
-            f"- PyTorch: `{report['environment']['torch_version']}`",
-            f"- Plataforma: `{report['environment']['platform']}`",
-            "",
-            "## Velocidade de escrita",
-            "",
-            "| Métrica | Valor |",
-            "|---|---:|",
-            f"| Tempo médio | {ws['avg_seconds']:.6f} s |",
-            f"| Tempo mínimo | {ws['min_seconds']:.6f} s |",
-            f"| Tempo máximo | {ws['max_seconds']:.6f} s |",
-            f"| Ops/s | {ws['ops_per_second']:.2f} |",
-            f"| Throughput | {ws['mb_per_second']:.2f} MB/s |",
-            "",
-            "## Velocidade de leitura",
-            "",
-            "| Métrica | Valor |",
-            "|---|---:|",
-            f"| Tempo médio | {rs['avg_seconds']:.6f} s |",
-            f"| Tempo mínimo | {rs['min_seconds']:.6f} s |",
-            f"| Tempo máximo | {rs['max_seconds']:.6f} s |",
-            f"| Ops/s | {rs['ops_per_second']:.2f} |",
-            f"| Throughput | {rs['mb_per_second']:.2f} MB/s |",
-            "",
-            "## Compressão",
-            "",
-            "| Métrica | Valor |",
-            "|---|---:|",
-            f"| Tamanho sem compressão | {cr['raw_size_bytes']} bytes |",
-            f"| Tamanho comprimido | {cr['compressed_size_bytes']} bytes |",
-            f"| Razão de compressão (raw/compressed) | {cr['compression_ratio']:.3f}x |",
-            f"| Economia de espaço | {cr['space_saving_percent']:.2f}% |",
-            f"| Método | {cr['method']} |",
-            "",
-            "## Fonte",
-            "",
-            "- JSON completo: `docs/assets/benchmarks_results.json`",
+            "Este comando atualiza:",
+            "- `docs/assets/benchmarks_results.json`",
+            "- `docs/BENCHMARKS.md`",
         ]
-    ) + "\n"
-
-
-def run(iterations: int, output_json: Path, output_markdown: Path) -> dict[str, Any]:
-    neuron = _build_neuron(seed=42)
-    compression_mode = _resolve_compression_mode()
-
-    with tempfile.TemporaryDirectory(prefix="pyfolds-bench-") as tmp:
-        workdir = Path(tmp)
-        write_stats, _, _ = _measure_write_speed(neuron, iterations, workdir, compression_mode)
-
-        ref_path = workdir / "read_target.fold"
-        save_fold_or_mind(neuron, str(ref_path), compress=compression_mode)
-        read_stats = _measure_read_speed(ref_path, iterations)
-
-        compression = _measure_compression_ratio(neuron, workdir, compression_mode)
-
-    report = {
-        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "iterations": iterations,
-        "environment": {
-            "python_version": platform.python_version(),
-            "torch_version": torch.__version__,
-            "platform": platform.platform(),
-        },
-        "compression_mode": compression_mode,
-        "write_speed": asdict(write_stats),
-        "read_speed": asdict(read_stats),
-        "compression": compression,
-    }
-
-    output_json.parent.mkdir(parents=True, exist_ok=True)
-    output_json.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-
-    output_markdown.parent.mkdir(parents=True, exist_ok=True)
-    output_markdown.write_text(_generate_markdown(report), encoding="utf-8")
-
-    return report
+    )
+    return "\n".join(lines) + "\n"
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Executa benchmarks de serialização do PyFolds")
-    parser.add_argument("--iterations", type=int, default=20, help="Número de iterações por métrica")
-    parser.add_argument(
-        "--output-json",
-        type=Path,
-        default=Path("docs/assets/benchmarks_results.json"),
-        help="Arquivo JSON de saída",
-    )
-    parser.add_argument(
-        "--output-markdown",
-        type=Path,
-        default=Path("docs/BENCHMARKS.md"),
-        help="Arquivo markdown de saída",
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--doc", type=Path, default=DEFAULT_DOC)
+    parser.add_argument("--iterations", type=int, default=5)
+    args = parser.parse_args()
+
+    payload = _build_payload(PAYLOAD_SIZE_MB * 1024 * 1024)
+    codecs = ["none"]
+    if zstd is not None:
+        codecs.append("zstd")
+
+    with tempfile.TemporaryDirectory(prefix="pyfolds-bench-") as tmp:
+        workdir = Path(tmp)
+        results = [_as_dict(_run_codec(codec, payload, args.iterations, workdir)) for codec in codecs]
+
+    output_data = {
+        "benchmark_version": 1,
+        "config": {
+            "payload_size_mb": PAYLOAD_SIZE_MB,
+            "iterations": args.iterations,
+            "codecs": codecs,
+        },
+        "results": sorted(results, key=lambda item: item["codec"]),
+    }
+
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(
+        json.dumps(output_data, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
     )
 
-    args = parser.parse_args()
-    report = run(iterations=args.iterations, output_json=args.output_json, output_markdown=args.output_markdown)
-    print(
-        "Benchmarks concluídos:",
-        f"write_ops_s={report['write_speed']['ops_per_second']:.2f}",
-        f"read_ops_s={report['read_speed']['ops_per_second']:.2f}",
-        f"compression={report['compression']['compression_ratio']:.2f}x",
-    )
+    args.doc.parent.mkdir(parents=True, exist_ok=True)
+    args.doc.write_text(_render_markdown(output_data), encoding="utf-8")
+
+    print(f"Benchmark JSON written to: {args.output}")
+    print(f"Benchmark report written to: {args.doc}")
 
 
 if __name__ == "__main__":

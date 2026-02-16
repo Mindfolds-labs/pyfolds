@@ -1,9 +1,9 @@
 name: Benchmarks
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: "0 6 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,35 +15,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -e .
-          pip install zstandard
+          pip install zstandard || echo "zstandard unavailable; benchmark will run with compress=none"
 
       - name: Run benchmarks
-        run: python scripts/run_benchmarks.py --iterations 30
-
-      - name: Upload benchmark artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-results
-          path: |
-            docs/assets/benchmarks_results.json
-            docs/BENCHMARKS.md
-
-      - name: Commit benchmark artifacts
         run: |
-          if git diff --quiet -- docs/assets/benchmarks_results.json docs/BENCHMARKS.md; then
-            echo "No benchmark changes to commit"
+          python scripts/run_benchmarks.py
+
+      - name: Commit benchmark updates
+        run: |
+          if git diff --quiet docs/assets/benchmarks_results.json docs/BENCHMARKS.md; then
+            echo "No benchmark changes to commit."
             exit 0
           fi
 
