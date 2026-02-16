@@ -57,12 +57,56 @@ Interpretação rápida:
 
 - 📚 Índice geral: `docs/README.md`
 - 🧪 Lógica científica: `docs/SCIENTIFIC_LOGIC.md`
+- 📦 Especificação binária `.fold/.mind`: `docs/FOLD_SPECIFICATION.md`
+- 🧾 ADRs (mapa e dependências): `docs/adr/INDEX.md`
 - 🏗️ Arquitetura (C4 + sequência): `docs/ARCHITECTURE.md`
+- 🧱 Especificação binária FOLD: `docs/FOLD_SPECIFICATION.md`
+- 🗂️ ADRs de serialização/qualidade: `docs/adr/INDEX.md`
 - 🔌 Referência de API: `docs/API_REFERENCE.md`
+- 📦 Especificação binária FOLD: `docs/FOLD_SPECIFICATION.md`
+- 🧩 ADRs de arquitetura FOLD: `docs/adr/INDEX.md`
 - 🧭 Guia MNIST: `docs/guides/mnist_example.md`
 - 🌊 Tutorial Wave v3.0: `docs/guides/wave_tutorial.md`
 - 🤝 Contribuição: `CONTRIBUTING.md`
 - 📝 Histórico de versões: `CHANGELOG.md`
+- 📈 Benchmarks automatizados: `docs/BENCHMARKS.md` (dados em `docs/assets/benchmarks_results.json`)
+
+## Benchmarks
+
+Os resultados de benchmark ficam em:
+
+- `docs/BENCHMARKS.md`
+- `docs/assets/benchmarks_results.json`
+
+Para reproduzir localmente:
+
+```bash
+python scripts/run_benchmarks.py
+```
+
+## Documentos de acompanhamento (caminho canônico)
+
+Para evitar divergência entre plano e código, os documentos abaixo ficam versionados na raiz do repositório:
+
+- [`SUMARIO_COMPLETO.md`](SUMARIO_COMPLETO.md)
+- [`analise_bugs.md`](analise_bugs.md)
+- [`revisao_fold_mind.md`](revisao_fold_mind.md)
+- [`tarefas_pendentes.md`](tarefas_pendentes.md)
+- [`solucoes_fold_mind.py`](solucoes_fold_mind.py)
+- [`VISUAL_FINAL.txt`](VISUAL_FINAL.txt)
+
+## Pacote de governança (canônico)
+
+Para evitar divergência futura entre plano e artefatos de referência, os documentos canônicos estão na raiz do projeto:
+
+- `SUMARIO_COMPLETO.md`
+- `analise_bugs.md`
+- `revisao_fold_mind.md`
+- `tarefas_pendentes.md`
+- `solucoes_fold_mind.py`
+- `VISUAL_FINAL.txt`
+
+Referência de consolidação atual: branch `work` e sem tags locais publicadas.
 
 ## Exemplo rápido
 

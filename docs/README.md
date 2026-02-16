@@ -15,3 +15,16 @@ A documentação foi organizada por categoria para facilitar navegação:
 - API central: `../docs/API_REFERENCE.md`
 - Guia MNIST: `../docs/guides/mnist_example.md`
 - Guia Wave: `../docs/guides/wave_tutorial.md`
+
+## Mapeamento de nomes esperados no plano
+
+| Nome esperado | Caminho real no repositório | Status |
+|---|---|---|
+| `docs/spec/FOLD_SPECIFICATION.md` | `docs/spec/FOLD_SPECIFICATION.md` | criado |
+| `docs/SCIENTIFIC_BASIS_V3.md` | `docs/SCIENTIFIC_BASIS_V3.md` | existente |
+| `docs/ARCHITECTURE.md` | `docs/ARCHITECTURE.md` | existente |
+| `docs/SCIENTIFIC_LOGIC.md` | `docs/SCIENTIFIC_LOGIC.md` | existente |
+
+> Nota: quando o plano citar uma referência histórica equivalente (ex.: formato `.fold`), priorize
+> o documento canônico em `docs/spec/FOLD_SPECIFICATION.md` e mantenha links para
+> `docs/theory/FOLD_MIND_FORMAT.md` para contexto teórico.
