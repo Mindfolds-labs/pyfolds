@@ -11,19 +11,23 @@ Características:
 - ✅ Suporte a learning_rate_multiplier via mode
 - ✅ Usa constantes da config (activity_threshold)
 - ✅ LOGGING profissional (DEBUG, INFO, WARNING, TRACE)
+- ✅ Validação de devices
+- ✅ Callbacks de homeostase
 """
 
 import torch
 import torch.nn as nn
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Callable
 from .config import MPJRDConfig
+from .base import BaseNeuron
 from .dendrite import MPJRDDendrite
 from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator, AccumulatedStats
 from ..utils.types import LearningMode
+from ..utils.validation import validate_input, validate_device_consistency
 
-# ✅ LOGGING - Adicionado
+# ✅ LOGGING
 from ..utils.logging import get_logger
 
 # Telemetria (import opcional)
@@ -34,7 +38,7 @@ except ImportError:
     TELEMETRY_AVAILABLE = False
 
 
-class MPJRDNeuron(nn.Module):
+class MPJRDNeuron(BaseNeuron):
     """
     Neurônio MPJRD completo.
     
@@ -43,6 +47,7 @@ class MPJRDNeuron(nn.Module):
         - Suporte a learning_rate_multiplier
         - Usa activity_threshold da config
         - ✅ LOGGING integrado
+        - ✅ Validação de devices
     """
 
     def __init__(self, cfg: MPJRDConfig, enable_telemetry: bool = False,
@@ -63,6 +68,10 @@ class MPJRDNeuron(nn.Module):
         
         self.homeostasis = HomeostasisController(cfg)
         self.neuromodulator = Neuromodulator(cfg)
+        
+        # Registra callbacks de homeostase
+        self.homeostasis.on_stable(self._on_homeostasis_stable)
+        self.homeostasis.on_unstable(self._on_homeostasis_unstable)
         
         # Sistema de acumulação unificado
         self.stats_acc = StatisticsAccumulator(
@@ -91,7 +100,49 @@ class MPJRDNeuron(nn.Module):
             self.telemetry = None
             self.logger.debug("   ⏭️ Telemetria desativada")
         
+        # Valida devices após inicialização
+        self._validate_internal_devices()
+        
         self.logger.info(f"✅ Neurônio {name or id(self)} inicializado com sucesso")
+
+    def _validate_internal_devices(self) -> None:
+        """Valida consistência de devices internos."""
+        devices = set()
+        
+        # Device do theta
+        devices.add(self.theta.device)
+        
+        # Devices das dendrites e sinapses
+        for dend in self.dendrites:
+            for syn in dend.synapses:
+                devices.add(syn.N.device)
+                devices.add(syn.I.device)
+        
+        if len(devices) > 1:
+            self.logger.error(f"❌ Devices inconsistentes: {devices}")
+            raise RuntimeError(
+                f"Componentes do neurônio em devices diferentes: {devices}. "
+                "Todos devem estar no mesmo device."
+            )
+        
+        self.logger.debug(f"✅ Devices consistentes: {devices.pop()}")
+
+    def _on_homeostasis_stable(self, controller: HomeostasisController) -> None:
+        """Callback quando homeostase se torna estável."""
+        self.logger.info(
+            f"✅ Homeostase estável! θ={controller.theta.item():.3f}, "
+            f"erro={controller.homeostasis_error.item():.3f}"
+        )
+        # Opcional: reduz learning rate ou muda modo
+        if self.mode == LearningMode.ONLINE:
+            self.logger.debug("📉 Considerando reduzir learning rate...")
+
+    def _on_homeostasis_unstable(self, controller: HomeostasisController) -> None:
+        """Callback quando homeostase se torna instável."""
+        self.logger.warning(
+            f"⚠️ Homeostase instável! θ={controller.theta.item():.3f}, "
+            f"erro={controller.homeostasis_error.item():.3f}"
+        )
 
     # ========== PROPRIEDADES AGREGADAS ==========
 
@@ -136,6 +187,10 @@ class MPJRDNeuron(nn.Module):
             self.mode = mode
             self.mode_switches.add_(1)
             self.logger.info(f"🔄 Modo alterado: {old_mode} → {mode.value}")
+            
+            # Ações específicas por modo
+            if mode == LearningMode.SLEEP:
+                self.stats_acc.reset()  # Limpa pendências antes de dormir
 
     # ========== NEUROMODULAÇÃO ENDÓGENA ==========
 
@@ -162,6 +217,14 @@ class MPJRDNeuron(nn.Module):
 
     # ========== FORWARD PASS ==========
 
+    def _validate_input_device(self, x: torch.Tensor) -> None:
+        """Valida se input está no device correto."""
+        if x.device != self.theta.device:
+            raise RuntimeError(
+                f"Input device {x.device} != neuron device {self.theta.device}. "
+                "Use .to(device) no input ou mova o neurônio."
+            )
+
     @torch.no_grad()
     def _apply_online_plasticity(
         self,
@@ -176,6 +239,7 @@ class MPJRDNeuron(nn.Module):
         post_rate_t = torch.tensor([max(0.0, min(1.0, post_rate))], device=self.theta.device)
 
         for d_idx, dend in enumerate(self.dendrites):
+            # Filtra sinapses ativas
             active_mask = (x[:, d_idx, :] > cfg.activity_threshold).float()
             active_count = active_mask.sum(dim=0).clamp_min(1.0)
             pre_rate = (x[:, d_idx, :] * active_mask).sum(dim=0) / active_count
@@ -189,6 +253,10 @@ class MPJRDNeuron(nn.Module):
                 mode=mode,
             )
 
+    @validate_input(
+        expected_ndim=3,
+        expected_shape_fn=lambda self: (self.cfg.n_dendrites, self.cfg.n_synapses_per_dendrite),
+    )
     def forward(self, x: torch.Tensor, reward: Optional[float] = None,
                 mode: Optional[LearningMode] = None,
                 collect_stats: bool = True,
@@ -201,21 +269,18 @@ class MPJRDNeuron(nn.Module):
             reward: Sinal de recompensa externo
             mode: Modo de aprendizado (sobrescreve o atual)
             collect_stats: Se deve coletar estatísticas
+            dt: Passo de tempo (ms)
         
         Returns:
             Dict com spikes, potenciais e estatísticas
         """
         effective_mode = mode if mode is not None else self.mode
         
+        # Valida device
+        self._validate_input_device(x)
+        
         device = self.theta.device
-        x = x.to(device)
-        B, D, S = x.shape
-
-        # Valida dimensões
-        if D != self.cfg.n_dendrites or S != self.cfg.n_synapses_per_dendrite:
-            self.logger.error(f"❌ Dimensão inválida: esperado ({self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}), recebido ({D}, {S})")
-            raise ValueError(f"Esperado ({self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}), "
-                             f"recebido ({D}, {S})")
+        B, D, _ = x.shape
 
         # ===== 1. INTEGRAÇÃO DENDRÍTICA =====
         v_dend = torch.zeros(B, D, device=device)
@@ -286,7 +351,7 @@ class MPJRDNeuron(nn.Module):
             ))
 
         # ===== 10. LOGGING =====
-        self.logger.trace(  # Nível TRACE para dados muito detalhados
+        self.logger.trace(
             f"Forward: batch={B}, spikes={spike_rate:.3f}, "
             f"θ={self.theta.item():.3f}, sat={saturation_ratio:.1%}"
         )
@@ -380,7 +445,7 @@ class MPJRDNeuron(nn.Module):
             R = self._compute_R_endogenous(post_rate, saturation_ratio)
         R_t = torch.tensor([R], device=device)
 
-        # Atualiza cada dendrito - PASSA O MODO!
+        # Atualiza cada dendrito
         for d_idx, dend in enumerate(self.dendrites):
             # Taxas pré: média sobre sinapses ativas
             active_mask = (x_mean[d_idx] > cfg.activity_threshold).float()
@@ -393,7 +458,7 @@ class MPJRDNeuron(nn.Module):
                 post_rate=post_rate_t,
                 R=R_t,
                 dt=dt,
-                mode=self.mode  # ✅ PASSA O MODO!
+                mode=self.mode
             )
 
         self.stats_acc.reset()
@@ -430,6 +495,15 @@ class MPJRDNeuron(nn.Module):
                 mode=self.mode.value,
                 duration=float(duration),
             ))
+
+    # ========== UTILITÁRIOS ==========
+
+    def to(self, device: torch.device) -> 'MPJRDNeuron':
+        """Move neurônio para device e valida consistência."""
+        super().to(device)
+        self._validate_internal_devices()
+        self.logger.debug(f"📦 Neurônio movido para {device}")
+        return self
 
     # ========== MÉTRICAS ==========
 
@@ -469,6 +543,8 @@ class MPJRDNeuron(nn.Module):
             'sleep_count': self.sleep_count.item(),
             'has_pending_updates': self.stats_acc.has_data,
             'pending_count': self.stats_acc.acc_count.item() if self.stats_acc.has_data else 0,
+            'device': str(self.theta.device),
+            'homeostasis_stable': self.homeostasis.is_stable(),
         }
         
         self.logger.debug(f"📊 Métricas coletadas: N_mean={metrics['N_mean']:.1f}, θ={metrics['theta']:.2f}")
@@ -476,4 +552,5 @@ class MPJRDNeuron(nn.Module):
 
     def extra_repr(self) -> str:
         return (f"mode={self.mode.value}, D={self.cfg.n_dendrites}, "
-                f"S={self.cfg.n_synapses_per_dendrite}, θ={self.theta.item():.2f}")
+                f"S={self.cfg.n_synapses_per_dendrite}, θ={self.theta.item():.2f}, "
+                f"device={self.theta.device}")

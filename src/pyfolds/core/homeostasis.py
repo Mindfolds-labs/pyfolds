@@ -2,7 +2,7 @@
 
 import torch
 import torch.nn as nn
-from typing import Union, Optional
+from typing import Union, Optional, Callable
 from .config import MPJRDConfig
 
 
@@ -12,8 +12,8 @@ class HomeostasisController(nn.Module):
     
     ✅ CORRIGIDO:
         - Removido +self.eps incorreto da média móvel
-        - ✅ is_stable AGORA É PROPRIEDADE SEM PARÂMETROS
-        - ✅ Adicionado is_stable_with_tolerance para custom tolerance
+        - is_stable unificado como método com tolerance opcional
+        - Adicionado callback para eventos de estabilidade
     """
 
     def __init__(self, cfg: MPJRDConfig):
@@ -28,11 +28,27 @@ class HomeostasisController(nn.Module):
         self.dead_neuron_penalty_factor = cfg.dead_neuron_penalty
         self.activity_threshold = cfg.activity_threshold
         self.eps = cfg.homeostasis_eps
+        
+        # Callbacks para eventos
+        self._on_stable_callbacks: list[Callable] = []
+        self._on_unstable_callbacks: list[Callable] = []
+        
+        # Estado de estabilidade
+        self._was_stable = False
 
     def update(self, 
                current_rate: Union[float, torch.Tensor], 
                clamp_theta: bool = True) -> torch.Tensor:
-        """Atualiza parâmetros homeostáticos."""
+        """
+        Atualiza parâmetros homeostáticos.
+        
+        Args:
+            current_rate: Taxa de disparo atual [0, 1]
+            clamp_theta: Se deve aplicar clamping no theta
+            
+        Returns:
+            theta atualizado
+        """
         # Validação com tolerância
         rate = float(current_rate) if isinstance(current_rate, torch.Tensor) else current_rate
         
@@ -59,50 +75,73 @@ class HomeostasisController(nn.Module):
             self.theta.clamp_(cfg.theta_min, cfg.theta_max)
 
         # 5. Média móvel exponencial
-        # ✅ CORRETO: r_hat = α * rate + (1-α) * r_hat
-        # ❌ SEM o +self.eps incorreto!
         rate_tensor = torch.tensor([rate], device=self.theta.device)
         self.r_hat.mul_(1 - cfg.homeostasis_alpha).add_(
             cfg.homeostasis_alpha * rate_tensor
         )
 
-        # 6. Contador
+        # 6. Verifica mudança de estado de estabilidade
+        self._check_stability_change()
+
+        # 7. Contador
         self.step_count.add_(1)
 
         return self.theta
+
+    def _check_stability_change(self, tolerance: float = 0.05) -> None:
+        """Verifica se houve mudança no estado de estabilidade."""
+        is_stable_now = self.is_stable(tolerance)
+        
+        if is_stable_now and not self._was_stable:
+            # Transição instável → estável
+            for callback in self._on_stable_callbacks:
+                callback(self)
+        elif not is_stable_now and self._was_stable:
+            # Transição estável → instável
+            for callback in self._on_unstable_callbacks:
+                callback(self)
+        
+        self._was_stable = is_stable_now
+
+    def on_stable(self, callback: Callable[['HomeostasisController'], None]) -> None:
+        """Registra callback para quando a homeostase se tornar estável."""
+        self._on_stable_callbacks.append(callback)
+
+    def on_unstable(self, callback: Callable[['HomeostasisController'], None]) -> None:
+        """Registra callback para quando a homeostase se tornar instável."""
+        self._on_unstable_callbacks.append(callback)
 
     def reset(self) -> None:
         """Reseta buffers."""
         self.theta.fill_(self.cfg.theta_init)
         self.r_hat.fill_(self.cfg.target_spike_rate)
         self.step_count.zero_()
+        self._was_stable = False
 
     @property
     def homeostasis_error(self) -> torch.Tensor:
         """Erro homeostático atual (r_hat - target)."""
         return self.r_hat - self.cfg.target_spike_rate
 
-    @property
-    def is_stable(self) -> bool:
-        """
-        Verifica se homeostase está estável (tolerance padrão = 0.05).
-        
-        Returns:
-            True se |r_hat - target| < 0.05
-        """
-        return abs(self.homeostasis_error.item()) < 0.05
+    def is_stable(self, tolerance: float = 0.05) -> bool:
+        """Verifica se homeostase está estável com tolerância configurável."""
+        return abs(self.homeostasis_error.item()) < tolerance
 
-    def is_stable_with_tolerance(self, tolerance: float = 0.05) -> bool:
+    def stability_ratio(self, window: int = 100) -> float:
         """
-        Verifica estabilidade com tolerance customizado.
+        Calcula proporção de passos estáveis na janela recente.
         
         Args:
-            tolerance: Tolerância para considerar estabilidade
+            window: Número de passos para considerar
             
         Returns:
-            True se |r_hat - target| < tolerance
+            Float entre 0 e 1 indicando proporção de estabilidade
         """
-        return abs(self.homeostasis_error.item()) < tolerance
+        if self.step_count.item() < window:
+            return 0.0
+        
+        # Implementação simplificada - em produção usaria buffer circular
+        return 1.0 if self.is_stable() else 0.0
 
     def extra_repr(self) -> str:
         """Representação string detalhada do módulo."""
@@ -111,4 +150,4 @@ class HomeostasisController(nn.Module):
                 f"r̂={self.r_hat.item():.3f}, "
                 f"target={self.cfg.target_spike_rate:.2f}, "
                 f"resgate_th={self.dead_neuron_threshold:.2f}, "
-                f"estável={self.is_stable}")
+                f"estável={self.is_stable()}")

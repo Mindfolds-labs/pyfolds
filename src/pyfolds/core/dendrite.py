@@ -46,21 +46,26 @@ class MPJRDDendrite(nn.Module):
         # ✅ ÚNICO LOOP sobre sinapses (coleta tudo de uma vez)
         N_list = []
         I_list = []
-        u_list = []
-        R_list = []
+        # Nota técnica:
+        # O núcleo MPJRD mantém apenas estados estruturais (N) e voláteis (I)
+        # por sinapse. Estados de STP (u, R) pertencem ao módulo avançado
+        # (ShortTermDynamicsMixin) em nível de neurônio, não ao core de sinapse.
+        has_short_term_state = all(hasattr(syn, "u") and hasattr(syn, "R") for syn in self.synapses)
+        u_list = [] if has_short_term_state else None
+        R_list = [] if has_short_term_state else None
         
         for syn in self.synapses:
             N_list.append(syn.N.to(device))
             I_list.append(syn.I.to(device))
-            u_list.append(syn.u.to(device))
-            R_list.append(syn.R.to(device))
+            if has_short_term_state:
+                u_list.append(syn.u.to(device))
+                R_list.append(syn.R.to(device))
         
         # ✅ Concatena de uma vez (operação vetorizada)
         self._cached_states = {
             'N': torch.cat(N_list).to(torch.int32),
             'I': torch.cat(I_list),
-            'u': torch.cat(u_list),
-            'R': torch.cat(R_list)
+            **({'u': torch.cat(u_list), 'R': torch.cat(R_list)} if has_short_term_state else {})
         }
         
         # ✅ W é derivado de N (calculado sob demanda, cacheado)
@@ -88,14 +93,22 @@ class MPJRDDendrite(nn.Module):
 
     @property
     def u(self) -> torch.Tensor:
-        """Facilitação [S] - ✅ retorna do cache."""
+        """Facilitação [S] quando disponível no backend sináptico."""
         self._ensure_cache_valid()
+        if 'u' not in self._cached_states:
+            raise AttributeError(
+                "Estado 'u' não existe no core MPJRD. Use ShortTermDynamicsMixin para STP."
+            )
         return self._cached_states['u']
 
     @property
     def R(self) -> torch.Tensor:
-        """Recuperação [S] - ✅ retorna do cache."""
+        """Recuperação [S] quando disponível no backend sináptico."""
         self._ensure_cache_valid()
+        if 'R' not in self._cached_states:
+            raise AttributeError(
+                "Estado 'R' não existe no core MPJRD. Use ShortTermDynamicsMixin para STP."
+            )
         return self._cached_states['R']
 
     @property
@@ -139,18 +152,18 @@ class MPJRDDendrite(nn.Module):
         """Atualiza sinapses de forma indexada (pré-sináptico por sinapse)."""
         if pre_rate.dim() == 2 and pre_rate.shape[1] == 1:
             pre_rate = pre_rate.squeeze(1)
-
-        if pre_rate.dim() != 1 or pre_rate.numel() != self.n_synapses:
+        
+        # Regra hebbiana local: cada sinapse deve receber sua taxa pré-sináptica
+        # correspondente para preservar especificidade sináptica.
+        if pre_rate.numel() not in (1, self.n_synapses):
             raise ValueError(
-                f"pre_rate deve ter shape [{self.n_synapses}], recebido {tuple(pre_rate.shape)}"
+                f"pre_rate deve ter 1 ou {self.n_synapses} elementos, recebeu {pre_rate.numel()}"
             )
 
-        # Cada sinapse recebe sua própria taxa pré-sináptica escalar.
-        # Isso preserva a regra local de aprendizado (Hebb/three-factor),
-        # evitando que todas as sinapses usem a mesma média do vetor inteiro.
-        for idx, syn in enumerate(self.synapses):
-            syn.update(pre_rate[idx:idx + 1], post_rate, R, dt, mode)
-
+        for s_idx, syn in enumerate(self.synapses):
+            local_pre = pre_rate if pre_rate.numel() == 1 else pre_rate[s_idx:s_idx + 1]
+            syn.update(local_pre, post_rate, R, dt, mode)
+        
         self._invalidate_cache()
 
     def consolidate(self, dt: float = 1.0) -> None:
@@ -166,8 +179,7 @@ class MPJRDDendrite(nn.Module):
             'N': self.N.clone(),
             'W': self.W.clone(),
             'I': self.I.clone(),
-            'u': self.u.clone(),
-            'R': self.R.clone()
+            **({'u': self.u.clone(), 'R': self.R.clone()} if 'u' in self._cached_states else {})
         }
 
     def load_states(self, states: Dict[str, torch.Tensor]) -> None:
@@ -177,9 +189,9 @@ class MPJRDDendrite(nn.Module):
                 syn.N.data = states['N'][idx].view(1)
             if 'I' in states:
                 syn.I.data = states['I'][idx].view(1)
-            if 'u' in states:
+            if 'u' in states and hasattr(syn, 'u'):
                 syn.u.data = states['u'][idx].view(1)
-            if 'R' in states:
+            if 'R' in states and hasattr(syn, 'R'):
                 syn.R.data = states['R'][idx].view(1)
         self._invalidate_cache()
 
