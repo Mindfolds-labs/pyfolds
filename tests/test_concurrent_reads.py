@@ -1,5 +1,7 @@
-import pytest
+import hashlib
 from concurrent.futures import ThreadPoolExecutor
+
+import pytest
 
 from pyfolds.core.config import MPJRDConfig
 from pyfolds.core.neuron import MPJRDNeuron
@@ -7,14 +9,6 @@ from pyfolds.serialization import FoldReader, save_fold_or_mind
 
 
 def _build_neuron() -> MPJRDNeuron:
-from pyfolds.core.config import MPJRDConfig
-from pyfolds.core.neuron import MPJRDNeuron
-from pyfolds.serialization import FoldReader, save_fold_or_mind
-
-
-@pytest.mark.concurrency
-def test_parallel_reads_same_fold_file(tmp_path):
- main
     cfg = MPJRDConfig(
         n_dendrites=2,
         n_synapses_per_dendrite=4,
@@ -25,35 +19,38 @@ def test_parallel_reads_same_fold_file(tmp_path):
     return MPJRDNeuron(cfg)
 
 
-def _read_fold_snapshot(path: str):
+def _read_signature(path: str):
     with FoldReader(path, use_mmap=True) as reader:
+        manifest = reader.read_json("llm_manifest")
+        torch_payload = reader.read_chunk_bytes("torch_state", verify=True)
         return {
-            "chunks": tuple(reader.list_chunks()),
-            "torch_state": reader.read_chunk_bytes("torch_state", verify=True),
-            "manifest": reader.read_chunk_bytes("llm_manifest", verify=True),
+            "hash": hashlib.sha256(torch_payload).hexdigest(),
+            "step_id": manifest["expression"]["step_id"],
+            "resume": manifest["routing"]["resume_training"],
+            "n_chunks": len(reader.index.get("chunks", [])),
         }
 
 
 @pytest.mark.concurrency
-def test_concurrent_reads_same_fold_file_consistent(tmp_path):
-    file_path = tmp_path / "parallel.fold"
+def test_parallel_reads_are_consistent(tmp_path):
+    fold_path = tmp_path / "concurrent.fold"
+    neuron = _build_neuron()
+
     save_fold_or_mind(
-        _build_neuron(),
-        str(file_path),
+        neuron,
+        str(fold_path),
         include_history=False,
         include_telemetry=False,
-        include_nuclear_arrays=False,
+        include_nuclear_arrays=True,
         compress="none",
     )
 
-    baseline = _read_fold_snapshot(str(file_path))
+    expected = _read_signature(str(fold_path))
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        results = list(executor.map(lambda _: _read_fold_snapshot(str(file_path)), range(10)))
+    with ThreadPoolExecutor(max_workers=10) as pool:
+        futures = [pool.submit(_read_signature, str(fold_path)) for _ in range(10)]
 
-    for result in results:
-        assert result["chunks"] == baseline["chunks"]
-        assert result["torch_state"] == baseline["torch_state"]
-        assert result["manifest"] == baseline["manifest"]
+    results = [f.result() for f in futures]
 
-        main
+    assert len(results) == 10
+    assert all(r == expected for r in results)

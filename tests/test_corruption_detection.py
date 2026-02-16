@@ -19,9 +19,10 @@ def _build_neuron() -> MPJRDNeuron:
     return MPJRDNeuron(cfg)
 
 
-def _save_fold(path):
+def _write_base_fold(path):
+    neuron = _build_neuron()
     save_fold_or_mind(
-        _build_neuron(),
+        neuron,
         str(path),
         include_history=False,
         include_telemetry=False,
@@ -30,9 +31,9 @@ def _save_fold(path):
     )
 
 
-def test_corruption_detection_bit_flip(tmp_path):
+def test_bit_flip_is_detected(tmp_path):
     file_path = tmp_path / "bitflip.fold"
-    _save_fold(file_path)
+    _write_base_fold(file_path)
 
     with FoldReader(str(file_path), use_mmap=False) as reader:
         chunk = next(c for c in reader.index["chunks"] if c["name"] == "torch_state")
@@ -40,41 +41,43 @@ def test_corruption_detection_bit_flip(tmp_path):
 
     with open(file_path, "r+b") as f:
         f.seek(target)
-        current = f.read(1)
+        original = f.read(1)
         f.seek(target)
-        f.write(bytes([current[0] ^ 0xFF]))
+        f.write(bytes([original[0] ^ 0x01]))
 
     with pytest.raises(RuntimeError, match="CRC32C inválido"):
         with FoldReader(str(file_path), use_mmap=False) as reader:
             reader.read_chunk_bytes("torch_state", verify=True)
 
 
-def test_corruption_detection_truncated_file(tmp_path):
+def test_truncation_is_detected(tmp_path):
     file_path = tmp_path / "truncated.fold"
-    _save_fold(file_path)
+    _write_base_fold(file_path)
 
     raw = file_path.read_bytes()
     file_path.write_bytes(raw[:-16])
 
-    with pytest.raises(ValueError, match="Index truncado|Index JSON corrompido"):
+    with pytest.raises(ValueError, match="Index truncado"):
         with FoldReader(str(file_path), use_mmap=False):
             pass
 
 
-def test_corruption_detection_invalid_magic(tmp_path):
-    file_path = tmp_path / "invalid-magic.fold"
-    bad_magic = b"NOTFOLD!"
-    header = struct.pack(HEADER_FMT, bad_magic, struct.calcsize(HEADER_FMT), 24, 0)
-    file_path.write_bytes(header)
+def test_invalid_magic_is_rejected(tmp_path):
+    file_path = tmp_path / "bad-magic.fold"
+    _write_base_fold(file_path)
+
+    with open(file_path, "r+b") as f:
+        f.seek(0)
+        f.write(b"NOTFOLD!")
 
     with pytest.raises(ValueError, match="Magic esperado"):
         with FoldReader(str(file_path), use_mmap=False):
             pass
 
 
-def test_corruption_detection_huge_index_len(tmp_path):
-    file_path = tmp_path / "huge-index.fold"
-    header = struct.pack(HEADER_FMT, MAGIC, struct.calcsize(HEADER_FMT), 28, 2_000_000_000)
+def test_huge_index_len_dos_guard(tmp_path):
+    file_path = tmp_path / "dos-index.fold"
+    header = struct.pack(HEADER_FMT, MAGIC, struct.calcsize(HEADER_FMT), 32, 10_000_000_000)
     file_path.write_bytes(header + (b"\x00" * 64))
 
     with pytest.raises(ValueError, match="Index muito grande"):
@@ -82,7 +85,7 @@ def test_corruption_detection_huge_index_len(tmp_path):
             pass
 
 
-def test_corruption_detection_partial_read_raises_eoferror(tmp_path):
+def test_partial_read_raises_eoferror(tmp_path):
     file_path = tmp_path / "partial.bin"
     file_path.write_bytes(b"abc")
 
