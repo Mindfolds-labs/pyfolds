@@ -1,3 +1,4 @@
+from pyfolds.serialization.foldio import crc32c_u32
 import numpy as np
 import torch
 import pytest
@@ -162,3 +163,7 @@ def test_ecc_roundtrip_if_available(tmp_path):
 
     assert chunks["torch_state"]["ecc_algo"] == "rs(16)"
     assert chunks["torch_state"]["ecc_len"] > 0
+
+
+def test_crc32c_matches_known_vector():
+    assert crc32c_u32(b"123456789") == 0xE3069283

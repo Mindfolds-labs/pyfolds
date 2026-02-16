@@ -112,9 +112,8 @@ class MPJRDSynapse(nn.Module):
         # post_rate é [1], pre_rate_filtered é [B] → resultado [B]
         hebb = (pre_rate_filtered * post_rate).clamp(0.0, 1.0)  # [B]
 
-        # Ganho dependente do peso (escalar)
-        W_val = self.W.item()  # Único .item() necessário
-        gain = 1.0 + cfg.beta_w * W_val
+        # Ganho dependente do peso (tensor escalar)
+        gain = 1.0 + cfg.beta_w * self.W
 
         # Delta de I (versão normalizada)
         # R é [1], neuromod_scale é escalar
@@ -144,8 +143,12 @@ class MPJRDSynapse(nn.Module):
                 self.sat_time.zero_()
 
         # ===== LTD (Demoção) =====
-        # Determina threshold baseado em proteção (precisa de .item() para condicional)
-        ltd_th = cfg.ltd_threshold_saturated if self.protection.item() else cfg.i_ltd_th
+        # Threshold tensorial para LTD (evita branching por .item())
+        ltd_th = torch.where(
+            self.protection,
+            torch.full_like(self.I, cfg.ltd_threshold_saturated),
+            torch.full_like(self.I, cfg.i_ltd_th),
+        )
         
         if self.I <= ltd_th:
             if self.N > cfg.n_min:

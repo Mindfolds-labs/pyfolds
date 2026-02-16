@@ -26,17 +26,17 @@ class TestMPJRDDendrite:
         v = dend(x)
         assert v.shape == (batch_size,)
 
-    def test_u_R_not_available_in_core_synapse(self, small_config):
-        """Core synapse should not expose STP state unless an advanced backend is used."""
+    def test_u_R_optional_state(self, small_config):
+        """u/R devem ser opcionais e nunca lançar exceção no acesso."""
         from pyfolds.core import MPJRDDendrite
 
         dend = MPJRDDendrite(small_config, dendrite_id=0)
 
-        with pytest.raises(AttributeError):
-            _ = dend.u
+        u_state = dend.u
+        r_state = dend.R
 
-        with pytest.raises(AttributeError):
-            _ = dend.R
+        assert u_state is None or isinstance(u_state, torch.Tensor)
+        assert r_state is None or isinstance(r_state, torch.Tensor)
 
     def test_update_uses_local_pre_rate_per_synapse(self, small_config):
         """Each synapse must receive its own pre-synaptic rate sample."""

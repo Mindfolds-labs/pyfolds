@@ -80,8 +80,8 @@ class StatisticsAccumulator(nn.Module):
         self._history_enabled = False
 
     @property
-    def history(self) -> Dict[str, List[float]]:
-        """Histórico (criado sob demanda)."""
+    def history(self) -> Dict[str, Deque[float]]:
+        """Histórico (deques circulares, criado sob demanda)."""
         if not self._history_enabled:
             return {}
         return self._history

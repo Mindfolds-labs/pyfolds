@@ -19,7 +19,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
-import zlib
 
 from .ecc import ECCCodec, NoECC, ReedSolomonECC, ecc_from_protection
 
@@ -36,6 +35,25 @@ CHUNK_HDR_FMT = ">4sIQQII"
 FLAG_COMP_NONE = 0
 FLAG_COMP_ZSTD = 1
 
+# Tabela CRC32C (Castagnoli) para fallback sem dependência externa.
+_CRC32C_POLY = 0x82F63B78
+_CRC32C_TABLE: List[int] = []
+for _i in range(256):
+    _crc = _i
+    for _ in range(8):
+        if _crc & 1:
+            _crc = (_crc >> 1) ^ _CRC32C_POLY
+        else:
+            _crc >>= 1
+    _CRC32C_TABLE.append(_crc & 0xFFFFFFFF)
+
+
+def _crc32c_fallback(data: bytes) -> int:
+    crc = 0xFFFFFFFF
+    for byte in data:
+        crc = _CRC32C_TABLE[(crc ^ byte) & 0xFF] ^ (crc >> 8)
+    return (crc ^ 0xFFFFFFFF) & 0xFFFFFFFF
+
 
 class FoldSecurityError(RuntimeError):
     """Erro de segurança ao desserializar payload torch."""
@@ -44,7 +62,7 @@ class FoldSecurityError(RuntimeError):
 def crc32c_u32(data: bytes) -> int:
     if google_crc32c is not None:
         return int.from_bytes(google_crc32c.value(data).to_bytes(4, "big"), "big")
-    return zlib.crc32(data) & 0xFFFFFFFF
+    return _crc32c_fallback(data)
 
 
 def sha256_hex(data: bytes) -> str:
