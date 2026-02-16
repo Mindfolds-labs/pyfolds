@@ -36,3 +36,13 @@ class TestHomeostasisController:
 
         assert homeo.is_stable(tolerance=0.1) is True
         assert homeo.is_stable(tolerance=0.05) is False
+
+    def test_update_limits_theta_step(self, small_config):
+        """PID-like update deve limitar variação instantânea de theta."""
+        from pyfolds.core import HomeostasisController
+
+        homeo = HomeostasisController(small_config)
+        initial = homeo.theta.item()
+        homeo.update(1.0)
+
+        assert abs(homeo.theta.item() - initial) <= 0.5

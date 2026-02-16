@@ -24,7 +24,7 @@ import torch.nn as nn
 from typing import Optional
 from .config import MPJRDConfig
 from ..utils.types import LearningMode
-from ..utils.math import clamp_rate, clamp_R
+from ..utils.math import clamp_rate, clamp_R, safe_weight_law
 
 
 class MPJRDSynapse(nn.Module):
@@ -62,7 +62,34 @@ class MPJRDSynapse(nn.Module):
     @property
     def W(self) -> torch.Tensor:
         """Peso sináptico derivado do número de filamentos."""
-        return torch.log2(1.0 + self.N.float()) / self.cfg.w_scale
+        return safe_weight_law(
+            self.N,
+            w_scale=self.cfg.w_scale,
+            max_log_val=self.cfg.max_log_weight,
+            enforce_checks=self.cfg.numerical_stability_checks,
+        )
+
+    @torch.no_grad()
+    def _update_with_soft_saturation(self, delta_mean: torch.Tensor) -> None:
+        """Atualiza I com amortecimento suave perto dos limites."""
+        cfg = self.cfg
+
+        near_min = (self.I - cfg.i_min) < 1.0
+        near_max = (cfg.i_max - self.I) < 1.0
+        damped_delta = delta_mean
+
+        if near_max.any() and damped_delta.item() > 0:
+            excess = (self.I[near_max] - cfg.i_max) / 5.0
+            damping = 1.0 / (1.0 + torch.exp(excess))
+            damped_delta = damped_delta * damping.mean()
+
+        if near_min.any() and damped_delta.item() < 0:
+            deficit = (cfg.i_min - self.I[near_min]) / 5.0
+            damping = 1.0 / (1.0 + torch.exp(deficit))
+            damped_delta = damped_delta * damping.mean()
+
+        self.I.mul_(cfg.i_gamma).add_(damped_delta)
+        self.I.clamp_(cfg.i_min, cfg.i_max)
 
     @torch.no_grad()
     def update(self, 
@@ -122,8 +149,7 @@ class MPJRDSynapse(nn.Module):
         # ✅ Atualização in-place (tensores)
         # Usa média do batch para atualizar I (sinapse única)
         delta_mean = delta.mean()  # []
-        self.I.mul_(cfg.i_gamma).add_(delta_mean)
-        self.I.clamp_(cfg.i_min, cfg.i_max)
+        self._update_with_soft_saturation(delta_mean=delta_mean)
 
         # ✅ Eligibility in-place
         self.eligibility.add_(delta_mean)
