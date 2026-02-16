@@ -3,7 +3,7 @@
 import math
 import torch
 from collections import deque
-from typing import Dict, Any, Optional
+from typing import Dict
 from .time_mixin import TimedMixin
 
 
@@ -32,6 +32,7 @@ class BackpropMixin(TimedMixin):
         self.backprop_trace_tau = cfg.backprop_trace_tau
         self.backprop_max_amp = cfg.backprop_max_amp
         self.backprop_max_gain = cfg.backprop_max_gain
+        self.backprop_active_threshold = getattr(cfg, 'backprop_active_threshold', 0.1)
         
         self._ensure_time_counter()
         
@@ -47,6 +48,7 @@ class BackpropMixin(TimedMixin):
         # Fila de backprop
         max_queue_size = max(100, int(self.backprop_delay * 50))
         self.backprop_queue = deque(maxlen=max_queue_size)
+        self._last_backprop_time = 0.0
     
     def _ensure_backprop_trace(self, batch_size: int, device: torch.device):
         """Garante que backprop_trace existe com tamanho correto."""
@@ -66,15 +68,18 @@ class BackpropMixin(TimedMixin):
     
     def _process_backprop_queue(self, current_time: float):
         """Processa eventos de backpropagação pendentes."""
-        # ✅ CORRIGIDO: decaimento escalar com math.exp
-        decay_amp = math.exp(-1.0 / self.backprop_amp_tau)
-        decay_trace = math.exp(-1.0 / self.backprop_trace_tau)
-        
-        self.dendrite_amplification.mul_(decay_amp)
-        
-        if self.backprop_trace is not None:
-            self.backprop_trace.mul_(decay_trace)
-        
+        if self.backprop_queue:
+            time_since_last = max(0.0, current_time - self._last_backprop_time)
+            decay_amp = math.exp(-time_since_last / self.backprop_amp_tau)
+            decay_trace = math.exp(-time_since_last / self.backprop_trace_tau)
+
+            self.dendrite_amplification.mul_(decay_amp)
+
+            if self.backprop_trace is not None:
+                self.backprop_trace.mul_(decay_trace)
+
+            self._last_backprop_time = current_time
+
         while self.backprop_queue and current_time >= self.backprop_queue[0]['time']:
             event = self.backprop_queue.popleft()
             v_dend = event['v_dend']  # [B, D]
@@ -93,7 +98,7 @@ class BackpropMixin(TimedMixin):
             # ✅ CORRIGIDO: backprop trace POR AMOSTRA
             for d_idx in range(self.cfg.n_dendrites):
                 # Para cada amostra, verifica se este dendrito estava ativo
-                active_samples = v_dend[:, d_idx] > 0.1  # [B]
+                active_samples = v_dend[:, d_idx] > self.backprop_active_threshold  # [B]
                 self.backprop_trace[active_samples, d_idx, :] += self.backprop_signal
                 self.backprop_trace.clamp_(max=2.0)
     

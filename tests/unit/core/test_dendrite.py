@@ -31,6 +31,8 @@ class TestMPJRDDendrite:
         from pyfolds.core import MPJRDDendrite
 
         dend = MPJRDDendrite(small_config, dendrite_id=0)
+        dend._cached_states = {'N': torch.zeros(4, dtype=torch.int32), 'I': torch.zeros(4)}
+        dend._cache_invalid = False
 
         u_state = dend.u
         r_state = dend.R

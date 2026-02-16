@@ -228,11 +228,18 @@ class MPJRDNetwork(nn.Module):
         # Distribui em padrão esparso e estável entre dendritos/sinapses
         input_tensor = torch.zeros(B, to_layer_obj.n_neurons, D, S, device=device)
 
-        # Gerador determinístico para reprodutibilidade
+        # Gerador controlado por seed global/configurável
         generator = torch.Generator(device='cpu')
-        generator.manual_seed(42)
+        cfg_seed = getattr(getattr(to_layer_obj, 'cfg', None), 'random_seed', None)
+        seed = torch.initial_seed() if cfg_seed is None else int(cfg_seed)
+        generator.manual_seed(seed)
 
-        active_synapses = max(1, S // 4)
+        ratio = getattr(
+            to_layer_obj,
+            'active_synapses_ratio',
+            getattr(getattr(to_layer_obj, 'cfg', None), 'active_synapses_ratio', 0.25),
+        )
+        active_synapses = min(S, max(1, int(S * ratio)))
         for d_idx in range(D):
             syn_indices = torch.randperm(S, generator=generator)[:active_synapses]
             input_tensor[:, :, d_idx, syn_indices] = (

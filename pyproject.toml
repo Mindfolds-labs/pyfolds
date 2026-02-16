@@ -2,18 +2,57 @@
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "pyfolds"
+version = "2.0.0"
+description = "MPJRD Neural Computation Framework"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "PyFolds Contributors" }]
+dependencies = [
+  "torch>=2.0.0",
+  "numpy>=1.24.0",
+]
+
+[project.optional-dependencies]
+full = [
+  "zstandard>=0.21.0",
+  "google-crc32c>=1.5.0",
+  "h5py>=3.8.0",
+  "msgpack>=1.0.5",
+  "reedsolo>=1.7.0",
+  "lz4>=4.3.2",
+  "matplotlib>=3.7.0",
+  "tqdm>=4.65.0",
+]
+serialization = [
+  "h5py>=3.8.0",
+  "msgpack>=1.0.5",
+  "zstandard>=0.21.0",
+  "reedsolo>=1.7.0",
+  "google-crc32c>=1.5.0",
+]
+telemetry = ["matplotlib>=3.7.0"]
+dev = [
+  "pytest>=7.0.0",
+  "black>=23.0.0",
+  "isort>=5.0.0",
+  "mypy>=1.0.0",
+]
+
 [tool.black]
 line-length = 88
 target-version = ["py38", "py39", "py310", "py311"]
-include = '\.pyi?$'
+include = '\\.pyi?$'
 extend-exclude = '''
 /(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
+    \\.eggs
+  | \\.git
+  | \\.hg
+  | \\.mypy_cache
+  | \\.tox
+  | \\.venv
   | _build
   | build
   | dist

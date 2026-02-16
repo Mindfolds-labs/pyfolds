@@ -3,7 +3,7 @@
 import math
 import torch
 import torch.nn as nn
-from typing import Dict, Any, Optional
+from typing import Dict
 from ..utils.math import clamp_rate
 
 
@@ -62,8 +62,9 @@ class ShortTermDynamicsMixin:
             x: Tensor de entrada [B, D, S]
             dt: Passo de tempo (ms)
         """
-        # Detecta spikes pré (entrada > 0.5)
-        pre_spikes = (x > 0.5).float().mean(dim=0)  # [D, S] - média no batch
+        # Detecta spikes pré com threshold configurável
+        spike_threshold = getattr(self.cfg, 'spike_threshold', 0.5)
+        pre_spikes = (x > spike_threshold).float().mean(dim=0)  # [D, S] - média no batch
         
         # ✅ CORRIGIDO: decaimento escalar com math.exp
         decay_fac = math.exp(-dt / self.tau_fac)

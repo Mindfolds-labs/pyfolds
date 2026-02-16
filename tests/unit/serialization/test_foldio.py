@@ -15,6 +15,8 @@ from pyfolds.serialization import (
     read_nuclear_arrays,
     save_fold_or_mind,
 )
+from pyfolds.serialization.foldio import crc32c_u32
+
 
 try:
     import reedsolo  # noqa: F401
