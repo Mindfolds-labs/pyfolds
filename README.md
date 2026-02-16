@@ -55,21 +55,21 @@ Interpretação rápida:
 
 ## Portal de documentação
 
-- 📚 Índice geral: `docs/README.md`
-- 🧪 Lógica científica: `docs/SCIENTIFIC_LOGIC.md`
-- 📦 Especificação binária `.fold/.mind`: `docs/FOLD_SPECIFICATION.md`
-- 🧾 ADRs (mapa e dependências): `docs/adr/INDEX.md`
-- 🏗️ Arquitetura (C4 + sequência): `docs/ARCHITECTURE.md`
-- 🧱 Especificação binária FOLD: `docs/FOLD_SPECIFICATION.md`
-- 🗂️ ADRs de serialização/qualidade: `docs/adr/INDEX.md`
-- 🔌 Referência de API: `docs/API_REFERENCE.md`
-- 📦 Especificação binária FOLD: `docs/FOLD_SPECIFICATION.md`
-- 🧩 ADRs de arquitetura FOLD: `docs/adr/INDEX.md`
-- 🧭 Guia MNIST: `docs/guides/mnist_example.md`
-- 🌊 Tutorial Wave v3.0: `docs/guides/wave_tutorial.md`
-- 🤝 Contribuição: `CONTRIBUTING.md`
-- 📝 Histórico de versões: `CHANGELOG.md`
-- 📈 Benchmarks automatizados: `docs/BENCHMARKS.md` (dados em `docs/assets/benchmarks_results.json`)
+- 📚 **Índice geral**: [docs/README.md](docs/README.md)
+- 🧪 **Lógica científica**: [docs/SCIENTIFIC_LOGIC.md](docs/SCIENTIFIC_LOGIC.md)
+- 📦 **Especificação binária .fold/.mind**: [docs/FOLD_SPECIFICATION.md](docs/FOLD_SPECIFICATION.md)
+- 🧾 **ADRs (mapa e dependências)**: [docs/adr/INDEX.md](docs/adr/INDEX.md)
+- 🏗️ **Arquitetura (C4 + sequência)**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- 🧱 **Especificação binária FOLD**: [docs/FOLD_SPECIFICATION.md](docs/FOLD_SPECIFICATION.md)
+- 🗂️ **ADRs de serialização/qualidade**: [docs/adr/INDEX.md](docs/adr/INDEX.md)
+- 🔌 **Referência de API**: [docs/API_REFERENCE.md](docs/API_REFERENCE.md)
+- 📦 **Especificação binária FOLD**: [docs/FOLD_SPECIFICATION.md](docs/FOLD_SPECIFICATION.md)
+- 🧩 **ADRs de arquitetura FOLD**: [docs/adr/INDEX.md](docs/adr/INDEX.md)
+- 🧭 **Guia MNIST**: [docs/guides/mnist_example.md](docs/guides/mnist_example.md)
+- 🌊 **Tutorial Wave v3.0**: [docs/guides/wave_tutorial.md](docs/guides/wave_tutorial.md)
+- 🤝 **Contribuição**: [CONTRIBUTING.md](CONTRIBUTING.md)
+- 📝 **Histórico de versões**: [CHANGELOG.md](CHANGELOG.md)
+- 📈 **Benchmarks automatizados**: [docs/BENCHMARKS.md](docs/BENCHMARKS.md) (dados em `docs/assets/benchmarks_results.json`)
 
 ---
 ## 📚 Documentação Técnica
