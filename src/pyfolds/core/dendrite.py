@@ -92,24 +92,16 @@ class MPJRDDendrite(nn.Module):
         return self._cached_states['I']
 
     @property
-    def u(self) -> torch.Tensor:
+    def u(self) -> Optional[torch.Tensor]:
         """Facilitação [S] quando disponível no backend sináptico."""
         self._ensure_cache_valid()
-        if 'u' not in self._cached_states:
-            raise AttributeError(
-                "Estado 'u' não existe no core MPJRD. Use ShortTermDynamicsMixin para STP."
-            )
-        return self._cached_states['u']
+        return self._cached_states.get('u')
 
     @property
-    def R(self) -> torch.Tensor:
+    def R(self) -> Optional[torch.Tensor]:
         """Recuperação [S] quando disponível no backend sináptico."""
         self._ensure_cache_valid()
-        if 'R' not in self._cached_states:
-            raise AttributeError(
-                "Estado 'R' não existe no core MPJRD. Use ShortTermDynamicsMixin para STP."
-            )
-        return self._cached_states['R']
+        return self._cached_states.get('R')
 
     @property
     def W(self) -> torch.Tensor:
@@ -175,12 +167,14 @@ class MPJRDDendrite(nn.Module):
     def get_states(self) -> Dict[str, torch.Tensor]:
         """Retorna todos os estados."""
         self._ensure_cache_valid()
-        return {
+        states = {
             'N': self.N.clone(),
             'W': self.W.clone(),
             'I': self.I.clone(),
-            **({'u': self.u.clone(), 'R': self.R.clone()} if 'u' in self._cached_states else {})
         }
+        if self.u is not None and self.R is not None:
+            states.update({'u': self.u.clone(), 'R': self.R.clone()})
+        return states
 
     def load_states(self, states: Dict[str, torch.Tensor]) -> None:
         """Carrega estados."""
