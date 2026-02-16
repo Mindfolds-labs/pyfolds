@@ -27,23 +27,33 @@ class STDPMixin:
     Bi, G. Q., & Poo, M. M. (1998).
     "Synaptic modifications in cultured hippocampal neurons".
     """
-
-    def _init_stdp(
-        self,
-        tau_pre: float = 20.0,
-        tau_post: float = 20.0,
-        A_plus: float = 0.01,
-        A_minus: float = 0.012,
-        plasticity_mode: str = "both",
-    ):
-        """Inicializa parâmetros e estado do mecanismo de STDP.
-
-        :param tau_pre: Constante de tempo do traço pré-sináptico.
-        :param tau_post: Constante de tempo do traço pós-sináptico.
-        :param A_plus: Amplitude de LTP.
-        :param A_minus: Amplitude de LTD.
-        :param plasticity_mode: Modo de plasticidade
-            (``"stdp"``, ``"hebbian"``, ``"both"``, ``"none"``).
+    Mixin para STDP (Spike-Timing Dependent Plasticity).
+    
+    ✅ VETORIZADO: sem loops Python
+    ✅ SEMÂNTICA: POR AMOSTRA (batch independente)
+    ℹ️ NOTA: O spike pós-sináptico é broadcast para todos os dendritos
+       da amostra; não há seleção de dendrito pós-sináptico específica.
+    
+    Implementa plasticidade baseada em temporização de spikes:
+        - LTP: spike pré antes do pós
+        - LTD: spike pós antes do pré
+    
+    Baseado em:
+        - Bi & Poo (1998) - Synaptic modifications in cultured hippocampal neurons
+    """
+    
+    def _init_stdp(self, tau_pre: float = 20.0, tau_post: float = 20.0,
+                    A_plus: float = 0.01, A_minus: float = 0.012,
+                    plasticity_mode: str = "both"):
+        """
+        Inicializa parâmetros STDP.
+        
+        Args:
+            tau_pre: Constante de tempo do traço pré-sináptico
+            tau_post: Constante de tempo do traço pós-sináptico
+            A_plus: Amplitude LTP
+            A_minus: Amplitude LTD
+            plasticity_mode: 'stdp', 'hebbian', 'both', 'none'
         """
         self.tau_pre = tau_pre
         self.tau_post = tau_post
@@ -100,8 +110,9 @@ class STDPMixin:
 
         # Adiciona aos traços pré
         self.trace_pre.add_(pre_spikes)
-
-        # Spike pós (broadcast para [B, 1, 1])
+        
+        # Spike pós é global por amostra e broadcast para [B, 1, 1]
+        # (mesma modulação para todos os dendritos/sinapses da amostra).
         post_expanded = post_spike.view(-1, 1, 1)  # [B, 1, 1]
 
         # LTD: onde trace_post > threshold

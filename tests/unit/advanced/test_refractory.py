@@ -70,3 +70,25 @@ class TestRefractoryMixin:
         expected = torch.tensor([5.0, -1000.0, 5.0])
         assert torch.allclose(neuron.last_spike_time, expected)
         assert neuron.time_counter.item() == 6.0
+
+
+    def test_refractory_blocks_spikes(self, full_config):
+        """Absolute refractory window should force spikes to zero."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
+
+        x = torch.ones(1, full_config.n_dendrites, full_config.n_synapses_per_dendrite)
+
+        # Primeiro passo: gera spike e marca last_spike_time no tempo 0.
+        first = neuron.forward(x, dt=1.0)
+        assert first['spikes'].shape[0] == 1
+
+        # Força estado no refratário absoluto para a próxima chamada.
+        neuron.time_counter.fill_(1.0)
+        neuron.last_spike_time = torch.tensor([0.0])
+
+        second = neuron.forward(x, dt=1.0)
+        assert second['refrac_blocked'][0].item() is True
+        assert second['spikes'][0].item() == 0.0
