@@ -44,6 +44,8 @@ pip install -e .[dev]
 - 🧪 Lógica científica: `docs/SCIENTIFIC_LOGIC.md`
 - 🏗️ Arquitetura (C4 + sequência): `docs/ARCHITECTURE.md`
 - 🔌 Referência de API: `docs/API_REFERENCE.md`
+- 📦 Especificação binária FOLD: `docs/FOLD_SPECIFICATION.md`
+- 🧩 ADRs de arquitetura FOLD: `docs/adr/INDEX.md`
 - 🧭 Guia MNIST: `docs/guides/mnist_example.md`
 - 🌊 Tutorial Wave v3.0: `docs/guides/wave_tutorial.md`
 - 🤝 Contribuição: `CONTRIBUTING.md`
