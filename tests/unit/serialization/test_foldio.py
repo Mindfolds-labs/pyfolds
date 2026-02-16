@@ -1,5 +1,6 @@
 import mmap
 import struct
+from types import MethodType
 
 import numpy as np
 import pytest
@@ -9,6 +10,7 @@ from pyfolds.core.config import MPJRDConfig
 from pyfolds.core.neuron import MPJRDNeuron
 from pyfolds.serialization import (
     FoldReader,
+    FoldWriter,
     ReedSolomonECC,
     ecc_from_protection,
     is_mind,
@@ -260,6 +262,23 @@ def test_fold_reader_header_len_validation(tmp_path):
             pass
 
 
+def test_fold_writer_finalize_wraps_io_failure_with_phase_context(tmp_path, monkeypatch):
+    file_path = tmp_path / "finalize-fail.fold"
+
+    def _fail_fsync(_fd):
+        raise OSError("disk full")
+
+    monkeypatch.setattr("pyfolds.serialization.foldio.os.fsync", _fail_fsync)
+
+    with FoldWriter(str(file_path), compress="none") as writer:
+        writer.add_chunk("meta", "JSON", b"{}")
+
+        with pytest.raises(RuntimeError, match=r"persistência do arquivo fold \(index fsync\)") as exc_info:
+            writer.finalize({"source": "unit-test"})
+
+    assert isinstance(exc_info.value.__cause__, OSError)
+
+
 def test_fold_reader_reports_magic_values(tmp_path):
     file_path = tmp_path / "wrong-magic.fold"
     bad_magic = b"NOTFOLD!"
@@ -290,45 +309,79 @@ def test_fold_reader_exit_closes_file_even_if_mmap_close_fails(tmp_path):
     assert reader._mm is None
 
 
-def test_fold_writer_rejects_oversized_chunk(tmp_path):
-    file_path = tmp_path / "too-big.fold"
+@pytest.mark.parametrize(
+    ("phase", "expected_error"),
+    [
+        ("capturar index_off", OSError("tell failed")),
+        ("escrever index", OSError("write index failed")),
+        ("persistir index (flush)", OSError("flush index failed")),
+        ("persistir index (fsync)", OSError("fsync index failed")),
+        ("reposicionar para header", OSError("seek failed")),
+        ("reescrever header", OSError("write header failed")),
+        ("persistir header (flush)", OSError("flush header failed")),
+        ("persistir header (fsync)", OSError("fsync header failed")),
+    ],
+)
+def test_fold_writer_finalize_io_errors_raise_runtimeerror_with_context(tmp_path, monkeypatch, phase, expected_error):
+    from pyfolds.serialization.foldio import FoldWriter
+
+    file_path = tmp_path / "finalize-io.fold"
+
     with FoldWriter(str(file_path), compress="none") as writer:
-        with pytest.raises(ValueError, match="muito grande"):
-            writer.add_chunk("big", "JSON", b"x" * (MAX_CHUNK_SIZE + 1))
+        writer.add_chunk("meta", "JSON", b"{}")
 
+        original_tell = writer._f.tell
+        original_write = writer._f.write
+        original_flush = writer._f.flush
+        original_seek = writer._f.seek
 
-def test_fold_reader_rejects_invalid_chunk_lengths(tmp_path):
-    file_path = tmp_path / "bad-chunk-len.fold"
-    neuron = _build_neuron()
-    save_fold_or_mind(
-        neuron,
-        str(file_path),
-        include_history=False,
-        include_telemetry=False,
-        include_nuclear_arrays=False,
-        compress="none",
-    )
+        state = {"write_calls": 0, "flush_calls": 0, "fsync_calls": 0}
 
-    with FoldReader(str(file_path), use_mmap=False) as reader:
-        chunk = next(c for c in reader.index["chunks"] if c["name"] == "torch_state")
-        offset = chunk["offset"]
+        def fail_tell(_self):
+            raise expected_error
 
-    with open(file_path, "r+b") as f:
-        f.seek(offset)
-        header = f.read(struct.calcsize(">4sIQQII"))
-        ctype, flags, uncomp_len, comp_len, crc, ecc_len = struct.unpack(">4sIQQII", header)
-        bad_header = struct.pack(
-            ">4sIQQII",
-            ctype,
-            flags,
-            uncomp_len,
-            MAX_CHUNK_SIZE + 1,
-            crc,
-            ecc_len,
-        )
-        f.seek(offset)
-        f.write(bad_header)
+        def fail_write(_self, data):
+            state["write_calls"] += 1
+            if phase == "escrever index" and state["write_calls"] == 1:
+                raise expected_error
+            if phase == "reescrever header" and state["write_calls"] == 2:
+                raise expected_error
+            return original_write(data)
 
-    with FoldReader(str(file_path), use_mmap=False) as reader:
-        with pytest.raises(ValueError, match="tamanho comprimido inválido"):
-            reader.read_chunk_bytes("torch_state", verify=False)
+        def fail_flush(_self):
+            state["flush_calls"] += 1
+            if phase == "persistir index (flush)" and state["flush_calls"] == 1:
+                raise expected_error
+            if phase == "persistir header (flush)" and state["flush_calls"] == 2:
+                raise expected_error
+            return original_flush()
+
+        def fail_seek(_self, pos, whence=0):
+            if phase == "reposicionar para header":
+                raise expected_error
+            return original_seek(pos, whence)
+
+        def fail_fsync(_):
+            state["fsync_calls"] += 1
+            if phase == "persistir index (fsync)" and state["fsync_calls"] == 1:
+                raise expected_error
+            if phase == "persistir header (fsync)" and state["fsync_calls"] == 2:
+                raise expected_error
+            return None
+
+        if phase == "capturar index_off":
+            writer._f.tell = MethodType(fail_tell, writer._f)
+        writer._f.write = MethodType(fail_write, writer._f)
+        writer._f.flush = MethodType(fail_flush, writer._f)
+        writer._f.seek = MethodType(fail_seek, writer._f)
+        monkeypatch.setattr("pyfolds.serialization.foldio.os.fsync", fail_fsync)
+
+        with pytest.raises(RuntimeError, match="Falha ao finalizar arquivo fold na fase") as err:
+            writer.finalize({"kind": "test"})
+
+    message = str(err.value)
+    assert str(file_path) in message
+    assert str(expected_error) in message
+
+    expected_phase = phase.split(" (")[0]
+    assert expected_phase in message

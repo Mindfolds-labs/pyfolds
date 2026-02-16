@@ -311,22 +311,33 @@ class FoldWriter:
             "metadata": metadata,
             "chunks": self._chunks,
         }
-        index_bytes = _json_bytes(index)
 
-        self._f.flush()
         index_off = self._f.tell()
-        self._f.write(index_bytes)
-        self._f.flush()
-        os.fsync(self._f.fileno())
 
+        phase = "index write"
         try:
+            self._f.write(index_bytes)
+
+            phase = "index flush"
+            self._f.flush()
+
+            phase = "index fsync"
+            os.fsync(self._f.fileno())
+
+            phase = "header seek"
             self._f.seek(0)
+
+            phase = "header write"
             header_len = struct.calcsize(HEADER_FMT)
             self._f.write(struct.pack(HEADER_FMT, MAGIC, header_len, index_off, len(index_bytes)))
+
+            phase = "header flush"
             self._f.flush()
+
+            phase = "header fsync"
             os.fsync(self._f.fileno())
         except Exception as exc:
-            raise RuntimeError(f"Falha ao escrever header do arquivo fold: {exc}") from exc
+            raise RuntimeError(f"Falha durante persistência do arquivo fold ({phase}): {exc}") from exc
 
 
 class FoldReader:
