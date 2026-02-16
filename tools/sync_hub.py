@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import csv
 import sys
+from datetime import datetime
 from pathlib import Path
 
 CSV_PATH = Path("docs/development/execution_queue.csv")
@@ -44,6 +45,37 @@ def _norm(value: str | None) -> str:
 
 def _escape_md(value: str) -> str:
     return value.replace("|", r"\|").replace("\n", " ")
+
+
+def _normalize_date(value: str) -> str:
+    cleaned = _norm(value)
+    if not cleaned:
+        return ""
+
+    formats = ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y")
+    for fmt in formats:
+        try:
+            parsed = datetime.strptime(cleaned, fmt)
+            return parsed.strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return cleaned
+
+
+def _format_cell(key: str, value: str) -> str:
+    cleaned = _norm(value)
+    if not cleaned:
+        return "-"
+
+    if key == "data":
+        return _escape_md(_normalize_date(cleaned))
+
+    if key == "artefatos":
+        parts = [part.strip() for part in cleaned.split(";") if part.strip()]
+        if parts:
+            return "<br>".join(_escape_md(part) for part in parts)
+
+    return _escape_md(cleaned)
 
 
 def read_rows(csv_path: Path) -> list[dict[str, str]]:
@@ -91,7 +123,7 @@ def build_table(rows: list[dict[str, str]]) -> str:
     ]
 
     for row in rows:
-        values = [_escape_md(_norm(row.get(key))) or "-" for key in keys]
+        values = [_format_cell(key, row.get(key, "")) for key in keys]
         lines.append("| " + " | ".join(values) + " |")
 
     return "\n".join(lines)
