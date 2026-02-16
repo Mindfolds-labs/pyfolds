@@ -57,19 +57,21 @@ class RefractoryMixin(TimedMixin):
             
         Returns:
             Tuple com:
-                - in_absolute: [B] máscara para refratário absoluto
-                - theta_boost: [B] boost no threshold para refratário relativo
+                - blocked: [B] máscara de bloqueio (absoluto + relativo)
+                - theta_boost: [B] boost no threshold (apenas relativo)
         """
         time_since = current_time - self.last_spike_time
         
         # Refratário absoluto: bloqueia spikes imediatamente após disparo
         in_absolute = time_since <= self.t_refrac_abs
 
-        # Refratário relativo: threshold elevado
+        # Refratário relativo: também bloqueia spikes, mas com boost de threshold
         in_relative = (
             (time_since > self.t_refrac_abs) &
             (time_since <= self.t_refrac_rel)
         )
+
+        blocked = in_absolute | in_relative
 
         # Boost no threshold durante refratário relativo
         theta_boost = torch.where(
@@ -78,7 +80,7 @@ class RefractoryMixin(TimedMixin):
             torch.zeros_like(time_since),
         )
 
-        return in_absolute, theta_boost
+        return blocked, theta_boost
     
     def _update_refractory_batch(self, spikes: torch.Tensor, dt: float = 1.0):
         """
@@ -123,7 +125,7 @@ class RefractoryMixin(TimedMixin):
         
         # Verifica estado refratário
         current_time = self.time_counter.item()
-        in_absolute, theta_boost = self._check_refractory_batch(current_time, batch_size)
+        blocked, theta_boost = self._check_refractory_batch(current_time, batch_size)
         
         # Aplica refratário
         # theta_eff deve permanecer 1-D ([B]) para preservar a semântica
@@ -131,12 +133,12 @@ class RefractoryMixin(TimedMixin):
         theta_eff = output['theta'] + theta_boost
         spikes_rel = (output['u'] >= theta_eff).float()
         
-        # Bloqueia spikes durante refratário absoluto
-        final_spikes = torch.where(in_absolute, torch.zeros_like(spikes_rel), spikes_rel)
+        # Bloqueia spikes durante refratário (absoluto + relativo)
+        final_spikes = torch.where(blocked, torch.zeros_like(spikes_rel), spikes_rel)
         
         # Atualiza output
         output['spikes'] = final_spikes
-        output['refrac_blocked'] = in_absolute
+        output['refrac_blocked'] = blocked
         output['theta_boost'] = theta_boost
         
         # Atualiza estado refratário
