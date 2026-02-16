@@ -2,9 +2,8 @@
 
 import torch
 import torch.nn as nn
-from typing import Optional, Tuple, Dict, List, Union, Deque
-from dataclasses import dataclass, field
-import warnings
+from typing import Optional, Dict, List, Deque
+from dataclasses import dataclass
 from collections import deque
 
 
@@ -192,7 +191,6 @@ class StatisticsAccumulator(nn.Module):
         if not self._history_enabled:
             return
             
-        batch_size = spikes.shape[0]
         spike_rate = spikes.float().mean().item()
         sparsity = (gated > 0).float().mean().item()
         

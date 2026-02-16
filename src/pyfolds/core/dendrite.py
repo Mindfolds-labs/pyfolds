@@ -2,7 +2,7 @@
 
 import torch
 import torch.nn as nn
-from typing import Optional, Dict, List
+from typing import Optional, Dict
 from .config import MPJRDConfig
 from .synapse import MPJRDSynapse
 
@@ -86,7 +86,7 @@ class MPJRDDendrite(nn.Module):
         return self._cached_states['N']
 
     @property
-    def I(self) -> torch.Tensor:
+    def I(self) -> torch.Tensor:  # noqa: E743
         """Potencial interno [S] - ✅ retorna do cache."""
         self._ensure_cache_valid()
         return self._cached_states['I']

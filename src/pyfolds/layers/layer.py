@@ -2,7 +2,7 @@
 
 import torch
 import torch.nn as nn
-from typing import Optional, Dict, List, Any, Union, Type
+from typing import Optional, Dict, List, Any, Type
 from ..core.config import MPJRDConfig
 from ..core.neuron import MPJRDNeuron
 from ..utils.types import LearningMode

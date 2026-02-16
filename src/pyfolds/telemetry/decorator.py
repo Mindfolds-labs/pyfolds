@@ -2,7 +2,7 @@
 
 import time
 import functools
-from typing import Optional, Callable, Any
+from typing import Optional, Callable
 from .controller import TelemetryController
 from .events import forward_event, commit_event, sleep_event
 

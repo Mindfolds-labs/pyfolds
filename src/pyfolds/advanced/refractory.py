@@ -1,7 +1,7 @@
 """Mixin para período refratário."""
 
 import torch
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Tuple
 from .time_mixin import TimedMixin
 
 

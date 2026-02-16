@@ -59,9 +59,6 @@ class STDPMixin:
         self.A_minus = A_minus
         self.plasticity_mode = plasticity_mode
 
-        D = self.cfg.n_dendrites
-        S = self.cfg.n_synapses_per_dendrite
-
         # Traços POR AMOSTRA
         self.trace_pre = None  # [B, D, S]
         self.trace_post = None  # [B, D, S]
@@ -90,8 +87,6 @@ class STDPMixin:
         """
         batch_size = x.shape[0]
         device = x.device
-        D, S = self.cfg.n_dendrites, self.cfg.n_synapses_per_dendrite
-
         self._ensure_traces(batch_size, device)
 
         # Decaimento escalar

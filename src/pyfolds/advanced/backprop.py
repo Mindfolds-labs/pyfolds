@@ -37,7 +37,6 @@ class BackpropMixin(TimedMixin):
         self._ensure_time_counter()
         
         D = self.cfg.n_dendrites
-        S = self.cfg.n_synapses_per_dendrite
         
         # Amplificação dendrítica: GLOBAL (média do batch)
         self.register_buffer("dendrite_amplification", torch.zeros(D))

@@ -1,10 +1,9 @@
 """Sinks (destinations) for telemetry events."""
 
 import json
-import warnings
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Optional, Union
+from typing import List, Union
 from pathlib import Path
 from .events import TelemetryEvent
 from .ringbuffer import RingBuffer

@@ -2,7 +2,7 @@
 
 import math
 import torch
-from typing import Dict, Any, Optional
+from typing import Dict
 from ..utils.types import LearningMode
 
 

@@ -2,7 +2,7 @@
 
 import torch
 import torch.nn as nn
-from typing import Dict, Optional, List, Union, Tuple
+from typing import Dict, Optional, List, Tuple
 from collections import defaultdict, deque
 from ..layers import MPJRDLayer
 from ..utils.types import LearningMode
@@ -176,7 +176,7 @@ class MPJRDNetwork(nn.Module):
             in_degree[to_l] += 1
         
         # Kahn's algorithm
-        queue = deque([l for l in self.layers if in_degree[l] == 0])
+        queue = deque([layer_name for layer_name in self.layers if in_degree[layer_name] == 0])
         result = []
         
         while queue:

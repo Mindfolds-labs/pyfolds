@@ -1,6 +1,6 @@
 """Tipos de payload para telemetria"""
 
-from typing import TypedDict, Optional
+from typing import TypedDict
 
 
 class ForwardPayload(TypedDict, total=False):
