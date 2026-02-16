@@ -37,6 +37,7 @@ class TestMPJRDConfig:
         with pytest.raises(ValueError):
             cfg.get_decay_rate(-1.0)
 
+
     def test_get_decay_rate_negative_dt_validation(self):
         """dt negativo deve gerar erro explícito."""
         cfg = pyfolds.MPJRDConfig()
