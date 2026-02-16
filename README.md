@@ -72,15 +72,38 @@ Interpretação rápida:
 - 📈 Benchmarks automatizados: `docs/BENCHMARKS.md` (dados em `docs/assets/benchmarks_results.json`)
 
 ---
-## 📚 Portal de Documentação
-Nossa base de conhecimento técnica está organizada no Índice de Documentação:
+📚 Documentação Técnica
+Nossa documentação é organizada para facilitar a navegação por níveis de interesse:
 
-🚀 Desenvolvedores: Referência de API e Guia MNIST.
+🚀 Para Desenvolvedores
+Guia de Introdução: Instalação e conceitos básicos.
 
-🧪 Pesquisadores: Lógica Científica e Arquitetura de Sistema.
+Referência da API: Detalhamento de classes e métodos.
 
-📦 Especificações: Protocolo FOLD e Registro de Decisões (ADRs).
-Os resultados de benchmark ficam em:
+Exemplos Práticos: Implementações reais (MNIST).
+
+🧪 Para Pesquisadores
+Lógica Científica: Fundamentação do modelo MPJRD.
+
+Especificação FOLD: Protocolo de serialização binária.
+
+Architecture Decision Records (ADRs): Por que tomamos essas decisões?.
+
+🛡️ Governança e Qualidade
+Mantemos um plano de qualidade rigoroso para garantir a estabilidade do framework:
+
+Testes: Cobertura automatizada para cada módulo do core.
+
+Benchmarks: Relatórios de performance e throughput.
+
+Riscos: Monitoramento de inconsistências e débitos.
+
+🤝 Contribuição
+O desenvolvimento é regido por padrões de engenharia de software de elite. Se você deseja contribuir, por favor leia nosso Manual de Desenvolvimento Interno.
+
+<div align="center">
+<sub>Uma iniciativa <strong>Mindfolds Labs</strong>.</sub>
+</div>
 ---
 - `docs/BENCHMARKS.md`
 - `docs/assets/benchmarks_results.json`
