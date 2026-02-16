@@ -1,5 +1,9 @@
 """Container .fold/.mind com chunking, leitura parcial, integridade e ECC opcional.
 
+Rastreabilidade de decisão (ADR):
+- ADR-001/ADR-002: formato de container `.fold/.mind` e serialização por chunks.
+- ADR-003: hardening de desserialização segura de payloads torch.
+
 Dependências opcionais:
 - zstandard: compressão/descompressão ZSTD.
 - google-crc32c: cálculo CRC32C acelerado (recomendado para integridade).

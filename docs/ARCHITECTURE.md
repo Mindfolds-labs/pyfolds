@@ -60,7 +60,7 @@ No desenho atual do PyFOLDS, isso é respeitado por:
 
 ## 5) Diagrama técnico
 
-Veja o fluxo em Mermaid em: `docs/diagrams/dendritic_processing_flow.mmd`.
+Veja o fluxo em Mermaid em: `docs/architecture/blueprints/dendritic_processing_flow.mmd`.
 
 ## 6) Padrões e robustez implementados
 
