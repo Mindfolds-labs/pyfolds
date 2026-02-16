@@ -32,10 +32,10 @@ class TestRefractoryMixin:
         
         # -10.0: 15ms ago → fora do refratário
         # 1.0: 4ms ago → refratário relativo (não bloqueia, aumenta theta)
-        # 3.0: 2ms ago → início do refratário relativo
+        # 3.0: 2ms ago → refratário absoluto (limite superior)
         assert blocked[1].item() is False
         assert theta_boost[1].item() == neuron.refrac_rel_strength
-        assert theta_boost[2].item() == neuron.refrac_rel_strength
+        assert theta_boost[2].item() == 0.0
     
         neuron._ensure_last_spike_time(batch_size=1, device=torch.device("cpu"))
         neuron.last_spike_time = torch.tensor([0.0])
@@ -45,7 +45,7 @@ class TestRefractoryMixin:
         assert theta_boost[0].item() == 0.0
 
         blocked, theta_boost = neuron._check_refractory_batch(3.0, batch_size=1)
-        assert blocked[0].item() is True
+        assert blocked[0].item() is False
         assert theta_boost[0].item() == neuron.refrac_rel_strength
 
         blocked, theta_boost = neuron._check_refractory_batch(6.0, batch_size=1)

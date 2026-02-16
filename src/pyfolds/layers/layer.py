@@ -67,7 +67,6 @@ class MPJRDLayer(nn.Module):
 
         # Cria neurônios com telemetria (se ativada)
         self.neuron_cls = neuron_cls
-        self.neuron_class = neuron_cls  # compatibilidade retroativa
         self.neurons = nn.ModuleList([
             neuron_cls(
                 cfg,

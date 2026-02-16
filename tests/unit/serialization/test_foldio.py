@@ -145,10 +145,11 @@ def test_ecc_from_protection_mapping():
         ecc_from_protection("ultra")
 
 
-@pytest.mark.skipif(not HAS_REEDSOLO, reason="reedsolo não instalado")
 def test_ecc_roundtrip_if_available(tmp_path):
     neuron = _build_neuron()
     file_path = tmp_path / "ecc.fold"
+
+    ecc_codec = ReedSolomonECC(symbols=16) if HAS_REEDSOLO else ecc_from_protection("off")
 
     save_fold_or_mind(
         neuron,
@@ -157,14 +158,18 @@ def test_ecc_roundtrip_if_available(tmp_path):
         include_telemetry=False,
         include_nuclear_arrays=True,
         compress="none",
-        ecc=ReedSolomonECC(symbols=16),
+        ecc=ecc_codec,
     )
 
     with FoldReader(str(file_path), use_mmap=True) as reader:
         chunks = {c["name"]: c for c in reader.index["chunks"]}
 
-    assert chunks["torch_state"]["ecc_algo"] == "rs(16)"
-    assert chunks["torch_state"]["ecc_len"] > 0
+    if HAS_REEDSOLO:
+        assert chunks["torch_state"]["ecc_algo"] == "rs(16)"
+        assert chunks["torch_state"]["ecc_len"] > 0
+    else:
+        assert chunks["torch_state"]["ecc_algo"] == "none"
+        assert chunks["torch_state"]["ecc_len"] == 0
 
 
 def test_crc32c_matches_known_vector():
