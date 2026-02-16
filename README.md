@@ -53,92 +53,60 @@ Interpretação rápida:
 - **razão de compressão vs `none`**: valores menores que `1.0` indicam arquivo comprimido menor. O método pode ser `fold:zstd` (quando disponível) ou fallback `zlib(level=6)`.
 - O workflow `.github/workflows/benchmarks.yml` executa semanalmente e atualiza os artefatos automaticamente.
 
-## Portal de documentação
+## 📚 Portal de Documentação
 
-- 📚 **Índice geral**: [docs/README.md](docs/README.md)
-- 🧪 **Lógica científica**: [docs/SCIENTIFIC_LOGIC.md](docs/SCIENTIFIC_LOGIC.md)
-- 📦 **Especificação binária .fold/.mind**: [docs/FOLD_SPECIFICATION.md](docs/FOLD_SPECIFICATION.md)
-- 🧾 **ADRs (mapa e dependências)**: [docs/adr/INDEX.md](docs/adr/INDEX.md)
-- 🏗️ **Arquitetura (C4 + sequência)**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- 🧱 **Especificação binária FOLD**: [docs/FOLD_SPECIFICATION.md](docs/FOLD_SPECIFICATION.md)
-- 🗂️ **ADRs de serialização/qualidade**: [docs/adr/INDEX.md](docs/adr/INDEX.md)
-- 🔌 **Referência de API**: [docs/API_REFERENCE.md](docs/API_REFERENCE.md)
-- 📦 **Especificação binária FOLD**: [docs/FOLD_SPECIFICATION.md](docs/FOLD_SPECIFICATION.md)
-- 🧩 **ADRs de arquitetura FOLD**: [docs/adr/INDEX.md](docs/adr/INDEX.md)
-- 🧭 **Guia MNIST**: [docs/guides/mnist_example.md](docs/guides/mnist_example.md)
-- 🌊 **Tutorial Wave v3.0**: [docs/guides/wave_tutorial.md](docs/guides/wave_tutorial.md)
-- 🤝 **Contribuição**: [CONTRIBUTING.md](CONTRIBUTING.md)
-- 📝 **Histórico de versões**: [CHANGELOG.md](CHANGELOG.md)
-- 📈 **Benchmarks automatizados**: [docs/BENCHMARKS.md](docs/BENCHMARKS.md) (dados em `docs/assets/benchmarks_results.json`)
+Acesso rápido aos ativos de conhecimento e especificações do projeto:
+
+- 📑 **[Índice Geral](docs/README.md)**: Mapa completo de navegação.
+- 🧪 **[Lógica Científica](docs/SCIENTIFIC_LOGIC.md)**: Fundamentação teórica do modelo MPJRD.
+- 🏗️ **[Arquitetura](docs/ARCHITECTURE.md)**: Diagramas C4, sequência e Wave v3.0.
+- 📦 **[Protocolo .fold/.mind](docs/FOLD_SPECIFICATION.md)**: Especificação de serialização binária.
+- 🔌 **[Referência de API](docs/API_REFERENCE.md)**: Documentação funcional de módulos e classes.
+- 🧾 **[Registro de ADRs](docs/adr/INDEX.md)**: Histórico de decisões arquiteturais.
+- 📈 **[Relatório de Benchmarks](docs/BENCHMARKS.md)**: Métricas de performance e compressão.
 
 ---
-## 📚 Documentação Técnica
 
-Nossa documentação é organizada para facilitar a navegação por níveis de interesse:
+## 🛠️ Manuais de Implementação
+
+Nossa documentação é segmentada por perfil de atuação para otimizar o tempo de busca (UX):
 
 ### 🚀 Para Desenvolvedores
-* **Guia de Introdução**: [Instalação e conceitos básicos](docs/guides/QUICKSTART.md).
-* **Referência da API**: [Detalhamento de classes e métodos](docs/API_REFERENCE.md).
-* **Exemplos Práticos**: [Implementações reais (MNIST)](examples/).
+* **Quickstart**: [Instalação e conceitos básicos](docs/guides/QUICKSTART.md).
+* **Guia MNIST**: [Exemplo prático de visão computacional](docs/guides/mnist_example.md).
+* **Tutorial Wave**: [Implementação de dinâmica de fase](docs/guides/wave_tutorial.md).
+* **Exemplos**: [Repositório de códigos de referência](examples/).
 
-### 🧪 Para Pesquisadores
-* **Lógica Científica**: [Fundamentação do modelo MPJRD](docs/SCIENTIFIC_LOGIC.md).
-* **Especificação FOLD**: [Protocolo de serialização binária](docs/FOLD_SPECIFICATION.md).
-* **Architecture Decision Records (ADRs)**: [Por que tomamos essas decisões?](docs/adr/INDEX.md).
-
----
-
-## 🛡️ Governança e Qualidade
-
-Mantemos um plano de qualidade rigoroso para garantir a estabilidade do framework:
-
-* **Testes**: Cobertura automatizada para cada módulo do core.
-* **Benchmarks**: [Relatórios de performance e throughput](docs/BENCHMARKS.md).
-* **Riscos**: [Monitoramento de inconsistências e débitos](RISK_REGISTER.md).
+### 🧪 Para Pesquisadores e Arquitetos
+* **Design Rationale**: Justificativas técnicas e científicas no [Índice de ADRs](docs/adr/INDEX.md).
+* **Validação**: Protocolos de integridade descritos na [Especificação FOLD](docs/FOLD_SPECIFICATION.md).
 
 ---
 
-## 🤝 Contribuição
+## 🛡️ Governança e Qualidade (Caminho Canônico)
 
-O desenvolvimento é regido por padrões de engenharia de software de elite. Se você deseja contribuir, por favor leia nosso **[Manual de Desenvolvimento Interno](SUMARIO_COMPLETO.md)**.
+Para garantir a integridade sistêmica e evitar a divergência entre plano e código, os artefatos abaixo são as **Fontes da Verdade** na raiz do projeto:
 
-<div align="center">
-<sub>Uma iniciativa <strong>Mindfolds Labs</strong>.</sub>
-</div>
+| Eixo | Documentos de Referência |
+| :--- | :--- |
+| **Planejamento** | [`SUMARIO_COMPLETO.md`](SUMARIO_COMPLETO.md) • [`tarefas_pendentes.md`](tarefas_pendentes.md) |
+| **Qualidade/RCA** | [`analise_bugs.md`](analise_bugs.md) • [`revisao_fold_mind.md`](revisao_fold_mind.md) |
+| **Implementação** | [`solucoes_fold_mind.py`](solucoes_fold_mind.py) • [`VISUAL_FINAL.txt`](VISUAL_FINAL.txt) |
 
-- `docs/BENCHMARKS.md`
-- `docs/assets/benchmarks_results.json`
+> **Nota de Sincronização**: Referência atual baseada na branch `work`.
 
-Para reproduzir localmente:
+---
+
+## 📈 Validação Local
+
+Para reproduzir os testes de throughput e compressão em seu ambiente:
 
 ```bash
+# Executa a suíte de benchmarks
 python scripts/run_benchmarks.py
-```
 
-## Documentos de acompanhamento (caminho canônico)
-
-Para evitar divergência entre plano e código, os documentos abaixo ficam versionados na raiz do repositório:
-
-- [`SUMARIO_COMPLETO.md`](SUMARIO_COMPLETO.md)
-- [`analise_bugs.md`](analise_bugs.md)
-- [`revisao_fold_mind.md`](revisao_fold_mind.md)
-- [`tarefas_pendentes.md`](tarefas_pendentes.md)
-- [`solucoes_fold_mind.py`](solucoes_fold_mind.py)
-- [`VISUAL_FINAL.txt`](VISUAL_FINAL.txt)
-
-## Pacote de governança (canônico)
-
-Para evitar divergência futura entre plano e artefatos de referência, os documentos canônicos estão na raiz do projeto:
-
-- `SUMARIO_COMPLETO.md`
-- `analise_bugs.md`
-- `revisao_fold_mind.md`
-- `tarefas_pendentes.md`
-- `solucoes_fold_mind.py`
-- `VISUAL_FINAL.txt`
-
-Referência de consolidação atual: branch `work` e sem tags locais publicadas.
-
+# Gera a documentação de performance atualizada
+python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/BENCHMARKS.md
 ## Exemplo rápido
 
 ```python
