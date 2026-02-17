@@ -49,6 +49,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-012 | DONE (aguardando revisão humana) | Auditoria de código em src + testes + ADR-035 | Codex | 2026-02-17 |
 | ISSUE-013 | DONE (aguardando revisão humana) | Estabilizar instalação editável em rede restrita e consolidar falhas da auditoria ADR-035 | Codex | 2026-02-17 |
 | ISSUE-014 | DONE (aguardando revisão humana) | Auditoria SRC/Testes ADR-035 + gate CI docs hub com Sphinx/MyST/PyData | Codex | 2026-02-17 |
+| ISSUE-015 | DONE (aguardando revisão humana) | Validar erros corrigidos + importacao pyfolds + suite completa + governanca | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
