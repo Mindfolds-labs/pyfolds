@@ -55,6 +55,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-018 | Concluída | Padronização de relatórios e obrigatoriedade de sync HUB | Codex | 2026-02-17 |
 | ISSUE-019 | Concluída | Determinismo de relatórios e logs no workflow de prompts | Codex | 2026-02-17 |
 | ISSUE-020 | Concluída | Relatório CI Docs Hub e correções para Sphinx/MyST | Codex | 2026-02-17 |
+| ISSUE-021 | Planejada | Auditoria total do repositório com análise sênior (sem execução de mudanças de produto) | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
@@ -295,6 +296,20 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
 Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
 
 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-020-relatorio-ci-docs-hub-sphinx-myst.md)
+
+</div>
+
+### 4.21 ISSUE-021
+<div style="background: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px;">
+
+**ISSUE-021** — Auditoria total do repositório com análise sênior (sem execução de mudanças de produto)  
+*Governança / Processo*
+
+Status: ⏳ Planejada | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-021-auditoria-total-repositorio-analise-senior.md)
+
+🛠️ [Ver execução técnica](./prompts/execucoes/EXEC-021-auditoria-total-repositorio-analise-senior.md)
 
 </div>
 
