@@ -1,0 +1,3 @@
+PYTHONPATH OK
+2026-02-17 03:52:11 | root                           | INFO     | logging.py:129 | ✅ Logging configurado - nível: INFO
+2.0.0
