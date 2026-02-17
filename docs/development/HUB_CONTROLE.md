@@ -52,6 +52,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-015 | Concluída | Validar erros corrigidos + importacao pyfolds + suite completa + governanca | Codex | 2026-02-17 |
 | ISSUE-001 | Concluída | Adicionar dependência linkify-it-py para MyST Parser na documentação | Codex | 2026-02-17 |
 | ISSUE-017 | Concluída | Governança de numeração automática e entrega completa de ISSUE/EXEC | Codex | 2026-02-17 |
+| ISSUE-018 | Concluída | Padronização de relatórios e obrigatoriedade de sync HUB | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001

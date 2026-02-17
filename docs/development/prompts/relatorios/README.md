@@ -1,48 +1,25 @@
 # 🧾 README — Relatórios de Issues
 
-Este diretório contém relatórios no padrão **auditoria/consolidação** (referência obrigatória: `ISSUE-003-auditoria-completa.md`).
+Este diretório contém relatórios no padrão de governança de prompts.
 
----
+## ✅ Regras obrigatórias
+- Todo novo `ISSUE-[NNN]-*.md` deve passar em `tools/validate_issue_format.py`.
+- O conteúdo analítico deve usar `ISSUE-003-auditoria-completa.md` como referência canônica.
+- Para cada ISSUE, deve existir um `EXEC-[NNN]-*.md` correspondente.
+- Sempre que `execution_queue.csv` for atualizado, `python tools/sync_hub.py` deve ser executado e `HUB_CONTROLE.md` deve mudar no mesmo commit.
 
-## ✅ Estrutura canônica (seguir à risca)
-Todo relatório novo deve conter, nesta ordem:
+## 🧱 Estrutura obrigatória da ISSUE (validador)
+1. `# ISSUE-NNN: ...`
+2. `## Metadados`
+3. `## 1. Objetivo`
+4. `## 2. Escopo`
+5. `### 2.1 Inclui:`
+6. `### 2.2 Exclui:`
+7. `## 3. Artefatos Gerados`
+8. `## 4. Riscos`
+9. `## 5. Critérios de Aceite`
+10. `## 6. PROMPT:EXECUTAR` com bloco YAML
 
-1. **Título principal** (ex.: `# RELATÓRIO DE CONSOLIDAÇÃO — ISSUE-017`)
-2. **Subtítulo** (contexto da issue)
-3. **Tabela de metadados** (Data, Responsável/Auditor, Issue, Tipo, Status, Normas)
-4. `## 1. Sumário Executivo`
-5. `## 2. Diagnóstico e Análise`
-6. `## 3. Artefatos Atualizados`
-7. `## 4. Execução Técnica`
-8. `## 5. Riscos, Restrições e Mitigações`
-9. `## 6. Critérios de Aceite e Status`
-
-Se não tiver essa estrutura, a issue está incompleta.
-
----
-
-## 🔢 Numeração obrigatória
-- Descobrir próximo número no `docs/development/execution_queue.csv`.
-- Criar `ISSUE-[NNN]-[slug].md` e `EXEC-[NNN]-[slug].md` com o mesmo NNN.
-
----
-
-## 📦 Entrega obrigatória por issue
-- Relatório em `relatorios/`
-- Execução em `execucoes/`
-- Linha no `execution_queue.csv`
-- HUB sincronizado por `tools/sync_hub.py`
-
----
-
-## ✅ Validações mínimas
-```bash
-python tools/sync_hub.py
-python tools/sync_hub.py --check
-python tools/check_issue_links.py docs/development/prompts/relatorios
-```
-
----
-
-## 📚 Referência de formato
-- `ISSUE-003-auditoria-completa.md`
+## 📚 Referências
+- Modelo base: `ISSUE-000-template.md`
+- Relatório canônico: `ISSUE-003-auditoria-completa.md`
