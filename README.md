@@ -47,7 +47,7 @@ print(output["spikes"])
 
 ```bash
 python scripts/run_benchmarks.py --output docs/assets/benchmarks_results.json
-python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/BENCHMARKS.md
+python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/assets/BENCHMARKS.md
 ```
 
 Interpretação rápida:
@@ -59,11 +59,11 @@ Interpretação rápida:
 
 ### 5.1 Uso público
 - 📑 [Índice de Documentação](docs/README.md)
-- 🧪 [Lógica Científica](docs/SCIENTIFIC_LOGIC.md)
+- 🧪 [Lógica Científica](docs/science/SCIENTIFIC_LOGIC.md)
 - 🏗️ [Arquitetura](docs/ARCHITECTURE.md)
 - 📦 [Especificação FOLD](docs/architecture/specs/FOLD_SPECIFICATION.md)
-- 🔌 [Referência de API](docs/API_REFERENCE.md)
-- 📈 [Relatório de Benchmarks](docs/BENCHMARKS.md)
+- 🔌 [Referência de API](docs/api/API_REFERENCE.md)
+- 📈 [Relatório de Benchmarks](docs/assets/BENCHMARKS.md)
 
 ### 5.2 Desenvolvimento e governança (interno)
 - 🧭 [Índice Técnico](docs/index.md)
@@ -92,7 +92,7 @@ Referências relevantes no repositório:
 
 ```bash
 python scripts/run_benchmarks.py
-python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/BENCHMARKS.md
+python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/assets/BENCHMARKS.md
 ```
 
 ## 8. Workflow v6 (CRIAR → ANALISAR → EXECUTAR → FINALIZAR)

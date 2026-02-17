@@ -6,7 +6,7 @@
 
 ### 👨‍💻 Desenvolvedor(a)
 - [Instalação (5 min)](_quickstart/README.md)
-- [Quickstart](quickstart.md)
+- [Quickstart](_quickstart/quickstart.md)
 - [Conceitos centrais](public/guides/core_concepts.md)
 - [Padrões de engenharia](public/guides/engineering_patterns.md)
 - [Referência de API](api/core.md)
@@ -20,9 +20,9 @@
 
 ### 🔬 Pesquisador(a)
 - [Portal científico](science/README.md)
-- [Lógica científica](SCIENTIFIC_LOGIC.md)
-- [Metodologia](METHODOLOGY.md)
-- [Protocolo de testes](TEST_PROTOCOL.md)
+- [Lógica científica](science/SCIENTIFIC_LOGIC.md)
+- [Metodologia](science/METHODOLOGY.md)
+- [Protocolo de testes](science/TEST_PROTOCOL.md)
 - [Pesquisa MPJRD](research/mpjrd/mpjrd_model.md)
 
 ### 👥 PM / Maintainer

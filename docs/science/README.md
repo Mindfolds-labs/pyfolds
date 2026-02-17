@@ -1,9 +1,9 @@
 # Scientific Foundations & Research
 
 ## Base teórica
-- [SCIENTIFIC_LOGIC.md](../SCIENTIFIC_LOGIC.md)
-- [METHODOLOGY.md](../METHODOLOGY.md)
-- [TEST_PROTOCOL.md](../TEST_PROTOCOL.md)
+- [SCIENTIFIC_LOGIC.md](./SCIENTIFIC_LOGIC.md)
+- [METHODOLOGY.md](./METHODOLOGY.md)
+- [TEST_PROTOCOL.md](./TEST_PROTOCOL.md)
 - [research/wave/PHASE_CODING.md](../research/wave/PHASE_CODING.md)
 
 ## Pesquisa aplicada
@@ -14,6 +14,6 @@
 
 ## Benchmark e validação operacional
 - [RELATORIO_TESTES_BENCHMARK.md](../RELATORIO_TESTES_BENCHMARK.md)
-- [BENCHMARKS.md](../BENCHMARKS.md)
+- [BENCHMARKS.md](../assets/BENCHMARKS.md)
 
 [← Voltar para docs](../README.md) | [Hub](../DEVELOPMENT_HUB.md)

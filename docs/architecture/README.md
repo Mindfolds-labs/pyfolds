@@ -2,7 +2,7 @@
 
 ## Visão arquitetural
 - [ARCHITECTURE.md](../ARCHITECTURE.md)
-- [ALGORITHM.md](../ALGORITHM.md)
+- [ALGORITHM.md](../science/ALGORITHM.md)
 
 ## Blueprints
 - [blueprints/README.md](blueprints/README.md)

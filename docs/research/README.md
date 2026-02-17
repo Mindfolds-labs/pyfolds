@@ -2,6 +2,6 @@
 
 Base científica e hipóteses do framework.
 
-- `../SCIENTIFIC_LOGIC.md`
+- `../science/SCIENTIFIC_LOGIC.md`
 - `../research/mpjrd/`
 - `../research/wave/`

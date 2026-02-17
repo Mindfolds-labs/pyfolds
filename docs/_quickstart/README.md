@@ -2,8 +2,8 @@
 
 Entrada rápida para instalação e primeiro uso.
 
-- [installation.md](../installation.md)
-- [quickstart.md](../quickstart.md)
+- [installation.md](./installation.md)
+- [quickstart.md](./quickstart.md)
 - [Guia inicial público](../public/guides/getting_started.md)
 
 Próximo passo recomendado:
