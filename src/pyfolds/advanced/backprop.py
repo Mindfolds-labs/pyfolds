@@ -74,6 +74,10 @@ class BackpropMixin(TimedMixin):
 
             self.dendrite_amplification.mul_(decay_amp)
 
+            batch_size = self.backprop_queue[0]['v_dend'].shape[0]
+            device = self.backprop_queue[0]['v_dend'].device
+            self._ensure_backprop_trace(batch_size, device)
+
             if self.backprop_trace is not None:
                 self.backprop_trace.mul_(decay_trace)
 

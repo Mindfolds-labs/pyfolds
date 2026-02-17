@@ -217,8 +217,19 @@ class InhibitionLayer(nn.Module):
         batch_size = exc_output['spikes'].shape[0]
         
         exc_spikes = exc_output['spikes']  # [B, n_exc]
+        if exc_spikes.dim() != 2 or exc_spikes.shape[1] != self.n_exc:
+            raise ValueError(
+                f"Esperado exc_output['spikes'] com shape [B, {self.n_exc}], "
+                f"recebido {tuple(exc_spikes.shape)}"
+            )
+
         inh_spikes = inh_output['inh_spikes']  # [n_inh]
-        
+        if inh_spikes.dim() != 1 or inh_spikes.shape[0] != self.n_inh:
+            raise ValueError(
+                f"Esperado inh_output['inh_spikes'] com shape [{self.n_inh}], "
+                f"recebido {tuple(inh_spikes.shape)}"
+            )
+
         # ===== INIBIÇÃO LATERAL =====
         # [B, n_exc] @ [n_exc, n_exc] → [B, n_exc]
         lateral_kernel = self.lateral_kernel.to(device)
@@ -243,15 +254,39 @@ class InhibitionLayer(nn.Module):
         u_inhibited = u - total_inh
         
         # Recomputa spikes com threshold
-        theta = exc_output.get('theta', exc_output.get('thetas', None))
-        if theta is not None:
-            if theta.dim() == 1:
-                # [n_neurons] → [1, n_neurons] → [B, n_neurons]
-                theta = theta.unsqueeze(0).expand(batch_size, -1)
-            spikes_final = (u_inhibited >= theta).float()
+        theta = exc_output.get('theta')
+        if theta is None and 'thetas' in exc_output:
+            theta = exc_output['thetas']
+
+        if theta is None:
+            raise ValueError(
+                "Campo 'theta' (ou 'thetas') não encontrado em exc_output. "
+                f"Campos disponíveis: {list(exc_output.keys())}"
+            )
+
+        if theta.dim() == 0:
+            theta_expanded = torch.full_like(u_inhibited, theta.item())
+        elif theta.dim() == 1:
+            if theta.shape[0] == batch_size and u_inhibited.shape[1] == 1:
+                theta_expanded = theta.unsqueeze(1)
+            elif theta.shape[0] == u_inhibited.shape[1]:
+                theta_expanded = theta.unsqueeze(0).expand(batch_size, -1)
+            elif theta.shape[0] == 1:
+                theta_expanded = theta.view(1, 1).expand_as(u_inhibited)
+            else:
+                raise ValueError(
+                    f"Shape de theta incompatível: {tuple(theta.shape)} para "
+                    f"u_inhibited {tuple(u_inhibited.shape)}"
+                )
+        elif theta.dim() == 2 and theta.shape == u_inhibited.shape:
+            theta_expanded = theta
         else:
-            # Fallback: usa threshold 0 (qualquer potencial positivo)
-            spikes_final = (u_inhibited > 0).float()
+            raise ValueError(
+                f"Shape de theta incompatível: {tuple(theta.shape)} para "
+                f"u_inhibited {tuple(u_inhibited.shape)}"
+            )
+
+        spikes_final = (u_inhibited >= theta_expanded).float()
         
         # ===== MODIFICA OUTPUT =====
         exc_output['spikes'] = spikes_final
