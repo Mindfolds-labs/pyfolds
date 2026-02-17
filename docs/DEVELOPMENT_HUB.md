@@ -34,15 +34,15 @@
 
 ## 📚 Mapa completo de seções
 
-- [_quickstart/](./_quickstart/) — entrada rápida.
-- [specifications/](./specifications/) — especificações técnicas.
-- [guides/](./guides/) — índice lógico para guias públicos.
-- [tutorials/](./tutorials/) — índice lógico para exemplos.
-- [api/](./api/) — documentação de API.
-- [science/](./science/) — teoria, metodologia e validação.
-- [architecture/](./architecture/) — blueprints e evolução.
-- [governance/](./governance/) — ADRs, qualidade, riscos.
-- [development/](./development/) — contribuição e operação interna.
+- [_quickstart/](./_quickstart/README.md) — entrada rápida.
+- [specifications/](./specifications/README.md) — especificações técnicas.
+- [guides/](./guides/README.md) — índice lógico para guias públicos.
+- [tutorials/](./tutorials/README.md) — índice lógico para exemplos.
+- [api/](./api/index.md) — documentação de API.
+- [science/](./science/README.md) — teoria, metodologia e validação.
+- [architecture/](./architecture/README.md) — blueprints e evolução.
+- [governance/](./governance/README.md) — ADRs, qualidade, riscos.
+- [development/](./development/README.md) — contribuição e operação interna.
 
 ## 🔗 Atalhos de tarefas
 
