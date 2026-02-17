@@ -1,0 +1,18 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PyFolds favicon">
+  <defs>
+    <linearGradient id="bg" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A1B3C"/>
+      <stop offset="1" stop-color="#133774"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="29" y1="19" x2="43" y2="39" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD76A"/>
+      <stop offset="1" stop-color="#E4A700"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)"/>
+  <path d="M16 20L32 10L48 20V44L32 54L16 44V20Z" fill="#2659C8"/>
+  <path d="M22 24L30 19V45L22 40V24Z" fill="#143778"/>
+  <path d="M32 19L40 24V40L32 45V19Z" fill="#3E7CF0"/>
+  <path d="M30 28L38 32L30 36L22 32L30 28Z" fill="#143778"/>
+  <path d="M32 30L43 36L36 40L25 34L32 30Z" fill="url(#accent)"/>
+</svg>

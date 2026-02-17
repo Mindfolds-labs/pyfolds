@@ -1,14 +1,18 @@
-name: Validate docstrings
+name: Validate docs hub
 
 on:
   pull_request:
     paths:
       - src/**
+      - docs/**
       - tools/check_api_docs.py
+      - tools/docs_hub_audit.py
+      - docs/conf.py
+      - requirements-docs.txt
       - .github/workflows/validate-docs.yml
 
 jobs:
-  api-docstrings:
+  docs-hub-quality:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,5 +23,16 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install docs dependencies
+        run: pip install -r requirements-docs.txt
+
       - name: Validate public API docstrings (strict)
         run: python tools/check_api_docs.py --strict
+
+      - name: Validate docs hub structure and generated artifacts
+        run: python tools/docs_hub_audit.py --check
+
+      - name: Build Sphinx docs (MyST + PyData)
+        env:
+          PYTHONPATH: src
+        run: sphinx-build -W -b html docs docs/_build/html

@@ -1,0 +1,47 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PyFolds logo">
+  <defs>
+    <linearGradient id="bg" x1="48" y1="48" x2="464" y2="464" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#08142D"/>
+      <stop offset="1" stop-color="#102B5F"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="120" y1="86" x2="402" y2="418" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B7BFF"/>
+      <stop offset="1" stop-color="#1C3F8E"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="236" y1="196" x2="350" y2="332" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD86A"/>
+      <stop offset="1" stop-color="#E5A800"/>
+    </linearGradient>
+    <filter id="softShadow" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#020814" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <g opacity="0.22" stroke="#39A4FF" stroke-width="2">
+    <path d="M64 96H448"/>
+    <path d="M64 160H448"/>
+    <path d="M64 224H448"/>
+    <path d="M64 288H448"/>
+    <path d="M64 352H448"/>
+    <path d="M64 416H448"/>
+    <path d="M96 64V448"/>
+    <path d="M160 64V448"/>
+    <path d="M224 64V448"/>
+    <path d="M288 64V448"/>
+    <path d="M352 64V448"/>
+    <path d="M416 64V448"/>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <path d="M131 181L256 107L381 181V331L256 405L131 331V181Z" fill="url(#blue)"/>
+    <path d="M174 212L236 176V336L174 300V212Z" fill="#143574"/>
+    <path d="M276 176L338 212V300L276 336V176Z" fill="#2B63D6"/>
+    <path d="M236 176L276 176L338 212L299 236L236 201V176Z" fill="#4B8AFF"/>
+    <path d="M236 336L276 336L338 300L299 276L236 311V336Z" fill="#234FA7"/>
+
+    <path d="M236 224L284 252L236 280L188 252L236 224Z" fill="#183B86"/>
+    <path d="M256 244L332 288L280 318L204 274L256 244Z" fill="url(#gold)"/>
+  </g>
+</svg>

@@ -48,6 +48,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-011-ESPECIAL | Concluída | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
 | ISSUE-012 | DONE (aguardando revisão humana) | Auditoria de código em src + testes + ADR-035 | Codex | 2026-02-17 |
 | ISSUE-013 | DONE (aguardando revisão humana) | Estabilizar instalação editável em rede restrita e consolidar falhas da auditoria ADR-035 | Codex | 2026-02-17 |
+| ISSUE-014 | DONE (aguardando revisão humana) | Auditoria SRC/Testes ADR-035 + gate CI docs hub com Sphinx/MyST/PyData | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
