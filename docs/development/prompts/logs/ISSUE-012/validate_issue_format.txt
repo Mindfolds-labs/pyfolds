@@ -1,0 +1,2 @@
+✅ /workspace/pyfolds/docs/development/prompts/relatorios/ISSUE-012-auditoria-codigo-testes-adr35.md
+exit_code=0
