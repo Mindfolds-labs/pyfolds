@@ -72,6 +72,34 @@ Status:
 - [ ] REPROVADA com ajustes
 ```
 
+## 🆕 Prompt padrão para CRIAR (humano)
+```markdown
+CRIAR NOVA ISSUE
+
+Contexto:
+- Problema observado:
+- Impacto esperado:
+
+Escopo:
+- Inclui:
+  - ...
+- Exclui:
+  - ...
+
+Artefatos esperados:
+- docs/development/prompts/relatorios/ISSUE-[NNN]-[slug].md
+- docs/development/prompts/execucoes/EXEC-[NNN]-[slug].md
+- docs/development/execution_queue.csv
+- docs/development/HUB_CONTROLE.md
+
+Critérios de aceite:
+- [ ] ISSUE no formato validado
+- [ ] EXEC correspondente criada
+- [ ] CSV atualizado com o mesmo ISSUE-NNN
+- [ ] HUB sincronizado no mesmo commit
+- [ ] Validações obrigatórias executadas
+```
+
 ## 🚀 Prompt padrão para EXECUTAR (IA)
 ```markdown
 Executar ISSUE-[NNN] conforme relatório aprovado.
