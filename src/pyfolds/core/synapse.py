@@ -26,6 +26,8 @@ from .config import MPJRDConfig
 from ..utils.types import LearningMode
 from ..utils.math import clamp_rate, clamp_R, safe_weight_law
 
+__all__ = ["MPJRDSynapse"]
+
 
 class MPJRDSynapse(nn.Module):
     """
@@ -61,7 +63,15 @@ class MPJRDSynapse(nn.Module):
 
     @property
     def W(self) -> torch.Tensor:
-        """Peso sináptico derivado do número de filamentos."""
+        """
+        Peso sináptico derivado do número de filamentos (Bartol Log Law).
+
+        Implementa a relação:
+            W = log2(1 + N) / w_scale
+
+        Returns:
+            Tensor escalar com o peso derivado em ponto flutuante.
+        """
         return safe_weight_law(
             self.N,
             w_scale=self.cfg.w_scale,

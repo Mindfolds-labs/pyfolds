@@ -49,24 +49,28 @@ class HomeostasisController(nn.Module):
         self.ki = cfg.homeostasis_eta * 0.1
         self.kd = cfg.homeostasis_eta * 0.01
 
-    def update(self, 
-               current_rate: Union[float, torch.Tensor], 
-               clamp_theta: bool = True) -> torch.Tensor:
+    def update(
+        self,
+        current_rate: Union[float, torch.Tensor],
+        clamp_theta: bool = True,
+    ) -> torch.Tensor:
         """
-        Atualiza parâmetros homeostáticos.
-        
+        Atualiza parâmetros homeostáticos (PID-like).
+
         Args:
-            current_rate: Taxa de disparo atual [0, 1]
-            clamp_theta: Se deve aplicar clamping no theta
-            
+            current_rate: Taxa atual no intervalo [0, 1].
+                Aceita float ou tensor escalar.
+            clamp_theta: Se deve limitar `theta` entre [theta_min, theta_max].
+
         Returns:
-            theta atualizado
+            torch.Tensor: theta atualizado (tensor escalar shape [1]).
         """
-        # Validação com tolerância
         rate = float(current_rate) if isinstance(current_rate, torch.Tensor) else current_rate
-        
+        if not isinstance(rate, (int, float)):
+            raise TypeError(f"current_rate deve ser float ou Tensor, recebido {type(rate)}")
+
         if math.isnan(rate) or math.isinf(rate):
-            raise ValueError(f"current_rate inválido: {rate}")
+            raise ValueError(f"current_rate inválido (NaN/Inf): {rate}")
 
         if rate < -self.eps or rate > 1.0 + self.eps:
             raise ValueError(f"current_rate deve estar em [0, 1], mas é {rate}")

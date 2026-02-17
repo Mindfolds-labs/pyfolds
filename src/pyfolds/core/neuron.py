@@ -93,14 +93,21 @@ class MPJRDNeuron(BaseNeuron):
         # ===== TELEMETRIA =====
         self.register_buffer("step_id", torch.tensor(0, dtype=torch.int64))
         if TELEMETRY_AVAILABLE and enable_telemetry:
-            from ..telemetry import TelemetryConfig, TelemetryController
+            from ..telemetry import TelemetryConfig, TelemetryController, TelemetryProfile
+
+            profile_enum = (
+                TelemetryProfile(telemetry_profile)
+                if isinstance(telemetry_profile, str)
+                else telemetry_profile
+            )
+            is_light = profile_enum == TelemetryProfile.LIGHT
             telem_cfg = TelemetryConfig(
-                profile=telemetry_profile if telemetry_profile in ["off", "light", "heavy"] else "off",
-                sample_every=50 if telemetry_profile == "light" else 1,
-                memory_capacity=256 if telemetry_profile == "light" else 2000
+                profile=profile_enum,
+                sample_every=50 if is_light else 1,
+                memory_capacity=256 if is_light else 2000,
             )
             self.telemetry = TelemetryController(telem_cfg)
-            self.logger.debug(f"   ✅ Telemetria ativada (profile={telemetry_profile})")
+            self.logger.debug(f"   ✅ Telemetria ativada (profile={profile_enum.value})")
         else:
             self.telemetry = None
             self.logger.debug("   ⏭️ Telemetria desativada")

@@ -1,6 +1,6 @@
 """MPJRDNeuronV2 - integração dendrítica cooperativa (Soft-WTA)."""
 
-from typing import Optional, Dict
+from typing import Optional, Dict, Union
 
 import torch
 
@@ -26,7 +26,7 @@ class MPJRDNeuronV2(MPJRDNeuron):
         mode: Optional[LearningMode] = None,
         collect_stats: bool = True,
         dt: float = 1.0,
-    ) -> Dict[str, torch.Tensor]:
+    ) -> Dict[str, Union[torch.Tensor, float, str]]:
         """
         Forward pass com integração cooperativa.
 
@@ -38,7 +38,11 @@ class MPJRDNeuronV2(MPJRDNeuron):
             dt: Passo de tempo (ms)
 
         Returns:
-            Dict com spikes, potenciais e estatísticas
+            Dict com:
+                - Tensores: spikes, u/somatic, v_dend, gated, theta, r_hat, R,
+                  N_mean/W_mean/I_mean
+                - Floats: spike_rate, saturation_ratio
+                - Strings: mode, device
         """
         effective_mode = mode if mode is not None else self.mode
         

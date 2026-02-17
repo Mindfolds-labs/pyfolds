@@ -4,18 +4,26 @@ import random
 import logging
 from dataclasses import dataclass
 from threading import Lock
-from typing import Optional, Literal, List, Dict, Any, TypedDict
+from typing import Optional, List, Dict, Any, TypedDict, Union
+from enum import Enum
 from .events import TelemetryEvent
 from .sinks import Sink, NoOpSink, MemorySink
 from .ringbuffer import RingBuffer
 
 logger = logging.getLogger(__name__)
-Profile = Literal["off", "light", "heavy"]
+class TelemetryProfile(str, Enum):
+    """Perfis disponíveis para telemetria."""
+    OFF = "off"
+    LIGHT = "light"
+    HEAVY = "heavy"
+
+
+Profile = TelemetryProfile
 
 
 class TelemetryStats(TypedDict):
     """Typed statistics for telemetry system."""
-    profile: Profile
+    profile: str
     sample_every: int
     step_count: int
     sink_type: str
@@ -30,16 +38,21 @@ class TelemetryStats(TypedDict):
 class TelemetryConfig:
     """Configuration for telemetry system."""
     
-    profile: Profile = "off"
+    profile: Union[TelemetryProfile, str] = TelemetryProfile.OFF
     sample_every: int = 1
     memory_capacity: int = 2048
     
     def __post_init__(self) -> None:
         """Validate configuration eagerly."""
-        # Validate profile
-        if self.profile not in ("off", "light", "heavy"):
-            raise ValueError(f"Invalid profile: {self.profile}. "
-                           f"Must be 'off', 'light', or 'heavy'")
+        # Validate/normalize profile
+        if not isinstance(self.profile, TelemetryProfile):
+            try:
+                self.profile = TelemetryProfile(self.profile)
+            except ValueError as exc:
+                raise ValueError(
+                    f"Invalid profile: {self.profile}. Must be one of: "
+                    f"{[p.value for p in TelemetryProfile]}"
+                ) from exc
         
         # Validate sample_every
         if self.sample_every < 1:
@@ -50,9 +63,9 @@ class TelemetryConfig:
             raise ValueError(f"memory_capacity must be >= 1, got {self.memory_capacity}")
         
         # Apply profile-specific defaults
-        if self.profile == "light" and self.sample_every == 1:
+        if self.profile == TelemetryProfile.LIGHT and self.sample_every == 1:
             self.sample_every = 50  # Light profile default
-        elif self.profile == "heavy" and self.sample_every != 1:
+        elif self.profile == TelemetryProfile.HEAVY and self.sample_every != 1:
             self.sample_every = 1   # Heavy = every step
 
 
@@ -81,7 +94,7 @@ class TelemetryController:
         # Select sink based on profile
         if sink is not None:
             self.sink = sink
-        elif self.cfg.profile == "off":
+        elif self.cfg.profile == TelemetryProfile.OFF:
             self.sink = NoOpSink()
         else:
             self.sink = MemorySink(self.cfg.memory_capacity)
@@ -99,7 +112,7 @@ class TelemetryController:
     
     def enabled(self) -> bool:
         """Is telemetry enabled?"""
-        return self.cfg.profile != "off"
+        return self.cfg.profile != TelemetryProfile.OFF
     
     def should_emit(self, step_id: int) -> bool:
         """
@@ -111,10 +124,10 @@ class TelemetryController:
         Returns:
             True if should emit
         """
-        if self.cfg.profile == "off":
+        if self.cfg.profile == TelemetryProfile.OFF:
             return False
         
-        if self.cfg.profile == "heavy":
+        if self.cfg.profile == TelemetryProfile.HEAVY:
             return True
         
         # Light profile: emit every sample_every steps
@@ -133,7 +146,7 @@ class TelemetryController:
         Returns:
             True if should emit based on random sampling
         """
-        if self.cfg.profile == "off":
+        if self.cfg.profile == TelemetryProfile.OFF:
             return False
         if sample_rate >= 1.0:
             return True
