@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 import pyfolds
@@ -34,3 +35,16 @@ def test_versioned_checkpoint_save_and_load(tmp_path):
     assert payload["integrity_hash"] == loaded["integrity_hash"]
     assert loaded["metadata"]["version"] == "1.0.0"
     assert loaded["metadata"]["experiment"] == "unit"
+
+def test_versioned_checkpoint_metadata_created_at_is_utc(tmp_path):
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    neuron = pyfolds.MPJRDNeuron(cfg)
+    ckpt = VersionedCheckpoint(neuron, version="1.0.0")
+
+    path = Path(tmp_path) / "neuron-metadata.pt"
+    payload = ckpt.save(str(path))
+
+    created_at = payload["metadata"]["created_at"]
+    assert created_at.endswith("Z")
+    assert datetime.fromisoformat(created_at.replace("Z", "+00:00")).tzinfo is not None
+

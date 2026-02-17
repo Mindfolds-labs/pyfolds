@@ -58,7 +58,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-021 | Planejada | Auditoria total do repositório com análise sênior (sem execução de mudanças de produto) | Codex | 2026-02-17 |
 | ISSUE-023 | Concluída | Auditoria corretiva de estabilidade runtime e consistência cross-módulo | Codex | 2026-02-17 |
 | ISSUE-022 | Concluída | Auditoria e correção do neurônio MPJRD (thread safety + validações + plasticidade) | Codex | 2026-02-17 |
-| ISSUE-024 | Planejada | Revisão estética do HUB_CONTROLE com cards sincronizados por CSV | Codex | 2026-02-17 |
+| ISSUE-025 | Concluída | Análise integral do pyfolds + execução direta + atualização de benchmark e ADR-037 | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 🔍 Detalhamento de Atividades (Cards)

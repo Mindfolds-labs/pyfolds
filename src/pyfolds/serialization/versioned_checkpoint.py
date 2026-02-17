@@ -6,7 +6,7 @@ import hashlib
 import subprocess
 import warnings
 from dataclasses import asdict, is_dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -73,7 +73,7 @@ class VersionedCheckpoint:
     def _metadata(self, extra: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Gera metadados para o checkpoint."""
         metadata = {
-            "created_at": datetime.utcnow().isoformat() + "Z",
+            "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "version": self.version,
             "git_hash": self._git_hash(),
             "config": self._cfg_dict(),
