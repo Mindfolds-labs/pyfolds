@@ -211,3 +211,21 @@ Depois de corrigir, reenviar para revisão.
 - [Workflow integrado](../WORKFLOW_INTEGRADO.md)
 - [relatorios/](./relatorios/)
 - [logs/](./logs/)
+
+## 🧭 Índice de links rápidos
+
+### Relatórios (001-011)
+- [ISSUE-003 — Auditoria completa](./relatorios/ISSUE-003-auditoria-completa.md)
+- [ISSUE-005 — Plano de ação de consolidação](./relatorios/ISSUE-005-plano-acao-consolidacao.md)
+- [ISSUE-007 — Consolidação final de prompts](./relatorios/ISSUE-007-consolidacao-final.md)
+- [ISSUE-008 — Melhoria do workflow de prompts](./relatorios/ISSUE-008-melhoria-workflow-prompts.md)
+- [ISSUE-009 — Padronização para IA](./relatorios/ISSUE-009-padronizacao-formatos-ia.md)
+- [ISSUE-010 — Fechamento 001-009](./relatorios/ISSUE-010-consolidacao-final-fechar-tudo.md)
+- [ISSUE-010-ESPECIAL — Correção da estrutura docs](./relatorios/ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md)
+- [ISSUE-011 — Consolidação de fluxo](./relatorios/ISSUE-011-consolidacao-fluxo.md)
+- [ISSUE-011-ESPECIAL — Consolidação de fluxo (execução)](./relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md)
+
+### Governança do formato de ISSUE
+- [Template IA](../templates/ISSUE-IA-TEMPLATE.md)
+- [Guia de formato](../guides/ISSUE-FORMAT-GUIDE.md)
+- [Checklist de validação](../checklists/ISSUE-VALIDATION.md)

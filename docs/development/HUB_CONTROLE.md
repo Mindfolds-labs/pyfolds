@@ -36,14 +36,15 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-002 | Concluída | Unificação e serialização da série de ADRs | Codex | 2026-02-16 |
 | ISSUE-003 | Concluída | Auditoria completa do repositório (docs + src + .github + examples + tests) | Codex | 2026-02-16 |
 | ISSUE-004 | Concluída | Consolidação do hub interno e navegação em docs/development | Codex | 2026-02-16 |
-| ISSUE-005 | Pausada | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Codex | 2026-02-16 |
+| ISSUE-005 | Concluída | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Codex | 2026-02-17 |
 | ISSUE-006 | Cancelada | Número reservado (não utilizado intencionalmente) | Codex | 2026-02-16 |
 | ISSUE-007 | Concluída | Consolidação final do workflow e normalização total de prompts | Codex | 2026-02-16 |
-| ISSUE-008 | Pausada | Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar | Neto | 2026-02-16 |
+| ISSUE-008 | Concluída | Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar | Codex | 2026-02-17 |
 | ISSUE-009 | Concluída | Padronização de formatos de ISSUEs para interação com IA | Codex | 2026-02-16 |
 | ISSUE-010 | Concluída | Consolidação final: fechamento das ISSUEs 001-009 e limpeza documental | Codex | 2026-02-16 |
 | ISSUE-010-ESPECIAL | Concluída | Corrigir estrutura docs/ - remover soltos e órfãos | Codex | 2026-02-17 |
-| ISSUE-011-ESPECIAL | Em Progresso | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
+| ISSUE-011 | Concluída | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
+| ISSUE-011-ESPECIAL | Concluída | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
@@ -95,12 +96,12 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 </div>
 
 ### 4.5 ISSUE-005
-<div style="background: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px;">
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
 
 **ISSUE-005** — Consolidação total: implementar plano de ação da auditoria (3 sprints)  
 *Documentação / Multi-área*
 
-Status: ⏸️ Pausada | Responsável: Codex | Data: 2026-02-16
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
 
 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md)
 
@@ -119,12 +120,12 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 </div>
 
 ### 4.7 ISSUE-008
-<div style="background: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px;">
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
 
 **ISSUE-008** — Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar  
 *Documentação / Processo*
 
-Status: ⏸️ Pausada | Responsável: Neto | Data: 2026-02-16
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
 
 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-008-melhoria-workflow-prompts.md)
 
@@ -166,13 +167,26 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
 
 </div>
 
-### 4.11 ISSUE-011-ESPECIAL
-<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+
+### 4.11 ISSUE-011
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-011** — Consolidação de fluxo operacional e correção de cards/links  
+*Governança / Documentação*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-011-consolidacao-fluxo.md)
+
+</div>
+
+### 4.12 ISSUE-011-ESPECIAL
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
 
 **ISSUE-011-ESPECIAL** — Consolidação de fluxo operacional e correção de cards/links  
 *Governança / Documentação*
 
-Status: 🔄 Em Progresso | Responsável: Codex | Data: 2026-02-17
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
 
 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md)
 
