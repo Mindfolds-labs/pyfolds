@@ -18,6 +18,7 @@ Características:
 import torch
 import torch.nn as nn
 from typing import Optional, Dict, Any
+from threading import Lock
 from .config import MPJRDConfig
 from .base import BaseNeuron
 from .dendrite import MPJRDDendrite
@@ -48,6 +49,7 @@ class MPJRDNeuron(BaseNeuron):
         - Usa activity_threshold da config
         - ✅ LOGGING integrado
         - ✅ Validação de devices
+        - ✅ Thread-safe telemetry
     """
 
     def __init__(self, cfg: MPJRDConfig, enable_telemetry: bool = False,
@@ -85,6 +87,9 @@ class MPJRDNeuron(BaseNeuron):
         self.register_buffer("sleep_count", torch.tensor(0))
         self.logger.debug(f"   ✅ Modo inicial: {self.mode.value}")
         
+        # ===== THREAD SAFETY PARA TELEMETRIA =====
+        self._telemetry_lock = Lock()
+
         # ===== TELEMETRIA =====
         self.register_buffer("step_id", torch.tensor(0, dtype=torch.int64))
         if TELEMETRY_AVAILABLE and enable_telemetry:
@@ -133,10 +138,6 @@ class MPJRDNeuron(BaseNeuron):
             f"✅ Homeostase estável! θ={controller.theta.item():.3f}, "
             f"erro={controller.homeostasis_error.item():.3f}"
         )
-        # Opcional: reduz learning rate ou muda modo
-        if self.mode == LearningMode.ONLINE:
-            self.logger.debug("📉 Considerando reduzir learning rate...")
-
     def _on_homeostasis_unstable(self, controller: HomeostasisController) -> None:
         """Callback quando homeostase se torna instável."""
         self.logger.warning(
@@ -219,6 +220,8 @@ class MPJRDNeuron(BaseNeuron):
 
     def _validate_input_device(self, x: torch.Tensor) -> None:
         """Valida se input está no device correto."""
+        if not isinstance(x, torch.Tensor):
+            raise TypeError(f"Input deve ser torch.Tensor, recebido {type(x)}")
         if x.device != self.theta.device:
             raise RuntimeError(
                 f"Input device {x.device} != neuron device {self.theta.device}. "
@@ -260,7 +263,7 @@ class MPJRDNeuron(BaseNeuron):
     def forward(self, x: torch.Tensor, reward: Optional[float] = None,
                 mode: Optional[LearningMode] = None,
                 collect_stats: bool = True,
-                dt: float = 1.0) -> Dict[str, torch.Tensor]:
+                dt: float = 1.0) -> Dict[str, Any]:
         """
         Forward pass do neurônio.
         
@@ -302,11 +305,16 @@ class MPJRDNeuron(BaseNeuron):
         spike_rate = spikes.mean().item()
         saturation_ratio = (self.N == self.cfg.n_max).float().mean().item()
 
-        # ===== 6. HOMEOSTASE =====
+        # ===== 6. VALIDAÇÃO ANTES DE HOMEOSTASE =====
+        if not (isinstance(spike_rate, float) and -0.1 <= spike_rate <= 1.1):
+            self.logger.warning(f"⚠️ spike_rate inválida: {spike_rate}, normalizando para 0.0")
+            spike_rate = max(0.0, min(1.0, spike_rate))
+
+        # ===== 7. HOMEOSTASE =====
         if effective_mode != LearningMode.INFERENCE and collect_stats:
             self.homeostasis.update(spike_rate)
 
-        # ===== 7. NEUROMODULAÇÃO =====
+        # ===== 8. NEUROMODULAÇÃO =====
         if self.cfg.neuromod_mode == "external":
             R_val = float(reward) if reward is not None else 0.0
             R_val = max(-1.0, min(1.0, R_val))
@@ -314,11 +322,11 @@ class MPJRDNeuron(BaseNeuron):
             R_val = self._compute_R_endogenous(spike_rate, saturation_ratio)
         R_tensor = torch.tensor([R_val], device=device)
 
-        # ===== 8. ACUMULAÇÃO (BATCH MODE) =====
+        # ===== 9. ACUMULAÇÃO (BATCH MODE) =====
         if collect_stats and effective_mode == LearningMode.BATCH and self.cfg.defer_updates:
             self.stats_acc.accumulate(x.detach(), gated.detach(), spikes.detach())
 
-        # ===== 8b. ATUALIZAÇÃO IMEDIATA (ONLINE) =====
+        # ===== 10. ATUALIZAÇÃO IMEDIATA (ONLINE) =====
         if (
             collect_stats
             and effective_mode == LearningMode.ONLINE
@@ -333,24 +341,36 @@ class MPJRDNeuron(BaseNeuron):
                 mode=effective_mode,
             )
 
-        # ===== 9. TELEMETRIA =====
-        self.step_id.add_(1)
-        if self.telemetry is not None and self.telemetry.enabled():
-            sid = int(self.step_id.item())
-            self.telemetry.emit(forward_event(
-                step_id=sid,
-                mode=self.mode.value,
-                spike_rate=spike_rate,
-                theta=float(self.theta.item()),
-                r_hat=float(self.r_hat.item()),
-                saturation_ratio=saturation_ratio,
-                R=float(R_tensor.item()),
-                N_mean=float(self.N.float().mean().item()),
-                I_mean=float(self.I.float().mean().item()),
-                W_mean=float(self.W.float().mean().item()),
-            ))
+        # ===== 11. TELEMETRIA COM SINCRONIZAÇÃO =====
+        emit_telemetry = (
+            self.telemetry is not None
+            and self.telemetry.enabled()
+            and collect_stats
+            and effective_mode != LearningMode.INFERENCE
+        )
 
-        # ===== 10. LOGGING =====
+        with self._telemetry_lock:
+            self.step_id.add_(1)
+            sid = int(self.step_id.item())
+
+            if emit_telemetry and self.telemetry.should_emit(sid):
+                try:
+                    self.telemetry.emit(forward_event(
+                        step_id=sid,
+                        mode=self.mode.value,
+                        spike_rate=spike_rate,
+                        theta=float(self.theta.item()),
+                        r_hat=float(self.r_hat.item()),
+                        saturation_ratio=saturation_ratio,
+                        R=float(R_tensor.item()),
+                        N_mean=float(self.N.float().mean().item()),
+                        I_mean=float(self.I.float().mean().item()),
+                        W_mean=float(self.W.float().mean().item()),
+                    ))
+                except Exception as exc:
+                    self.logger.error(f"Falha ao emitir telemetria: {exc}")
+
+        # ===== 12. LOGGING =====
         self.logger.trace(
             f"Forward: batch={B}, spikes={spike_rate:.3f}, "
             f"θ={self.theta.item():.3f}, sat={saturation_ratio:.1%}"
@@ -368,7 +388,7 @@ class MPJRDNeuron(BaseNeuron):
         if R_val > 0.8:
             self.logger.debug(f"🎯 Neuromodulação alta: R={R_val:.2f}")
 
-        # ===== 11. RETORNO =====
+        # ===== 13. RETORNO =====
         return {
             "spikes": spikes,
             "u": u,
@@ -376,12 +396,12 @@ class MPJRDNeuron(BaseNeuron):
             "gated": gated,
             "theta": self.theta.clone(),
             "r_hat": self.r_hat.clone(),
-            "spike_rate": torch.tensor(spike_rate, device=device),
-            "saturation_ratio": torch.tensor(saturation_ratio, device=device),
-            "R": R_tensor,
-            "N_mean": self.N.float().mean().to(device),
-            "W_mean": self.W.float().mean().to(device),
-            "I_mean": self.I.float().mean().to(device),
+            "spike_rate": spike_rate,
+            "saturation_ratio": saturation_ratio,
+            "R": R_val,
+            "N_mean": self.N.float().mean().item(),
+            "W_mean": self.W.float().mean().item(),
+            "I_mean": self.I.float().mean().item(),
             "mode": self.mode.value,
         }
 
@@ -445,33 +465,40 @@ class MPJRDNeuron(BaseNeuron):
         R_t = torch.tensor([R], device=device)
 
         # Atualiza cada dendrito
-        for d_idx, dend in enumerate(self.dendrites):
-            # Taxas pré: média sobre sinapses ativas
-            active_mask = (x_mean[d_idx] > cfg.activity_threshold).float()
-            n_active = active_mask.sum().clamp_min(1.0)
-            pre_rate = (x_mean[d_idx] * active_mask) / n_active
-            pre_rate = pre_rate.clamp(0.0, 1.0)
+        try:
+            for d_idx, dend in enumerate(self.dendrites):
+                active_mask = (x_mean[d_idx] > cfg.activity_threshold).float()
+                n_active = active_mask.sum().clamp_min(1.0)
+                pre_rate = (x_mean[d_idx] * active_mask) / n_active
+                pre_rate = pre_rate.clamp(0.0, 1.0)
 
-            dend.update_synapses_rate_based(
-                pre_rate=pre_rate,
-                post_rate=post_rate_t,
-                R=R_t,
-                dt=dt,
-                mode=self.mode
-            )
+                dend.update_synapses_rate_based(
+                    pre_rate=pre_rate,
+                    post_rate=post_rate_t,
+                    R=R_t,
+                    dt=dt,
+                    mode=self.mode
+                )
+        except Exception as exc:
+            self.logger.error(f"Falha ao aplicar plasticidade: {exc}")
+            raise
 
         self.stats_acc.reset()
         self.logger.debug(f"✅ Plasticidade aplicada, R={R:.3f}, post_rate={post_rate_float:.3f}")
 
         if self.telemetry is not None and self.telemetry.enabled():
-            sid = int(self.step_id.item())
-            self.telemetry.emit(commit_event(
-                step_id=sid,
-                mode=self.mode.value,
-                committed=True,
-                post_rate=post_rate_float,
-                R=R,
-            ))
+            with self._telemetry_lock:
+                try:
+                    sid = int(self.step_id.item())
+                    self.telemetry.emit(commit_event(
+                        step_id=sid,
+                        mode=self.mode.value,
+                        committed=True,
+                        post_rate=post_rate_float,
+                        R=R,
+                    ))
+                except Exception as exc:
+                    self.logger.error(f"Falha ao emitir evento de commit: {exc}")
 
     # ========== CICLO DE SONO ==========
 
@@ -488,12 +515,16 @@ class MPJRDNeuron(BaseNeuron):
         self.logger.info("✅ Sono concluído")
 
         if self.telemetry is not None and self.telemetry.enabled():
-            sid = int(self.step_id.item())
-            self.telemetry.emit(sleep_event(
-                step_id=sid,
-                mode=self.mode.value,
-                duration=float(duration),
-            ))
+            with self._telemetry_lock:
+                try:
+                    sid = int(self.step_id.item())
+                    self.telemetry.emit(sleep_event(
+                        step_id=sid,
+                        mode=self.mode.value,
+                        duration=float(duration),
+                    ))
+                except Exception as exc:
+                    self.logger.error(f"Falha ao emitir evento de sleep: {exc}")
 
     # ========== UTILITÁRIOS ==========
 
