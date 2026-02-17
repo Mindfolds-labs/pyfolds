@@ -131,8 +131,17 @@ class MPJRDDendrite(nn.Module):
         # Produto interno vetorizado
         weights = self.W.to(x_flat.device)  # [S]
         v_dend = torch.einsum('s,bs->b', weights, x_flat)  # [B]
-        
+
+        # Proteção numérica para cenários com taxa alta
+        v_dend = torch.clamp(v_dend, min=-10.0, max=10.0)
+
         return v_dend
+
+    @staticmethod
+    def _validate_finite(name: str, value: torch.Tensor) -> None:
+        """Falha cedo quando entradas contêm NaN/Inf."""
+        if torch.isnan(value).any() or torch.isinf(value).any():
+            raise ValueError(f"{name} contém NaN/Inf")
 
     @torch.no_grad()
     def update_synapses_rate_based(self, 
@@ -142,6 +151,10 @@ class MPJRDDendrite(nn.Module):
                                   dt: float = 1.0,
                                   mode=None) -> None:
         """Atualiza sinapses de forma indexada (pré-sináptico por sinapse)."""
+        self._validate_finite("pre_rate", pre_rate)
+        self._validate_finite("post_rate", post_rate)
+        self._validate_finite("R", R)
+
         if pre_rate.dim() == 2 and pre_rate.shape[1] == 1:
             pre_rate = pre_rate.squeeze(1)
         
@@ -158,8 +171,11 @@ class MPJRDDendrite(nn.Module):
         
         self._invalidate_cache()
 
+    @torch.no_grad()
     def consolidate(self, dt: float = 1.0) -> None:
         """Consolida mudanças sinápticas."""
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
         for syn in self.synapses:
             syn.consolidate(dt)
         self._invalidate_cache()
