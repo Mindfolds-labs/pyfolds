@@ -1,231 +1,118 @@
 # 📁 Portal de Prompts Operacionais
 
-Guia prático para executar o ciclo de issues com aprovação humana no PR.
+Guia para o fluxo **humano → IA** com rastreabilidade completa.
 
 ---
 
-## 🔄 Ciclo oficial
-1. **CRIAR** (humano)
-2. **ANALISAR** (humano)
-3. **EXECUTAR** (Codex)
-4. **FINALIZAR** (humano)
-
-> O detalhe completo fica dentro de cada relatório em `relatorios/ISSUE-XXX-slug.md`.
-
----
-
-## 🗂️ Estrutura
-- `relatorios/` → plano completo da issue + prompts
-- `logs/` → evidência de execução
-
-## 📚 Índice de Relatórios
-- [`ISSUE-003-auditoria-completa.md`](./relatorios/ISSUE-003-auditoria-completa.md)
-- [`ISSUE-005-plano-acao-consolidacao.md`](./relatorios/ISSUE-005-plano-acao-consolidacao.md)
-- [`ISSUE-007-consolidacao-final.md`](./relatorios/ISSUE-007-consolidacao-final.md)
-- [`ISSUE-008-melhoria-workflow-prompts.md`](./relatorios/ISSUE-008-melhoria-workflow-prompts.md)
-- [`ISSUE-009-padronizacao-formatos-ia.md`](./relatorios/ISSUE-009-padronizacao-formatos-ia.md)
-- [`ISSUE-010-consolidacao-final-fechar-tudo.md`](./relatorios/ISSUE-010-consolidacao-final-fechar-tudo.md)
-- [`ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md`](./relatorios/ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md)
-- [`ISSUE-011-ESPECIAL-consolidacao-fluxo.md`](./relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md)
-
-Padronização de formato (ISSUE-009):
-- `../templates/ISSUE-IA-TEMPLATE.md`
-- `../guides/ISSUE-FORMAT-GUIDE.md`
-- `../checklists/ISSUE-VALIDATION.md`
+## 🎯 Objetivo
+Garantir que toda solicitação tenha:
+1. relatório (`ISSUE-NNN`),
+2. execução (`EXEC-NNN`),
+3. registro no CSV,
+4. HUB sincronizado.
 
 ---
 
-## 🆕 Como CRIAR uma boa ISSUE
+## 🔄 Fluxo oficial (humano + IA)
+1. **CRIAR (humano)**
+   - descreve problema, escopo e critérios.
+2. **ANALISAR (humano)**
+   - aprova/reprova com checklist.
+3. **EXECUTAR (IA)**
+   - executa somente o escopo aprovado.
+4. **FINALIZAR (humano)**
+   - valida evidências e aprova PR.
 
-Antes de pedir a criação da issue, preencha na ordem:
+---
 
-1. **TIPO:** `CODE`, `DOCS`, `TEST`, `ADR`, `GOVERNANCE`
-2. **TÍTULO curto:** até 10 palavras
-3. **JUSTIFICATIVA:** problema real que será resolvido
-4. **ESCOPO (inclui/exclui):** limites claros
-5. **ARTEFATOS:** lista explícita de arquivos/pastas
-6. **RISCOS:** risco + mitigação
+## 🔢 Regra obrigatória de numeração (IA)
+Antes de criar nova issue, a IA deve ler `docs/development/execution_queue.csv` e calcular o próximo `ISSUE-NNN` regular.
 
-Prompt recomendado:
+### Algoritmo
+1. Extrair IDs `ISSUE-\d{3}`.
+2. Ignorar variantes como `ISSUE-010-ESPECIAL`.
+3. Calcular `max + 1`.
+4. Criar:
+   - `docs/development/prompts/relatorios/ISSUE-[NNN]-[slug].md`
+   - `docs/development/prompts/execucoes/EXEC-[NNN]-[slug].md`
+5. Registrar no CSV e sincronizar HUB.
+
+> Exemplo: se o maior for `ISSUE-016`, a próxima obrigatória é `ISSUE-017`.
+
+---
+
+## 🧩 Prompt padrão para o HUMANO criar uma issue para IA
 
 ```markdown
-CRIAR ISSUE
+CRIAR ISSUE PARA IA
 
 TIPO: [CODE|DOCS|TEST|ADR|GOVERNANCE]
 TITULO: [curto e objetivo]
-JUSTIFICATIVA: [uma frase]
+JUSTIFICATIVA: [problema real]
 
 INCLUI:
 - item 1
 - item 2
 
 EXCLUI:
-- item 1
+- item fora de escopo
 
 ARTEFATOS:
 - caminho/arquivo1
 - caminho/arquivo2
 
 RISCOS:
-- risco 1 | mitigação
+- risco | mitigação
 
-Criar em: docs/development/prompts/relatorios/ISSUE-[N]-[slug].md
-```
-
-Após criar:
-1) registrar no `docs/development/execution_queue.csv`
-2) rodar `python tools/sync_hub.py`
-3) rodar `python tools/sync_hub.py --check`
-4) rodar `python tools/validate_issue_format.py docs/development/prompts/relatorios/ISSUE-[N]-[slug].md`
-5) rodar `python tools/check_issue_links.py docs/development/prompts/relatorios`
-
----
-
-## ✅ Como ANALISAR uma ISSUE antes de executar
-
-Checklist humano obrigatório:
-- [ ] Objetivo é claro em 1 frase.
-- [ ] Escopo está limitado e executável.
-- [ ] Artefatos estão específicos (caminhos concretos).
-- [ ] Riscos têm mitigação prática.
-- [ ] Critérios de aceite são verificáveis.
-- [ ] Bloco `PROMPT:EXECUTAR` está completo.
-
-Aprovação padrão:
-
-```markdown
-✅ ANÁLISE APROVADA
-
-Pode executar conforme PROMPT:EXECUTAR.
-Expectativa de PR: [data].
-```
-
-Se reprovar:
-
-```markdown
-⚠️ ANÁLISE COM AJUSTES
-
-- [ ] ponto 1
-- [ ] ponto 2
-
-Revisar o relatório e reenviar para análise.
+Regras obrigatórias:
+- descobrir próximo ISSUE-NNN pelo execution_queue.csv
+- criar ISSUE-[NNN]-[slug].md e EXEC-[NNN]-[slug].md
+- registrar no execution_queue.csv
+- sincronizar HUB
 ```
 
 ---
 
-## 🚀 Como EXECUTAR (Codex) por tipo de ISSUE
+## ✅ Prompt padrão para ANALISAR (humano)
 
-### TIPO = CODE
 ```markdown
-Executar ISSUE-[N] conforme relatorio.
+ANÁLISE DA ISSUE
 
-Passos:
-1) Implementar somente o escopo definido.
-2) Atualizar docstring e documentação de API afetada.
-3) Validar:
-   - python -m compileall src/
-   - python tools/check_api_docs.py --strict
-   - python tools/check_links.py docs/ README.md
-   - PYTHONPATH=src pytest tests/ -v
-4) Atualizar execution_queue e log da issue.
-5) Commit + PR ready for review.
+Checklist:
+- [ ] formato do relatório segue padrão ISSUE-003
+- [ ] escopo inclui/exclui está claro
+- [ ] artefatos estão explícitos
+- [ ] riscos e mitigação definidos
+- [ ] critérios de aceite verificáveis
+
+Status:
+- [ ] APROVADA para execução
+- [ ] REPROVADA com ajustes
 ```
 
-### TIPO = DOCS
+---
+
+## 🚀 Prompt padrão para EXECUTAR (IA)
+
 ```markdown
-Executar ISSUE-[N] conforme relatorio.
+Executar ISSUE-[NNN] conforme relatório aprovado.
 
 Passos:
-1) Alterar somente artefatos de documentação listados.
-2) Preservar links e navegação.
-3) Validar:
-   - python tools/check_links.py docs/ README.md
+1) Aplicar apenas o escopo definido.
+2) Atualizar os artefatos listados.
+3) Criar/atualizar EXEC-[NNN].
+4) Atualizar execution_queue.csv.
+5) Rodar validações:
+   - python tools/sync_hub.py
    - python tools/sync_hub.py --check
-4) Atualizar execution_queue e log da issue.
-5) Commit + PR ready for review.
-```
-
-### TIPO = TEST
-```markdown
-Executar ISSUE-[N] conforme relatorio.
-
-Passos:
-1) Criar/ajustar testes previstos no escopo.
-2) Rodar testes isolados e suíte geral.
-3) Validar:
-   - PYTHONPATH=src pytest tests/ -v
-4) Atualizar execution_queue e log da issue.
-5) Commit + PR ready for review.
-```
-
-### TIPO = ADR
-```markdown
-Executar ISSUE-[N] conforme relatorio.
-
-Passos:
-1) Criar/atualizar ADR em docs/governance/adr/.
-2) Atualizar docs/governance/adr/INDEX.md.
-3) Validar:
-   - python tools/check_links.py docs/
-   - python tools/sync_hub.py --check
-4) Atualizar execution_queue e log da issue.
-5) Commit + PR ready for review.
+   - python tools/check_issue_links.py docs/development/prompts/relatorios
+6) Commit + PR.
 ```
 
 ---
 
-## ✅ Como FINALIZAR (Humano)
-
-Checklist de fechamento:
-- [ ] PR tem evidências de validação.
-- [ ] `execution_queue.csv` está atualizado.
-- [ ] Log da issue foi atualizado em `prompts/logs/`.
-- [ ] Links/documentação não quebraram.
-- [ ] HUB consistente (`python tools/sync_hub.py --check`).
-
-Modelo de aprovação:
-
-```markdown
-✅ APROVADO
-
-Validações revisadas e rastreabilidade confirmada.
-Pode fazer merge.
-```
-
-Modelo de ajuste:
-
-```markdown
-⚠️ AJUSTES NECESSÁRIOS
-
-1. [ajuste 1]
-2. [ajuste 2]
-
-Depois de corrigir, reenviar para revisão.
-```
-
----
-
-## 🔗 Links úteis
-- [HUB_CONTROLE.md](../HUB_CONTROLE.md)
-- [execution_queue.csv](../execution_queue.csv)
-- [Workflow integrado](../WORKFLOW_INTEGRADO.md)
-- [relatorios/](./relatorios/)
-- [logs/](./logs/)
-
-## 🧭 Índice de links rápidos
-
-### Relatórios (001-011)
-- [ISSUE-003 — Auditoria completa](./relatorios/ISSUE-003-auditoria-completa.md)
-- [ISSUE-005 — Plano de ação de consolidação](./relatorios/ISSUE-005-plano-acao-consolidacao.md)
-- [ISSUE-007 — Consolidação final de prompts](./relatorios/ISSUE-007-consolidacao-final.md)
-- [ISSUE-008 — Melhoria do workflow de prompts](./relatorios/ISSUE-008-melhoria-workflow-prompts.md)
-- [ISSUE-009 — Padronização para IA](./relatorios/ISSUE-009-padronizacao-formatos-ia.md)
-- [ISSUE-010 — Fechamento 001-009](./relatorios/ISSUE-010-consolidacao-final-fechar-tudo.md)
-- [ISSUE-010-ESPECIAL — Correção da estrutura docs](./relatorios/ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md)
-- [ISSUE-011 — Consolidação de fluxo](./relatorios/ISSUE-011-consolidacao-fluxo.md)
-- [ISSUE-011-ESPECIAL — Consolidação de fluxo (execução)](./relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md)
-
-### Governança do formato de ISSUE
-- [Template IA](../templates/ISSUE-IA-TEMPLATE.md)
+## 🔗 Referências
+- [Relatórios](./relatorios/README.md)
 - [Guia de formato](../guides/ISSUE-FORMAT-GUIDE.md)
-- [Checklist de validação](../checklists/ISSUE-VALIDATION.md)
+- [execution_queue.csv](../execution_queue.csv)
+- [HUB_CONTROLE.md](../HUB_CONTROLE.md)

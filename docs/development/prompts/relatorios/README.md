@@ -1,68 +1,48 @@
 # 🧾 README — Relatórios de Issues
 
-Cada relatório (`ISSUE-XXX-slug.md`) é a fonte única para execução da issue.
+Este diretório contém relatórios no padrão **auditoria/consolidação** (referência obrigatória: `ISSUE-003-auditoria-completa.md`).
 
 ---
 
-## ✅ Estrutura mínima obrigatória
-- Objetivo
-- Escopo (inclui/exclui)
-- Artefatos afetados
-- Riscos
-- Critérios de aceite
-- `PROMPT:EXECUTAR`
+## ✅ Estrutura canônica (seguir à risca)
+Todo relatório novo deve conter, nesta ordem:
 
-Padrão canônico oficial:
-- [`../../templates/ISSUE-IA-TEMPLATE.md`](../../templates/ISSUE-IA-TEMPLATE.md)
-- [`../../guides/ISSUE-FORMAT-GUIDE.md`](../../guides/ISSUE-FORMAT-GUIDE.md)
-- [`../../checklists/ISSUE-VALIDATION.md`](../../checklists/ISSUE-VALIDATION.md)
+1. **Título principal** (ex.: `# RELATÓRIO DE CONSOLIDAÇÃO — ISSUE-017`)
+2. **Subtítulo** (contexto da issue)
+3. **Tabela de metadados** (Data, Responsável/Auditor, Issue, Tipo, Status, Normas)
+4. `## 1. Sumário Executivo`
+5. `## 2. Diagnóstico e Análise`
+6. `## 3. Artefatos Atualizados`
+7. `## 4. Execução Técnica`
+8. `## 5. Riscos, Restrições e Mitigações`
+9. `## 6. Critérios de Aceite e Status`
 
-Template base:
-- [`ISSUE-000-template.md`](./ISSUE-000-template.md)
-- [`ISSUE-009-padronizacao-formatos-ia.md`](./ISSUE-009-padronizacao-formatos-ia.md)
+Se não tiver essa estrutura, a issue está incompleta.
 
 ---
 
-## 🔄 Fluxo recomendado no próprio relatório
-1. **CRIAR** — issue documentada e registrada no CSV.
-2. **ANALISAR** — humano valida objetivo, escopo e critérios.
-3. **EXECUTAR** — Codex executa conforme `PROMPT:EXECUTAR`.
-4. **FINALIZAR** — humano aprova no PR.
+## 🔢 Numeração obrigatória
+- Descobrir próximo número no `docs/development/execution_queue.csv`.
+- Criar `ISSUE-[NNN]-[slug].md` e `EXEC-[NNN]-[slug].md` com o mesmo NNN.
 
 ---
 
-## 🧩 Bloco pronto para copiar
-```markdown
-## 📝 PROMPT:EXECUTAR
-<!-- PROMPT:EXECUTAR:INICIO -->
-Você é o Codex atuando como Executor Técnico.
-
-1) Leia este relatório e extraia objetivo, artefatos e critérios de aceite.
-2) Execute somente os artefatos listados.
-3) Valide:
-   - python -m compileall src/
-   - python tools/validate_docs_links.py
-   - python tools/sync_hub.py --check
-   - PYTHONPATH=src pytest tests/ -v
-4) Atualize docs/development/execution_queue.csv.
-5) Atualize o log em ../logs/ISSUE-XXX-slug-LOG.md.
-6) Faça commit e deixe o PR ready for review.
-<!-- PROMPT:EXECUTAR:FIM -->
-```
+## 📦 Entrega obrigatória por issue
+- Relatório em `relatorios/`
+- Execução em `execucoes/`
+- Linha no `execution_queue.csv`
+- HUB sincronizado por `tools/sync_hub.py`
 
 ---
 
-## 📌 Convenção de nome
-- `ISSUE-XXX-slug.md`
-
-Validação recomendada:
-
+## ✅ Validações mínimas
 ```bash
-python tools/validate_issue_format.py docs/development/prompts/relatorios/ISSUE-*.md
-python tools/check_issue_links.py docs/development/prompts/relatorios
+python tools/sync_hub.py
 python tools/sync_hub.py --check
+python tools/check_issue_links.py docs/development/prompts/relatorios
 ```
 
-Exemplos:
+---
+
+## 📚 Referência de formato
 - `ISSUE-003-auditoria-completa.md`
-- `ISSUE-008-melhoria-workflow-prompts.md`
