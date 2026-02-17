@@ -12,7 +12,11 @@ license = { text = "MIT" }
 authors = [{ name = "PyFolds Contributors" }]
 dependencies = [
   "torch>=2.0.0",
+  "torchvision>=0.15.0",
   "numpy>=1.24.0",
+  "zstandard>=0.21.0",
+  "google-crc32c>=1.5.0",
+  "reedsolo>=1.7.0",
 ]
 
 [project.optional-dependencies]
@@ -43,6 +47,17 @@ dev = [
 examples = [
   "torchvision>=0.15.0",
 ]
+
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+pyfolds = ["py.typed"]
 
 [tool.black]
 line-length = 88
