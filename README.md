@@ -29,6 +29,25 @@ O framework abstrai a computação dendrítica em um pipeline modular para acele
 pip install pyfolds
 ```
 
+
+## Documentation
+
+- Instale dependências de documentação:
+
+```bash
+pip install -r requirements-docs.txt
+```
+
+- Gere o site localmente com Sphinx:
+
+```bash
+sphinx-build -b html docs docs/_build/html
+```
+
+- Entrada principal da documentação: `docs/index.md`.
+- Portal HUB já existente: `docs/development/HUB_CONTROLE.md` (use como base, sem recriação do zero).
+- Publicação (quando disponível no CI/GitHub Pages): consultar workflow de docs do repositório.
+
 ## 3. Quickstart
 
 ```python
