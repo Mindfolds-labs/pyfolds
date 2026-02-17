@@ -10,6 +10,7 @@ Calcula o sinal neuromodulador R baseado em diferentes estratégias:
 O sinal R é sempre clampado em [-1, 1] para estabilidade.
 """
 
+import math
 import torch
 import torch.nn as nn
 from typing import Optional, Union
@@ -103,16 +104,27 @@ class Neuromodulator(nn.Module):
             # Modo capacity: baseado em capacidade livre (saturação)
             if saturation_ratio is None:
                 raise ValueError("saturation_ratio must be provided when neuromod_mode='capacity'")
-            
-            # Capacidade livre = 1 - saturação
-            free_capacity = 1.0 - max(0.0, min(1.0, saturation_ratio))
-            
+            saturation_ratio = float(saturation_ratio)
+            if math.isnan(saturation_ratio):
+                raise ValueError("saturation_ratio não pode ser NaN no modo 'capacity'")
+
+            saturation_ratio = max(0.0, min(1.0, saturation_ratio))
+            free_capacity = 1.0 - saturation_ratio
+
             # Penalidade por desvio da taxa alvo
             rate_error = abs(rate - self.cfg.target_spike_rate)
-            
-            R_val = (self.cfg.cap_bias + 
-                    self.cfg.cap_k_sat * free_capacity - 
-                    self.cfg.cap_k_rate * rate_error)
+            if math.isnan(rate_error):
+                raise ValueError(
+                    f"rate_error resultou em NaN (rate={rate}, target={self.cfg.target_spike_rate})"
+                )
+
+            R_val = (
+                self.cfg.cap_bias
+                + self.cfg.cap_k_sat * free_capacity
+                - self.cfg.cap_k_rate * rate_error
+            )
+            if math.isnan(R_val):
+                raise ValueError("R_val resultou em NaN no modo 'capacity'")
             
         elif self.cfg.neuromod_mode == "surprise":
             # Modo surprise: baseado em erro de predição

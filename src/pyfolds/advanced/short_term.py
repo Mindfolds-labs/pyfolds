@@ -60,6 +60,19 @@ class ShortTermDynamicsMixin:
             x: Tensor de entrada [B, D, S]
             dt: Passo de tempo (ms)
         """
+        if x.dim() != 3:
+            raise ValueError(
+                f"Esperado entrada com 3 dimensões [B, D, S], recebido shape {tuple(x.shape)}"
+            )
+
+        _, D, S = x.shape
+        if D != self.cfg.n_dendrites or S != self.cfg.n_synapses_per_dendrite:
+            raise ValueError(
+                "Shape incompatível para dinâmica de curto prazo: "
+                f"esperado [B, {self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}], "
+                f"recebido {tuple(x.shape)}"
+            )
+
         # Detecta spikes pré com threshold configurável
         spike_threshold = getattr(self.cfg, 'spike_threshold', 0.5)
         pre_spikes = (x > spike_threshold).float().mean(dim=0)  # [D, S] - média no batch
