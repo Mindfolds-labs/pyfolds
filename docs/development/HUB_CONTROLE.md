@@ -52,6 +52,8 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-015 | Concluída | Validar erros corrigidos + importacao pyfolds + suite completa + governanca | Codex | 2026-02-17 |
 | ISSUE-001 | Concluída | Adicionar dependência linkify-it-py para MyST Parser na documentação | Codex | 2026-02-17 |
 | ISSUE-017 | Concluída | Governança de numeração automática e entrega completa de ISSUE/EXEC | Codex | 2026-02-17 |
+| ISSUE-018 | Concluída | Padronização de relatórios e obrigatoriedade de sync HUB | Codex | 2026-02-17 |
+| ISSUE-019 | Concluída | Determinismo de relatórios e logs no workflow de prompts | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
@@ -235,6 +237,54 @@ Status: 🔄 DONE (aguardando revisão humana) | Responsável: Codex | Data: 202
 
 </div>
 
+### 4.16 ISSUE-015
+<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+
+**ISSUE-015** — Validar erros corrigidos + importacao pyfolds + suite completa + governanca  
+*Código / Testes / Governança*
+
+Status: 🔄 DONE (aguardando revisão humana) | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-015-validar-erros-imports-testes-e-governanca.md)
+
+</div>
+
+### 4.17 ISSUE-017
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-017** — Governança de numeração automática e entrega completa de ISSUE/EXEC  
+*Governança / Processo*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-017-governanca-numeracao-automatica-prompts.md)
+
+</div>
+
+### 4.18 ISSUE-018
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-018** — Padronização de relatórios e obrigatoriedade de sync HUB  
+*Governança / Processo*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-018-padronizacao-relatorios-sync-hub-obrigatorio.md)
+
+</div>
+
+### 4.19 ISSUE-019
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-019** — Determinismo de relatórios e logs no workflow de prompts  
+*Governança / Processo*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-019-determinismo-relatorios-logs-workflow-prompts.md)
+
+</div>
+
 ### 4.8 Padrão de Cores
 
 - ✅ Concluída → `#d4edda` (fundo) | `#28a745` (borda esquerda)
@@ -244,11 +294,11 @@ Status: 🔄 DONE (aguardando revisão humana) | Responsável: Codex | Data: 202
 - ❌ Bloqueada → `#f8d7da` (fundo) | `#dc3545` (borda esquerda)
 
 ## 5. Fluxo Padrão para Novas Issues
-1. Registrar issue na tabela acima.
+1. Registrar issue em `execution_queue.csv` e sincronizar a tabela acima com `python tools/sync_hub.py`.
 2. Verificar se há ADR aplicável.
 3. Criar próximo ADR sequencial (`ADR-XXX-*`) quando necessário.
 4. Executar mudanças em branch dedicada.
-5. Atualizar este HUB e os índices de governança.
+5. Confirmar link de relatório no card da issue e atualizar este HUB e os índices de governança.
 
 ## 6. Checklist de Fechamento
 - [ ] Links internos validados.
