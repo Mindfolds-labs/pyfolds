@@ -1,0 +1,98 @@
+@startuml
+title pyfolds class overview
+class "pyfolds.advanced.MPJRDNeuronAdvanced" as pyfolds_advanced_MPJRDNeuronAdvanced
+class "pyfolds.advanced.MPJRDWaveNeuronAdvanced" as pyfolds_advanced_MPJRDWaveNeuronAdvanced
+class "pyfolds.advanced.MPJRDLayerAdvanced" as pyfolds_advanced_MPJRDLayerAdvanced
+class "pyfolds.advanced.MPJRDWaveLayerAdvanced" as pyfolds_advanced_MPJRDWaveLayerAdvanced
+class "pyfolds.advanced.adaptation.AdaptationMixin" as pyfolds_advanced_adaptation_AdaptationMixin
+class "pyfolds.advanced.backprop.BackpropMixin" as pyfolds_advanced_backprop_BackpropMixin
+class "pyfolds.advanced.inhibition.InhibitionLayer" as pyfolds_advanced_inhibition_InhibitionLayer
+class "pyfolds.advanced.inhibition.InhibitionMixin" as pyfolds_advanced_inhibition_InhibitionMixin
+class "pyfolds.advanced.refractory.RefractoryMixin" as pyfolds_advanced_refractory_RefractoryMixin
+class "pyfolds.advanced.short_term.ShortTermDynamicsMixin" as pyfolds_advanced_short_term_ShortTermDynamicsMixin
+class "pyfolds.advanced.stdp.STDPMixin" as pyfolds_advanced_stdp_STDPMixin
+class "pyfolds.advanced.time_mixin.TimedMixin" as pyfolds_advanced_time_mixin_TimedMixin
+class "pyfolds.core.accumulator.AccumulatedStats" as pyfolds_core_accumulator_AccumulatedStats
+class "pyfolds.core.accumulator.StatisticsAccumulator" as pyfolds_core_accumulator_StatisticsAccumulator
+class "pyfolds.core.base.BasePlasticityRule" as pyfolds_core_base_BasePlasticityRule
+class "pyfolds.core.base.BaseNeuron" as pyfolds_core_base_BaseNeuron
+class "pyfolds.core.config.MPJRDConfig" as pyfolds_core_config_MPJRDConfig
+class "pyfolds.core.dendrite.MPJRDDendrite" as pyfolds_core_dendrite_MPJRDDendrite
+class "pyfolds.core.factory.NeuronType" as pyfolds_core_factory_NeuronType
+class "pyfolds.core.factory.NeuronFactory" as pyfolds_core_factory_NeuronFactory
+class "pyfolds.core.homeostasis.HomeostasisController" as pyfolds_core_homeostasis_HomeostasisController
+class "pyfolds.core.neuromodulation.Neuromodulator" as pyfolds_core_neuromodulation_Neuromodulator
+class "pyfolds.core.neuron.MPJRDNeuron" as pyfolds_core_neuron_MPJRDNeuron
+class "pyfolds.core.neuron_v2.MPJRDNeuronV2" as pyfolds_core_neuron_v2_MPJRDNeuronV2
+class "pyfolds.core.synapse.MPJRDSynapse" as pyfolds_core_synapse_MPJRDSynapse
+class "pyfolds.factory.NeuronType" as pyfolds_factory_NeuronType
+class "pyfolds.factory.NeuronFactory" as pyfolds_factory_NeuronFactory
+class "pyfolds.layers.layer.MPJRDLayer" as pyfolds_layers_layer_MPJRDLayer
+class "pyfolds.layers.wave_layer.MPJRDWaveLayer" as pyfolds_layers_wave_layer_MPJRDWaveLayer
+class "pyfolds.monitoring.health.HealthStatus" as pyfolds_monitoring_health_HealthStatus
+class "pyfolds.monitoring.health.NeuronHealthCheck" as pyfolds_monitoring_health_NeuronHealthCheck
+class "pyfolds.monitoring.health.NeuronHealthMonitor" as pyfolds_monitoring_health_NeuronHealthMonitor
+class "pyfolds.network.builder.NetworkBuilder" as pyfolds_network_builder_NetworkBuilder
+class "pyfolds.network.network.MPJRDNetwork" as pyfolds_network_network_MPJRDNetwork
+class "pyfolds.network.wave_network.MPJRDWaveNetwork" as pyfolds_network_wave_network_MPJRDWaveNetwork
+class "pyfolds.serialization.ecc.ECCResult" as pyfolds_serialization_ecc_ECCResult
+class "pyfolds.serialization.ecc.ECCCodec" as pyfolds_serialization_ecc_ECCCodec
+class "pyfolds.serialization.ecc.NoECC" as pyfolds_serialization_ecc_NoECC
+class "pyfolds.serialization.ecc.ReedSolomonECC" as pyfolds_serialization_ecc_ReedSolomonECC
+class "pyfolds.serialization.foldio.FoldSecurityError" as pyfolds_serialization_foldio_FoldSecurityError
+class "pyfolds.serialization.foldio.FoldWriter" as pyfolds_serialization_foldio_FoldWriter
+class "pyfolds.serialization.foldio.FoldReader" as pyfolds_serialization_foldio_FoldReader
+class "pyfolds.serialization.foldio._TrustedFoldReader" as pyfolds_serialization_foldio__TrustedFoldReader
+class "pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint" as pyfolds_serialization_versioned_checkpoint_VersionedCheckpoint
+class "pyfolds.telemetry.controller.TelemetryProfile" as pyfolds_telemetry_controller_TelemetryProfile
+class "pyfolds.telemetry.controller.TelemetryStats" as pyfolds_telemetry_controller_TelemetryStats
+class "pyfolds.telemetry.controller.TelemetryConfig" as pyfolds_telemetry_controller_TelemetryConfig
+class "pyfolds.telemetry.controller.TelemetryController" as pyfolds_telemetry_controller_TelemetryController
+class "pyfolds.telemetry.events.TelemetryEvent" as pyfolds_telemetry_events_TelemetryEvent
+class "pyfolds.telemetry.ringbuffer.RingBuffer" as pyfolds_telemetry_ringbuffer_RingBuffer
+class "pyfolds.telemetry.sinks.Sink" as pyfolds_telemetry_sinks_Sink
+class "pyfolds.telemetry.sinks.NoOpSink" as pyfolds_telemetry_sinks_NoOpSink
+class "pyfolds.telemetry.sinks.MemorySink" as pyfolds_telemetry_sinks_MemorySink
+class "pyfolds.telemetry.sinks.ConsoleSink" as pyfolds_telemetry_sinks_ConsoleSink
+class "pyfolds.telemetry.sinks.JSONLinesSink" as pyfolds_telemetry_sinks_JSONLinesSink
+class "pyfolds.telemetry.sinks.DistributorSink" as pyfolds_telemetry_sinks_DistributorSink
+class "pyfolds.telemetry.types.ForwardPayload" as pyfolds_telemetry_types_ForwardPayload
+class "pyfolds.telemetry.types.CommitPayload" as pyfolds_telemetry_types_CommitPayload
+class "pyfolds.telemetry.types.SleepPayload" as pyfolds_telemetry_types_SleepPayload
+class "pyfolds.utils.device.DeviceManager" as pyfolds_utils_device_DeviceManager
+class "pyfolds.utils.logging.StructuredFormatter" as pyfolds_utils_logging_StructuredFormatter
+class "pyfolds.utils.logging.PyFoldsLogger" as pyfolds_utils_logging_PyFoldsLogger
+class "pyfolds.utils.types.LearningMode" as pyfolds_utils_types_LearningMode
+class "pyfolds.utils.types.ConnectionType" as pyfolds_utils_types_ConnectionType
+class "pyfolds.utils.types.ModeConfig" as pyfolds_utils_types_ModeConfig
+class "pyfolds.utils.types.AdaptationOutput" as pyfolds_utils_types_AdaptationOutput
+class "pyfolds.utils.types.AdaptationConfig" as pyfolds_utils_types_AdaptationConfig
+class "pyfolds.wave.config.MPJRDWaveConfig" as pyfolds_wave_config_MPJRDWaveConfig
+class "pyfolds.wave.neuron.MPJRDWaveNeuron" as pyfolds_wave_neuron_MPJRDWaveNeuron
+pyfolds_advanced_MPJRDNeuronAdvanced --|> pyfolds_advanced_backprop_BackpropMixin
+pyfolds_advanced_MPJRDNeuronAdvanced --|> pyfolds_advanced_short_term_ShortTermDynamicsMixin
+pyfolds_advanced_MPJRDNeuronAdvanced --|> pyfolds_advanced_stdp_STDPMixin
+pyfolds_advanced_MPJRDNeuronAdvanced --|> pyfolds_advanced_adaptation_AdaptationMixin
+pyfolds_advanced_MPJRDNeuronAdvanced --|> pyfolds_advanced_refractory_RefractoryMixin
+pyfolds_advanced_MPJRDWaveNeuronAdvanced --|> pyfolds_advanced_backprop_BackpropMixin
+pyfolds_advanced_MPJRDWaveNeuronAdvanced --|> pyfolds_advanced_short_term_ShortTermDynamicsMixin
+pyfolds_advanced_MPJRDWaveNeuronAdvanced --|> pyfolds_advanced_stdp_STDPMixin
+pyfolds_advanced_MPJRDWaveNeuronAdvanced --|> pyfolds_advanced_adaptation_AdaptationMixin
+pyfolds_advanced_MPJRDWaveNeuronAdvanced --|> pyfolds_advanced_refractory_RefractoryMixin
+pyfolds_advanced_MPJRDLayerAdvanced --|> pyfolds_layers_layer_MPJRDLayer
+pyfolds_advanced_MPJRDWaveLayerAdvanced --|> pyfolds_layers_layer_MPJRDLayer
+pyfolds_advanced_backprop_BackpropMixin --|> pyfolds_advanced_time_mixin_TimedMixin
+pyfolds_advanced_refractory_RefractoryMixin --|> pyfolds_advanced_time_mixin_TimedMixin
+pyfolds_core_neuron_MPJRDNeuron --|> pyfolds_core_base_BaseNeuron
+pyfolds_core_neuron_v2_MPJRDNeuronV2 --|> pyfolds_core_neuron_MPJRDNeuron
+pyfolds_layers_wave_layer_MPJRDWaveLayer --|> pyfolds_layers_layer_MPJRDLayer
+pyfolds_network_wave_network_MPJRDWaveNetwork --|> pyfolds_network_network_MPJRDNetwork
+pyfolds_serialization_foldio__TrustedFoldReader --|> pyfolds_serialization_foldio_FoldReader
+pyfolds_telemetry_sinks_NoOpSink --|> pyfolds_telemetry_sinks_Sink
+pyfolds_telemetry_sinks_MemorySink --|> pyfolds_telemetry_sinks_Sink
+pyfolds_telemetry_sinks_ConsoleSink --|> pyfolds_telemetry_sinks_Sink
+pyfolds_telemetry_sinks_JSONLinesSink --|> pyfolds_telemetry_sinks_Sink
+pyfolds_telemetry_sinks_DistributorSink --|> pyfolds_telemetry_sinks_Sink
+pyfolds_wave_config_MPJRDWaveConfig --|> pyfolds_core_config_MPJRDConfig
+pyfolds_wave_neuron_MPJRDWaveNeuron --|> pyfolds_core_neuron_MPJRDNeuron
+@enduml

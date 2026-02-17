@@ -1,0 +1,11 @@
+{
+  "default": {
+    "file_count": 125
+  },
+  "no_tests": {
+    "file_count": 69
+  },
+  "src_only": {
+    "file_count": 51
+  }
+}
