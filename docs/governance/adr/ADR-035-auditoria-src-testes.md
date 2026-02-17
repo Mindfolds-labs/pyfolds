@@ -35,3 +35,11 @@ As correções devem ser separadas em PRs curtos, cada um com reprodução míni
 - Maior capacidade de associar cada correção ao achado auditado.
 - Necessidade de manter fila de execução atualizada com status e vínculos de evidência.
 - Confirmação prática da recorrência do problema de instalação editável em rede restrita (ISSUE-013), sem regressão funcional na suíte.
+
+
+## Atualização (ISSUE-014)
+Com base na recorrência dos achados da auditoria, a ADR-035 passa a incluir um gate automático de documentação estrutural no CI:
+- geração automática de inventário de módulos, tabela de funções/classes públicas, métricas e diagrama de dependências;
+- execução de validação em modo estrito para docstrings de API pública;
+- falha de pipeline quando houver função pública sem docstring, módulo não referenciado no inventário ou divergência entre estrutura do `src/` e artefatos gerados;
+- build de documentação com Sphinx (MyST + PyData theme) em modo `-W` para tratar warnings como erro.
