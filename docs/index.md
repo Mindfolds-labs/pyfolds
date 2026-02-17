@@ -39,10 +39,10 @@ The documentation covers:
 ## 2. Audience Navigation
 
 ### 2.1 Public (user-facing)
-- [`installation.md`](installation.md)
-- [`quickstart.md`](quickstart.md)
+- [`installation.md`](_quickstart/installation.md)
+- [`quickstart.md`](_quickstart/quickstart.md)
 - [`public/guides/getting_started.md`](public/guides/getting_started.md)
-- [`API_REFERENCE.md`](API_REFERENCE.md)
+- [`API_REFERENCE.md`](api/API_REFERENCE.md)
 
 ### 2.2 Internal (development and governance)
 - [`development/DEVELOPMENT.md`](development/DEVELOPMENT.md)
@@ -68,20 +68,20 @@ PyFolds documentation is structured in layers, aligned with C4 communication pra
 
 For efficient onboarding and technical depth progression:
 
-1. [`installation.md`](installation.md)
-2. [`quickstart.md`](quickstart.md)
+1. [`installation.md`](_quickstart/installation.md)
+2. [`quickstart.md`](_quickstart/quickstart.md)
 3. [`public/guides/core_concepts.md`](public/guides/core_concepts.md)
 4. [`public/guides/neuron_architecture.md`](public/guides/neuron_architecture.md)
 5. [`api/core.md`](api/core.md)
-6. [`SCIENTIFIC_LOGIC.md`](SCIENTIFIC_LOGIC.md)
+6. [`SCIENTIFIC_LOGIC.md`](science/SCIENTIFIC_LOGIC.md)
 
 ---
 
 ## 5. Documentation Map
 
 ### 5.1 Getting Started
-- [`installation.md`](installation.md)
-- [`quickstart.md`](quickstart.md)
+- [`installation.md`](_quickstart/installation.md)
+- [`quickstart.md`](_quickstart/quickstart.md)
 - [`public/guides/getting_started.md`](public/guides/getting_started.md)
 
 ### 5.2 Guides (Conceptual and Operational)
@@ -104,7 +104,7 @@ For efficient onboarding and technical depth progression:
 - [`api/telemetry.md`](api/telemetry.md)
 
 ### 5.4 Theory and Scientific Logic
-- [`SCIENTIFIC_LOGIC.md`](SCIENTIFIC_LOGIC.md)
+- [`SCIENTIFIC_LOGIC.md`](science/SCIENTIFIC_LOGIC.md)
 - [`research/mpjrd/mpjrd_model.md`](research/mpjrd/mpjrd_model.md)
 - [`research/mpjrd/three_factor_learning.md`](research/mpjrd/three_factor_learning.md)
 - [`research/mpjrd/two_factor_consolidation.md`](research/mpjrd/two_factor_consolidation.md)

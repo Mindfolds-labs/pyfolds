@@ -12,7 +12,7 @@ A partir da raiz do repositório:
 
 ```bash
 python scripts/run_benchmarks.py --output docs/assets/benchmarks_results.json
-python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/BENCHMARKS.md
+python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/assets/BENCHMARKS.md
 ```
 
 Parâmetros úteis:
@@ -26,7 +26,7 @@ python scripts/run_benchmarks.py --samples 7 --output docs/assets/benchmarks_res
 ## Saídas
 
 - JSON determinístico: `docs/assets/benchmarks_results.json`
-- Relatório em Markdown: `docs/BENCHMARKS.md`
+- Relatório em Markdown: `docs/assets/BENCHMARKS.md`
 
 ## Como interpretar os números
 
