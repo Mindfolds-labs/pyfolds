@@ -59,3 +59,8 @@ html_theme_options = {
 }
 
 nitpicky = False
+# Suprimir warnings de documentos fora do toctree (baseline controlado)
+suppress_warnings = [
+    "toc.not_included",
+]
+
