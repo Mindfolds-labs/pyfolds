@@ -1,24 +1,49 @@
 # 🚀 HUB_CONTROLE — Gestão de Issues e Governança
 
-<p align="left">
-  <img src="https://img.shields.io/badge/ID-DEV--HUB--CTRL--001-blue?style=for-the-badge" alt="ID">
-  <img src="https://img.shields.io/badge/Status-Ativo-success?style=for-the-badge" alt="Status">
-  <img src="https://img.shields.io/badge/Normas-ISO%2FIEC%20%7C%20IEEE-orange?style=for-the-badge" alt="Normas">
+<p align="center">
+  <img src="pyfoldnovo.PNG" width="250" alt="Logo PyFolds">
+</p>
+
+<p align="center">
+  <a href="#id-do-documento">
+    <img src="https://img.shields.io/badge/ID-DEV--HUB--CTRL--001-0A3069?style=for-the-badge&logo=target" alt="ID">
+  </a>
+  <a href="../../actions">
+    <img src="https://img.shields.io/badge/Status-Ativo-FFD700?style=for-the-badge&logo=github-actions&logoColor=0A3069" alt="Status">
+  </a>
+  <a href="#-referências">
+    <img src="https://img.shields.io/badge/Normas-IEEE_|_ISO-0A3069?style=for-the-badge&logo=bookstack" alt="Normas">
+  </a>
 </p>
 
 > [!IMPORTANT]
-> **Atenção:** Este HUB é uma ferramenta de governança interna. Não deve ser utilizado por usuários finais, apenas por mantenedores e agentes de IA.
+> **Atenção:** Este HUB é uma ferramenta de governança interna para o projeto **PyFolds**. Não deve ser utilizado por usuários finais, apenas por mantenedores e agentes de IA.
 
 ---
 
-## 🗺️ Navegação Rápida
+## 🗺️ Painel de Navegação Técnica
+*Acesse os artefatos de engenharia clicando nos botões abaixo:*
 
-| Documento | Função | Link |
-| :--- | :--- | :--- |
-| 🛠️ **Desenvolvimento** | Guia de Setup e Execução | [`DEVELOPMENT.md`](DEVELOPMENT.md) |
-| 🤝 **Contribuição** | Regras de PR e Commits | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
-| 📜 **Master Plan** | Plano de Governança Raiz | [`MASTER_PLAN.md`](../governance/MASTER_PLAN.md) |
-| ⚖️ **ADR Index** | Decisões de Arquitetura | [`ADR/INDEX.md`](../governance/adr/INDEX.md) |
+<p align="left">
+  <a href="DEVELOPMENT.md">
+    <img src="https://img.shields.io/badge/Engenharia-DEVELOPMENT.md-0A3069?style=for-the-badge&logo=python&logoColor=FFD700" alt="Dev">
+  </a>
+  <a href="CONTRIBUTING.md">
+    <img src="https://img.shields.io/badge/Contribuição-CONTRIBUTING.md-0A3069?style=for-the-badge&logo=github&logoColor=FFD700" alt="Contrib">
+  </a>
+  <a href="release_process.md">
+    <img src="https://img.shields.io/badge/Release-Process-0A3069?style=for-the-badge&logo=semantic-release&logoColor=FFD700" alt="Release">
+  </a>
+</p>
+
+<p align="left">
+  <a href="../governance/MASTER_PLAN.md">
+    <img src="https://img.shields.io/badge/Governança-MASTER_PLAN-FFD700?style=for-the-badge&logo=googlesheets&logoColor=0A3069" alt="Gov">
+  </a>
+  <a href="../governance/adr/INDEX.md">
+    <img src="https://img.shields.io/badge/Decisões-ADR_INDEX-FFD700?style=for-the-badge&logo=blueprint&logoColor=0A3069" alt="ADR">
+  </a>
+</p>
 
 ---
 
@@ -32,12 +57,11 @@
 
 ---
 
-## 🧩 Detalhamento de Issues (Timeline)
+## 🧩 Timeline de Issues (Detalhamento IEEE 730)
 
 > [!TIP]
 > ### ISSUE-023 — Estabilidade Runtime
 > **Status:** ✅ Concluída | **Data:** 17/02/2026
->
 > Focada em consistência cross-módulo e resolução de falhas críticas de importação.
 > - 📄 [Ver Relatório](./prompts/relatorios/ISSUE-023.md)
 > - 📦 [Ver Execução](./prompts/execucoes/EXEC-023.md)
@@ -45,22 +69,20 @@
 > [!WARNING]
 > ### ISSUE-012 — Auditoria de Código
 > **Status:** 🔄 DONE (Aguardando Revisão Humana) | **Data:** 17/02/2026
->
-> Verificação completa da suíte de testes conforme ADR-035.
+> Verificação completa da suíte de testes conforme **ADR-035**.
 > - 📄 [Ver Relatório](./prompts/relatorios/ISSUE-012.md)
 
 ---
 
-## 🔄 Fluxo de Trabalho (Engenharia)
+## 🔄 Fluxo de Trabalho (Engenharia de Software)
 
-Para manter a ordem e evitar conflitos entre agentes, siga rigorosamente o fluxo:
+Conforme **ISO/IEC 12207**, siga o ciclo Criar-Analisar-Executar-Finalizar:
 
-1. **Registrar:** Adicione a demanda em `execution_queue.csv`.
-2. **Sincronizar:** Execute `python tools/sync_hub.py` para atualizar esta página.
-3. **Executar:** Crie uma branch dedicada e vincule a uma **ADR**.
-4. **Validar:** Verifique se os links estão funcionais antes do Merge.
+1. **Registrar:** Issue em `execution_queue.csv`.
+2. **Sincronizar:** `python tools/sync_hub.py`.
+3. **Desenvolver:** Branch isolada vinculada à **ADR**.
+4. **Validar:** Check de integridade e revisão documental.
 
-### Automação
 ```bash
-# Sincronização manual
+# Sincronização e Auditoria via CLI
 python tools/sync_hub.py --check
