@@ -4,6 +4,8 @@ import logging
 import torch
 import torch.nn as nn
 from typing import Union, Callable
+from threading import Lock
+import math
 from .config import MPJRDConfig
 
 
@@ -35,6 +37,9 @@ class HomeostasisController(nn.Module):
         # Callbacks para eventos
         self._on_stable_callbacks: list[Callable] = []
         self._on_unstable_callbacks: list[Callable] = []
+        self._on_stable_ids: set[int] = set()
+        self._on_unstable_ids: set[int] = set()
+        self._lock = Lock()
         
         # Estado de estabilidade
         self._was_stable = False
@@ -60,6 +65,9 @@ class HomeostasisController(nn.Module):
         # Validação com tolerância
         rate = float(current_rate) if isinstance(current_rate, torch.Tensor) else current_rate
         
+        if math.isnan(rate) or math.isinf(rate):
+            raise ValueError(f"current_rate inválido: {rate}")
+
         if rate < -self.eps or rate > 1.0 + self.eps:
             raise ValueError(f"current_rate deve estar em [0, 1], mas é {rate}")
         
@@ -112,14 +120,15 @@ class HomeostasisController(nn.Module):
         """Verifica se houve mudança no estado de estabilidade."""
         is_stable_now = self.is_stable(tolerance)
 
-        if is_stable_now and not self._was_stable:
-            callbacks = list(self._on_stable_callbacks)
-        elif not is_stable_now and self._was_stable:
-            callbacks = list(self._on_unstable_callbacks)
-        else:
-            callbacks = []
+        with self._lock:
+            if is_stable_now and not self._was_stable:
+                callbacks = list(self._on_stable_callbacks)
+            elif not is_stable_now and self._was_stable:
+                callbacks = list(self._on_unstable_callbacks)
+            else:
+                callbacks = []
 
-        self._was_stable = is_stable_now
+            self._was_stable = is_stable_now
 
         for callback in callbacks:
             try:
@@ -129,11 +138,23 @@ class HomeostasisController(nn.Module):
 
     def on_stable(self, callback: Callable[['HomeostasisController'], None]) -> None:
         """Registra callback para quando a homeostase se tornar estável."""
-        self._on_stable_callbacks.append(callback)
+        if not callable(callback):
+            raise TypeError("callback deve ser chamável")
+        callback_id = id(callback)
+        with self._lock:
+            if callback_id not in self._on_stable_ids:
+                self._on_stable_callbacks.append(callback)
+                self._on_stable_ids.add(callback_id)
 
     def on_unstable(self, callback: Callable[['HomeostasisController'], None]) -> None:
         """Registra callback para quando a homeostase se tornar instável."""
-        self._on_unstable_callbacks.append(callback)
+        if not callable(callback):
+            raise TypeError("callback deve ser chamável")
+        callback_id = id(callback)
+        with self._lock:
+            if callback_id not in self._on_unstable_ids:
+                self._on_unstable_callbacks.append(callback)
+                self._on_unstable_ids.add(callback_id)
 
     def reset(self) -> None:
         """Reseta buffers."""
