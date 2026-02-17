@@ -1,0 +1,27 @@
+@startuml
+title pyfolds package dependency map
+package "pyfolds" as pyfolds
+package "pyfolds.advanced" as pyfolds_advanced
+package "pyfolds.core" as pyfolds_core
+package "pyfolds.layers" as pyfolds_layers
+package "pyfolds.monitoring" as pyfolds_monitoring
+package "pyfolds.network" as pyfolds_network
+package "pyfolds.serialization" as pyfolds_serialization
+package "pyfolds.telemetry" as pyfolds_telemetry
+package "pyfolds.utils" as pyfolds_utils
+package "pyfolds.wave" as pyfolds_wave
+pyfolds --> pyfolds_core
+pyfolds --> pyfolds_wave
+pyfolds_advanced --> pyfolds_utils
+pyfolds_core --> pyfolds_utils
+pyfolds_layers --> pyfolds
+pyfolds_layers --> pyfolds_core
+pyfolds_layers --> pyfolds_utils
+pyfolds_network --> pyfolds
+pyfolds_network --> pyfolds_core
+pyfolds_network --> pyfolds_layers
+pyfolds_network --> pyfolds_utils
+pyfolds_utils --> pyfolds_core
+pyfolds_wave --> pyfolds_core
+pyfolds_wave --> pyfolds_utils
+@enduml

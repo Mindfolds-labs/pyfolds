@@ -1,0 +1,1856 @@
+{
+  "module_count": 51,
+  "internal_dependency_count": 65,
+  "modules": {
+    "pyfolds": {
+      "file": "__init__.py",
+      "imports": [
+        "core.base",
+        "core.config",
+        "core.factory",
+        "core.neuron",
+        "core.neuron_v2",
+        "layers",
+        "monitoring",
+        "network",
+        "serialization",
+        "telemetry",
+        "utils.context",
+        "utils.types",
+        "wave"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    "pyfolds.advanced": {
+      "file": "advanced/__init__.py",
+      "imports": [
+        "core.neuron",
+        "layers.layer",
+        "logging",
+        "pyfolds.adaptation",
+        "pyfolds.backprop",
+        "pyfolds.inhibition",
+        "pyfolds.refractory",
+        "pyfolds.short_term",
+        "pyfolds.stdp",
+        "torch",
+        "typing",
+        "utils.logging",
+        "wave"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDNeuronAdvanced",
+          "bases": [
+            "BackpropMixin",
+            "ShortTermDynamicsMixin",
+            "STDPMixin",
+            "AdaptationMixin",
+            "RefractoryMixin",
+            "MPJRDNeuronBase"
+          ],
+          "methods": [
+            "__init__",
+            "_init_advanced_mixins",
+            "get_all_advanced_metrics",
+            "reset_all_mechanisms"
+          ],
+          "lineno": 47
+        },
+        {
+          "name": "MPJRDWaveNeuronAdvanced",
+          "bases": [
+            "BackpropMixin",
+            "ShortTermDynamicsMixin",
+            "STDPMixin",
+            "AdaptationMixin",
+            "RefractoryMixin",
+            "MPJRDWaveNeuronBase"
+          ],
+          "methods": [
+            "__init__"
+          ],
+          "lineno": 174
+        },
+        {
+          "name": "MPJRDLayerAdvanced",
+          "bases": [
+            "MPJRDLayer"
+          ],
+          "methods": [
+            "__init__"
+          ],
+          "lineno": 189
+        },
+        {
+          "name": "MPJRDWaveLayerAdvanced",
+          "bases": [
+            "MPJRDLayer"
+          ],
+          "methods": [
+            "__init__"
+          ],
+          "lineno": 212
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.advanced.adaptation": {
+      "file": "advanced/adaptation.py",
+      "imports": [
+        "math",
+        "pyfolds.utils.types",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "AdaptationMixin",
+          "bases": [],
+          "methods": [
+            "_init_adaptation",
+            "_ensure_adaptation_current",
+            "_apply_adaptation",
+            "forward"
+          ],
+          "lineno": 9
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.advanced.backprop": {
+      "file": "advanced/backprop.py",
+      "imports": [
+        "collections",
+        "math",
+        "pyfolds.advanced.time_mixin",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "BackpropMixin",
+          "bases": [
+            "TimedMixin"
+          ],
+          "methods": [
+            "_init_backprop",
+            "_ensure_backprop_trace",
+            "_schedule_backprop",
+            "_process_backprop_queue",
+            "forward"
+          ],
+          "lineno": 10
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.advanced.inhibition": {
+      "file": "advanced/inhibition.py",
+      "imports": [
+        "logging",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "InhibitionLayer",
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "__init__",
+            "_init_E2I_weights",
+            "_init_I2E_weights",
+            "_create_lateral_kernel",
+            "forward",
+            "apply_inhibition",
+            "get_inhibition_metrics",
+            "extra_repr"
+          ],
+          "lineno": 22
+        },
+        {
+          "name": "InhibitionMixin",
+          "bases": [],
+          "methods": [
+            "_init_inhibition",
+            "forward",
+            "get_inhibition_metrics"
+          ],
+          "lineno": 326
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.advanced.refractory": {
+      "file": "advanced/refractory.py",
+      "imports": [
+        "pyfolds.advanced.time_mixin",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "RefractoryMixin",
+          "bases": [
+            "TimedMixin"
+          ],
+          "methods": [
+            "_init_refractory",
+            "_ensure_last_spike_time",
+            "_check_refractory_batch",
+            "_update_refractory_batch",
+            "forward",
+            "reset_refractory",
+            "get_refractory_metrics"
+          ],
+          "lineno": 8
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.advanced.short_term": {
+      "file": "advanced/short_term.py",
+      "imports": [
+        "math",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "ShortTermDynamicsMixin",
+          "bases": [],
+          "methods": [
+            "_init_short_term",
+            "_update_short_term_dynamics",
+            "forward"
+          ],
+          "lineno": 8
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.advanced.stdp": {
+      "file": "advanced/stdp.py",
+      "imports": [
+        "math",
+        "pyfolds.utils.types",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "STDPMixin",
+          "bases": [],
+          "methods": [
+            "_init_stdp",
+            "_ensure_traces",
+            "_update_stdp_traces",
+            "_should_apply_stdp",
+            "forward"
+          ],
+          "lineno": 9
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.advanced.time_mixin": {
+      "file": "advanced/time_mixin.py",
+      "imports": [
+        "torch"
+      ],
+      "classes": [
+        {
+          "name": "TimedMixin",
+          "bases": [],
+          "methods": [
+            "_ensure_time_counter",
+            "_increment_time",
+            "_get_time"
+          ],
+          "lineno": 6
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.core": {
+      "file": "core/__init__.py",
+      "imports": [
+        "pyfolds.accumulator",
+        "pyfolds.base",
+        "pyfolds.config",
+        "pyfolds.dendrite",
+        "pyfolds.factory",
+        "pyfolds.homeostasis",
+        "pyfolds.neuromodulation",
+        "pyfolds.neuron",
+        "pyfolds.neuron_v2",
+        "pyfolds.synapse"
+      ],
+      "classes": [],
+      "functions": [
+        "create_accumulator",
+        "create_neuron",
+        "create_neuron_v2",
+        "demo"
+      ]
+    },
+    "pyfolds.core.accumulator": {
+      "file": "core/accumulator.py",
+      "imports": [
+        "collections",
+        "dataclasses",
+        "threading",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "AccumulatedStats",
+          "bases": [],
+          "methods": [
+            "is_valid",
+            "__repr__"
+          ],
+          "lineno": 12
+        },
+        {
+          "name": "StatisticsAccumulator",
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "__init__",
+            "history",
+            "enable_history",
+            "reset",
+            "accumulate",
+            "_update_history",
+            "get_averages",
+            "plot_history",
+            "has_data",
+            "batch_count",
+            "extra_repr"
+          ],
+          "lineno": 38
+        }
+      ],
+      "functions": [
+        "create_accumulator_from_config"
+      ]
+    },
+    "pyfolds.core.base": {
+      "file": "core/base.py",
+      "imports": [
+        "__future__",
+        "abc",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "BasePlasticityRule",
+          "bases": [
+            "ABC"
+          ],
+          "methods": [
+            "update"
+          ],
+          "lineno": 12
+        },
+        {
+          "name": "BaseNeuron",
+          "bases": [
+            "nn.Module",
+            "ABC"
+          ],
+          "methods": [
+            "forward",
+            "apply_plasticity",
+            "get_metrics"
+          ],
+          "lineno": 25
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.core.config": {
+      "file": "core/config.py",
+      "imports": [
+        "dataclasses",
+        "math",
+        "typing",
+        "warnings"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDConfig",
+          "bases": [],
+          "methods": [
+            "__post_init__",
+            "validate_numerical_safety",
+            "get_ts",
+            "get_decay_rate",
+            "to_dict",
+            "from_dict",
+            "get_preset",
+            "__repr__"
+          ],
+          "lineno": 16
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.core.dendrite": {
+      "file": "core/dendrite.py",
+      "imports": [
+        "pyfolds.core.config",
+        "pyfolds.core.synapse",
+        "threading",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDDendrite",
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "__init__",
+            "_ensure_cache_valid",
+            "_invalidate_cache",
+            "N",
+            "I",
+            "u",
+            "R",
+            "W",
+            "forward",
+            "_validate_finite",
+            "update_synapses_rate_based",
+            "consolidate",
+            "get_states",
+            "load_states",
+            "extra_repr"
+          ],
+          "lineno": 11
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.core.factory": {
+      "file": "core/factory.py",
+      "imports": [
+        "__future__",
+        "enum",
+        "pyfolds.core.config",
+        "typing",
+        "warnings"
+      ],
+      "classes": [
+        {
+          "name": "NeuronType",
+          "bases": [
+            "Enum"
+          ],
+          "methods": [],
+          "lineno": 12
+        },
+        {
+          "name": "NeuronFactory",
+          "bases": [],
+          "methods": [
+            "register",
+            "create",
+            "is_registered"
+          ],
+          "lineno": 20
+        }
+      ],
+      "functions": [
+        "get_available_types",
+        "infer_neuron_type",
+        "register_default_neurons",
+        "register_neuron"
+      ]
+    },
+    "pyfolds.core.homeostasis": {
+      "file": "core/homeostasis.py",
+      "imports": [
+        "logging",
+        "math",
+        "pyfolds.core.config",
+        "threading",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "HomeostasisController",
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "__init__",
+            "update",
+            "_check_stability_change",
+            "on_stable",
+            "on_unstable",
+            "reset",
+            "homeostasis_error",
+            "is_stable",
+            "stability_ratio",
+            "extra_repr"
+          ],
+          "lineno": 12
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.core.neuromodulation": {
+      "file": "core/neuromodulation.py",
+      "imports": [
+        "math",
+        "pyfolds.core.config",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "Neuromodulator",
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "__init__",
+            "forward",
+            "extra_repr"
+          ],
+          "lineno": 20
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.core.neuron": {
+      "file": "core/neuron.py",
+      "imports": [
+        "pyfolds.core.accumulator",
+        "pyfolds.core.base",
+        "pyfolds.core.config",
+        "pyfolds.core.dendrite",
+        "pyfolds.core.homeostasis",
+        "pyfolds.core.neuromodulation",
+        "pyfolds.utils.logging",
+        "pyfolds.utils.types",
+        "pyfolds.utils.validation",
+        "threading",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDNeuron",
+          "bases": [
+            "BaseNeuron"
+          ],
+          "methods": [
+            "__init__",
+            "_validate_internal_devices",
+            "_on_homeostasis_stable",
+            "_on_homeostasis_unstable",
+            "N",
+            "I",
+            "W",
+            "protection",
+            "theta",
+            "r_hat",
+            "set_mode",
+            "_compute_R_endogenous",
+            "_validate_input_device",
+            "_apply_online_plasticity",
+            "forward",
+            "step",
+            "apply_plasticity",
+            "sleep",
+            "to",
+            "get_metrics",
+            "extra_repr"
+          ],
+          "lineno": 42
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.core.neuron_v2": {
+      "file": "core/neuron_v2.py",
+      "imports": [
+        "pyfolds.core.neuron",
+        "pyfolds.utils.types",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDNeuronV2",
+          "bases": [
+            "MPJRDNeuron"
+          ],
+          "methods": [
+            "forward",
+            "_telemetry_forward_event",
+            "extra_repr"
+          ],
+          "lineno": 11
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.core.synapse": {
+      "file": "core/synapse.py",
+      "imports": [
+        "pyfolds.core.config",
+        "pyfolds.utils.math",
+        "pyfolds.utils.types",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDSynapse",
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "__init__",
+            "W",
+            "_update_with_soft_saturation",
+            "update",
+            "consolidate",
+            "get_state",
+            "load_state",
+            "extra_repr"
+          ],
+          "lineno": 32
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.factory": {
+      "file": "factory.py",
+      "imports": [
+        "__future__",
+        "enum",
+        "pyfolds.core.base",
+        "pyfolds.core.config",
+        "pyfolds.core.neuron",
+        "pyfolds.wave.neuron",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "NeuronType",
+          "bases": [
+            "str",
+            "Enum"
+          ],
+          "methods": [],
+          "lineno": 14
+        },
+        {
+          "name": "NeuronFactory",
+          "bases": [],
+          "methods": [
+            "register",
+            "create"
+          ],
+          "lineno": 22
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.layers": {
+      "file": "layers/__init__.py",
+      "imports": [
+        "pyfolds.layer",
+        "pyfolds.wave_layer"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    "pyfolds.layers.layer": {
+      "file": "layers/layer.py",
+      "imports": [
+        "pyfolds.core.config",
+        "pyfolds.core.neuron",
+        "pyfolds.utils.types",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDLayer",
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "__init__",
+            "n_dendrites",
+            "n_synapses",
+            "theta_mean",
+            "r_hat_mean",
+            "forward",
+            "_prepare_input",
+            "set_mode",
+            "apply_batch_update",
+            "sleep",
+            "get_all_metrics",
+            "get_layer_metrics",
+            "extra_repr"
+          ],
+          "lineno": 11
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.layers.wave_layer": {
+      "file": "layers/wave_layer.py",
+      "imports": [
+        "pyfolds.layers.layer",
+        "pyfolds.wave",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDWaveLayer",
+          "bases": [
+            "MPJRDLayer"
+          ],
+          "methods": [
+            "__init__"
+          ],
+          "lineno": 10
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.monitoring": {
+      "file": "monitoring/__init__.py",
+      "imports": [
+        "pyfolds.health"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    "pyfolds.monitoring.health": {
+      "file": "monitoring/health.py",
+      "imports": [
+        "__future__",
+        "enum",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "HealthStatus",
+          "bases": [
+            "Enum"
+          ],
+          "methods": [],
+          "lineno": 11
+        },
+        {
+          "name": "NeuronHealthCheck",
+          "bases": [],
+          "methods": [
+            "__init__",
+            "check"
+          ],
+          "lineno": 19
+        },
+        {
+          "name": "NeuronHealthMonitor",
+          "bases": [],
+          "methods": [
+            "__init__",
+            "check_health",
+            "get_health_score"
+          ],
+          "lineno": 53
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.network": {
+      "file": "network/__init__.py",
+      "imports": [
+        "pyfolds.builder",
+        "pyfolds.network",
+        "pyfolds.wave_network"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    "pyfolds.network.builder": {
+      "file": "network/builder.py",
+      "imports": [
+        "__future__",
+        "pyfolds.core.config",
+        "pyfolds.layers.layer",
+        "pyfolds.network.network",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "NetworkBuilder",
+          "bases": [],
+          "methods": [
+            "__init__",
+            "add_layer",
+            "build"
+          ],
+          "lineno": 12
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.network.network": {
+      "file": "network/network.py",
+      "imports": [
+        "collections",
+        "pyfolds.layers",
+        "pyfolds.utils.types",
+        "torch",
+        "torch.nn",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDNetwork",
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "__init__",
+            "add_layer",
+            "connect",
+            "_has_cycle",
+            "_topological_sort",
+            "_prepare_input_for_layer",
+            "build",
+            "forward",
+            "set_mode",
+            "apply_batch_update",
+            "sleep",
+            "get_all_metrics",
+            "get_network_metrics",
+            "extra_repr"
+          ],
+          "lineno": 11
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.network.wave_network": {
+      "file": "network/wave_network.py",
+      "imports": [
+        "pyfolds.layers",
+        "pyfolds.network.network",
+        "pyfolds.wave"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDWaveNetwork",
+          "bases": [
+            "MPJRDNetwork"
+          ],
+          "methods": [
+            "add_wave_layer"
+          ],
+          "lineno": 8
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.serialization": {
+      "file": "serialization/__init__.py",
+      "imports": [
+        "pyfolds.ecc",
+        "pyfolds.foldio",
+        "pyfolds.versioned_checkpoint"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    "pyfolds.serialization.ecc": {
+      "file": "serialization/ecc.py",
+      "imports": [
+        "__future__",
+        "dataclasses",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "ECCResult",
+          "bases": [],
+          "methods": [],
+          "lineno": 10
+        },
+        {
+          "name": "ECCCodec",
+          "bases": [
+            "Protocol"
+          ],
+          "methods": [
+            "encode",
+            "decode"
+          ],
+          "lineno": 17
+        },
+        {
+          "name": "NoECC",
+          "bases": [],
+          "methods": [
+            "encode",
+            "decode"
+          ],
+          "lineno": 29
+        },
+        {
+          "name": "ReedSolomonECC",
+          "bases": [],
+          "methods": [
+            "__init__",
+            "encode",
+            "decode"
+          ],
+          "lineno": 41
+        }
+      ],
+      "functions": [
+        "ecc_from_protection"
+      ]
+    },
+    "pyfolds.serialization.foldio": {
+      "file": "serialization/foldio.py",
+      "imports": [
+        "__future__",
+        "dataclasses",
+        "hashlib",
+        "importlib",
+        "io",
+        "json",
+        "mmap",
+        "numpy",
+        "os",
+        "pathlib",
+        "platform",
+        "pyfolds.serialization.ecc",
+        "struct",
+        "subprocess",
+        "sys",
+        "time",
+        "torch",
+        "typing",
+        "warnings"
+      ],
+      "classes": [
+        {
+          "name": "FoldSecurityError",
+          "bases": [
+            "RuntimeError"
+          ],
+          "methods": [],
+          "lineno": 89
+        },
+        {
+          "name": "FoldWriter",
+          "bases": [],
+          "methods": [
+            "__init__",
+            "__enter__",
+            "__exit__",
+            "_compress",
+            "add_chunk",
+            "finalize"
+          ],
+          "lineno": 220
+        },
+        {
+          "name": "FoldReader",
+          "bases": [],
+          "methods": [
+            "__init__",
+            "__enter__",
+            "__exit__",
+            "_read_at",
+            "_read_header_and_index",
+            "list_chunks",
+            "_decompress",
+            "_ecc_codec",
+            "read_chunk_bytes",
+            "read_json",
+            "read_torch"
+          ],
+          "lineno": 365
+        },
+        {
+          "name": "_TrustedFoldReader",
+          "bases": [
+            "FoldReader"
+          ],
+          "methods": [
+            "read_torch"
+          ],
+          "lineno": 613
+        }
+      ],
+      "functions": [
+        "_build_nuclear_npz",
+        "_cfg_to_dict",
+        "_crc32c_fallback",
+        "_expression_summary",
+        "_history_snapshot",
+        "_init_crc32c_table",
+        "_json_bytes",
+        "_optional_import",
+        "_reproducibility_metadata",
+        "_safe_git_hash",
+        "_telemetry_snapshot",
+        "crc32c_u32",
+        "is_mind",
+        "is_mind_chunks",
+        "load_fold_or_mind",
+        "peek_fold_or_mind",
+        "peek_mind",
+        "read_nuclear_arrays",
+        "save_fold_or_mind",
+        "sha256_hex"
+      ]
+    },
+    "pyfolds.serialization.versioned_checkpoint": {
+      "file": "serialization/versioned_checkpoint.py",
+      "imports": [
+        "__future__",
+        "dataclasses",
+        "datetime",
+        "hashlib",
+        "pathlib",
+        "subprocess",
+        "torch",
+        "typing",
+        "warnings"
+      ],
+      "classes": [
+        {
+          "name": "VersionedCheckpoint",
+          "bases": [],
+          "methods": [
+            "__init__",
+            "_cfg_dict",
+            "_git_hash",
+            "_metadata",
+            "_compute_hash",
+            "save",
+            "load",
+            "__repr__"
+          ],
+          "lineno": 16
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.telemetry": {
+      "file": "telemetry/__init__.py",
+      "imports": [
+        "pyfolds.controller",
+        "pyfolds.decorator",
+        "pyfolds.events",
+        "pyfolds.ringbuffer",
+        "pyfolds.sinks",
+        "pyfolds.types"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    "pyfolds.telemetry.controller": {
+      "file": "telemetry/controller.py",
+      "imports": [
+        "dataclasses",
+        "enum",
+        "logging",
+        "pyfolds.telemetry.events",
+        "pyfolds.telemetry.ringbuffer",
+        "pyfolds.telemetry.sinks",
+        "random",
+        "threading",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "TelemetryProfile",
+          "bases": [
+            "str",
+            "Enum"
+          ],
+          "methods": [],
+          "lineno": 14
+        },
+        {
+          "name": "TelemetryStats",
+          "bases": [
+            "TypedDict"
+          ],
+          "methods": [],
+          "lineno": 24
+        },
+        {
+          "name": "TelemetryConfig",
+          "bases": [],
+          "methods": [
+            "__post_init__"
+          ],
+          "lineno": 38
+        },
+        {
+          "name": "TelemetryController",
+          "bases": [],
+          "methods": [
+            "__init__",
+            "step_count",
+            "_increment_step",
+            "enabled",
+            "should_emit",
+            "should_emit_sample",
+            "emit",
+            "snapshot",
+            "clear",
+            "get_stats",
+            "get_telemetry_metrics"
+          ],
+          "lineno": 72
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.telemetry.decorator": {
+      "file": "telemetry/decorator.py",
+      "imports": [
+        "functools",
+        "pyfolds.telemetry.controller",
+        "pyfolds.telemetry.events",
+        "time",
+        "typing"
+      ],
+      "classes": [],
+      "functions": [
+        "telemetry"
+      ]
+    },
+    "pyfolds.telemetry.events": {
+      "file": "telemetry/events.py",
+      "imports": [
+        "dataclasses",
+        "time",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "TelemetryEvent",
+          "bases": [],
+          "methods": [
+            "payload"
+          ],
+          "lineno": 14
+        }
+      ],
+      "functions": [
+        "commit_event",
+        "commit_event_lazy",
+        "forward_event",
+        "forward_event_lazy",
+        "sleep_event",
+        "sleep_event_lazy"
+      ]
+    },
+    "pyfolds.telemetry.ringbuffer": {
+      "file": "telemetry/ringbuffer.py",
+      "imports": [
+        "collections.abc",
+        "threading",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "RingBuffer",
+          "bases": [
+            "Generic[T]"
+          ],
+          "methods": [
+            "__init__",
+            "append",
+            "extend",
+            "snapshot",
+            "clear",
+            "capacity",
+            "is_full",
+            "__len__",
+            "__repr__"
+          ],
+          "lineno": 10
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.telemetry.sinks": {
+      "file": "telemetry/sinks.py",
+      "imports": [
+        "abc",
+        "json",
+        "logging",
+        "pathlib",
+        "pyfolds.telemetry.events",
+        "pyfolds.telemetry.ringbuffer",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "Sink",
+          "bases": [
+            "ABC"
+          ],
+          "methods": [
+            "emit",
+            "flush",
+            "close",
+            "__enter__",
+            "__exit__"
+          ],
+          "lineno": 21
+        },
+        {
+          "name": "NoOpSink",
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "emit",
+            "flush",
+            "close"
+          ],
+          "lineno": 46
+        },
+        {
+          "name": "MemorySink",
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "__init__",
+            "emit",
+            "snapshot",
+            "clear",
+            "flush",
+            "close"
+          ],
+          "lineno": 59
+        },
+        {
+          "name": "ConsoleSink",
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "__init__",
+            "emit",
+            "flush",
+            "close"
+          ],
+          "lineno": 90
+        },
+        {
+          "name": "JSONLinesSink",
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "__init__",
+            "__enter__",
+            "__exit__",
+            "_ensure_open",
+            "_make_serializable",
+            "emit",
+            "flush",
+            "close"
+          ],
+          "lineno": 118
+        },
+        {
+          "name": "DistributorSink",
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "__init__",
+            "emit",
+            "flush",
+            "close"
+          ],
+          "lineno": 226
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.telemetry.types": {
+      "file": "telemetry/types.py",
+      "imports": [
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "ForwardPayload",
+          "bases": [
+            "TypedDict"
+          ],
+          "methods": [],
+          "lineno": 6
+        },
+        {
+          "name": "CommitPayload",
+          "bases": [
+            "TypedDict"
+          ],
+          "methods": [],
+          "lineno": 23
+        },
+        {
+          "name": "SleepPayload",
+          "bases": [
+            "TypedDict"
+          ],
+          "methods": [],
+          "lineno": 33
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.utils": {
+      "file": "utils/__init__.py",
+      "imports": [
+        "pyfolds.device",
+        "pyfolds.logging",
+        "pyfolds.math",
+        "pyfolds.types",
+        "pyfolds.validation"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    "pyfolds.utils.context": {
+      "file": "utils/context.py",
+      "imports": [
+        "__future__",
+        "contextlib",
+        "pyfolds.core.base",
+        "pyfolds.utils.types",
+        "typing"
+      ],
+      "classes": [],
+      "functions": [
+        "learning_mode"
+      ]
+    },
+    "pyfolds.utils.device": {
+      "file": "utils/device.py",
+      "imports": [
+        "logging",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "DeviceManager",
+          "bases": [],
+          "methods": [
+            "__init__",
+            "_validate_device",
+            "to",
+            "check_consistency"
+          ],
+          "lineno": 42
+        }
+      ],
+      "functions": [
+        "ensure_device",
+        "get_device",
+        "infer_device"
+      ]
+    },
+    "pyfolds.utils.logging": {
+      "file": "utils/logging.py",
+      "imports": [
+        "datetime",
+        "json",
+        "logging",
+        "logging.handlers",
+        "pathlib",
+        "sys",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "StructuredFormatter",
+          "bases": [
+            "logging.Formatter"
+          ],
+          "methods": [
+            "format"
+          ],
+          "lineno": 34
+        },
+        {
+          "name": "PyFoldsLogger",
+          "bases": [],
+          "methods": [
+            "__new__",
+            "__init__",
+            "setup",
+            "get_logger",
+            "add_file_handler"
+          ],
+          "lineno": 57
+        }
+      ],
+      "functions": [
+        "get_logger",
+        "setup_logging",
+        "trace"
+      ]
+    },
+    "pyfolds.utils.math": {
+      "file": "utils/math.py",
+      "imports": [
+        "math",
+        "torch",
+        "typing"
+      ],
+      "classes": [],
+      "functions": [
+        "calculate_vc_dimension",
+        "clamp_R",
+        "clamp_rate",
+        "safe_div",
+        "safe_weight_law",
+        "xavier_init"
+      ]
+    },
+    "pyfolds.utils.types": {
+      "file": "utils/types.py",
+      "imports": [
+        "dataclasses",
+        "enum",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "LearningMode",
+          "bases": [
+            "Enum"
+          ],
+          "methods": [
+            "learning_rate_multiplier",
+            "description",
+            "is_learning",
+            "is_consolidating"
+          ],
+          "lineno": 13
+        },
+        {
+          "name": "ConnectionType",
+          "bases": [
+            "Enum"
+          ],
+          "methods": [],
+          "lineno": 60
+        },
+        {
+          "name": "ModeConfig",
+          "bases": [],
+          "methods": [
+            "__post_init__",
+            "get_learning_rate",
+            "get_consolidation_factor",
+            "from_learning_mode"
+          ],
+          "lineno": 76
+        },
+        {
+          "name": "AdaptationOutput",
+          "bases": [
+            "NamedTuple"
+          ],
+          "methods": [],
+          "lineno": 136
+        },
+        {
+          "name": "AdaptationConfig",
+          "bases": [],
+          "methods": [
+            "validate"
+          ],
+          "lineno": 144
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.utils.validation": {
+      "file": "utils/validation.py",
+      "imports": [
+        "__future__",
+        "functools",
+        "torch",
+        "typing"
+      ],
+      "classes": [],
+      "functions": [
+        "validate_device_consistency",
+        "validate_input"
+      ]
+    },
+    "pyfolds.wave": {
+      "file": "wave/__init__.py",
+      "imports": [
+        "pyfolds.config",
+        "pyfolds.neuron"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    "pyfolds.wave.config": {
+      "file": "wave/config.py",
+      "imports": [
+        "dataclasses",
+        "pyfolds.core.config",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDWaveConfig",
+          "bases": [
+            "MPJRDConfig"
+          ],
+          "methods": [
+            "__post_init__"
+          ],
+          "lineno": 10
+        }
+      ],
+      "functions": []
+    },
+    "pyfolds.wave.neuron": {
+      "file": "wave/neuron.py",
+      "imports": [
+        "__future__",
+        "pyfolds.core.neuron",
+        "pyfolds.utils.types",
+        "pyfolds.utils.validation",
+        "pyfolds.wave.config",
+        "torch",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "MPJRDWaveNeuron",
+          "bases": [
+            "MPJRDNeuron"
+          ],
+          "methods": [
+            "__init__",
+            "_frequency_for_class",
+            "_compute_phase",
+            "_compute_latency",
+            "_generate_wave_output",
+            "forward",
+            "apply_plasticity"
+          ],
+          "lineno": 14
+        }
+      ],
+      "functions": []
+    }
+  },
+  "internal_dependencies": [
+    {
+      "from": "pyfolds.advanced",
+      "to": "pyfolds"
+    },
+    {
+      "from": "pyfolds.advanced.adaptation",
+      "to": "pyfolds.utils.types"
+    },
+    {
+      "from": "pyfolds.advanced.backprop",
+      "to": "pyfolds.advanced.time_mixin"
+    },
+    {
+      "from": "pyfolds.advanced.refractory",
+      "to": "pyfolds.advanced.time_mixin"
+    },
+    {
+      "from": "pyfolds.advanced.stdp",
+      "to": "pyfolds.utils.types"
+    },
+    {
+      "from": "pyfolds.core",
+      "to": "pyfolds"
+    },
+    {
+      "from": "pyfolds.core",
+      "to": "pyfolds.factory"
+    },
+    {
+      "from": "pyfolds.core.dendrite",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.core.dendrite",
+      "to": "pyfolds.core.synapse"
+    },
+    {
+      "from": "pyfolds.core.factory",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.core.homeostasis",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.core.neuromodulation",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.core.neuron",
+      "to": "pyfolds.core.accumulator"
+    },
+    {
+      "from": "pyfolds.core.neuron",
+      "to": "pyfolds.core.base"
+    },
+    {
+      "from": "pyfolds.core.neuron",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.core.neuron",
+      "to": "pyfolds.core.dendrite"
+    },
+    {
+      "from": "pyfolds.core.neuron",
+      "to": "pyfolds.core.homeostasis"
+    },
+    {
+      "from": "pyfolds.core.neuron",
+      "to": "pyfolds.core.neuromodulation"
+    },
+    {
+      "from": "pyfolds.core.neuron",
+      "to": "pyfolds.utils.logging"
+    },
+    {
+      "from": "pyfolds.core.neuron",
+      "to": "pyfolds.utils.types"
+    },
+    {
+      "from": "pyfolds.core.neuron",
+      "to": "pyfolds.utils.validation"
+    },
+    {
+      "from": "pyfolds.core.neuron_v2",
+      "to": "pyfolds.core.neuron"
+    },
+    {
+      "from": "pyfolds.core.neuron_v2",
+      "to": "pyfolds.utils.types"
+    },
+    {
+      "from": "pyfolds.core.synapse",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.core.synapse",
+      "to": "pyfolds.utils.math"
+    },
+    {
+      "from": "pyfolds.core.synapse",
+      "to": "pyfolds.utils.types"
+    },
+    {
+      "from": "pyfolds.factory",
+      "to": "pyfolds.core.base"
+    },
+    {
+      "from": "pyfolds.factory",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.factory",
+      "to": "pyfolds.core.neuron"
+    },
+    {
+      "from": "pyfolds.factory",
+      "to": "pyfolds.wave.neuron"
+    },
+    {
+      "from": "pyfolds.layers",
+      "to": "pyfolds"
+    },
+    {
+      "from": "pyfolds.layers.layer",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.layers.layer",
+      "to": "pyfolds.core.neuron"
+    },
+    {
+      "from": "pyfolds.layers.layer",
+      "to": "pyfolds.utils.types"
+    },
+    {
+      "from": "pyfolds.layers.wave_layer",
+      "to": "pyfolds.layers.layer"
+    },
+    {
+      "from": "pyfolds.layers.wave_layer",
+      "to": "pyfolds.wave"
+    },
+    {
+      "from": "pyfolds.monitoring",
+      "to": "pyfolds"
+    },
+    {
+      "from": "pyfolds.network",
+      "to": "pyfolds"
+    },
+    {
+      "from": "pyfolds.network.builder",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.network.builder",
+      "to": "pyfolds.layers.layer"
+    },
+    {
+      "from": "pyfolds.network.builder",
+      "to": "pyfolds.network.network"
+    },
+    {
+      "from": "pyfolds.network.network",
+      "to": "pyfolds.layers"
+    },
+    {
+      "from": "pyfolds.network.network",
+      "to": "pyfolds.utils.types"
+    },
+    {
+      "from": "pyfolds.network.wave_network",
+      "to": "pyfolds.layers"
+    },
+    {
+      "from": "pyfolds.network.wave_network",
+      "to": "pyfolds.network.network"
+    },
+    {
+      "from": "pyfolds.network.wave_network",
+      "to": "pyfolds.wave"
+    },
+    {
+      "from": "pyfolds.serialization",
+      "to": "pyfolds"
+    },
+    {
+      "from": "pyfolds.serialization.foldio",
+      "to": "pyfolds.serialization.ecc"
+    },
+    {
+      "from": "pyfolds.telemetry",
+      "to": "pyfolds"
+    },
+    {
+      "from": "pyfolds.telemetry.controller",
+      "to": "pyfolds.telemetry.events"
+    },
+    {
+      "from": "pyfolds.telemetry.controller",
+      "to": "pyfolds.telemetry.ringbuffer"
+    },
+    {
+      "from": "pyfolds.telemetry.controller",
+      "to": "pyfolds.telemetry.sinks"
+    },
+    {
+      "from": "pyfolds.telemetry.decorator",
+      "to": "pyfolds.telemetry.controller"
+    },
+    {
+      "from": "pyfolds.telemetry.decorator",
+      "to": "pyfolds.telemetry.events"
+    },
+    {
+      "from": "pyfolds.telemetry.sinks",
+      "to": "pyfolds.telemetry.events"
+    },
+    {
+      "from": "pyfolds.telemetry.sinks",
+      "to": "pyfolds.telemetry.ringbuffer"
+    },
+    {
+      "from": "pyfolds.utils",
+      "to": "pyfolds"
+    },
+    {
+      "from": "pyfolds.utils.context",
+      "to": "pyfolds.core.base"
+    },
+    {
+      "from": "pyfolds.utils.context",
+      "to": "pyfolds.utils.types"
+    },
+    {
+      "from": "pyfolds.wave",
+      "to": "pyfolds"
+    },
+    {
+      "from": "pyfolds.wave.config",
+      "to": "pyfolds.core.config"
+    },
+    {
+      "from": "pyfolds.wave.neuron",
+      "to": "pyfolds.core.neuron"
+    },
+    {
+      "from": "pyfolds.wave.neuron",
+      "to": "pyfolds.utils.types"
+    },
+    {
+      "from": "pyfolds.wave.neuron",
+      "to": "pyfolds.utils.validation"
+    },
+    {
+      "from": "pyfolds.wave.neuron",
+      "to": "pyfolds.wave.config"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+[project]
+name = "pyfolds"
+root = "."
+
+[scan]
+include_dirs = ["src", "tests"]
+exclude_dirs = [
+  ".git",
+  "__pycache__",
+  ".pytest_cache",
+  ".mypy_cache",
+  ".ruff_cache",
+  "dist",
+  "build",
+  ".venv",
+  "venv"
+]
+max_file_kb = 1024
+include_tests = true
+
+[audit]
+scope = ["src", "tests"]
+exclude = ["build", "dist"]
+
+[parser]
+mode = "tolerant"
+python_version = "3.12"
+
+[trace]
+enabled = true
+output_dir = "docs/sheer-audit/data/trace"
+max_depth = 200
+ignore_modules = ["typing", "dataclasses", "pytest"]
+
+[uml]
+engine = "plantuml"
+output_dir = "docs/sheer-audit/data/uml"
+
+[uml.sequence]
+max_depth = 80
+
+[architecture]
+layers = ["core", "advanced", "telemetry", "utils", "wave"]
+layer_paths = ["src/pyfolds"]
+forbidden_imports = []
+
+[docs]
+adr_dir = "docs/adr"
+blueprints_dir = "docs/sheer-audit/blueprints"
+atas_dir = "docs/atas"
