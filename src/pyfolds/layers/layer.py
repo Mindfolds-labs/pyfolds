@@ -162,8 +162,9 @@ class MPJRDLayer(nn.Module):
         if self.training:
             # Modo treinamento: permite gradientes
             for i, neuron in enumerate(self.neurons):
+                x_neuron = x[:, i, :, :].to(neuron.theta.device)
                 out = neuron(
-                    x[:, i, :, :],  # [batch, dendrites, synapses]
+                    x_neuron,  # [batch, dendrites, synapses]
                     reward=reward,
                     mode=mode,
                     **neuron_kwargs,
@@ -187,8 +188,9 @@ class MPJRDLayer(nn.Module):
             # Modo avaliação: sem gradientes (mais rápido)
             with torch.no_grad():
                 for i, neuron in enumerate(self.neurons):
+                    x_neuron = x[:, i, :, :].to(neuron.theta.device)
                     out = neuron(
-                        x[:, i, :, :],
+                        x_neuron,
                         reward=reward,
                         mode=mode,
                         **neuron_kwargs,

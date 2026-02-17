@@ -321,9 +321,18 @@ class MPJRDNetwork(nn.Module):
             for from_layer, to_layer in self.connections:
                 if to_layer == layer_name and from_layer in outputs:
                     spikes = outputs[from_layer]['spikes']  # [B, from]
+                    from_neurons = self.layers[from_layer].n_neurons
+                    if spikes.dim() != 2 or spikes.shape[1] != from_neurons:
+                        raise ValueError(
+                            f"Spikes shape mismatch: esperado [{spikes.shape[0]}, {from_neurons}], "
+                            f"recebido {tuple(spikes.shape)}"
+                        )
+
                     conn_name = f"{from_layer}_to_{to_layer}"
                     weights = self.connection_weights[conn_name]  # [from, to]
-                    
+                    if weights.shape[0] != from_neurons:
+                        raise ValueError(f"Weight shape mismatch: {tuple(weights.shape)}")
+
                     # ✅ PREPARA ENTRADA COM DISTRIBUIÇÃO DENDRÍTICA
                     prepared = self._prepare_input_for_layer(
                         spikes, layer_name, weights

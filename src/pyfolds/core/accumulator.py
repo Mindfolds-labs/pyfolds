@@ -3,6 +3,7 @@
 import torch
 import torch.nn as nn
 from typing import Optional, Dict, List, Deque
+from threading import Lock
 from dataclasses import dataclass
 from collections import deque
 
@@ -77,6 +78,7 @@ class StatisticsAccumulator(nn.Module):
         # Histórico (lazy evaluation)
         self._history: Dict[str, Deque[float]] = {}
         self._history_enabled = False
+        self._lock = Lock()
 
     @property
     def history(self) -> Dict[str, Deque[float]]:
@@ -98,23 +100,24 @@ class StatisticsAccumulator(nn.Module):
 
     def reset(self) -> None:
         """Reseta todos os acumuladores."""
-        self.acc_x.zero_()
-        self.acc_gated.zero_()
-        self.acc_spikes.zero_()
-        self.acc_count.zero_()
-        
-        if self.track_extra:
-            self.acc_v_dend.zero_()
-            self.acc_u.zero_()
-            self.acc_theta.zero_()
-            self.acc_r_hat.zero_()
-            self.acc_adaptation.zero_()
-        
-        self.initialized.fill_(False)
-        
-        if self._history_enabled:
-            for key in self._history:
-                self._history[key].clear()
+        with self._lock:
+            self.acc_x.zero_()
+            self.acc_gated.zero_()
+            self.acc_spikes.zero_()
+            self.acc_count.zero_()
+
+            if self.track_extra:
+                self.acc_v_dend.zero_()
+                self.acc_u.zero_()
+                self.acc_theta.zero_()
+                self.acc_r_hat.zero_()
+                self.acc_adaptation.zero_()
+
+            self.initialized.fill_(False)
+
+            if self._history_enabled:
+                for key in self._history:
+                    self._history[key].clear()
 
     def accumulate(self, 
                   x: torch.Tensor, 
@@ -128,59 +131,76 @@ class StatisticsAccumulator(nn.Module):
         """Acumula estatísticas de um batch (versão otimizada)."""
         # Validação rápida
         batch_size = x.shape[0]
-        
+
         if x.shape[1:] != (self.n_dendrites, self.n_synapses):
             raise ValueError(
                 f"Esperado [B, {self.n_dendrites}, {self.n_synapses}], "
                 f"recebido {x.shape}"
             )
 
+        if gated.dim() != 2 or gated.shape != (batch_size, self.n_dendrites):
+            raise ValueError(
+                f"gated deve ser [B, {self.n_dendrites}], recebido {gated.shape}"
+            )
+
+        if spikes.dim() != 1 or spikes.shape[0] != batch_size:
+            raise ValueError(
+                f"spikes deve ser [B], recebido {spikes.shape}"
+            )
+
+        # Evita retenção de grafo por acúmulo
+        x = x.detach()
+        gated = gated.detach()
+        spikes = spikes.detach()
+
         # Device sync (só uma vez)
         device = x.device
         if self.acc_x.device != device:
             self.to(device)
 
-        if not self.initialized.item():
-            # Primeira batch
-            self.acc_x.copy_(x.sum(dim=0))
-            self.acc_gated.copy_(gated.sum(dim=0))
-            self.acc_spikes.copy_(spikes.sum().long())
-            self.acc_count.copy_(torch.tensor(batch_size, device=device, dtype=torch.long))
-            
-            if self.track_extra:
-                if v_dend is not None:
-                    self.acc_v_dend.copy_(v_dend.sum(dim=0))
-                if u is not None:
-                    self.acc_u.copy_(u.sum())
-                if theta is not None:
-                    self.acc_theta.copy_(theta.sum() if theta.dim() > 0 else theta * batch_size)
-                if r_hat is not None:
-                    self.acc_r_hat.copy_(r_hat.sum() if r_hat.dim() > 0 else r_hat * batch_size)
-                if adaptation is not None:
-                    self.acc_adaptation.copy_(adaptation.sum() if adaptation.dim() > 0 else adaptation * batch_size)
-            
-            self.initialized.fill_(True)
-        else:
-            # Acumulação vetorizada
-            self.acc_x += x.sum(dim=0)
-            self.acc_gated += gated.sum(dim=0)
-            self.acc_spikes += spikes.sum().long()
-            self.acc_count += batch_size
-            
-            if self.track_extra:
-                if v_dend is not None:
-                    self.acc_v_dend += v_dend.sum(dim=0)
-                if u is not None:
-                    self.acc_u += u.sum()
-                if theta is not None:
-                    self.acc_theta += theta.sum() if theta.dim() > 0 else theta * batch_size
-                if r_hat is not None:
-                    self.acc_r_hat += r_hat.sum() if r_hat.dim() > 0 else r_hat * batch_size
-                if adaptation is not None:
-                    self.acc_adaptation += adaptation.sum() if adaptation.dim() > 0 else adaptation * batch_size
+        with self._lock:
+            if not self.initialized.item():
+                # Primeira batch
+                self.acc_x.copy_(x.sum(dim=0))
+                self.acc_gated.copy_(gated.sum(dim=0))
+                self.acc_spikes.copy_(spikes.sum().long())
+                self.acc_count.copy_(torch.tensor(batch_size, device=device, dtype=torch.long))
 
-        if self._history_enabled:
-            self._update_history(spikes, gated, theta, r_hat)
+                if self.track_extra:
+                    if v_dend is not None:
+                        self.acc_v_dend.copy_(v_dend.sum(dim=0))
+                    if u is not None:
+                        self.acc_u.copy_(u.sum())
+                    if theta is not None:
+                        self.acc_theta.copy_(theta.sum() if theta.dim() > 0 else theta * batch_size)
+                    if r_hat is not None:
+                        self.acc_r_hat.copy_(r_hat.sum() if r_hat.dim() > 0 else r_hat * batch_size)
+                    if adaptation is not None:
+                        self.acc_adaptation.copy_(adaptation.sum() if adaptation.dim() > 0 else adaptation * batch_size)
+
+                self.initialized.fill_(True)
+            else:
+                # Acumulação vetorizada
+                self.acc_x += x.sum(dim=0)
+                self.acc_gated += gated.sum(dim=0)
+                self.acc_spikes += spikes.sum().long()
+                self.acc_count += batch_size
+
+                if self.track_extra:
+                    if v_dend is not None:
+                        self.acc_v_dend += v_dend.sum(dim=0)
+                    if u is not None:
+                        self.acc_u += u.sum()
+                    if theta is not None:
+                        self.acc_theta += theta.sum() if theta.dim() > 0 else theta * batch_size
+                    if r_hat is not None:
+                        self.acc_r_hat += r_hat.sum() if r_hat.dim() > 0 else r_hat * batch_size
+                    if adaptation is not None:
+                        self.acc_adaptation += adaptation.sum() if adaptation.dim() > 0 else adaptation * batch_size
+
+            if self._history_enabled:
+                self._update_history(spikes, gated, theta, r_hat)
+
 
     def _update_history(self, 
                        spikes: torch.Tensor, 
@@ -208,34 +228,37 @@ class StatisticsAccumulator(nn.Module):
     def get_averages(self) -> AccumulatedStats:
         """Retorna médias de todas as estatísticas acumuladas."""
         stats = AccumulatedStats()
-        
+
         if not self.has_data:
             return stats
+
+        with self._lock:
+            if self.acc_count.item() <= 0:
+                return stats
+            count = self.acc_count.float().clamp_min(1.0)
         
-        count = self.acc_count.float() + self.eps
-        
-        stats.x_mean = self.acc_x / count
-        stats.gated_mean = self.acc_gated / count
-        stats.post_rate = (self.acc_spikes.float() / count).item()
-        stats.total_samples = int(self.acc_count.item())
-        stats.spike_count = int(self.acc_spikes.item())
-        
-        if stats.gated_mean is not None:
-            stats.sparsity = (stats.gated_mean > 0).float().mean().item()
-        
-        if self.track_extra:
-            if hasattr(self, 'acc_v_dend'):
-                stats.v_dend_mean = self.acc_v_dend / count
-            if hasattr(self, 'acc_u'):
-                stats.u_mean = (self.acc_u / count).item()
-            if hasattr(self, 'acc_theta'):
-                stats.theta_mean = (self.acc_theta / count).item()
-            if hasattr(self, 'acc_r_hat'):
-                stats.r_hat_mean = (self.acc_r_hat / count).item()
-            if hasattr(self, 'acc_adaptation'):
-                stats.adaptation_mean = (self.acc_adaptation / count).item()
-        
-        return stats
+            stats.x_mean = self.acc_x / count
+            stats.gated_mean = self.acc_gated / count
+            stats.post_rate = (self.acc_spikes.float() / count).item()
+            stats.total_samples = int(self.acc_count.item())
+            stats.spike_count = int(self.acc_spikes.item())
+
+            if stats.gated_mean is not None:
+                stats.sparsity = (stats.gated_mean > 0).float().mean().item()
+
+            if self.track_extra:
+                if hasattr(self, 'acc_v_dend'):
+                    stats.v_dend_mean = self.acc_v_dend / count
+                if hasattr(self, 'acc_u'):
+                    stats.u_mean = (self.acc_u / count).item()
+                if hasattr(self, 'acc_theta'):
+                    stats.theta_mean = (self.acc_theta / count).item()
+                if hasattr(self, 'acc_r_hat'):
+                    stats.r_hat_mean = (self.acc_r_hat / count).item()
+                if hasattr(self, 'acc_adaptation'):
+                    stats.adaptation_mean = (self.acc_adaptation / count).item()
+
+            return stats
 
     def plot_history(self, keys: Optional[List[str]] = None, figsize=(10, 6)):
         """Plota histórico (retorna figura para maior controle)."""

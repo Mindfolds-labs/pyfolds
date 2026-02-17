@@ -148,7 +148,10 @@ class MPJRDSynapse(nn.Module):
 
         # ✅ Atualização in-place (tensores)
         # Usa média do batch para atualizar I (sinapse única)
-        delta_mean = delta.mean()  # []
+        if delta.numel() > 0:
+            delta_mean = delta.mean()  # []
+        else:
+            delta_mean = torch.tensor(0.0, device=self.I.device)
         self._update_with_soft_saturation(delta_mean=delta_mean)
 
         # ✅ Eligibility in-place
@@ -187,9 +190,9 @@ class MPJRDSynapse(nn.Module):
                     self.sat_time.zero_()
 
         # ===== Recuperação da saturação =====
-        if self.protection.item():
+        if bool(self.protection.squeeze()):
             self.sat_time.add_(dt)
-            if self.sat_time.item() >= cfg.saturation_recovery_time:
+            if cfg.saturation_recovery_time > 0 and float(self.sat_time.item()) >= cfg.saturation_recovery_time:
                 self.protection.fill_(False)
                 self.sat_time.zero_()
 

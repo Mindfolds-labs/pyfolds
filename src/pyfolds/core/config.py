@@ -185,6 +185,9 @@ class MPJRDConfig:
         if self.homeostasis_eps <= 0:
             raise ValueError(f"homeostasis_eps must be > 0, got {self.homeostasis_eps}")
 
+        if self.neuromod_scale <= 0:
+            raise ValueError(f"neuromod_scale must be > 0, got {self.neuromod_scale}")
+
         if not (0.0 < self.active_synapses_ratio <= 1.0):
             raise ValueError(
                 f"active_synapses_ratio must be in (0, 1], got {self.active_synapses_ratio}"

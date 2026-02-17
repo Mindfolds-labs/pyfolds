@@ -124,7 +124,13 @@ class MPJRDNeuron(BaseNeuron):
                 f"Componentes do neurônio em devices diferentes: {devices}. "
                 "Todos devem estar no mesmo device."
             )
-        
+
+        expected_device = self.theta.device
+        if self.step_id.device != expected_device:
+            raise RuntimeError(
+                f"step_id device {self.step_id.device} != theta device {expected_device}"
+            )
+
         self.logger.debug(f"✅ Devices consistentes: {devices.pop()}")
 
     def _on_homeostasis_stable(self, controller: HomeostasisController) -> None:
@@ -376,8 +382,8 @@ class MPJRDNeuron(BaseNeuron):
             "gated": gated,
             "theta": self.theta.clone(),
             "r_hat": self.r_hat.clone(),
-            "spike_rate": torch.tensor(spike_rate, device=device),
-            "saturation_ratio": torch.tensor(saturation_ratio, device=device),
+            "spike_rate": spike_rate,
+            "saturation_ratio": saturation_ratio,
             "R": R_tensor,
             "N_mean": self.N.float().mean().to(device),
             "W_mean": self.W.float().mean().to(device),
