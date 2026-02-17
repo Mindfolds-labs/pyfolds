@@ -38,11 +38,12 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-004 | Concluída | Consolidação do hub interno e navegação em docs/development | Codex | 2026-02-16 |
 | ISSUE-005 | Pausada | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Codex | 2026-02-16 |
 | ISSUE-006 | Cancelada | Número reservado (não utilizado intencionalmente) | Codex | 2026-02-16 |
-| ISSUE-007 | Pausada | Consolidação final do workflow e normalização total de prompts | Codex | 2026-02-16 |
-| ISSUE-008 | Planejada | Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar | Neto | 2026-02-16 |
-| ISSUE-009 | Pausada | Padronização de formatos de ISSUEs para interação com IA | Codex | 2026-02-16 |
+| ISSUE-007 | Concluída | Consolidação final do workflow e normalização total de prompts | Codex | 2026-02-16 |
+| ISSUE-008 | Pausada | Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar | Neto | 2026-02-16 |
+| ISSUE-009 | Concluída | Padronização de formatos de ISSUEs para interação com IA | Codex | 2026-02-16 |
 | ISSUE-010 | Concluída | Consolidação final: fechamento das ISSUEs 001-009 e limpeza documental | Codex | 2026-02-16 |
 | ISSUE-010-ESPECIAL | Concluída | Corrigir estrutura docs/ - remover soltos e órfãos | Codex | 2026-02-17 |
+| ISSUE-011-ESPECIAL | Em Progresso | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
@@ -79,8 +80,6 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 
 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-003-auditoria-completa.md)
 
-> Diagnóstico e plano de consolidação que originou a ISSUE-005.
-
 </div>
 
 ### 4.4 ISSUE-004
@@ -96,29 +95,24 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 </div>
 
 ### 4.5 ISSUE-005
-<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+<div style="background: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px;">
 
-**ISSUE-005** — Consolidação Total: Implementar Plano de Ação da Auditoria  
-*Desenvolvimento / Multi-área (3 sprints)*
+**ISSUE-005** — Consolidação total: implementar plano de ação da auditoria (3 sprints)  
+*Documentação / Multi-área*
 
-Status: 🔄 Em Progresso | Responsável: Codex | Data: 2026-02-16  
-Sprint: 2/3 🔄
+Status: ⏸️ Pausada | Responsável: Codex | Data: 2026-02-16
 
 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md)
-
-> Sprint 1 (fechado): gaps críticos.  
-> Sprint 2 (planejado): validação de docs + testes.  
-> Sprint 3 (planejado): consolidação final.
 
 </div>
 
 ### 4.6 ISSUE-007
-<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
 
 **ISSUE-007** — Consolidação final do workflow e normalização total de prompts  
-*Desenvolvimento / Processo*
+*Documentação / Processo*
 
-Status: 🔄 Em Progresso | Responsável: Codex | Data: 2026-02-16  
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
 
 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-007-consolidacao-final.md)
 
@@ -128,11 +122,59 @@ Status: 🔄 Em Progresso | Responsável: Codex | Data: 2026-02-16
 <div style="background: #e2e3e5; border-left: 4px solid #6c757d; padding: 12px;">
 
 **ISSUE-008** — Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar  
-*Desenvolvimento / Processo*
+*Documentação / Processo*
 
-Status: ⏳ Planejada | Responsável: Neto | Data: 2026-02-16  
+Status: ⏸️ Pausada | Responsável: Neto | Data: 2026-02-16
 
 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-008-melhoria-workflow-prompts.md)
+
+</div>
+
+### 4.8 ISSUE-009
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-009** — Padronização de formatos de ISSUEs para interação com IA  
+*Documentação / Processo*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-009-padronizacao-formatos-ia.md)
+
+</div>
+
+### 4.9 ISSUE-010
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-010** — Consolidação final: fechamento das ISSUEs 001-009 e limpeza documental  
+*Governança / Documentação*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-16
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-010-consolidacao-final-fechar-tudo.md)
+
+</div>
+
+### 4.10 ISSUE-010-ESPECIAL
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-010-ESPECIAL** — Corrigir estrutura docs/ - remover soltos e órfãos  
+*Governança / Documentação*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md)
+
+</div>
+
+### 4.11 ISSUE-011-ESPECIAL
+<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+
+**ISSUE-011-ESPECIAL** — Consolidação de fluxo operacional e correção de cards/links  
+*Governança / Documentação*
+
+Status: 🔄 Em Progresso | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md)
 
 </div>
 
