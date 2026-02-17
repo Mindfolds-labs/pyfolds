@@ -61,7 +61,7 @@ Interpretação rápida:
 - 📑 [Índice de Documentação](docs/README.md)
 - 🧪 [Lógica Científica](docs/SCIENTIFIC_LOGIC.md)
 - 🏗️ [Arquitetura](docs/ARCHITECTURE.md)
-- 📦 [Especificação FOLD](docs/FOLD_SPECIFICATION.md)
+- 📦 [Especificação FOLD](docs/architecture/specs/FOLD_SPECIFICATION.md)
 - 🔌 [Referência de API](docs/API_REFERENCE.md)
 - 📈 [Relatório de Benchmarks](docs/BENCHMARKS.md)
 

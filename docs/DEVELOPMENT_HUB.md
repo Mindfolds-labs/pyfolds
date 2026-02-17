@@ -15,7 +15,6 @@
 ### 🏛️ Arquiteto(a)
 - [Especificações técnicas](specifications/README.md)
 - [Arquitetura de alto nível](ARCHITECTURE.md)
-- [Arquitetura v3](ARCHITECTURE_V3.md)
 - [Blueprints e diagramas](architecture/blueprints/README.md)
 - [Histórico de decisões (ADRs)](governance/adr/INDEX.md)
 
