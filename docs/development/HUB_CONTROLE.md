@@ -54,6 +54,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-017 | Concluída | Governança de numeração automática e entrega completa de ISSUE/EXEC | Codex | 2026-02-17 |
 | ISSUE-018 | Concluída | Padronização de relatórios e obrigatoriedade de sync HUB | Codex | 2026-02-17 |
 | ISSUE-019 | Concluída | Determinismo de relatórios e logs no workflow de prompts | Codex | 2026-02-17 |
+| ISSUE-020 | Concluída | Relatório CI Docs Hub e correções para Sphinx/MyST | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
@@ -282,6 +283,18 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
 Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
 
 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-019-determinismo-relatorios-logs-workflow-prompts.md)
+
+</div>
+
+### 4.20 ISSUE-020
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px;">
+
+**ISSUE-020** — Relatório CI Docs Hub e correções para Sphinx/MyST  
+*Documentação / Governança*
+
+Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-020-relatorio-ci-docs-hub-sphinx-myst.md)
 
 </div>
 

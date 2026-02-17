@@ -37,5 +37,5 @@ governance/index
 ```
 
 ## Referências
-- [README do projeto](../README.md)
+- [README da documentação](README.md)
 - [Portal interno de prompts](development/prompts.md)
