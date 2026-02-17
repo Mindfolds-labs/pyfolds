@@ -1,39 +1,48 @@
 # 🧾 README — Relatórios de Issues
 
-Os relatórios em `relatorios/` seguem padrão de **auditoria/consolidação** (ex.: ISSUE-003), com análise explícita e evidências.
+Este diretório contém relatórios no padrão **auditoria/consolidação** (referência obrigatória: `ISSUE-003-auditoria-completa.md`).
 
 ---
 
-## 📌 Formato recomendado (canônico atual)
-1. Título do relatório (`RELATÓRIO ... ISSUE-NNN`)
-2. Metadados em tabela (data, responsável, issue, tipo, status, normas)
-3. **1. Sumário Executivo**
-4. **2. Diagnóstico e Análise**
-5. **3. Artefatos Atualizados**
-6. **4. Execução Técnica**
-7. **5. Riscos, Restrições e Mitigações**
-8. **6. Critérios de Aceite e Status**
+## ✅ Estrutura canônica (seguir à risca)
+Todo relatório novo deve conter, nesta ordem:
+
+1. **Título principal** (ex.: `# RELATÓRIO DE CONSOLIDAÇÃO — ISSUE-017`)
+2. **Subtítulo** (contexto da issue)
+3. **Tabela de metadados** (Data, Responsável/Auditor, Issue, Tipo, Status, Normas)
+4. `## 1. Sumário Executivo`
+5. `## 2. Diagnóstico e Análise`
+6. `## 3. Artefatos Atualizados`
+7. `## 4. Execução Técnica`
+8. `## 5. Riscos, Restrições e Mitigações`
+9. `## 6. Critérios de Aceite e Status`
+
+Se não tiver essa estrutura, a issue está incompleta.
 
 ---
 
-## 🔢 Regra de numeração obrigatória
-Sempre usar o próximo `ISSUE-NNN` calculado a partir de `docs/development/execution_queue.csv`.
-
-Se o maior for `ISSUE-016`, a próxima criação obrigatória é `ISSUE-017`.
+## 🔢 Numeração obrigatória
+- Descobrir próximo número no `docs/development/execution_queue.csv`.
+- Criar `ISSUE-[NNN]-[slug].md` e `EXEC-[NNN]-[slug].md` com o mesmo NNN.
 
 ---
 
-## 📦 Entrega completa da ISSUE
-Para cada relatório criado, também deve existir:
-- `docs/development/prompts/execucoes/EXEC-[NNN]-[slug].md`
-- linha correspondente no `execution_queue.csv`
+## 📦 Entrega obrigatória por issue
+- Relatório em `relatorios/`
+- Execução em `execucoes/`
+- Linha no `execution_queue.csv`
 - HUB sincronizado por `tools/sync_hub.py`
 
 ---
 
-## ✅ Validação operacional
+## ✅ Validações mínimas
 ```bash
 python tools/sync_hub.py
 python tools/sync_hub.py --check
 python tools/check_issue_links.py docs/development/prompts/relatorios
 ```
+
+---
+
+## 📚 Referência de formato
+- `ISSUE-003-auditoria-completa.md`
