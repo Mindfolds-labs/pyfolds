@@ -196,10 +196,47 @@ Status: ✅ Concluída | Responsável: Codex | Data: 2026-02-17
 
 </div>
 
+### 4.13 ISSUE-012
+<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+
+**ISSUE-012** — Auditoria de código em src + testes + ADR-035  
+*Código / Testes / Governança*
+
+Status: 🔄 DONE (aguardando revisão humana) | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-012-auditoria-codigo-testes-adr35.md)
+
+</div>
+
+### 4.14 ISSUE-013
+<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+
+**ISSUE-013** — Estabilizar instalação editável em rede restrita e consolidar falhas da auditoria ADR-035  
+*Código / Testes / Governança*
+
+Status: 🔄 DONE (aguardando revisão humana) | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-013-estabilizar-install-editavel-rede-restrita.md)
+
+</div>
+
+### 4.15 ISSUE-014
+<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+
+**ISSUE-014** — Auditoria SRC/Testes ADR-035 + gate CI docs hub com Sphinx/MyST/PyData  
+*Código / Testes / Governança*
+
+Status: 🔄 DONE (aguardando revisão humana) | Responsável: Codex | Data: 2026-02-17
+
+📄 [Ver relatório completo](./prompts/relatorios/ISSUE-014-auditoria-src-testes-adr35-ci-docs-hub.md)
+
+</div>
+
 ### 4.8 Padrão de Cores
 
 - ✅ Concluída → `#d4edda` (fundo) | `#28a745` (borda esquerda)
 - 🔄 Progresso → `#fff3cd` (fundo) | `#ffc107` (borda esquerda)
+- 🟡 DONE (aguardando revisão humana) → `#fff3cd` (fundo) | `#ffc107` (borda esquerda)
 - ⏳ Planejada → `#e2e3e5` (fundo) | `#6c757d` (borda esquerda)
 - ❌ Bloqueada → `#f8d7da` (fundo) | `#dc3545` (borda esquerda)
 
