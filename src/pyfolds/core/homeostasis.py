@@ -1,5 +1,6 @@
 """Controle de homeostase do neurônio MPJRD - VERSÃO CORRIGIDA FINAL"""
 
+import logging
 import torch
 import torch.nn as nn
 from typing import Union, Callable
@@ -110,17 +111,21 @@ class HomeostasisController(nn.Module):
     def _check_stability_change(self, tolerance: float = 0.05) -> None:
         """Verifica se houve mudança no estado de estabilidade."""
         is_stable_now = self.is_stable(tolerance)
-        
+
         if is_stable_now and not self._was_stable:
-            # Transição instável → estável
-            for callback in self._on_stable_callbacks:
-                callback(self)
+            callbacks = list(self._on_stable_callbacks)
         elif not is_stable_now and self._was_stable:
-            # Transição estável → instável
-            for callback in self._on_unstable_callbacks:
-                callback(self)
-        
+            callbacks = list(self._on_unstable_callbacks)
+        else:
+            callbacks = []
+
         self._was_stable = is_stable_now
+
+        for callback in callbacks:
+            try:
+                callback(self)
+            except Exception as exc:
+                logging.getLogger(__name__).error("Callback de homeostase falhou: %s", exc)
 
     def on_stable(self, callback: Callable[['HomeostasisController'], None]) -> None:
         """Registra callback para quando a homeostase se tornar estável."""

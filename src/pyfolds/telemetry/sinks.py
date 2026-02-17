@@ -49,6 +49,12 @@ class NoOpSink(Sink):
     def emit(self, event: TelemetryEvent) -> None:
         pass
 
+    def flush(self) -> None:
+        pass
+
+    def close(self) -> None:
+        pass
+
 
 class MemorySink(Sink):
     """
@@ -72,6 +78,10 @@ class MemorySink(Sink):
         """Clear the buffer."""
         self.buffer = RingBuffer[TelemetryEvent](self.buffer.capacity)
     
+    def flush(self) -> None:
+        """Nothing to flush for memory sink."""
+        pass
+
     def close(self) -> None:
         """Nothing to close for memory sink."""
         pass
@@ -98,6 +108,9 @@ class ConsoleSink(Sink):
         else:
             print(f"[pyfolds] step={event.step_id} phase={event.phase}")
     
+    def flush(self) -> None:
+        pass
+
     def close(self) -> None:
         pass
 
