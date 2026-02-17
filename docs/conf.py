@@ -4,11 +4,20 @@ import os
 import sys
 from datetime import datetime
 
+# Adiciona src ao path
 sys.path.insert(0, os.path.abspath("../src"))
+
+# -----------------------------------------------------------------------------
+# Project info
+# -----------------------------------------------------------------------------
 
 project = "PyFolds"
 author = "PyFolds Contributors"
 copyright = f"{datetime.now().year}, {author}"
+
+# -----------------------------------------------------------------------------
+# Extensions
+# -----------------------------------------------------------------------------
 
 extensions = [
     "myst_parser",
@@ -34,6 +43,10 @@ myst_enable_extensions = [
     "substitution",
 ]
 
+# -----------------------------------------------------------------------------
+# HTML
+# -----------------------------------------------------------------------------
+
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
@@ -41,9 +54,7 @@ html_logo = "_static/brand/pyfolds-logo.svg"
 html_favicon = "_static/brand/favicon.svg"
 
 html_theme_options = {
-    "logo": {
-        "text": "PyFolds Docs",
-    },
+    "logo": {"text": "PyFolds Docs"},
     "navbar_start": ["navbar-logo"],
     "navbar_end": ["navbar-icon-links"],
     "show_toc_level": 2,
@@ -58,9 +69,15 @@ html_theme_options = {
     ],
 }
 
+# -----------------------------------------------------------------------------
+# Warnings policy (baseline control)
+# -----------------------------------------------------------------------------
+
 nitpicky = False
-# Suprimir warnings de documentos fora do toctree (baseline controlado)
+
+# Suprime warning massivo de documentos fora do toctree
 suppress_warnings = [
     "toc.not_included",
 ]
+
 
