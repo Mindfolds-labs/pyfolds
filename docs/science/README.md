@@ -2,10 +2,9 @@
 
 ## Base teórica
 - [SCIENTIFIC_LOGIC.md](../SCIENTIFIC_LOGIC.md)
-- [SCIENTIFIC_BASIS_V3.md](../SCIENTIFIC_BASIS_V3.md)
 - [METHODOLOGY.md](../METHODOLOGY.md)
 - [TEST_PROTOCOL.md](../TEST_PROTOCOL.md)
-- [PHASE_CODING.md](../PHASE_CODING.md)
+- [research/wave/PHASE_CODING.md](../research/wave/PHASE_CODING.md)
 
 ## Pesquisa aplicada
 - [research/README.md](../research/README.md)
