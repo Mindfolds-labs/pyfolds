@@ -1,1 +1,1 @@
-OK: validated 176 markdown files.
+OK: validated 162 markdown files.

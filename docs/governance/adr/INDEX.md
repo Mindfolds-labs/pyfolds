@@ -36,4 +36,4 @@
 | ADR-032 | ADR-009 — Quality gates (lint/tipos/segurança/testes/benchmark) | Implementado | 2026-02-16 | [ADR-032-adr-009-quality-gates-lint-tipos-seguran-a-testes-benchmark.md](ADR-032-adr-009-quality-gates-lint-tipos-seguran-a-testes-benchmark.md) |
 | ADR-033 | ADR-009 — Segurança na desserialização Torch | Implementado | 2026-02-16 | [ADR-033-adr-009-seguran-a-na-desserializa-o-torch.md](ADR-033-adr-009-seguran-a-na-desserializa-o-torch.md) |
 | ADR-034 | ADR-009 — Testes de propriedades matemáticas (property-based) | Implementado | 2026-02-16 | [ADR-034-adr-009-testes-de-propriedades-matem-ticas-property-based.md](ADR-034-adr-009-testes-de-propriedades-matem-ticas-property-based.md) |
-| ADR-035 | Auditoria de `src/`, testes e estratégia de correção incremental | Proposto | 2026-02-17 | [ADR-035-auditoria-src-testes.md](ADR-035-auditoria-src-testes.md) |
+| ADR-035 | Auditoria de `src/`, testes e estratégia de correção incremental | Aceito | 2026-02-17 | [ADR-035-auditoria-src-testes.md](ADR-035-auditoria-src-testes.md) |
