@@ -3,75 +3,79 @@
 ## Metadados
 
 | Campo | Valor |
-|---|---|
-| **Tipo** | GOVERNANCE |
+|-------|-------|
 | **Data** | 2026-02-17 |
-| **Autor** | Codex |
-| **Objetivo** | Normalizar `docs/` antes da ISSUE-011 sem perda de conteúdo |
+| **Autor** | Codex (Engenharia de Documentação) |
+| **Tipo** | GOVERNANCE |
+| **Dependência** | ISSUE-011 (preparação) |
+| **Issue relacionada** | ISSUE-010 |
 
-## 1. Escopo executado
+## 1. Objetivo
+Normalizar a raiz de `docs/` removendo arquivos soltos e órfãos **somente quando existir equivalente já consolidado em subpasta** e sem perda de conteúdo.
 
-### Inclui
-- Verificação de arquivos soltos em `docs/` versus subpastas-alvo.
-- Remanejamento dos arquivos da raiz para as pastas corretas já existentes.
-- Verificação dos 6 órfãos listados na solicitação.
-- Revisão de links após remanejamento.
-- Validação de links com `python tools/check_links.py`.
-- Sincronização do HUB com `python tools/sync_hub.py --check`.
+## 2. Justificativa
+A raiz de `docs/` ainda contém artefatos legados (ex.: `quickstart.md`, `API_REFERENCE.md`) e histórico de remoções de órfãos que precisam ser validados antes da ISSUE-011.
 
-### Exclui (respeitado)
-- Não alterar conteúdo técnico dos arquivos movidos.
-- Não mexer em `src/`.
+## 3. Escopo
+
+### 3.1 Inclui
+- Verificar duplicação/migração de:
+  - `ALGORITHM.md`, `SCIENTIFIC_LOGIC.md`, `METHODOLOGY.md`, `TEST_PROTOCOL.md` em `docs/science/`
+  - `API_REFERENCE.md` em `docs/api/`
+  - `installation.md` e `quickstart.md` em `docs/_quickstart/`
+  - `BENCHMARKS.md` em `docs/benchmarks/` ou `docs/assets/`
+- Verificar os 6 órfãos legados:
+  - `ARCHITECTURE_V3.md`
+  - `SCIENTIFIC_BASIS_V3.md`
+  - `PHASE_CODING.md`
+  - `WAVELENGTH_MAPPING.md`
+  - `COOPERATIVE_INTEGRATION.md`
+  - `FOLD_SPECIFICATION.md`
+- Executar validação de links com `python tools/check_links.py`.
+- Sincronizar HUB com `python tools/sync_hub.py` + `--check`.
+- Registrar log completo em `docs/development/prompts/logs/ISSUE-010-ESPECIAL-corrigir-estrutura-docs-LOG.md`.
+
+### 3.2 Exclui
+- Não alterar conteúdo de arquivos.
+- Não alterar `src/`.
 - Não criar novas pastas.
+- Não remover arquivo sem equivalente migrado/validado.
 
-## 2. Remanejamento executado (8 soltos)
+## 4. Critério de segurança para remoção
+Só remover arquivo da raiz se:
+1. houver equivalente em subpasta alvo;
+2. o equivalente preservar conteúdo e referências críticas;
+3. busca de referências não indicar dependência exclusiva do arquivo de raiz.
 
-| Arquivo origem em `docs/` | Destino final | Situação |
-|---|---|---|
-| `ALGORITHM.md` | `docs/science/ALGORITHM.md` | Movido |
-| `SCIENTIFIC_LOGIC.md` | `docs/science/SCIENTIFIC_LOGIC.md` | Movido |
-| `METHODOLOGY.md` | `docs/science/METHODOLOGY.md` | Movido |
-| `TEST_PROTOCOL.md` | `docs/science/TEST_PROTOCOL.md` | Movido |
-| `API_REFERENCE.md` | `docs/api/API_REFERENCE.md` | Movido |
-| `installation.md` | `docs/_quickstart/installation.md` | Movido |
-| `quickstart.md` | `docs/_quickstart/quickstart.md` | Movido |
-| `BENCHMARKS.md` | `docs/assets/BENCHMARKS.md` | Movido |
+Se houver divergência de conteúdo, **NÃO remover**; consolidar em etapa dedicada.
 
-## 3. Verificação dos 6 órfãos
+## 5. Resultado desta execução (ISSUE-010-ESPECIAL)
+- **Não houve remoções nesta rodada** por ausência de equivalentes canônicos nos diretórios-alvo definidos para os arquivos soltos.
+- Os 6 órfãos listados já estavam removidos da raiz (`docs/`) desde execução anterior (ISSUE-010); apenas registros em subpastas temáticas persistem (`docs/research/wave/PHASE_CODING.md` e `docs/architecture/specs/FOLD_SPECIFICATION.md`).
+- Estrutura registrada e pronta para próxima etapa de migração controlada antes da ISSUE-011.
 
-| Arquivo órfão listado | Encontrado na raiz `docs/`? | Situação |
-|---|---|---|
-| `ARCHITECTURE_V3.md` | Não | Já removido em ciclo anterior |
-| `SCIENTIFIC_BASIS_V3.md` | Não | Já removido em ciclo anterior |
-| `PHASE_CODING.md` | Não | Raiz limpa; documento existe em `docs/research/wave/` |
-| `WAVELENGTH_MAPPING.md` | Não | Já removido em ciclo anterior |
-| `COOPERATIVE_INTEGRATION.md` | Não | Já removido em ciclo anterior |
-| `FOLD_SPECIFICATION.md` | Não | Raiz limpa; documento existe em `docs/architecture/specs/` |
+## 6. PROMPT:EXECUTAR
 
-## 4. Ajustes de referências
+```yaml
+fase: GOVERNANCE_DOCS_NORMALIZACAO
+prioridade: ALTA
+responsavel: CODEX
+issue: ISSUE-010-ESPECIAL
 
-Foram atualizados links em índices e hubs para os novos destinos em:
-- `README.md`
-- `docs/index.md`
-- `docs/science/README.md`
-- `docs/_quickstart/README.md`
-- `docs/architecture/README.md`
-- `docs/specifications/README.md`
-- `docs/DEVELOPMENT_HUB.md`
-- `docs/research/README.md`
-- `docs/architecture/blueprints/README.md`
-- `docs/development/benchmarking.md`
+acoes:
+  - "Inventariar arquivos soltos em docs/ e comparar com destinos-alvo"
+  - "Checar órfãos históricos e confirmar status"
+  - "Remover somente arquivos com duplicata canônica comprovada"
+  - "Validar links após mudanças"
+  - "Sincronizar HUB e fila de execução"
+  - "Registrar log técnico completo"
 
-## 5. Conclusão
+regras_de_bloqueio:
+  - "Se conteúdo divergir, não remover"
+  - "Se arquivo não existir no destino-alvo, não remover"
+  - "Sem alterações em src/"
 
-- `docs/` raiz foi normalizada com remoção de soltos por remanejamento seguro.
-- Nenhuma perda de conteúdo: operação feita via `git mv`.
-- Estrutura pronta para continuação da ISSUE-011.
-
-## 6. Comandos de validação
-
-```bash
-python tools/check_links.py
-python tools/sync_hub.py
-python tools/sync_hub.py --check
+validacao:
+  - "python tools/check_links.py"
+  - "python tools/sync_hub.py --check"
 ```
