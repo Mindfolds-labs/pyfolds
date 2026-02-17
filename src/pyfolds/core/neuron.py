@@ -129,7 +129,13 @@ class MPJRDNeuron(BaseNeuron):
                 f"Componentes do neurônio em devices diferentes: {devices}. "
                 "Todos devem estar no mesmo device."
             )
-        
+
+        expected_device = self.theta.device
+        if self.step_id.device != expected_device:
+            raise RuntimeError(
+                f"step_id device {self.step_id.device} != theta device {expected_device}"
+            )
+
         self.logger.debug(f"✅ Devices consistentes: {devices.pop()}")
 
     def _on_homeostasis_stable(self, controller: HomeostasisController) -> None:

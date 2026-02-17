@@ -85,7 +85,8 @@ class HomeostasisController(nn.Module):
         delta_i = self.ki * self.integral_error
 
         d_error = error - float(self.last_error.item())
-        delta_d = self.kd * d_error / max(cfg.dt, 1e-6)
+        safe_dt = max(cfg.dt, 1e-6) if cfg.dt > 0 else 1e-6
+        delta_d = self.kd * d_error / safe_dt
         self.last_error.fill_(error)
 
         delta_theta = torch.tensor([delta_p], device=self.theta.device)

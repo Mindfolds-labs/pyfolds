@@ -3,6 +3,7 @@
 import torch
 import torch.nn as nn
 from typing import Optional, Dict
+from threading import Lock
 from .config import MPJRDConfig
 from .synapse import MPJRDSynapse
 
@@ -31,53 +32,55 @@ class MPJRDDendrite(nn.Module):
         # Cache único (dicionário)
         self._cached_states = None
         self._cache_invalid = True
+        self._cache_lock = Lock()
 
     def _ensure_cache_valid(self):
         """
         ✅ OTIMIZADO: Coleta estados UMA ÚNICA VEZ e cacheia tudo.
         Propriedades individuais retornam do cache, não recalculam.
         """
-        if not self._cache_invalid and self._cached_states is not None:
-            return
-        
-        first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
-        device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
-        
-        # ✅ ÚNICO LOOP sobre sinapses (coleta tudo de uma vez)
-        N_list = []
-        I_list = []
-        # Nota técnica:
-        # O núcleo MPJRD mantém apenas estados estruturais (N) e voláteis (I)
-        # por sinapse. Estados de STP (u, R) pertencem ao módulo avançado
-        # (ShortTermDynamicsMixin) em nível de neurônio, não ao core de sinapse.
-        has_short_term_state = all(hasattr(syn, "u") and hasattr(syn, "R") for syn in self.synapses)
-        u_list = [] if has_short_term_state else None
-        R_list = [] if has_short_term_state else None
-        
-        for syn in self.synapses:
-            N_list.append(syn.N.to(device))
-            I_list.append(syn.I.to(device))
-            if has_short_term_state:
-                u_list.append(syn.u.to(device))
-                R_list.append(syn.R.to(device))
-        
-        # ✅ Concatena de uma vez (operação vetorizada)
-        self._cached_states = {
-            'N': torch.cat(N_list).to(torch.int32),
-            'I': torch.cat(I_list),
-            **({'u': torch.cat(u_list), 'R': torch.cat(R_list)} if has_short_term_state else {})
-        }
-        
-        # ✅ W é derivado de N (calculado sob demanda, cacheado)
-        self._cached_W = torch.log2(1.0 + self._cached_states['N'].float()) / self.cfg.w_scale
-        
-        self._cache_invalid = False
+        with self._cache_lock:
+            if not self._cache_invalid and self._cached_states is not None:
+                return
+
+            first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
+            device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
+
+            # ✅ ÚNICO LOOP sobre sinapses (coleta tudo de uma vez)
+            N_list = []
+            I_list = []
+            # Nota técnica:
+            # O núcleo MPJRD mantém apenas estados estruturais (N) e voláteis (I)
+            # por sinapse. Estados de STP (u, R) pertencem ao módulo avançado
+            # (ShortTermDynamicsMixin) em nível de neurônio, não ao core de sinapse.
+            has_short_term_state = all(hasattr(syn, "u") and hasattr(syn, "R") for syn in self.synapses)
+            u_list = [] if has_short_term_state else None
+            R_list = [] if has_short_term_state else None
+
+            for syn in self.synapses:
+                N_list.append(syn.N.to(device))
+                I_list.append(syn.I.to(device))
+                if has_short_term_state:
+                    u_list.append(syn.u.to(device))
+                    R_list.append(syn.R.to(device))
+
+            # ✅ Concatena de uma vez (operação vetorizada)
+            self._cached_states = {
+                'N': torch.cat(N_list).to(torch.int32),
+                'I': torch.cat(I_list),
+                **({'u': torch.cat(u_list), 'R': torch.cat(R_list)} if has_short_term_state else {})
+            }
+
+            # ✅ W é derivado de N (calculado sob demanda, cacheado)
+            self._cached_W = torch.log2(1.0 + self._cached_states['N'].float()) / self.cfg.w_scale
+            self._cache_invalid = False
 
     def _invalidate_cache(self):
         """Invalida o cache (chamar após modificar sinapses)."""
-        self._cache_invalid = True
-        self._cached_states = None
-        self._cached_W = None
+        with self._cache_lock:
+            self._cache_invalid = True
+            self._cached_states = None
+            self._cached_W = None
 
     @property
     def N(self) -> torch.Tensor:
@@ -189,7 +192,7 @@ class MPJRDDendrite(nn.Module):
             'N': self.N.clone(),
             'W': self.W.clone(),
             'I': self.I.clone(),
-        }
+            }
 
         if u_state is not None and r_state is not None:
             states.update({'u': u_state.clone(), 'R': r_state.clone()})

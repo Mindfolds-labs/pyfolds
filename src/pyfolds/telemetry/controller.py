@@ -118,7 +118,9 @@ class TelemetryController:
             return True
         
         # Light profile: emit every sample_every steps
-        every = max(1, self.cfg.sample_every)
+        every = max(1, int(self.cfg.sample_every))
+        if every <= 0:
+            return False
         return (step_id % every) == 0
     
     def should_emit_sample(self, sample_rate: float) -> bool:

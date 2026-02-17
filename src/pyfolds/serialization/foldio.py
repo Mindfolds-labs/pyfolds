@@ -59,15 +59,24 @@ SUPPORTED_FOLD_VERSIONS = {"1.0.0", "1.1.0", "1.2.0"}
 
 # Tabela CRC32C (Castagnoli) para fallback sem dependência externa.
 _CRC32C_POLY = 0x82F63B78
-_CRC32C_TABLE: List[int] = []
-for _i in range(256):
-    _crc = _i
-    for _ in range(8):
-        if _crc & 1:
-            _crc = (_crc >> 1) ^ _CRC32C_POLY
-        else:
-            _crc >>= 1
-    _CRC32C_TABLE.append(_crc & 0xFFFFFFFF)
+_CRC32C_TABLE: List[int] = [0] * 256
+
+
+def _init_crc32c_table() -> None:
+    """Inicializa tabela CRC32C na primeira chamada."""
+    global _CRC32C_TABLE
+    if _CRC32C_TABLE[0] == 0 and _CRC32C_TABLE[1] == 0:
+        for _i in range(256):
+            _crc = _i
+            for _ in range(8):
+                if _crc & 1:
+                    _crc = (_crc >> 1) ^ _CRC32C_POLY
+                else:
+                    _crc >>= 1
+            _CRC32C_TABLE[_i] = _crc & 0xFFFFFFFF
+
+
+_init_crc32c_table()
 
 
 def _crc32c_fallback(data: bytes) -> int:

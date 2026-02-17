@@ -51,6 +51,13 @@ class NeuronFactory:
             return MPJRDWaveNeuron(cfg, **kwargs)
 
         if type_name in cls._registry:
-            return cls._registry[type_name](cfg, **kwargs)
+            neuron_cls = cls._registry[type_name]
+            try:
+                return neuron_cls(cfg, **kwargs)
+            except TypeError as e:
+                raise ValueError(
+                    f"Erro ao criar neurônio {type_name}: {e}\n"
+                    f"kwargs inválidos: {list(kwargs.keys())}"
+                ) from e
 
         raise ValueError(f"Tipo de neurônio desconhecido: {type_name}")

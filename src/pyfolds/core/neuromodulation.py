@@ -143,6 +143,10 @@ class Neuromodulator(nn.Module):
             # Modo desconhecido: neutro
             R_val = 0.0
         
+        # Validação antes do clamp final
+        if math.isnan(R_val) or math.isinf(R_val):
+            raise ValueError(f"R_val inválido: {R_val}")
+
         # Clamp para faixa biológica [-1, 1]
         R_val = max(-1.0, min(1.0, R_val))
         

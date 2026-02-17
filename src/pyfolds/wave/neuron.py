@@ -133,9 +133,17 @@ class MPJRDWaveNeuron(MPJRDNeuron):
 
         # atualiza histórico de fase com média dos exemplos que dispararam
         with torch.no_grad():
-            if spikes.sum() > 0:
-                phase_mean = phase[spikes.bool()].mean()
-            else:
+            try:
+                if spikes.sum() > 0:
+                    spike_indices = spikes.bool()
+                    if spike_indices.any():
+                        phase_mean = phase[spike_indices].mean()
+                    else:
+                        phase_mean = phase.mean()
+                else:
+                    phase_mean = phase.mean()
+            except Exception as e:
+                self.logger.warning(f"Erro ao calcular phase_mean: {e}, usando fallback")
                 phase_mean = phase.mean()
             ptr = int(self.phase_pointer.item())
             self.phase_history[ptr] = phase_mean.detach().cpu()
@@ -166,8 +174,8 @@ class MPJRDWaveNeuron(MPJRDNeuron):
             "dendritic_activations": dendritic_activations,
             "theta": self.theta.clone(),
             "r_hat": self.r_hat.clone(),
-            "spike_rate": torch.tensor(spike_rate, device=device),
-            "saturation_ratio": torch.tensor(saturation_ratio, device=device),
+            "spike_rate": spike_rate,
+            "saturation_ratio": saturation_ratio,
             "R": R_tensor,
             "phase": phase,
             "latency": latency,

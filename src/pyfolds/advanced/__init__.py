@@ -85,7 +85,8 @@ class MPJRDNeuronAdvanced(
         if missing:
             raise RuntimeError(
                 f"Configuração incompleta para mixins avançados ({model_kind}): "
-                f"faltando atributos: {', '.join(missing)}"
+                f"faltando atributos: {', '.join(missing)}. "
+                f"Verifique que você está usando MPJRDConfig completo."
             )
 
         logger.debug("🔧 Inicializando mixins avançados (%s)", model_kind)
