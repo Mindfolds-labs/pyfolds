@@ -1,0 +1,36 @@
+:root {
+  --pyfolds-blue: #0f4c81;
+  --pyfolds-blue-dark: #0b3558;
+  --pyfolds-yellow: #f2c94c;
+  --pyfolds-yellow-dark: #c59f2f;
+}
+
+html[data-theme="light"] {
+  --pst-color-primary: var(--pyfolds-blue);
+  --pst-color-link: #0a5ea8;
+  --pst-color-link-hover: var(--pyfolds-blue-dark);
+  --pst-color-secondary: var(--pyfolds-yellow);
+  --pst-color-accent: var(--pyfolds-yellow);
+}
+
+html[data-theme="dark"] {
+  --pst-color-primary: #4f9bd8;
+  --pst-color-link: #7ab8ea;
+  --pst-color-link-hover: #a8d2f2;
+  --pst-color-secondary: var(--pyfolds-yellow);
+  --pst-color-accent: #ffd86a;
+}
+
+.bd-header {
+  border-bottom: 3px solid var(--pyfolds-yellow);
+}
+
+.bd-sidebar-primary .nav-link.active {
+  border-left: 3px solid var(--pyfolds-yellow);
+}
+
+.admonition,
+div.note,
+div.warning {
+  border-left: 4px solid var(--pyfolds-blue);
+}
