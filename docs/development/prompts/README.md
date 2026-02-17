@@ -18,6 +18,16 @@ Guia prático para executar o ciclo de issues com aprovação humana no PR.
 - `relatorios/` → plano completo da issue + prompts
 - `logs/` → evidência de execução
 
+## 📚 Índice de Relatórios
+- [`ISSUE-003-auditoria-completa.md`](./relatorios/ISSUE-003-auditoria-completa.md)
+- [`ISSUE-005-plano-acao-consolidacao.md`](./relatorios/ISSUE-005-plano-acao-consolidacao.md)
+- [`ISSUE-007-consolidacao-final.md`](./relatorios/ISSUE-007-consolidacao-final.md)
+- [`ISSUE-008-melhoria-workflow-prompts.md`](./relatorios/ISSUE-008-melhoria-workflow-prompts.md)
+- [`ISSUE-009-padronizacao-formatos-ia.md`](./relatorios/ISSUE-009-padronizacao-formatos-ia.md)
+- [`ISSUE-010-consolidacao-final-fechar-tudo.md`](./relatorios/ISSUE-010-consolidacao-final-fechar-tudo.md)
+- [`ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md`](./relatorios/ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md)
+- [`ISSUE-011-ESPECIAL-consolidacao-fluxo.md`](./relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md)
+
 Padronização de formato (ISSUE-009):
 - `../templates/ISSUE-IA-TEMPLATE.md`
 - `../guides/ISSUE-FORMAT-GUIDE.md`
