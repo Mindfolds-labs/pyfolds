@@ -74,6 +74,14 @@ class AdaptationMixin:
         output = super().forward(x, **kwargs)
         
         if kwargs.get('mode') != LearningMode.INFERENCE:
+            required_fields = ('u', 'spikes')
+            missing = [field for field in required_fields if field not in output]
+            if missing:
+                raise KeyError(
+                    "Campos obrigatórios ausentes em output para adaptação: "
+                    f"{missing}. Campos disponíveis: {list(output.keys())}"
+                )
+
             u_adapted = self._apply_adaptation(
                 output['u'], 
                 output['spikes'],

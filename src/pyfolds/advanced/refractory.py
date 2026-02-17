@@ -130,7 +130,20 @@ class RefractoryMixin(TimedMixin):
         # Aplica refratário
         # theta_eff deve permanecer 1-D ([B]) para preservar a semântica
         # ponto-a-ponto do refratário por amostra.
-        theta_eff = output['theta'] + theta_boost
+        theta_raw = output['theta']
+        if theta_raw.dim() == 0:
+            theta = torch.full_like(theta_boost, theta_raw.item())
+        elif theta_raw.dim() == 1 and theta_raw.shape[0] == 1:
+            theta = theta_raw.expand(batch_size)
+        elif theta_raw.dim() == 1 and theta_raw.shape[0] == batch_size:
+            theta = theta_raw
+        else:
+            raise ValueError(
+                "Campo 'theta' incompatível para refratário: "
+                f"shape={tuple(theta_raw.shape)}, esperado escalar, [1] ou [{batch_size}]"
+            )
+
+        theta_eff = theta + theta_boost
         spikes_rel = (output['u'] >= theta_eff).float()
         
         # Bloqueia spikes apenas no refratário absoluto
