@@ -42,6 +42,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-008 | Planejada | Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar | Neto | 2026-02-16 |
 | ISSUE-009 | Pausada | Padronização de formatos de ISSUEs para interação com IA | Codex | 2026-02-16 |
 | ISSUE-010 | Concluída | Consolidação final: fechamento das ISSUEs 001-009 e limpeza documental | Codex | 2026-02-16 |
+| ISSUE-010-ESPECIAL | Concluída | Corrigir estrutura docs/ - remover soltos e órfãos | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
