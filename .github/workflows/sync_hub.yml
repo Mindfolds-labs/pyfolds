@@ -2,10 +2,11 @@ name: Sync HUB from execution queue
 
 on:
   push:
+    branches: [main]
     paths:
       - docs/development/execution_queue.csv
       - tools/sync_hub.py
-      - docs/development/HUB_CONTROLE.md
+      - .github/workflows/sync-hub.yml
 
 permissions:
   contents: write
@@ -13,7 +14,10 @@ permissions:
 
 jobs:
   sync-hub:
+    # evita loop quando o commit foi criado pelo bot
+    if: ${{ github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,16 +30,22 @@ jobs:
       - name: Sync HUB block
         run: python tools/sync_hub.py
 
+      - name: Debug diff
+        run: |
+          echo "== git status =="
+          git status --porcelain
+          echo "== git diff --stat =="
+          git diff --stat || true
+
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: automation/sync-hub
           title: "docs: sync HUB queue from CSV"
           commit-message: "docs: sync HUB queue from CSV"
           body: |
             Automated update of `docs/development/HUB_CONTROLE.md` from
             `docs/development/execution_queue.csv` using `tools/sync_hub.py`.
-
-            > Repository setting required:
-            > Settings > Actions > General > Workflow permissions >
-            > Allow GitHub Actions to create and approve pull requests.
+          delete-branch: false
+          draft: false
