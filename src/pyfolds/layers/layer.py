@@ -129,9 +129,9 @@ class MPJRDLayer(nn.Module):
         Returns:
             Dict com:
                 - spikes: [batch, n_neurons] spikes de cada neurônio
-                - rates: [n_neurons] taxas médias
-                - thetas: [n_neurons] thresholds atuais
-                - r_hats: [n_neurons] taxas médias móveis
+                - spike_rates: [n_neurons] taxas médias por neurônio
+                - theta_values: [n_neurons] thresholds atuais
+                - r_hat_values: [n_neurons] médias móveis
         """
         # Prepara entrada
         x = x.to(self.device)
@@ -149,9 +149,9 @@ class MPJRDLayer(nn.Module):
 
         # Pré-aloca tensores de saída
         spikes = torch.zeros(batch_size, self.n_neurons, device=self.device)
-        rates = torch.zeros(self.n_neurons, device=self.device)
-        thetas = torch.zeros(self.n_neurons, device=self.device)
-        r_hats = torch.zeros(self.n_neurons, device=self.device)
+        spike_rates = torch.zeros(self.n_neurons, device=self.device)
+        theta_values = torch.zeros(self.n_neurons, device=self.device)
+        r_hat_values = torch.zeros(self.n_neurons, device=self.device)
 
         wave_real = None
         wave_imag = None
@@ -170,9 +170,9 @@ class MPJRDLayer(nn.Module):
                     **neuron_kwargs,
                 )
                 spikes[:, i] = out['spikes']
-                rates[i] = out['spike_rate']
-                thetas[i] = out['theta']
-                r_hats[i] = out['r_hat']
+                spike_rates[i] = out['spike_rate']
+                theta_values[i] = out['theta']
+                r_hat_values[i] = out['r_hat']
 
                 if 'wave_real' in out:
                     if wave_real is None:
@@ -196,9 +196,9 @@ class MPJRDLayer(nn.Module):
                         **neuron_kwargs,
                     )
                     spikes[:, i] = out['spikes']
-                    rates[i] = out['spike_rate']
-                    thetas[i] = out['theta']
-                    r_hats[i] = out['r_hat']
+                    spike_rates[i] = out['spike_rate']
+                    theta_values[i] = out['theta']
+                    r_hat_values[i] = out['r_hat']
 
                     if 'wave_real' in out:
                         if wave_real is None:
@@ -213,9 +213,12 @@ class MPJRDLayer(nn.Module):
 
         output = {
             'spikes': spikes,
-            'rates': rates,
-            'thetas': thetas,
-            'r_hats': r_hats,
+            'spike_rates': spike_rates,
+            'theta_values': theta_values,
+            'r_hat_values': r_hat_values,
+            'rates': spike_rates,
+            'thetas': theta_values,
+            'r_hats': r_hat_values,
         }
 
         if wave_real is not None and wave_imag is not None and phase is not None and frequency is not None:

@@ -29,7 +29,7 @@ from .events import (
 )
 from .ringbuffer import RingBuffer
 from .sinks import Sink, NoOpSink, MemorySink, ConsoleSink, JSONLinesSink, DistributorSink
-from .controller import TelemetryController, TelemetryConfig, Profile
+from .controller import TelemetryController, TelemetryConfig, Profile, TelemetryProfile
 from .decorator import telemetry
 from .types import ForwardPayload, CommitPayload, SleepPayload
 
@@ -60,6 +60,7 @@ __all__ = [
     "TelemetryController",
     "TelemetryConfig",
     "Profile",
+    "TelemetryProfile",
     
     # Decorator
     "telemetry",

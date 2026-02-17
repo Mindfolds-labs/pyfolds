@@ -8,6 +8,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union
 
+__all__ = [
+    "TRACE_LEVEL",
+    "PyFoldsLogger",
+    "StructuredFormatter",
+    "get_logger",
+    "setup_logging",
+    "trace",
+]
+
 TRACE_LEVEL = 5
 logging.addLevelName(TRACE_LEVEL, "TRACE")
 logging.TRACE = TRACE_LEVEL

@@ -34,3 +34,9 @@ Padronizar, para correções de estabilidade/runtime, o fluxo mínimo de valida�
 - Aumenta confiança em correções críticas de runtime.
 - Reduz ambiguidades de ambiente para importação (`pyfolds`).
 - Exige disciplina de atualização da fila e validações de governança.
+
+
+## Atualização vinculada (ISSUE-024)
+- Aplicação das correções de tipagem/telemetria/API descritas em `ISSUE-024-correcao-tipos-telemetria-apis.md`.
+- Validação operacional executada com `compileall` e `pytest -q`.
+- Mantida retrocompatibilidade de chaves legadas na camada (`rates`, `thetas`, `r_hats`) via aliases.
