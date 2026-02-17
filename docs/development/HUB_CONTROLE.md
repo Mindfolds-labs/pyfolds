@@ -63,8 +63,8 @@
 > ### ISSUE-023 — Estabilidade Runtime
 > **Status:** ✅ Concluída | **Data:** 17/02/2026
 > Focada em consistência cross-módulo e resolução de falhas críticas de importação.
-> - 📄 [Ver Relatório](./prompts/relatorios/ISSUE-023.md)
-> - 📦 [Ver Execução](./prompts/execucoes/EXEC-023.md)
+> - 📄 [Ver Relatório](./prompts/relatorios/ISSUE-023-auditoria-corretiva-estabilidade-runtime.md)
+> - 📦 [Ver Execução](./prompts/execucoes/EXEC-023-auditoria-corretiva-estabilidade-runtime.md)
 
 > [!WARNING]
 > ### ISSUE-012 — Auditoria de Código
