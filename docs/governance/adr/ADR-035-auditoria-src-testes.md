@@ -1,10 +1,10 @@
 # ADR-035 — Auditoria de `src/`, testes e estratégia de correção incremental
 
 ## Status
-Proposto
+Aceito
 
 ## Contexto
-A ISSUE-012 executou auditoria focada em `src/` com evidências reprodutíveis em logs para: compilação, importação, instalação editável, validações de documentação/hub e suíte de testes.
+As ISSUEs 012 e 013 executaram auditoria focada em `src/` com evidências reprodutíveis em logs para: compilação, importação, instalação editável, validações de documentação/hub e suíte de testes.
 
 Principais achados:
 - `python -m compileall src/` sem erros de sintaxe.
@@ -34,3 +34,4 @@ As correções devem ser separadas em PRs curtos, cada um com reprodução míni
 - Melhor previsibilidade de entrega e revisão.
 - Maior capacidade de associar cada correção ao achado auditado.
 - Necessidade de manter fila de execução atualizada com status e vínculos de evidência.
+- Confirmação prática da recorrência do problema de instalação editável em rede restrita (ISSUE-013), sem regressão funcional na suíte.

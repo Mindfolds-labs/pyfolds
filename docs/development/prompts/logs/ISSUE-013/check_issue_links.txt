@@ -1,0 +1,4 @@
+❌ Referências inválidas encontradas:
+   - docs/development/prompts/relatorios/ISSUE-011-consolidacao-fluxo.md: referência para ISSUE-001 não encontrada em docs/development/prompts/relatorios
+   - docs/development/prompts/relatorios/ISSUE-012-auditoria-codigo-testes-adr35.md: referência para ISSUE-014 não encontrada em docs/development/prompts/relatorios
+   - docs/development/prompts/relatorios/ISSUE-012-auditoria-codigo-testes-adr35.md: referência para ISSUE-015 não encontrada em docs/development/prompts/relatorios

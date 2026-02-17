@@ -1,0 +1,13 @@
+# Smoke import sem instalação editável
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'pyfolds'
+
+# Smoke import com PYTHONPATH=src
+2026-02-17 04:47:02 | root                           | INFO     | logging.py:129 | ✅ Logging configurado - nível: INFO
+OK pyfolds
+OK pyfolds.core.synapse
+OK pyfolds.network.network
+OK pyfolds.serialization.foldio
+OK pyfolds.monitoring.health
+SMOKE_IMPORT_DONE_WITH_PYTHONPATH

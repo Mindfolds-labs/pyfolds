@@ -14,6 +14,7 @@ Este HUB **não é documentação de usuário final**. Ele deve ser usado apenas
 - Índice interno de desenvolvimento: [`DEVELOPMENT.md`](DEVELOPMENT.md)
 - Processo de contribuição: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - Processo de release: [`release_process.md`](release_process.md)
+- Guia de revisão UX/IEEE: [`guides/DOC-UX-IEEE-REVIEW.md`](guides/DOC-UX-IEEE-REVIEW.md)
 - Governança (raiz): [`../governance/MASTER_PLAN.md`](../governance/MASTER_PLAN.md)
 - ADR index canônico: [`../governance/adr/INDEX.md`](../governance/adr/INDEX.md)
 
@@ -45,6 +46,8 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-010-ESPECIAL | Concluída | Corrigir estrutura docs/ - remover soltos e órfãos | Codex | 2026-02-17 |
 | ISSUE-011 | Concluída | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
 | ISSUE-011-ESPECIAL | Concluída | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
+| ISSUE-012 | DONE (aguardando revisão humana) | Auditoria de código em src + testes + ADR-035 | Codex | 2026-02-17 |
+| ISSUE-013 | DONE (aguardando revisão humana) | Estabilizar instalação editável em rede restrita e consolidar falhas da auditoria ADR-035 | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
