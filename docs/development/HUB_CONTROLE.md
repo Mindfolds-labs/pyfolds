@@ -46,10 +46,12 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-010-ESPECIAL | Concluída | Corrigir estrutura docs/ - remover soltos e órfãos | Codex | 2026-02-17 |
 | ISSUE-011 | Concluída | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
 | ISSUE-011-ESPECIAL | Concluída | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
-| ISSUE-012 | DONE (aguardando revisão humana) | Auditoria de código em src + testes + ADR-035 | Codex | 2026-02-17 |
-| ISSUE-013 | DONE (aguardando revisão humana) | Estabilizar instalação editável em rede restrita e consolidar falhas da auditoria ADR-035 | Codex | 2026-02-17 |
-| ISSUE-014 | DONE (aguardando revisão humana) | Auditoria SRC/Testes ADR-035 + gate CI docs hub com Sphinx/MyST/PyData | Codex | 2026-02-17 |
-| ISSUE-015 | DONE (aguardando revisão humana) | Validar erros corrigidos + importacao pyfolds + suite completa + governanca | Codex | 2026-02-17 |
+| ISSUE-012 | Concluída | Auditoria de código em src + testes + ADR-035 | Codex | 2026-02-17 |
+| ISSUE-013 | Concluída | Estabilizar instalação editável em rede restrita e consolidar falhas da auditoria ADR-035 | Codex | 2026-02-17 |
+| ISSUE-014 | Concluída | Auditoria SRC/Testes ADR-035 + gate CI docs hub com Sphinx/MyST/PyData | Codex | 2026-02-17 |
+| ISSUE-015 | Concluída | Validar erros corrigidos + importacao pyfolds + suite completa + governanca | Codex | 2026-02-17 |
+| ISSUE-001 | Concluída | Adicionar dependência linkify-it-py para MyST Parser na documentação | Codex | 2026-02-17 |
+| ISSUE-017 | Concluída | Governança de numeração automática e entrega completa de ISSUE/EXEC | Codex | 2026-02-17 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 ISSUE-001
