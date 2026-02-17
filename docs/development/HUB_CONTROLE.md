@@ -11,66 +11,83 @@
   <a href="../../actions">
     <img src="https://img.shields.io/badge/CI_STATUS-Ativo-FFD700?style=for-the-badge&logo=github-actions&logoColor=0A3069" alt="Status">
   </a>
-  <a href="#-referências-normativas">
+  <a href="#7-referências">
     <img src="https://img.shields.io/badge/STANDARDS-IEEE_|_ISO-0A3069?style=for-the-badge&logo=bookstack" alt="Normas">
   </a>
 </p>
 
 > [!IMPORTANT]
-> **GOVERNANÇA AUTOMATIZADA:** Esta fila de execução é sincronizada dinamicamente a partir de `docs/development/execution_queue.csv`. Toda alteração deve seguir os protocolos de rastreabilidade das normas **IEEE 730** e **ISO/IEC 12207**.
+> **GOVERNANÇA AUTOMATIZADA:** Esta fila de execução é sincronizada dinamicamente a partir de `docs/development/execution_queue.csv`. Toda alteração deve seguir a norma **IEEE 730**.
 
 ---
 
-## 🗺️ Painel de Comando (Navegação UX)
-*Selecione a camada de documentação técnica clicando nos botões abaixo:*
+## 1. Objetivo
+Centralizar a fila de execução de documentação e governança para evitar conflitos entre agentes e manter rastreabilidade.
 
-| Camada de Engenharia (Dev) | Camada de Governança (Estratégia) |
+## 2. Escopo e Navegação
+Este HUB **não é documentação de usuário final**. Ele deve ser usado apenas por quem mantém a base documental e os artefatos de governança.
+
+| Componente | Link |
 | :--- | :--- |
-| <a href="DEVELOPMENT.md"><img src="https://img.shields.io/badge/Dev_Setup-0A3069?style=for-the-badge&logo=python&logoColor=FFD700"></a> | <a href="../governance/MASTER_PLAN.md"><img src="https://img.shields.io/badge/Master_Plan-FFD700?style=for-the-badge&logo=googlesheets&logoColor=0A3069"></a> |
-| <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/Workflow-0A3069?style=for-the-badge&logo=git&logoColor=FFD700"></a> | <a href="../governance/adr/INDEX.md"><img src="https://img.shields.io/badge/Decision_Log-FFD700?style=for-the-badge&logo=blueprint&logoColor=0A3069"></a> |
-| <a href="release_process.md"><img src="https://img.shields.io/badge/Deploy_CI-0A3069?style=for-the-badge&logo=semantic-release&logoColor=FFD700"></a> | <a href="guides/DOC-UX-IEEE-REVIEW.md"><img src="https://img.shields.io/badge/Review_UX-FFD700?style=for-the-badge&logo=adobe-experience-manager&logoColor=0A3069"></a> |
+| 🛠️ Dev Index | [`DEVELOPMENT.md`](DEVELOPMENT.md) |
+| 📜 Master Plan | [`../governance/MASTER_PLAN.md`](../governance/MASTER_PLAN.md) |
+| ⚖️ ADR Index | [`../governance/adr/INDEX.md`](../governance/adr/INDEX.md) |
 
 ---
 
-## 📊 4.0 Tabela Resumida (Fila de Execução)
+## 3. Regras Operacionais
+1. Toda issue deve referenciar uma ADR quando alterar arquitetura ou processo.
+2. Apenas uma issue em estado **Em Progresso** por agente.
+3. Mudanças em `/docs/governance` exigem atualização de índices.
+
+---
+
+## 4. Fila de Execução (Tabela Resumida)
 
 | ID | Status | Tema | Responsável | Data |
 | :-- | :-- | :-- | :-- | :-- |
-| ISSUE-021 | ⏳ Planejada | Auditoria total do repositório com análise sênior (sem execução de mudanças de produto) | Codex | 2026-02-17 |
-| ISSUE-023 | ✅ Concluída | Auditoria corretiva de estabilidade runtime e consistência cross-módulo | Codex | 2026-02-17 |
-| ISSUE-020 | ✅ Concluída | Relatório CI Docs Hub e correções para Sphinx/MyST | Codex | 2026-02-17 |
-| ISSUE-019 | ✅ Concluída | Determinismo de relatórios e logs no workflow de prompts | Codex | 2026-02-17 |
+| ISSUE-023 | ✅ Concluída | Auditoria corretiva de estabilidade runtime | Codex | 2026-02-17 |
+| ISSUE-021 | ⏳ Planejada | Auditoria total do repositório (Análise Sênior) | Codex | 2026-02-17 |
+| ISSUE-020 | ✅ Concluída | Relatório CI Docs Hub (Sphinx/MyST) | Codex | 2026-02-17 |
 | ISSUE-012 | ✅ Concluída | Auditoria de código em src + testes + ADR-035 | Codex | 2026-02-17 |
-| ISSUE-010-ESPECIAL | ✅ Concluída | Corrigir estrutura docs/ - remover soltos e órfãos | Codex | 2026-02-17 |
-| ISSUE-001 | ✅ Concluída | Reestruturação sistêmica de /docs e raiz (governança v1.0.0) | Codex | 2026-02-16 |
+| ISSUE-001 | ✅ Concluída | Reestruturação sistêmica de /docs e raiz | Codex | 2026-02-16 |
 ---
 
-## 🔍 Detalhamento e Rastreabilidade (Deep Dive)
+## 🔍 Detalhamento de Atividades (Cards)
 
-Abaixo, os detalhes extraídos dos artefatos técnicos de auditoria e execução.
-
-### ⚪ ISSUE-021 — Auditoria Total (Análise Sênior)
-* **Status:** ⏳ Planejada
-* **Foco:** Análise de arquitetura e consistência sem alteração de produto.
-* **Documentação:**
-    * 📄 [Relatório de Auditoria](./prompts/relatorios/ISSUE-021-auditoria-total-repositorio-analise-senior.md)
-    * 🛠️ [Plano de Execução Técnica](./prompts/execucoes/EXEC-021-auditoria-total-repositorio-analise-senior.md)
+### ⚪ ISSUE-021 — Auditoria Total (Sênior)
+> **Status:** ⏳ Planejada | **Responsável:** Codex | **Data:** 2026-02-17
+> - 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-021-auditoria-total-repositorio-analise-senior.md)
+> - 🛠️ [Ver execução técnica](./prompts/execucoes/EXEC-021-auditoria-total-repositorio-analise-senior.md)
 
 ### 🟢 ISSUE-023 — Estabilidade Runtime
-* **Status:** ✅ Concluída
-* **Foco:** Correção de bugs de importação e consistência entre módulos.
-* **Documentação:**
-    * 📄 [Relatório de Estabilidade](./prompts/relatorios/ISSUE-023-auditoria-corretiva-estabilidade-runtime.md)
-    * 📦 [Logs de Execução Técnica](./prompts/execucoes/EXEC-023-auditoria-corretiva-estabilidade-runtime.md)
+> **Status:** ✅ Concluída | **Responsável:** Codex | **Data:** 2026-02-17
+> - 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-023-auditoria-corretiva-estabilidade-runtime.md)
+> - 📦 [Ver execução](./prompts/execucoes/EXEC-023-auditoria-corretiva-estabilidade-runtime.md)
+
+### 🟢 ISSUE-012 — Auditoria SRC
+> **Status:** ✅ Concluída | **Responsável:** Codex | **Data:** 2026-02-17
+> - 📄 [Ver relatório completo](./prompts/relatorios/ISSUE-012-auditoria-codigo-testes-adr35.md)
 
 ---
 
-## 🔄 Protocolo Operacional (Governança)
+## ⚙️ Workflow e Sincronização
 
-1. **Input:** Registrar demanda em `docs/development/execution_queue.csv`.
-2. **Sync:** Executar `python tools/sync_hub.py` para atualizar este dashboard.
-3. **Traceability:** Cada issue deve possuir um par Relatório/Execução em `prompts/`.
+### 5. Fluxo Padrão para Novas Issues
+1. Registrar issue em `execution_queue.csv`.
+2. Executar `python tools/sync_hub.py` para atualizar esta página.
+3. Criar próximo ADR sequencial quando necessário.
 
-```bash
-# Sincronização automática
-python tools/sync_hub.py --check
+### 6. Checklist de Fechamento
+- [ ] Links internos validados.
+- [ ] Índices atualizados.
+- [ ] Conformidade IEEE/ISO revisada.
+
+### 7. Referências
+- **ISO/IEC 12207** — Lifecycle Processes.
+- **IEEE 730** — Quality Assurance.
+
+---
+<p align="center">
+  <sub><b>PyFolds HUB_CONTROLE</b> • Atualizado via <code>sync_hub.py</code></sub>
+</p>
