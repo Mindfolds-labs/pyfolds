@@ -54,6 +54,8 @@ FLAG_COMP_NONE = 0
 FLAG_COMP_ZSTD = 1
 MAX_INDEX_SIZE = 100 * 1024 * 1024
 MAX_CHUNK_SIZE = 2 * 1024 * 1024 * 1024
+SUPPORTED_FOLD_FORMAT = "fold"
+SUPPORTED_FOLD_VERSIONS = {"1.0.0", "1.1.0", "1.2.0"}
 
 # Tabela CRC32C (Castagnoli) para fallback sem dependência externa.
 _CRC32C_POLY = 0x82F63B78
@@ -472,6 +474,22 @@ class FoldReader:
         except json.JSONDecodeError as exc:
             raise ValueError(f"Index JSON corrompido: {exc}") from exc
 
+
+        format_version = self.index.get("format")
+        if format_version != SUPPORTED_FOLD_FORMAT:
+            raise ValueError(
+                f"Formato fold incompatível: esperado '{SUPPORTED_FOLD_FORMAT}', obtido '{format_version}'"
+            )
+
+        file_version = str(self.index.get("version", "1.0.0"))
+        if file_version not in SUPPORTED_FOLD_VERSIONS:
+            warnings.warn(
+                f"Versão de arquivo fold potencialmente incompatível: {file_version}. "
+                f"Versões suportadas: {sorted(SUPPORTED_FOLD_VERSIONS)}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+
     def list_chunks(self) -> List[str]:
         return [chunk["name"] for chunk in self.index.get("chunks", [])]
 
@@ -561,23 +579,38 @@ class FoldReader:
     def read_json(self, name: str, verify: bool = True) -> Dict[str, Any]:
         return json.loads(self.read_chunk_bytes(name, verify=verify).decode("utf-8"))
 
-    def read_torch(self, name: str, map_location: str = "cpu", verify: bool = True) -> Any:
+    def read_torch(
+        self,
+        name: str,
+        map_location: str = "cpu",
+        verify: bool = True,
+        trusted: bool = False,
+    ) -> Any:
         payload = self.read_chunk_bytes(name, verify=verify)
-        kwargs: Dict[str, Any] = {"map_location": map_location}
+
+        if trusted:
+            return torch.load(io.BytesIO(payload), map_location=map_location)
+
         try:
-            kwargs["weights_only"] = True
-            return torch.load(io.BytesIO(payload), **kwargs)
+            return torch.load(io.BytesIO(payload), map_location=map_location, weights_only=True)
         except Exception as exc:
             raise FoldSecurityError(
                 "Falha ao carregar chunk torch em modo seguro (weights_only=True). "
-                "Se o arquivo for confiável, use load_fold_or_mind(..., trusted_torch_payload=True)."
+                "Se o arquivo for confiável, use read_torch(..., trusted=True) "
+                "ou load_fold_or_mind(..., trusted_torch_payload=True)."
             ) from exc
 
 
 class _TrustedFoldReader(FoldReader):
     """Reader dedicado para ambientes de confiança explícita."""
 
-    def read_torch(self, name: str, map_location: str = "cpu", verify: bool = True) -> Any:
+    def read_torch(
+        self,
+        name: str,
+        map_location: str = "cpu",
+        verify: bool = True,
+        trusted: bool = False,
+    ) -> Any:
         payload = self.read_chunk_bytes(name, verify=verify)
         return torch.load(io.BytesIO(payload), map_location=map_location)
 

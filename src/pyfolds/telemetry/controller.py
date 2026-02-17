@@ -151,8 +151,9 @@ class TelemetryController:
             self.sink.emit(event)
         except Exception as e:
             logger.error(f"Failed to emit telemetry event: {e}")
-        
-        self._increment_step()
+        finally:
+            # Mantém monotonicidade do contador mesmo quando sink falha.
+            self._increment_step()
     
     def snapshot(self) -> List[Dict[str, Any]]:
         """

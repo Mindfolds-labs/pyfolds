@@ -70,19 +70,28 @@ class Neuromodulator(nn.Module):
             ValueError: Se saturation_ratio for None no modo 'capacity'
         """
         if device is None:
-            device = torch.device('cpu')
-        
-        # Converte tensores para float se necessário (mantendo no device)
-        if isinstance(rate, torch.Tensor):
-            rate = rate.item() if rate.numel() == 1 else float(rate.mean())
-        else:
-            rate = float(rate)
-            
-        if isinstance(r_hat, torch.Tensor):
-            r_hat = r_hat.item() if r_hat.numel() == 1 else float(r_hat.mean())
-        else:
-            r_hat = float(r_hat)
-        
+            if isinstance(rate, torch.Tensor):
+                device = rate.device
+            elif isinstance(r_hat, torch.Tensor):
+                device = r_hat.device
+            elif isinstance(reward, torch.Tensor):
+                device = reward.device
+            else:
+                device = torch.device("cpu")
+
+        def _to_scalar(value: Union[float, torch.Tensor], name: str) -> float:
+            if isinstance(value, torch.Tensor):
+                scalar = value.item() if value.numel() == 1 else float(value.mean())
+            else:
+                scalar = float(value)
+            if not math.isfinite(scalar):
+                raise ValueError(f"{name} deve ser finito, obtido {scalar}")
+            return scalar
+
+        # Converte tensores para escalar e valida domínio numérico
+        rate = _to_scalar(rate, "rate")
+        r_hat = _to_scalar(r_hat, "r_hat")
+
         # Valida ranges
         rate = max(0.0, min(1.0, rate))
         r_hat = max(0.0, min(1.0, r_hat))
@@ -93,11 +102,7 @@ class Neuromodulator(nn.Module):
             if reward is None:
                 raise ValueError("reward must be provided when neuromod_mode='external'")
             
-            if isinstance(reward, torch.Tensor):
-                reward = reward.item() if reward.numel() == 1 else float(reward.mean())
-            else:
-                reward = float(reward)
-            
+            reward = _to_scalar(reward, "reward")
             R_val = reward
             
         elif self.cfg.neuromod_mode == "capacity":
@@ -105,8 +110,8 @@ class Neuromodulator(nn.Module):
             if saturation_ratio is None:
                 raise ValueError("saturation_ratio must be provided when neuromod_mode='capacity'")
             saturation_ratio = float(saturation_ratio)
-            if math.isnan(saturation_ratio):
-                raise ValueError("saturation_ratio não pode ser NaN no modo 'capacity'")
+            if not math.isfinite(saturation_ratio):
+                raise ValueError("saturation_ratio deve ser finito no modo 'capacity'")
 
             saturation_ratio = max(0.0, min(1.0, saturation_ratio))
             free_capacity = 1.0 - saturation_ratio
@@ -125,6 +130,9 @@ class Neuromodulator(nn.Module):
             )
             if math.isnan(R_val):
                 raise ValueError("R_val resultou em NaN no modo 'capacity'")
+
+            # Clamp intermediário para evitar explosões numéricas antes do clamp biológico final.
+            R_val = max(-10.0, min(10.0, R_val))
             
         elif self.cfg.neuromod_mode == "surprise":
             # Modo surprise: baseado em erro de predição

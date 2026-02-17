@@ -66,9 +66,8 @@ class RingBuffer(Generic[T]):
             
             for i in range(self._size):
                 idx = (start + i) % self._cap
-                # ✅ Always append, even if None (None shouldn't happen)
                 result.append(self._buf[idx])
-            
+
             return result
     
     def clear(self) -> None:

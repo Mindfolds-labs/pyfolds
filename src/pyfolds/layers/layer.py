@@ -136,6 +136,13 @@ class MPJRDLayer(nn.Module):
         # Prepara entrada
         x = x.to(self.device)
         x = self._prepare_input(x)
+
+        if x.shape[1] != self.n_neurons:
+            raise ValueError(
+                f"Após _prepare_input, esperado eixo de neurônios={self.n_neurons}, "
+                f"recebido {x.shape[1]}"
+            )
+
         batch_size = x.shape[0]
 
         neuron_kwargs = neuron_kwargs or {}
