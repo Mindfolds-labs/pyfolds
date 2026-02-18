@@ -32,3 +32,29 @@ A execução técnica confirmou sucesso em `python -m build`, `twine check dist/
 - O projeto ganha trilha formal de auditoria PyPI e critério objetivo de “go/no-go”.
 - Publicações futuras ficam mais previsíveis com gate mínimo explícito.
 - É criado backlog técnico claro para adequação completa ao padrão moderno de empacotamento.
+
+---
+
+## Adendo final — Integração dendrítica NMDA + shunting (implementação)
+
+### Contexto adicional
+O comportamento legado do `MPJRDNeuron` utilizava *WTA hard* (`scatter_`), colapsando a contribuição de `D` dendritos para um único ramo ativo por passo. Isso reduz capacidade efetiva, empobrece o crédito plástico e não representa adequadamente integração dendrítica não-linear.
+
+### Decisão adicional
+1. Introduzir módulo dedicado `DendriticIntegration` com:
+   - gate local tipo NMDA (`sigmoid(gain * (v_dend - theta_dend))`);
+   - normalização divisiva (*shunting*);
+   - saída explícita de contribuição proporcional por dendrito.
+2. Tornar o modo de integração configurável em `MPJRDConfig`:
+   - `wta_hard` (legado/compatibilidade),
+   - `wta_soft` (sigmóide sem shunting),
+   - `nmda_shunting` (novo padrão recomendado/default).
+3. Atualizar `BackpropMixin` para usar `dend_contribution` quando `bap_proportional=True`, mantendo fallback legado.
+
+### Consequências
+- Todos os dendritos podem contribuir no modo padrão (`nmda_shunting`), preservando competição suave e crédito plástico proporcional.
+- O pipeline mantém compatibilidade por configuração para experimentos antigos (`wta_hard`).
+- Testes unitários foram estendidos para validar:
+  - parâmetros/validações de configuração,
+  - exposição de `dend_contribution`,
+  - ganho proporcional em backprop.

@@ -60,3 +60,26 @@ class TestBackpropMixin:
             torch.ones_like(neuron.dendrite_amplification) * 0.5 * expected_decay,
             atol=1e-5,
         )
+
+    def test_bap_proportional_uses_dendritic_contribution(self, full_config):
+        """Com bap_proportional=True, ganho deve seguir contribuição."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        cfg = pyfolds.MPJRDConfig(
+            n_dendrites=full_config.n_dendrites,
+            n_synapses_per_dendrite=full_config.n_synapses_per_dendrite,
+            bap_proportional=True,
+            device="cpu",
+        )
+        neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+
+        v_dend = torch.zeros(2, cfg.n_dendrites)
+        contribution = torch.zeros(2, cfg.n_dendrites)
+        contribution[:, 0] = 1.0
+
+        neuron._schedule_backprop(0.0, v_dend, dend_contribution=contribution)
+        neuron._process_backprop_queue(1.0)
+
+        assert neuron.dendrite_amplification[0] > 0
+        assert torch.all(neuron.dendrite_amplification[1:] == 0)
