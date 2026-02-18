@@ -32,6 +32,7 @@ from .synapse import MPJRDSynapse
 from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator, create_accumulator_from_config  # ✅ Adicionado
+from .dendrite_integration import DendriticIntegration, DendriticOutput
 from .factory import NeuronFactory, NeuronType, register_neuron, register_default_neurons, infer_neuron_type
 
 __version__ = "1.0.1"  # ✅ Atualizado para versão 1.0.1
@@ -48,6 +49,8 @@ __all__ = [
     "HomeostasisController",
     "Neuromodulator",
     "StatisticsAccumulator",
+    "DendriticIntegration",
+    "DendriticOutput",
     
     # Tipos úteis
     "NeuromodMode",

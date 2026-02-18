@@ -25,6 +25,7 @@ from .dendrite import MPJRDDendrite
 from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator
+from .dendrite_integration import DendriticIntegration
 from ..utils.types import LearningMode
 from ..utils.validation import validate_input
 
@@ -80,6 +81,16 @@ class MPJRDNeuron(BaseNeuron):
             cfg.n_dendrites, cfg.n_synapses_per_dendrite, cfg.eps
         )
         self.logger.debug(f"   ✅ Accumulator criado (track_extra={self.stats_acc.track_extra})")
+
+        # Integração dendrítica (substitui WTA hard)
+        self.dendrite_integration = DendriticIntegration(cfg)
+        self.logger.debug(
+            "   ✅ DendriticIntegration: mode=%s, gain=%.1f, θ_ratio=%.2f, shunting_eps=%.2f",
+            cfg.dendrite_integration_mode,
+            cfg.dendrite_gain,
+            cfg.theta_dend_ratio,
+            cfg.shunting_eps,
+        )
 
         # ===== ESTADO =====
         self.mode = LearningMode.ONLINE
@@ -303,15 +314,25 @@ class MPJRDNeuron(BaseNeuron):
         for d_idx, dend in enumerate(self.dendrites):
             v_dend[:, d_idx] = dend(x[:, d_idx, :])
 
-        # ===== 2. WTA (Winner-Take-All) =====
-        max_val, max_idx = v_dend.max(dim=1, keepdim=True)
-        gated = torch.zeros_like(v_dend)
-        gated.scatter_(1, max_idx, v_dend.gather(1, max_idx))
+        # ===== 2-4. INTEGRAÇÃO DENDRÍTICA → POTENCIAL → DISPARO =====
+        integration_mode = getattr(self.cfg, "dendrite_integration_mode", "wta_hard")
 
-        # ===== 3. POTENCIAL SOMÁTICO =====
-        u = gated.sum(dim=1)
+        if integration_mode == "nmda_shunting":
+            dend_out = self.dendrite_integration(v_dend, self.theta)
+            u = dend_out.u
+            gated = dend_out.v_nmda
+            dend_contribution = dend_out.contribution
+        elif integration_mode == "wta_soft":
+            gated = torch.sigmoid(v_dend - (self.theta * 0.5))
+            u = gated.sum(dim=1)
+            dend_contribution = None
+        else:
+            max_idx = v_dend.max(dim=1, keepdim=True)[1]
+            gated = torch.zeros_like(v_dend)
+            gated.scatter_(1, max_idx, v_dend.gather(1, max_idx))
+            u = gated.sum(dim=1)
+            dend_contribution = None
 
-        # ===== 4. DISPARO =====
         spikes = (u >= self.theta).float()
 
         # ===== 5. ESTATÍSTICAS =====
@@ -379,13 +400,14 @@ class MPJRDNeuron(BaseNeuron):
                         N_mean=float(self.N.float().mean().item()),
                         I_mean=float(self.I.float().mean().item()),
                         W_mean=float(self.W.float().mean().item()),
+                        integration_mode=integration_mode,
                     ))
                 except Exception as exc:
                     self.logger.error(f"Falha ao emitir telemetria: {exc}")
 
         # ===== 12. LOGGING =====
         self.logger.trace(
-            f"Forward: batch={B}, spikes={spike_rate:.3f}, "
+            f"Forward [{integration_mode}]: batch={B}, spikes={spike_rate:.3f}, "
             f"θ={self.theta.item():.3f}, sat={saturation_ratio:.1%}"
         )
         
@@ -402,7 +424,7 @@ class MPJRDNeuron(BaseNeuron):
             self.logger.debug(f"🎯 Neuromodulação alta: R={R_val:.2f}")
 
         # ===== 13. RETORNO =====
-        return {
+        out = {
             "spikes": spikes,
             "u": u,
             "v_dend": v_dend,
@@ -416,7 +438,13 @@ class MPJRDNeuron(BaseNeuron):
             "W_mean": self.W.float().mean().item(),
             "I_mean": self.I.float().mean().item(),
             "mode": self.mode.value,
+            "integration_mode": integration_mode,
         }
+
+        if dend_contribution is not None:
+            out["dend_contribution"] = dend_contribution
+
+        return out
 
     def step(
         self,

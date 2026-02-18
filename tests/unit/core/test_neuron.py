@@ -25,6 +25,25 @@ class TestMPJRDNeuron:
         assert out['spikes'].shape == (batch_size,)
         assert out['u'].shape == (batch_size,)
         assert out['v_dend'].shape == (batch_size, 2)
+        assert out['integration_mode'] == small_config.dendrite_integration_mode
+
+    def test_nmda_shunting_exposes_dendritic_contribution(self, batch_size):
+        """Modo nmda_shunting deve retornar contribuição por dendrito."""
+        cfg = pyfolds.MPJRDConfig(
+            n_dendrites=2,
+            n_synapses_per_dendrite=4,
+            dendrite_integration_mode="nmda_shunting",
+            device="cpu",
+        )
+        neuron = pyfolds.MPJRDNeuron(cfg)
+        x = torch.randn(batch_size, 2, 4)
+
+        out = neuron(x)
+
+        assert 'dend_contribution' in out
+        contrib = out['dend_contribution']
+        assert contrib.shape == (batch_size, 2)
+        assert torch.allclose(contrib.sum(dim=1), torch.ones(batch_size), atol=1e-5)
     
     
     def test_step_alias(self, small_config, batch_size):

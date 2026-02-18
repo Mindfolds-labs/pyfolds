@@ -19,11 +19,13 @@ class TestMPJRDConfig:
         cfg = pyfolds.MPJRDConfig(
             n_dendrites=8,
             n_synapses_per_dendrite=64,
-            plastic=False
+            plastic=False,
+            dendrite_integration_mode="wta_soft",
         )
         assert cfg.n_dendrites == 8
         assert cfg.n_synapses_per_dendrite == 64
         assert cfg.plastic is False
+        assert cfg.dendrite_integration_mode == "wta_soft"
     
     def test_validation(self):
         """Test validation."""
@@ -51,3 +53,18 @@ class TestMPJRDConfig:
 
         with pytest.raises(ValueError):
             pyfolds.MPJRDConfig(float_precision="float16")
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"dendrite_integration_mode": "invalid"},
+            {"dendrite_gain": 0.0},
+            {"theta_dend_ratio": 1.5},
+            {"shunting_eps": 0.0},
+            {"shunting_strength": -0.1},
+        ],
+    )
+    def test_dendritic_integration_validation(self, kwargs):
+        """Valida limites dos novos parâmetros de integração dendrítica."""
+        with pytest.raises(ValueError):
+            pyfolds.MPJRDConfig(**kwargs)

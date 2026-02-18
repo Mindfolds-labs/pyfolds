@@ -68,6 +68,14 @@ class MPJRDConfig:
     
     # ✅ NOVO: Epsilon para homeostase (evita divisão por zero)
     homeostasis_eps: float = 1e-7
+
+    # ===== INTEGRAÇÃO DENDRÍTICA (substitui WTA hard) =====
+    dendrite_integration_mode: str = "nmda_shunting"
+    dendrite_gain: float = 2.0
+    theta_dend_ratio: float = 0.25
+    shunting_eps: float = 0.1
+    shunting_strength: float = 1.0
+    bap_proportional: bool = True
     
     # ===== MECANISMO 5: BACKPROPAGAÇÃO =====
     backprop_enabled: bool = True
@@ -187,6 +195,32 @@ class MPJRDConfig:
 
         if self.neuromod_scale <= 0:
             raise ValueError(f"neuromod_scale must be > 0, got {self.neuromod_scale}")
+
+        valid_integration_modes = {"wta_hard", "wta_soft", "nmda_shunting"}
+        if self.dendrite_integration_mode not in valid_integration_modes:
+            raise ValueError(
+                "dendrite_integration_mode inválido: "
+                f"{self.dendrite_integration_mode}. "
+                f"Use: {valid_integration_modes}"
+            )
+
+        if self.dendrite_gain <= 0:
+            raise ValueError(f"dendrite_gain deve ser > 0, recebido {self.dendrite_gain}")
+
+        if not 0.0 < self.theta_dend_ratio < 1.0:
+            raise ValueError(
+                "theta_dend_ratio deve estar em (0, 1), "
+                f"recebido {self.theta_dend_ratio}"
+            )
+
+        if self.shunting_eps <= 0:
+            raise ValueError(f"shunting_eps deve ser > 0, recebido {self.shunting_eps}")
+
+        if self.shunting_strength < 0:
+            raise ValueError(
+                "shunting_strength deve ser >= 0, "
+                f"recebido {self.shunting_strength}"
+            )
 
         if not (0.0 < self.active_synapses_ratio <= 1.0):
             raise ValueError(
