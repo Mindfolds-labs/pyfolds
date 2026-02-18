@@ -103,11 +103,10 @@ class InhibitionLayer(nn.Module):
         generator = torch.Generator(device='cpu')
         generator.manual_seed(self.seed)
 
-        with torch.random.fork_rng(devices=[]):
-            torch.manual_seed(self.seed)
-            dense_weights = torch.nn.init.xavier_uniform_(
-                torch.empty(self.n_exc, self.n_inh)
-            )
+        dense_weights = torch.nn.init.xavier_uniform_(
+            torch.empty(self.n_exc, self.n_inh),
+            generator=generator,
+        )
 
         sparsity_level = 0.1
         mask = torch.bernoulli(
