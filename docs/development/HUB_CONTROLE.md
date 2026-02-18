@@ -59,6 +59,8 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-023 | Concluída | Auditoria corretiva de estabilidade runtime e consistência cross-módulo | Codex | 2026-02-17 |
 | ISSUE-022 | Concluída | Auditoria e correção do neurônio MPJRD (thread safety + validações + plasticidade) | Codex | 2026-02-17 |
 | ISSUE-025 | Concluída | Análise integral do pyfolds + execução direta + atualização de benchmark e ADR-037 | Codex | 2026-02-17 |
+| ISSUE-024 | Planejada | Revisão estética do HUB_CONTROLE com cards sincronizados por CSV | Codex | 2026-02-17 |
+| ISSUE-036 | Concluída | Auditoria fold/mind integridade lógica e governança operacional | Codex | 2026-02-18 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 🔍 Detalhamento de Atividades (Cards)
@@ -314,6 +316,16 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-022-auditoria-neuron-thread-safety-plasticidade.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-022-auditoria-neuron-thread-safety-plasticidade.md)
 
+> [!TIP]
+> **ISSUE-025** · Análise integral do pyfolds + execução direta + atualização de benchmark e ADR-037
+>
+> **Status:** ✅ Concluída  
+> **Responsável:** Codex  
+> **Data:** 2026-02-17  
+> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-025-analise-integral-benchmark-adr37.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-025-analise-integral-benchmark-adr37.md)
+
 > [!NOTE]
 > **ISSUE-024** · Revisão estética do HUB_CONTROLE com cards sincronizados por CSV
 >
@@ -323,6 +335,16 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > **Prioridade:** `Alta` · **Área:** `Documentação/Processo`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-024-correcao-tipos-telemetria-apis.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-024-revisao-estetica-hub-controle.md)
+
+> [!TIP]
+> **ISSUE-036** · Auditoria fold/mind integridade lógica e governança operacional
+>
+> **Status:** ✅ Concluída  
+> **Responsável:** Codex  
+> **Data:** 2026-02-18  
+> **Prioridade:** `Crítica` · **Área:** `Código/Governança`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-036-auditoria-fold-mind-integridade-governanca.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-036-auditoria-fold-mind-integridade-governanca.md)
 
 <!-- HUB:CARDS:END -->
 

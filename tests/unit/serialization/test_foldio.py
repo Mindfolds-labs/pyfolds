@@ -19,7 +19,7 @@ from pyfolds.serialization import (
     read_nuclear_arrays,
     save_fold_or_mind,
 )
-from pyfolds.serialization.foldio import HEADER_FMT, MAGIC, MAX_CHUNK_SIZE, FoldWriter, crc32c_u32
+from pyfolds.serialization.foldio import HEADER_FMT, MAGIC, MAX_CHUNK_SIZE, FoldSecurityError, FoldWriter, crc32c_u32
 
 
 try:
@@ -386,3 +386,76 @@ def _failing_write_after_first_call(original_write):
         return original_write(data)
 
     return mock.Mock(side_effect=_write)
+
+
+def test_fold_manifest_includes_governance_sections(tmp_path):
+    neuron = _build_neuron()
+    file_path = tmp_path / "governance.fold"
+
+    save_fold_or_mind(
+        neuron,
+        str(file_path),
+        compress="none",
+        dataset_manifest={"name": "mnist", "version": "1.0"},
+        performance_manifest={"latency_ms": 3.2, "throughput": 1200},
+        fairness_manifest={"demographic_parity_gap": 0.02},
+        explainability_manifest={"method": "integrated-gradients"},
+        compliance_manifest={"standards": ["IEEE-730", "ISO-15288"]},
+    )
+
+    info = peek_fold_or_mind(str(file_path), use_mmap=False)
+    llm_manifest = info["llm_manifest"]
+    assert llm_manifest["hyperparameters"]["n_dendrites"] == neuron.cfg.n_dendrites
+    assert llm_manifest["dataset"]["name"] == "mnist"
+    assert llm_manifest["performance"]["throughput"] == 1200
+    assert llm_manifest["fairness"]["demographic_parity_gap"] == 0.02
+    assert llm_manifest["explainability"]["method"] == "integrated-gradients"
+    assert llm_manifest["compliance"]["standards"][0] == "IEEE-730"
+
+
+def test_fold_signature_roundtrip_if_cryptography_available(tmp_path):
+    serialization_module = pytest.importorskip("cryptography.hazmat.primitives.serialization")
+    ed25519_module = pytest.importorskip("cryptography.hazmat.primitives.asymmetric.ed25519")
+
+    private_key = ed25519_module.Ed25519PrivateKey.generate()
+    private_pem = private_key.private_bytes(
+        encoding=serialization_module.Encoding.PEM,
+        format=serialization_module.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization_module.NoEncryption(),
+    ).decode("utf-8")
+    public_pem = private_key.public_key().public_bytes(
+        encoding=serialization_module.Encoding.PEM,
+        format=serialization_module.PublicFormat.SubjectPublicKeyInfo,
+    ).decode("utf-8")
+
+    neuron = _build_neuron()
+    file_path = tmp_path / "signed.fold"
+
+    save_fold_or_mind(
+        neuron,
+        str(file_path),
+        compress="none",
+        include_history=False,
+        include_telemetry=False,
+        signature_private_key_pem=private_pem,
+        signature_key_id="unit-test",
+    )
+
+    with FoldReader(str(file_path), use_mmap=False) as reader:
+        signature = reader.index["metadata"]["signature"]
+    assert signature["algorithm"] == "ed25519"
+    assert signature["key_id"] == "unit-test"
+
+    loaded = load_fold_or_mind(
+        str(file_path),
+        MPJRDNeuron,
+        signature_public_key_pem=public_pem,
+    )
+    assert loaded.__class__.__name__ == "MPJRDNeuron"
+
+    with pytest.raises(FoldSecurityError):
+        load_fold_or_mind(
+            str(file_path),
+            MPJRDNeuron,
+            signature_public_key_pem=private_pem,
+        )
