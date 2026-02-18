@@ -12,6 +12,7 @@ Dependências opcionais:
 from __future__ import annotations
 
 import hashlib
+import hmac
 import importlib
 import io
 import json
@@ -33,7 +34,10 @@ import torch
 from .ecc import ECCCodec, NoECC, ReedSolomonECC, ecc_from_protection
 
 def _optional_import(module_name: str) -> Any:
-    spec = importlib.util.find_spec(module_name)
+    try:
+        spec = importlib.util.find_spec(module_name)
+    except ModuleNotFoundError:
+        return None
     if spec is None:
         return None
     try:
@@ -44,6 +48,8 @@ def _optional_import(module_name: str) -> Any:
 
 zstd = _optional_import("zstandard")
 google_crc32c = _optional_import("google_crc32c")
+serialization = _optional_import("cryptography.hazmat.primitives.serialization")
+ed25519 = _optional_import("cryptography.hazmat.primitives.asymmetric.ed25519")
 
 
 MAGIC = b"FOLDv1\0\0"
@@ -124,6 +130,10 @@ def sha256_hex(data: bytes) -> str:
 
 def _json_bytes(obj: Any) -> bytes:
     return json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+
+
+def _canonical_json(obj: Any) -> bytes:
+    return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
 def _cfg_to_dict(cfg: Any) -> Any:
@@ -668,6 +678,41 @@ def _reproducibility_metadata() -> Dict[str, Any]:
     }
 
 
+def _collect_hyperparameters(neuron: Any) -> Dict[str, Any]:
+    cfg = _cfg_to_dict(getattr(neuron, "cfg", None))
+    if isinstance(cfg, dict):
+        return cfg
+    return {}
+
+
+def _sign_payload_ed25519(payload: bytes, private_key_pem: str) -> str:
+    if serialization is None or ed25519 is None:
+        raise RuntimeError(
+            "Assinatura digital requer pacote 'cryptography'. Instale a dependência para habilitar assinatura."
+        )
+
+    private_key = serialization.load_pem_private_key(private_key_pem.encode("utf-8"), password=None)
+    if not isinstance(private_key, ed25519.Ed25519PrivateKey):
+        raise ValueError("Chave privada inválida: esperado Ed25519 PEM.")
+    return private_key.sign(payload).hex()
+
+
+def _verify_payload_signature_ed25519(payload: bytes, signature_hex: str, public_key_pem: str) -> bool:
+    if serialization is None or ed25519 is None:
+        raise RuntimeError(
+            "Verificação de assinatura requer pacote 'cryptography'. Instale a dependência para validar assinaturas."
+        )
+
+    public_key = serialization.load_pem_public_key(public_key_pem.encode("utf-8"))
+    if not isinstance(public_key, ed25519.Ed25519PublicKey):
+        raise ValueError("Chave pública inválida: esperado Ed25519 PEM.")
+    try:
+        public_key.verify(bytes.fromhex(signature_hex), payload)
+        return True
+    except Exception:
+        return False
+
+
 def save_fold_or_mind(
     neuron: Any,
     path: str,
@@ -679,6 +724,14 @@ def save_fold_or_mind(
     ecc: Optional[ECCCodec] = None,
     protection: str = "off",
     extra_manifest: Optional[Dict[str, Any]] = None,
+    dataset_manifest: Optional[Dict[str, Any]] = None,
+    performance_manifest: Optional[Dict[str, Any]] = None,
+    fairness_manifest: Optional[Dict[str, Any]] = None,
+    explainability_manifest: Optional[Dict[str, Any]] = None,
+    compliance_manifest: Optional[Dict[str, Any]] = None,
+    audit_events: Optional[List[Dict[str, Any]]] = None,
+    signature_private_key_pem: Optional[str] = None,
+    signature_key_id: Optional[str] = None,
 ) -> None:
     """Salva neurônio MPJRD em container .fold/.mind único e extensível."""
 
@@ -714,12 +767,25 @@ def save_fold_or_mind(
         "version": "1.2.0",
         "created_at_unix": time.time(),
         "model_type": neuron.__class__.__name__,
+        "hyperparameters": _collect_hyperparameters(neuron),
         "tags": tags or {},
         "expression": expression,
         "reproducibility": _reproducibility_metadata(),
+        "dataset": dataset_manifest or {},
+        "performance": performance_manifest or {},
+        "fairness": fairness_manifest or {},
+        "explainability": explainability_manifest or {},
+        "compliance": compliance_manifest or {},
         "routing": {
             "resume_training": "torch_state",
-            "audit": ["llm_manifest", "metrics", "history", "telemetry", "nuclear_arrays"],
+            "audit": [
+                "llm_manifest",
+                "metrics",
+                "history",
+                "telemetry",
+                "nuclear_arrays",
+                "audit_trail",
+            ],
         },
         "chunks_expected": [
             "torch_state",
@@ -728,6 +794,7 @@ def save_fold_or_mind(
             "history",
             "telemetry",
             "nuclear_arrays",
+            "audit_trail",
         ],
     }
     if extra_manifest:
@@ -741,6 +808,20 @@ def save_fold_or_mind(
         "protection": protection,
     }
 
+    if signature_private_key_pem:
+        signed_payload = {
+            "model_type": metadata["model_type"],
+            "tags": metadata["tags"],
+            "reproducibility": metadata["reproducibility"],
+            "protection": metadata["protection"],
+        }
+        metadata["signature"] = {
+            "algorithm": "ed25519",
+            "key_id": signature_key_id or "default",
+            "payload_sha256": sha256_hex(_canonical_json(signed_payload)),
+            "value": _sign_payload_ed25519(_canonical_json(signed_payload), signature_private_key_pem),
+        }
+
     tmp_path = f"{path}.tmp"
     with FoldWriter(tmp_path, compress=compress, ecc=selected_ecc) as writer:
         writer.add_chunk("torch_state", "TSAV", torch_buffer.getvalue())
@@ -753,6 +834,8 @@ def save_fold_or_mind(
             writer.add_chunk("telemetry", "JSON", _json_bytes(telemetry))
         if nuclear_arrays:
             writer.add_chunk("nuclear_arrays", "NPZ0", nuclear_arrays)
+        if audit_events:
+            writer.add_chunk("audit_trail", "JSON", _json_bytes(audit_events))
         writer.finalize(metadata=metadata)
 
     os.replace(tmp_path, path)
@@ -784,11 +867,44 @@ def load_fold_or_mind(
     neuron_class: Any,
     map_location: str = "cpu",
     trusted_torch_payload: bool = False,
+    signature_public_key_pem: Optional[str] = None,
 ) -> Any:
     """Carrega neurônio pelo chunk `torch_state` com validação por chunk."""
 
     reader_class = _TrustedFoldReader if trusted_torch_payload else FoldReader
     with reader_class(path, use_mmap=True) as reader:
+        if signature_public_key_pem:
+            signature = reader.index.get("metadata", {}).get("signature")
+            if not signature:
+                raise FoldSecurityError("Assinatura obrigatória ausente no metadata do arquivo fold/mind.")
+
+            signed_payload = {
+                "model_type": reader.index.get("metadata", {}).get("model_type"),
+                "tags": reader.index.get("metadata", {}).get("tags", {}),
+                "reproducibility": reader.index.get("metadata", {}).get("reproducibility", {}),
+                "protection": reader.index.get("metadata", {}).get("protection"),
+            }
+            if signature.get("algorithm") != "ed25519":
+                raise FoldSecurityError("Algoritmo de assinatura não suportado.")
+            if not hmac.compare_digest(
+                signature.get("payload_sha256", ""), sha256_hex(_canonical_json(signed_payload))
+            ):
+                raise FoldSecurityError("Payload de assinatura divergente: metadata possivelmente adulterado.")
+
+            try:
+                is_valid = _verify_payload_signature_ed25519(
+                    _canonical_json(signed_payload),
+                    signature.get("value", ""),
+                    signature_public_key_pem,
+                )
+            except Exception as exc:
+                raise FoldSecurityError(
+                    "Falha ao validar assinatura digital do arquivo fold/mind."
+                ) from exc
+
+            if not is_valid:
+                raise FoldSecurityError("Assinatura digital inválida para o arquivo fold/mind.")
+
         payload = reader.read_torch("torch_state", map_location=map_location)
 
     cfg = payload.get("config")

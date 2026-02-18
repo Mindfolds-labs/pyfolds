@@ -39,3 +39,4 @@
 | ADR-035 | Auditoria de `src/`, testes e estratégia de correção incremental | Aceito | 2026-02-17 | [ADR-035-auditoria-src-testes.md](ADR-035-auditoria-src-testes.md) |
 | ADR-036 | Governança de validação integral pós-correção (import + testes + issue) | Aceito | 2026-02-17 | [ADR-036-governanca-validacao-integral-import-testes.md](ADR-036-governanca-validacao-integral-import-testes.md) |
 | ADR-037 | Análise integral de execução (ISSUE-025) e atualização contínua de benchmark | Aceito | 2026-02-17 | [ADR-037-analise-integral-issue-025-benchmark-refresh.md](ADR-037-analise-integral-issue-025-benchmark-refresh.md) |
+| ADR-038 | Auditoria contínua do formato `.fold/.mind` com governança de execução (ISSUE-036) | Aceito | 2026-02-18 | [ADR-038-auditoria-fold-mind-governanca-execucao.md](ADR-038-auditoria-fold-mind-governanca-execucao.md) |
