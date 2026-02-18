@@ -14,10 +14,15 @@ Execute com: pytest tests/test_utils.py -v
 import pytest
 import torch
 import logging
+import re
 import tempfile
+import subprocess
+import os
 from pathlib import Path
 
 # ===== IMPORTS DO PyFolds =====
+from pyfolds.utils.logging import build_log_path, next_log_path, setup_run_logging
+
 from pyfolds.utils import (
     # Math
     safe_div,
@@ -345,6 +350,41 @@ class TestLogging:
         captured = capsys.readouterr()
         assert "Esta mensagem NÃO deve aparecer" not in captured.out
     
+
+    def test_import_pyfolds_does_not_add_stream_handler(self):
+        """Import não deve configurar handlers automaticamente."""
+        cmd = [
+            "python",
+            "-c",
+            (
+                "import logging; "
+                "before=len(logging.getLogger().handlers); "
+                "import pyfolds; "
+                "after=len(logging.getLogger().handlers); "
+                "print(f'{before}:{after}')"
+            ),
+        ]
+        env = os.environ.copy()
+        env["PYTHONPATH"] = "src"
+        proc = subprocess.run(cmd, capture_output=True, text=True, env=env, check=True)
+        before, after = map(int, proc.stdout.strip().split(":"))
+        assert before == after
+
+    def test_setup_run_logging_returns_logger_and_path(self, tmp_path):
+        """Helper de setup deve criar arquivo incremental e logger configurado."""
+        logger, log_path = setup_run_logging(
+            app="pyfolds",
+            version="2.0.0",
+            log_dir=tmp_path,
+            console=False,
+            fixed_layout=True,
+        )
+        logger.info("linha setup_run")
+
+        assert log_path.exists()
+        assert log_path.name.startswith("001_pyfolds_2.0.0_")
+        assert "linha setup_run" in log_path.read_text()
+
     def test_logger_file_handler(self, tmp_path):
         """Testa se logger escreve em arquivo."""
         log_file = tmp_path / "test.log"
@@ -363,6 +403,73 @@ class TestLogging:
         content = log_file.read_text()
         assert "Mensagem para arquivo" in content
     
+
+    def test_logger_console_false_keeps_terminal_clean(self, tmp_path, capsys):
+        """Com console=False, logs não devem ir para stdout/stderr."""
+        log_file = tmp_path / "silent.log"
+
+        logger_manager = PyFoldsLogger()
+        logger_manager.setup(level="INFO", log_file=log_file, console=False)
+
+        logger = get_logger('test.silent')
+        logger.info("arquivo-only")
+
+        captured = capsys.readouterr()
+        assert "arquivo-only" not in captured.out
+        assert "arquivo-only" not in captured.err
+        assert "arquivo-only" in log_file.read_text()
+
+    def test_logger_fixed_layout(self, tmp_path):
+        """Valida layout fixo de colunas para auditoria."""
+        log_file = tmp_path / "cobol.log"
+
+        logger_manager = PyFoldsLogger()
+        logger_manager.setup(level="INFO", log_file=log_file, console=False, fixed_layout=True)
+
+        logger = get_logger('test.fixed')
+        logger.info("mensagem\ncom quebra")
+
+        line = log_file.read_text().strip().splitlines()[-1]
+        pattern = re.compile(r"^\d{8} \d{6}\.\d{3} \| [A-Z]{4,8}\s* \| .{35} \| .{14} \| .+$")
+        assert pattern.match(line)
+        assert "\\n" in line
+
+    def test_build_log_path_increments_counter(self, tmp_path):
+        """Valida nome incremental NNN_app_version_timestamp.log."""
+        p1 = build_log_path(tmp_path, app="pyfolds", version="2.0.0")
+        p1.write_text("x")
+        p2 = build_log_path(tmp_path, app="pyfolds", version="2.0.0")
+
+        assert p1.name.startswith("001_pyfolds_2.0.0_")
+        assert p2.name.startswith("002_pyfolds_2.0.0_")
+
+
+    def test_next_log_path_alias(self, tmp_path):
+        """`next_log_path` deve manter contrato de nome incremental."""
+        p1 = next_log_path(tmp_path, app="pyfolds", version="2.0.0")
+        p1.write_text("x")
+        p2 = next_log_path(tmp_path, app="pyfolds", version="2.0.0")
+
+        assert p1.name.startswith("001_pyfolds_2.0.0_")
+        assert p2.name.startswith("002_pyfolds_2.0.0_")
+
+    def test_logger_circular_buffer_file_handler(self, tmp_path):
+        """Testa escrita em TXT com comportamento circular por número de linhas."""
+        log_file = tmp_path / "circular.log"
+
+        logger_manager = PyFoldsLogger()
+        logger_manager.setup(level="INFO", log_file=log_file, circular_buffer_lines=3)
+
+        logger = get_logger('test.circular')
+        for idx in range(5):
+            logger.info(f"linha-{idx}")
+
+        content = log_file.read_text().strip().splitlines()
+        assert len(content) == 3
+        assert any("linha-2" in line for line in content)
+        assert any("linha-3" in line for line in content)
+        assert any("linha-4" in line for line in content)
+
     def test_multiple_loggers_same_name(self):
         """Testa se get_logger com mesmo nome retorna mesmo logger."""
         logger1 = get_logger('test.same')

@@ -89,8 +89,12 @@ class MemorySink(Sink):
 
 class ConsoleSink(Sink):
     """
-    Sink that prints events to console.
-    
+    Sink que escreve eventos diretamente no stdout via ``print``.
+
+    Nota: este sink ignora a configuração de handlers do ``logging``.
+    Para execução silenciosa (console limpo), prefira ``JSONLinesSink``
+    ou ``MemorySink``.
+
     Args:
         verbose: If True, print full payload
     """
