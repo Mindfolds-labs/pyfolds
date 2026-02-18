@@ -23,7 +23,7 @@ Profile = TelemetryProfile
 
 class TelemetryStats(TypedDict):
     """Typed statistics for telemetry system."""
-    profile: str
+    profile: TelemetryProfile
     sample_every: int
     step_count: int
     sink_type: str

@@ -8,7 +8,7 @@ version = "1.0.1"
 description = "MPJRD Neural Computation Framework"
 readme = "README.md"
 requires-python = ">=3.8"
-license = { text = "MIT" }
+license = { text = "Apache-2.0" }
 authors = [{ name = "PyFolds Contributors" }]
 dependencies = [
   "torch>=2.0.0",

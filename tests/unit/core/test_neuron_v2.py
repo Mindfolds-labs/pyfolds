@@ -1,6 +1,7 @@
 """Tests for MPJRDNeuronV2."""
 
 import torch
+from concurrent.futures import ThreadPoolExecutor
 
 import pyfolds
 
@@ -35,3 +36,16 @@ def test_cooperative_sum_uses_multiple_dendrites():
     assert torch.all(out["dendritic_gain"] > 0.5)
     assert out["somatic"].item() > 1.1
     assert out["spikes"].item() == 1.0
+
+
+def test_step_id_thread_safe_increment_v2(small_config):
+    neuron = pyfolds.MPJRDNeuronV2(small_config)
+    x = torch.randn(1, small_config.n_dendrites, small_config.n_synapses_per_dendrite)
+
+    calls = 40
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = [pool.submit(neuron.forward, x, None, None, False, 1.0) for _ in range(calls)]
+        for fut in futures:
+            fut.result()
+
+    assert int(neuron.step_id.item()) == calls

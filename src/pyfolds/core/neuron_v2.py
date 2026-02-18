@@ -122,17 +122,19 @@ class MPJRDNeuronV2(MPJRDNeuron):
             )
 
         # ===== 10. TELEMETRIA =====
-        self.step_id.add_(1)
-        if self.telemetry is not None and self.telemetry.enabled():
+        with self._telemetry_lock:
+            self.step_id.add_(1)
             sid = int(self.step_id.item())
-            self.telemetry.emit(
-                self._telemetry_forward_event(
-                    sid=sid,
-                    spike_rate=spike_rate,
-                    saturation_ratio=saturation_ratio,
-                    R_tensor=R_tensor,
+
+            if self.telemetry is not None and self.telemetry.enabled() and self.telemetry.should_emit(sid):
+                self.telemetry.emit(
+                    self._telemetry_forward_event(
+                        sid=sid,
+                        spike_rate=spike_rate,
+                        saturation_ratio=saturation_ratio,
+                        R_tensor=R_tensor,
+                    )
                 )
-            )
 
         # ===== 11. LOGGING =====
         self.logger.trace(

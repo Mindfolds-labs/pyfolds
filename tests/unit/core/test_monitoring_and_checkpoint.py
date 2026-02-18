@@ -23,6 +23,21 @@ def test_health_check_critical_for_dead_neurons():
     assert alerts
 
 
+
+def test_health_check_uses_fallback_metrics_from_get_metrics_contract():
+    checker = NeuronHealthCheck(
+        DummyNeuron({"protection_ratio": 0.4, "r_hat": 0.0}),
+        thresholds={
+            "dead_neuron_rate": 0.05,
+            "saturation_ratio": 0.30,
+            "min_spike_rate": 0.01,
+        },
+    )
+    status, alerts = checker.check()
+
+    assert status == HealthStatus.CRITICAL
+    assert any("neurônios mortos" in alert for alert in alerts)
+
 def test_versioned_checkpoint_save_and_load(tmp_path):
     cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     neuron = pyfolds.MPJRDNeuron(cfg)

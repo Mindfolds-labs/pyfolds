@@ -32,7 +32,7 @@ class NeuronHealthCheck:
         alerts: List[str] = []
         status = HealthStatus.HEALTHY
 
-        dead_ratio = metrics.get("dead_neuron_ratio", 0.0)
+        dead_ratio = float(metrics.get("dead_neuron_ratio", metrics.get("protection_ratio", 0.0)))
         if dead_ratio > self.thresholds["dead_neuron_rate"]:
             status = HealthStatus.CRITICAL
             alerts.append(f"Alta taxa de neurônios mortos: {dead_ratio:.2%}")
@@ -42,7 +42,7 @@ class NeuronHealthCheck:
             status = HealthStatus.DEGRADED
             alerts.append(f"Saturação alta: {saturation:.2%}")
 
-        spike_rate = metrics.get("spike_rate", 1.0)
+        spike_rate = float(metrics.get("spike_rate", metrics.get("r_hat", 1.0)))
         if spike_rate < self.thresholds["min_spike_rate"] and status != HealthStatus.CRITICAL:
             status = HealthStatus.DEGRADED
             alerts.append(f"Taxa de disparo muito baixa: {spike_rate:.3f}")
