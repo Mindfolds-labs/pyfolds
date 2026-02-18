@@ -5,7 +5,7 @@ import torch.nn as nn
 from typing import Dict, Optional, List, Tuple
 from collections import defaultdict, deque
 from ..layers import MPJRDLayer
-from ..utils.types import LearningMode
+from ..utils.types import LearningMode, normalize_learning_mode
 
 
 class MPJRDNetwork(nn.Module):
@@ -276,7 +276,7 @@ class MPJRDNetwork(nn.Module):
 
     def forward(self, x: torch.Tensor,
                 reward: Optional[float] = None,
-                mode: LearningMode = LearningMode.ONLINE,
+                mode: LearningMode | str = LearningMode.ONLINE,
                 layer_kwargs: Optional[Dict[str, Dict[str, object]]] = None) -> Dict[str, torch.Tensor]:
         """
         Forward pass da rede com ordenação topológica real.
@@ -293,6 +293,9 @@ class MPJRDNetwork(nn.Module):
                 - final_layer: nome da última camada
                 - layer_order: ordem de processamento
         """
+        normalized_mode = normalize_learning_mode(mode)
+        assert normalized_mode is not None
+
         if not self.built:
             raise RuntimeError("Rede não foi construída. Chame .build() primeiro.")
         
@@ -309,7 +312,7 @@ class MPJRDNetwork(nn.Module):
         outputs[first_layer] = self.layers[first_layer](
             x,
             reward=reward,
-            mode=mode,
+            mode=normalized_mode,
             **layer_kwargs.get(first_layer, {}),
         )
         
@@ -355,7 +358,7 @@ class MPJRDNetwork(nn.Module):
             outputs[layer_name] = self.layers[layer_name](
                 combined_input,
                 reward=reward,
-                mode=mode,
+                mode=normalized_mode,
                 **layer_kwargs.get(layer_name, {}),
             )
         
@@ -367,10 +370,12 @@ class MPJRDNetwork(nn.Module):
             'layer_order': layer_order
         }
 
-    def set_mode(self, mode: LearningMode) -> None:
+    def set_mode(self, mode: LearningMode | str) -> None:
         """Define modo de aprendizado para todas as camadas."""
+        normalized = normalize_learning_mode(mode)
+        assert normalized is not None
         for layer in self.layers.values():
-            layer.set_mode(mode)
+            layer.set_mode(normalized)
 
     def apply_batch_update(self, reward: Optional[float] = None) -> None:
         """

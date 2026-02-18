@@ -5,7 +5,7 @@ import torch.nn as nn
 from typing import Optional, Dict, List, Any, Type
 from ..core.config import MPJRDConfig
 from ..core.neuron import MPJRDNeuron
-from ..utils.types import LearningMode
+from ..utils.types import LearningMode, normalize_learning_mode
 
 
 class MPJRDLayer(nn.Module):
@@ -112,7 +112,7 @@ class MPJRDLayer(nn.Module):
         self,
         x: torch.Tensor,
         reward: Optional[float] = None,
-        mode: Optional[LearningMode] = None,
+        mode: Optional[LearningMode | str] = None,
         neuron_kwargs: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, torch.Tensor]:
         """
@@ -133,6 +133,8 @@ class MPJRDLayer(nn.Module):
                 - theta_values: [n_neurons] thresholds atuais
                 - r_hat_values: [n_neurons] médias móveis
         """
+        mode = normalize_learning_mode(mode)
+
         # Prepara entrada
         x = x.to(self.device)
         x = self._prepare_input(x)
@@ -295,10 +297,12 @@ class MPJRDLayer(nn.Module):
             f"ou [B,{self.n_dendrites},{self.n_synapses}]"
         )
 
-    def set_mode(self, mode: LearningMode) -> None:
+    def set_mode(self, mode: LearningMode | str) -> None:
         """Define modo de aprendizado para todos os neurônios."""
+        normalized = normalize_learning_mode(mode)
+        assert normalized is not None
         for neuron in self.neurons:
-            neuron.set_mode(mode)
+            neuron.set_mode(normalized)
 
     def apply_batch_update(self, reward: Optional[float] = None) -> None:
         """
