@@ -34,7 +34,7 @@ from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator, create_accumulator_from_config  # ✅ Adicionado
 from .factory import NeuronFactory, NeuronType, register_neuron, register_default_neurons, infer_neuron_type
 
-__version__ = "2.0.0"  # ✅ Atualizado para versão 2.0.0
+__version__ = "1.0.1"  # ✅ Atualizado para versão 1.0.1
 
 __all__ = [
     # Classes principais
