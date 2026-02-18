@@ -317,27 +317,28 @@ class TestLogging:
         logger2 = PyFoldsLogger()
         assert logger1 is logger2
     
-    def test_logger_setup_basic(self, capsys):
-        """Testa configuração básica do logger."""
+    def test_logger_setup_basic(self):
+        """Testa configuração básica do logger com console silencioso por padrão."""
+        import inspect
+
+        signature = inspect.signature(PyFoldsLogger.setup)
+        assert signature.parameters["console"].default is False
+
         logger_manager = PyFoldsLogger()
         logger_manager.setup(level="INFO")
-        
+
         logger = get_logger('test.setup')
         logger.info("Mensagem de teste")
-        
-        captured = capsys.readouterr()
-        assert "Mensagem de teste" in captured.out
     
-    def test_logger_trace_output(self, capsys):
-        """Testa se trace realmente loga quando configurado."""
+    def test_logger_trace_output(self):
+        """Testa se nível TRACE pode ser usado sem erro."""
         logger_manager = PyFoldsLogger()
         logger_manager.setup(level="TRACE")
-        
+
         logger = get_logger('test.trace')
         logger.trace("Mensagem TRACE")
-        
-        captured = capsys.readouterr()
-        assert "Mensagem TRACE" in captured.out
+
+        assert logger.isEnabledFor(TRACE_LEVEL)
     
     def test_logger_trace_silent_when_lower_level(self, capsys):
         """Testa se trace não loga quando nível mais baixo."""

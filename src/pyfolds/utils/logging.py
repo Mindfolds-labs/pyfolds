@@ -107,7 +107,7 @@ class PyFoldsLogger:
         module_levels: Optional[dict] = None,
         structured: bool = False,
         circular_buffer_lines: Optional[int] = None,
-        console: bool = True,
+        console: bool = False,
         fixed_layout: bool = False,
     ):
         """Configura logging global e permite reconfiguração segura."""
@@ -175,11 +175,14 @@ class PyFoldsLogger:
     def get_logger(self, name: str, level: Optional[int] = None) -> logging.Logger:
         """Retorna logger configurado."""
         if name not in self._loggers:
-            logger = logging.getLogger(name)
-            if level is not None:
-                logger.setLevel(level)
-            self._loggers[name] = logger
-        return self._loggers[name]
+            self._loggers[name] = logging.getLogger(name)
+
+        logger = self._loggers[name]
+        logger.propagate = True
+        logger.disabled = False
+        if level is not None:
+            logger.setLevel(level)
+        return logger
 
     def add_file_handler(
         self,
@@ -248,7 +251,7 @@ def setup_run_logging(
         console=console,
         fixed_layout=fixed_layout,
     )
-    logger = logger_manager.get_logger(app)
+    logger = logger_manager.get_logger(app, level=level if isinstance(level, int) else getattr(logging, str(level).upper(), logging.INFO))
     logger.info("Run logging configured: %s", log_path)
     return logger, log_path
 
@@ -257,7 +260,7 @@ def setup_logging(
     level: int = logging.INFO,
     structured: bool = False,
     circular_buffer_lines: Optional[int] = None,
-    console: bool = True,
+    console: bool = False,
     fixed_layout: bool = False,
 ) -> logging.Logger:
     """Setup rápido de logging."""
