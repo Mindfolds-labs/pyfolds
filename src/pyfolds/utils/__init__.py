@@ -31,10 +31,11 @@ from .types import (
     ModeConfig,
     AdaptationOutput,
     AdaptationConfig,
+    normalize_learning_mode,
 )
 
 # Logging
-from .logging import get_logger, PyFoldsLogger, trace, TRACE_LEVEL
+from .logging import get_logger, PyFoldsLogger, trace, TRACE_LEVEL, setup_run_logging, next_log_path, build_log_path
 from .validation import validate_input, validate_device_consistency
 
 __all__ = [
@@ -57,12 +58,16 @@ __all__ = [
     "ModeConfig",
     "AdaptationOutput",
     "AdaptationConfig",
+    "normalize_learning_mode",
     
     # Logging
     "get_logger",
     "PyFoldsLogger",
     "trace",
     "TRACE_LEVEL",
+    "setup_run_logging",
+    "next_log_path",
+    "build_log_path",
     "validate_input",
     "validate_device_consistency",
 ]

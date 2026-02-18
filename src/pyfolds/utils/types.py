@@ -1,7 +1,7 @@
 """Tipos de configuração para PyFolds - VERSÃO COMPLETA."""
 
 from dataclasses import dataclass
-from typing import NamedTuple, Dict
+from typing import NamedTuple, Dict, Optional, Union
 from enum import Enum
 import torch
 from torch import Tensor
@@ -55,6 +55,22 @@ class LearningMode(Enum):
     def is_consolidating(self) -> bool:
         """Retorna True se o modo é consolidação (sono)."""
         return self == LearningMode.SLEEP
+
+
+def normalize_learning_mode(mode: Optional[Union["LearningMode", str]]) -> Optional["LearningMode"]:
+    """Normaliza o modo aceitando enum ou string (case-insensitive)."""
+    if mode is None:
+        return None
+    if isinstance(mode, LearningMode):
+        return mode
+    if isinstance(mode, str):
+        candidate = mode.strip().lower()
+        try:
+            return LearningMode(candidate)
+        except ValueError as exc:
+            valid = ", ".join(m.value for m in LearningMode)
+            raise ValueError(f"mode inválido: {mode!r}. Valores válidos: {valid}") from exc
+    raise ValueError(f"mode inválido: {mode!r}. Use LearningMode ou string.")
 
 
 class ConnectionType(Enum):
