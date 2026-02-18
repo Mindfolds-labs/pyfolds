@@ -899,9 +899,9 @@ def load_fold_or_mind(
                 )
             except Exception as exc:
                 raise FoldSecurityError(
-                    "Falha ao validar assinatura digital do arquivo fold/mind."
+                    "Falha ao verificar assinatura digital do arquivo fold/mind. "
+                    "Valide formato da chave pública e presença da dependência cryptography."
                 ) from exc
-
             if not is_valid:
                 raise FoldSecurityError("Assinatura digital inválida para o arquivo fold/mind.")
 
