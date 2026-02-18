@@ -70,6 +70,33 @@ def test_fold_roundtrip_and_peek(tmp_path):
     assert loaded.cfg.n_synapses_per_dendrite == neuron.cfg.n_synapses_per_dendrite
 
 
+def test_fold_roundtrip_preserves_state_dict_after_forward_steps(tmp_path):
+    neuron = _build_neuron(enable_telemetry=True)
+
+    x = torch.rand(8, neuron.cfg.n_dendrites, neuron.cfg.n_synapses_per_dendrite)
+    for _ in range(5):
+        neuron.forward(x, collect_stats=True)
+
+    file_path = tmp_path / "state-roundtrip.fold"
+    save_fold_or_mind(
+        neuron,
+        str(file_path),
+        tags={"audit": "issue-026"},
+        include_history=True,
+        include_telemetry=True,
+        include_nuclear_arrays=True,
+        compress="none",
+    )
+
+    loaded = load_fold_or_mind(str(file_path), MPJRDNeuron, map_location="cpu")
+
+    assert loaded.cfg.n_dendrites == neuron.cfg.n_dendrites
+    assert loaded.cfg.n_synapses_per_dendrite == neuron.cfg.n_synapses_per_dendrite
+
+    for key, value in neuron.state_dict().items():
+        assert torch.allclose(value, loaded.state_dict()[key], atol=1e-6), f"Mismatch in param {key}"
+
+
 def test_training_then_save_with_telemetry_and_history_and_nuclear_arrays(tmp_path):
     neuron = _build_neuron(enable_telemetry=True)
 
