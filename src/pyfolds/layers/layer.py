@@ -113,6 +113,7 @@ class MPJRDLayer(nn.Module):
         x: torch.Tensor,
         reward: Optional[float] = None,
         mode: Optional[LearningMode | str] = None,
+        dt: float = 1.0,
         neuron_kwargs: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, torch.Tensor]:
         """
@@ -169,6 +170,7 @@ class MPJRDLayer(nn.Module):
                     x_neuron,  # [batch, dendrites, synapses]
                     reward=reward,
                     mode=mode,
+                    dt=dt,
                     **neuron_kwargs,
                 )
                 spikes[:, i] = out['spikes']
@@ -195,6 +197,7 @@ class MPJRDLayer(nn.Module):
                         x_neuron,
                         reward=reward,
                         mode=mode,
+                        dt=dt,
                         **neuron_kwargs,
                     )
                     spikes[:, i] = out['spikes']

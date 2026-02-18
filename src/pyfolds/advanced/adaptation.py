@@ -3,7 +3,7 @@
 import math
 import torch
 from typing import Dict
-from ..utils.types import LearningMode
+from ..utils.types import LearningMode, normalize_learning_mode
 
 
 class AdaptationMixin:
@@ -73,7 +73,8 @@ class AdaptationMixin:
         """Forward pass com adaptação POR AMOSTRA."""
         output = super().forward(x, **kwargs)
         
-        if kwargs.get('mode') != LearningMode.INFERENCE:
+        mode_val = normalize_learning_mode(kwargs.get('mode'))
+        if mode_val != LearningMode.INFERENCE:
             required_fields = ('u', 'spikes')
             missing = [field for field in required_fields if field not in output]
             if missing:

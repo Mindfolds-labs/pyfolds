@@ -80,16 +80,20 @@ class TestSTDPMixin:
         
         assert neuron._should_apply_stdp(LearningMode.ONLINE) is True
         assert neuron._should_apply_stdp(LearningMode.INFERENCE) is False
-    def test_stdp_does_not_update_global_I_online(self, full_config):
-        """Online STDP update should only change traces, not global I."""
+    def test_stdp_updates_underlying_synapses_online(self, full_config):
+        """Online STDP update deve persistir nas sinapses reais."""
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
 
         neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
-        before = neuron.I.clone()
+        before = torch.stack([torch.cat([s.I for s in d.synapses]) for d in neuron.dendrites])
+
         x = torch.ones(2, full_config.n_dendrites, full_config.n_synapses_per_dendrite)
         post_spike = torch.ones(2)
 
         neuron._update_stdp_traces(x, post_spike, dt=1.0)
 
-        assert torch.allclose(neuron.I, before)
+        after = torch.stack([torch.cat([s.I for s in d.synapses]) for d in neuron.dendrites])
+        assert not torch.allclose(after, before)
+        assert torch.all(after >= full_config.i_min)
+        assert torch.all(after <= full_config.i_max)

@@ -69,7 +69,7 @@ class TestRefractoryMixin:
 
         expected = torch.tensor([5.0, -1000.0, 5.0])
         assert torch.allclose(neuron.last_spike_time, expected)
-        assert neuron.time_counter.item() == 6.0
+        assert neuron.time_counter.item() == 5.0
 
 
     def test_refractory_blocks_spikes(self, full_config):
@@ -92,3 +92,17 @@ class TestRefractoryMixin:
         second = neuron.forward(x, dt=1.0)
         assert second['refrac_blocked'][0].item() is True
         assert second['spikes'][0].item() == 0.0
+
+
+    def test_forward_increments_time_once(self, full_config):
+        """Backprop + refractory chain deve incrementar tempo uma única vez por passo."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
+        neuron.time_counter.zero_()
+
+        x = torch.ones(1, full_config.n_dendrites, full_config.n_synapses_per_dendrite)
+        neuron.forward(x, dt=1.0)
+
+        assert neuron.time_counter.item() == pytest.approx(1.0)

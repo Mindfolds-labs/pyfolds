@@ -61,6 +61,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-025 | Concluída | Análise integral do pyfolds + execução direta + atualização de benchmark e ADR-037 | Codex | 2026-02-17 |
 | ISSUE-024 | Planejada | Revisão estética do HUB_CONTROLE com cards sincronizados por CSV | Codex | 2026-02-17 |
 | ISSUE-036 | Concluída | Auditoria do fluxo .fold/.mind + validação lógica + governança ADR/EXEC/HUB | Codex | 2026-02-18 |
+| ISSUE-038 | Concluída | Auditoria de prontidão para publicação no PyPI com checklist sênior e evidências de build | Codex | 2026-02-18 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 🔍 Detalhamento de Atividades (Cards)
@@ -345,6 +346,16 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-036-auditoria-fluxo-fold-mind-governanca.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-036-auditoria-fluxo-fold-mind-governanca.md)
+
+> [!TIP]
+> **ISSUE-038** · Auditoria de prontidão para publicação no PyPI com checklist sênior e evidências de build
+>
+> **Status:** ✅ Concluída  
+> **Responsável:** Codex  
+> **Data:** 2026-02-18  
+> **Prioridade:** `Crítica` · **Área:** `Governança/Release`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-038-auditoria-prontidao-publicacao-pypi.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-038-auditoria-prontidao-publicacao-pypi.md)
 
 <!-- HUB:CARDS:END -->
 
