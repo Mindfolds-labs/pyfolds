@@ -19,7 +19,14 @@ from pyfolds.serialization import (
     read_nuclear_arrays,
     save_fold_or_mind,
 )
-from pyfolds.serialization.foldio import HEADER_FMT, MAGIC, MAX_CHUNK_SIZE, FoldSecurityError, FoldWriter, crc32c_u32
+from pyfolds.serialization.foldio import (
+    HEADER_FMT,
+    MAGIC,
+    MAX_CHUNK_SIZE,
+    FoldSecurityError,
+    FoldWriter,
+    crc32c_u32,
+)
 
 
 try:

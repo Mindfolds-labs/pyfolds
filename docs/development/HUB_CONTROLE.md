@@ -60,8 +60,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-022 | Concluída | Auditoria e correção do neurônio MPJRD (thread safety + validações + plasticidade) | Codex | 2026-02-17 |
 | ISSUE-025 | Concluída | Análise integral do pyfolds + execução direta + atualização de benchmark e ADR-037 | Codex | 2026-02-17 |
 | ISSUE-024 | Planejada | Revisão estética do HUB_CONTROLE com cards sincronizados por CSV | Codex | 2026-02-17 |
-| ISSUE-025 | Concluída | Auditoria fold/mind integridade lógica e governança operacional | Codex | 2026-02-18 |
-| ISSUE-026 | Concluída | Auditoria técnica do foldio (.fold/.mind) com validação de roundtrip, integridade e relatório de testes | Codex | 2026-02-18 |
+| ISSUE-036 | Concluída | Auditoria do fluxo .fold/.mind + validação lógica + governança ADR/EXEC/HUB | Codex | 2026-02-18 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 🔍 Detalhamento de Atividades (Cards)
@@ -338,15 +337,14 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > 📄 [Relatório](./prompts/relatorios/ISSUE-024-correcao-tipos-telemetria-apis.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-024-revisao-estetica-hub-controle.md)
 
 > [!TIP]
-> **ISSUE-025** · Auditoria fold/mind integridade lógica e governança operacional
-> **ISSUE-026** · Auditoria técnica do foldio (.fold/.mind) com validação de roundtrip, integridade e relatório de testes
+> **ISSUE-036** · Auditoria do fluxo .fold/.mind + validação lógica + governança ADR/EXEC/HUB
 >
 > **Status:** ✅ Concluída  
 > **Responsável:** Codex  
 > **Data:** 2026-02-18  
-> **Prioridade:** `Crítica` · **Área:** `Código/Governança`  
+> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
 >
-> 📄 [Relatório](./prompts/relatorios/ISSUE-036-auditoria-fold-mind-integridade-governanca.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-036-auditoria-fold-mind-integridade-governanca.md)
+> 📄 [Relatório](./prompts/relatorios/ISSUE-036-auditoria-fluxo-fold-mind-governanca.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-036-auditoria-fluxo-fold-mind-governanca.md)
 
 <!-- HUB:CARDS:END -->
 
