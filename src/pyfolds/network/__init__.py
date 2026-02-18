@@ -10,4 +10,4 @@ __all__ = [
     "NetworkBuilder",
 ]
 
-__version__ = "2.0.0"  # ✅ Alinhado com core
+__version__ = "1.0.1"  # ✅ Alinhado com core
