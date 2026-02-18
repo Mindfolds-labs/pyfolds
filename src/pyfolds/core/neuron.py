@@ -481,8 +481,11 @@ class MPJRDNeuron(BaseNeuron):
         try:
             for d_idx, dend in enumerate(self.dendrites):
                 active_mask = (x_mean[d_idx] > cfg.activity_threshold).float()
-                n_active = active_mask.sum().clamp_min(1.0)
-                pre_rate = (x_mean[d_idx] * active_mask) / n_active
+                # `x_mean[d_idx]` já é média temporal por sinapse (E[x_j]).
+                # Dividir novamente por `n_active` acopla sinapses entre si e
+                # reduz indevidamente o termo local pré-sináptico, quebrando a
+                # equivalência ONLINE vs BATCH da regra Hebbiana baseada em taxa.
+                pre_rate = x_mean[d_idx] * active_mask
                 pre_rate = pre_rate.clamp(0.0, 1.0)
 
                 dend.update_synapses_rate_based(

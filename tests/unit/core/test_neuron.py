@@ -62,6 +62,43 @@ class TestMPJRDNeuron:
 
         assert torch.any(n_after > n_before)
 
+    def test_batch_plasticity_preserves_local_pre_synaptic_rate(self):
+        """BATCH deve manter média local por sinapse (sem normalização cruzada)."""
+        cfg = pyfolds.MPJRDConfig(
+            n_dendrites=1,
+            n_synapses_per_dendrite=4,
+            defer_updates=True,
+            activity_threshold=0.05,
+            neuromod_mode="external",
+            plastic=True,
+            device="cpu",
+        )
+        neuron = pyfolds.MPJRDNeuron(cfg)
+        neuron.set_mode(LearningMode.BATCH)
+
+        captured_pre_rates = []
+        original = neuron.dendrites[0].update_synapses_rate_based
+
+        def wrapped(pre_rate, post_rate, R, dt=1.0, mode=None, _orig=original):
+            captured_pre_rates.append(pre_rate.detach().clone())
+            return _orig(pre_rate, post_rate, R, dt, mode)
+
+        neuron.dendrites[0].update_synapses_rate_based = wrapped
+
+        # Médias por sinapse no batch: [0.10, 0.40, 0.01, 0.80]
+        # activity_threshold=0.05 -> terceira sinapse deve ser mascarada para zero.
+        x = torch.tensor([
+            [[0.10, 0.40, 0.01, 0.80]],
+            [[0.10, 0.40, 0.01, 0.80]],
+        ])
+
+        neuron.forward(x, reward=1.0, mode=LearningMode.BATCH)
+        neuron.apply_plasticity(reward=1.0)
+
+        assert len(captured_pre_rates) == 1
+        expected = torch.tensor([0.10, 0.40, 0.00, 0.80])
+        assert torch.allclose(captured_pre_rates[0], expected, atol=1e-6)
+
     @pytest.mark.parametrize("mode", ["online", "batch", "inference"])
     def test_modes(self, small_config, mode):
         """Test learning modes."""
