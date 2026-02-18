@@ -65,3 +65,17 @@ class TestAdaptationMixin:
         ])
         
         assert torch.allclose(neuron.adaptation_current, expected)
+
+
+    def test_adaptation_respects_string_inference_mode(self, full_config):
+        """mode='inference' (str) não deve aplicar adaptação."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
+        x = torch.ones(2, full_config.n_dendrites, full_config.n_synapses_per_dendrite)
+
+        out = neuron.forward(x, mode='inference')
+
+        assert 'u_adapted' not in out
+        assert 'adaptation_current' not in out

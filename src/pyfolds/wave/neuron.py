@@ -68,6 +68,7 @@ class MPJRDWaveNeuron(MPJRDNeuron):
         mode: Optional[LearningMode] = None,
         collect_stats: bool = True,
         target_class: Optional[int] = None,
+        dt: float = 1.0,
     ) -> Dict[str, torch.Tensor]:
         effective_mode = mode if mode is not None else self.mode
 
@@ -111,25 +112,29 @@ class MPJRDWaveNeuron(MPJRDNeuron):
             self.stats_acc.accumulate(x.detach(), dendritic_activations.detach(), spikes.detach())
 
         # telemetria compatível com o pipeline base
-        self.step_id.add_(1)
-        if self.telemetry is not None and self.telemetry.enabled():
-            from ..telemetry import forward_event
-            sid = int(self.step_id.item())
-            self.telemetry.emit(forward_event(
-                step_id=sid,
-                mode=self.mode.value,
-                spike_rate=spike_rate,
-                theta=float(self.theta.item()),
-                r_hat=float(self.r_hat.item()),
-                saturation_ratio=saturation_ratio,
-                R=float(R_tensor.item()),
-                N_mean=float(self.N.float().mean().item()),
-                I_mean=float(self.I.float().mean().item()),
-                W_mean=float(self.W.float().mean().item()),
-                phase_mean=float(phase.mean().item()),
-                amplitude_mean=float(amplitude.mean().item()),
-                frequency_hz=float(self._frequency_for_class(target_class)),
-            ))
+        with self._telemetry_lock:
+            self.step_id.add_(1)
+            if self.telemetry is not None and self.telemetry.enabled():
+                from ..telemetry import forward_event
+
+                sid = int(self.step_id.item())
+                self.telemetry.emit(
+                    forward_event(
+                        step_id=sid,
+                        mode=self.mode.value,
+                        spike_rate=spike_rate,
+                        theta=float(self.theta.item()),
+                        r_hat=float(self.r_hat.item()),
+                        saturation_ratio=saturation_ratio,
+                        R=float(R_tensor.item()),
+                        N_mean=float(self.N.float().mean().item()),
+                        I_mean=float(self.I.float().mean().item()),
+                        W_mean=float(self.W.float().mean().item()),
+                        phase_mean=float(phase.mean().item()),
+                        amplitude_mean=float(amplitude.mean().item()),
+                        frequency_hz=float(self._frequency_for_class(target_class)),
+                    )
+                )
 
         # atualiza histórico de fase com média dos exemplos que dispararam
         with torch.no_grad():
@@ -150,7 +155,7 @@ class MPJRDWaveNeuron(MPJRDNeuron):
             self.phase_history.mul_(self.cfg.phase_decay)
             self.phase_pointer.copy_(torch.tensor((ptr + 1) % self.cfg.phase_buffer_size))
 
-        self.wave_time.add_(self.cfg.dt)
+        self.wave_time.add_(dt)
         frequency_hz = self._frequency_for_class(target_class)
 
         wave_payload = self._generate_wave_output(

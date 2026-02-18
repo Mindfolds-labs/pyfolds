@@ -117,13 +117,16 @@ class STDPMixin:
         ltp_mask = (self.trace_pre > trace_threshold).float()
         delta_ltp = self.A_plus * self.trace_pre * ltp_mask * post_expanded
 
-        # ✅ VETORIZADO: aplica a TODAS as sinapses de uma vez
-        # Requer que self.I exista (tensor consolidado)
-        if hasattr(self, "I"):
-            # Soma contribuições locais de cada amostra sem colapsar estado
-            delta_total = (delta_ltd + delta_ltp).sum(dim=0)
-            self.I.add_(delta_total)
-            self.I.clamp_(self.cfg.i_min, self.cfg.i_max)
+        # Aplica atualização diretamente nas sinapses reais.
+        # self.I é uma visão consolidada/cached e não deve receber add_ in-place.
+        if hasattr(self, "dendrites"):
+            delta_total = (delta_ltd + delta_ltp).sum(dim=0)  # [D, S]
+            with torch.no_grad():
+                for d_idx, dend in enumerate(self.dendrites):
+                    for s_idx, syn in enumerate(dend.synapses):
+                        syn.I.add_(delta_total[d_idx, s_idx])
+                        syn.I.clamp_(self.cfg.i_min, self.cfg.i_max)
+                    dend._invalidate_cache()
 
         # Adiciona traço pós
         self.trace_post.add_(post_expanded)

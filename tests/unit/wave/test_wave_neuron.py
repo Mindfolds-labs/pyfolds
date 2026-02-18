@@ -27,3 +27,18 @@ def test_cooperative_integration_uses_multiple_dendrites():
     # soma cooperativa de ativações em dois dendritos (sem WTA)
     assert out["dendritic_activations"].shape == (1, 2)
     assert out["u"].item() > out["dendritic_activations"][0, 0].item()
+
+
+def test_wave_step_id_thread_safe_increment():
+    cfg = MPJRDWaveConfig(n_dendrites=2, n_synapses_per_dendrite=2, theta_init=0.1)
+    neuron = MPJRDWaveNeuron(cfg)
+
+    x = torch.ones(1, 2, 2)
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    calls = 20
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        list(ex.map(lambda _: neuron(x), range(calls)))
+
+    assert int(neuron.step_id.item()) == calls

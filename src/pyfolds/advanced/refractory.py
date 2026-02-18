@@ -100,8 +100,6 @@ class RefractoryMixin(TimedMixin):
             self.last_spike_time
         )
         
-        # Incrementa contador de tempo
-        self._increment_time(dt)
     
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         """
