@@ -1,23 +1,46 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PyFolds icon master">
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#08142D"/>
-      <stop offset="1" stop-color="#102B5F"/>
+    <radialGradient id="bg_grad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#1A2B4D" />
+      <stop offset="100%" stop-color="#050A14" />
+    </radialGradient>
+    
+    <linearGradient id="fold_blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D5BFF" />
+      <stop offset="100%" stop-color="#142850" />
     </linearGradient>
-    <linearGradient id="core" x1="140" y1="112" x2="372" y2="388" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#3B7BFF"/>
-      <stop offset="1" stop-color="#1C3F8E"/>
+
+    <linearGradient id="fold_gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFD700" />
+      <stop offset="50%" stop-color="#FDB813" />
+      <stop offset="100%" stop-color="#B8860B" />
     </linearGradient>
-    <linearGradient id="accent" x1="236" y1="212" x2="328" y2="310" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFD86A"/>
-      <stop offset="1" stop-color="#E5A800"/>
-    </linearGradient>
+
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <stop offset="0%" stop-color="#FFD86A" />
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" />
+      <feOffset dx="0" dy="4" />
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.5" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
   </defs>
 
-  <rect x="0" y="0" width="512" height="512" rx="96" fill="url(#bg)"/>
-  <path d="M131 181L256 107L381 181V331L256 405L131 331V181Z" fill="url(#core)"/>
-  <path d="M176 212L236 176V336L176 300V212Z" fill="#143574"/>
-  <path d="M276 176L336 212V300L276 336V176Z" fill="#2B63D6"/>
-  <path d="M236 224L284 252L236 280L188 252L236 224Z" fill="#183B86"/>
-  <path d="M256 244L332 288L280 318L204 274L256 244Z" fill="url(#accent)"/>
+  <rect width="512" height="512" rx="120" fill="url(#bg_grad)" />
+  
+  <path d="M0 128H512M0 256H512M0 384H512M128 0V512M256 0V512M384 0V512" stroke="white" stroke-opacity="0.05" stroke-width="1"/>
+
+  <path d="M256 80L110 164V348L256 432V330L180 286V226L256 182V80Z" fill="url(#fold_blue)" opacity="0.9" />
+  
+  <path d="M256 80L402 164V348L256 432V330L332 286V226L256 182V80Z" fill="#0F1F3D" />
+
+  <path d="M256 182L332 226V286L256 330L180 286L210 268L256 294L295 272V240L256 218L215 240L180 220L256 182Z" fill="url(#fold_gold)" filter="url(#shadow)" />
+
+  <circle cx="256" cy="256" r="12" fill="white" fill-opacity="0.8">
+    <animate attributeName="r" values="10;14;10" dur="3s" repeatCount="indefinite" />
+  </circle>
 </svg>
