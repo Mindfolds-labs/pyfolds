@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
-"""Synchronize docs/development/HUB_CONTROLE.md blocks from CSV.
+"""Synchronize docs/development/HUB_CONTROLE.md blocks from CSV files.
 
 Flow:
-1) Read docs/development/execution_queue.csv as source of truth.
-2) Render deterministic Markdown table (resumo) and cards (detalhamento).
-3) Replace only content between HUB markers in HUB_CONTROLE.md.
-4) In --check mode, do not write; exit 1 if file is out of sync.
+1) Read docs/development/execution_queue.csv as source of truth for active queue.
+2) Read docs/development/failure_register.csv as source of truth for detected failures.
+3) Render deterministic Markdown (summary table, detail cards, failures table).
+4) Replace only content between HUB markers in HUB_CONTROLE.md.
+5) In --check mode, do not write; exit 1 if file is out of sync.
+
+Recommended routine (local/CI pre-commit):
+- Local: ``python tools/sync_hub.py && python tools/sync_hub.py --check``
+- CI: run ``python tools/sync_hub.py --check`` to fail fast when HUB is stale.
+
+The generation is deterministic to avoid noisy diffs:
+- queue rows are sorted by priority/date/id;
+- failure rows are sorted by criticality/date/id.
 """
 
 from __future__ import annotations
@@ -17,12 +26,15 @@ from datetime import datetime
 from pathlib import Path
 
 CSV_PATH = Path("docs/development/execution_queue.csv")
+FAILURE_CSV_PATH = Path("docs/development/failure_register.csv")
 HUB_PATH = Path("docs/development/HUB_CONTROLE.md")
 
 QUEUE_BEGIN_MARKER = "<!-- HUB:QUEUE:BEGIN -->"
 QUEUE_END_MARKER = "<!-- HUB:QUEUE:END -->"
 CARDS_BEGIN_MARKER = "<!-- HUB:CARDS:BEGIN -->"
 CARDS_END_MARKER = "<!-- HUB:CARDS:END -->"
+FAILURES_BEGIN_MARKER = "<!-- HUB:FAILURES:BEGIN -->"
+FAILURES_END_MARKER = "<!-- HUB:FAILURES:END -->"
 
 REPORTS_DIR = Path("docs/development/prompts/relatorios")
 EXECS_DIR = Path("docs/development/prompts/execucoes")
@@ -39,6 +51,40 @@ REQUIRED_COLUMNS = [
     "prioridade",
     "area",
 ]
+
+REQUIRED_FAILURE_COLUMNS = [
+    "id",
+    "tipo",
+    "descricao",
+    "impacto",
+    "status",
+    "issue_correcao",
+    "data_registro",
+    "ultima_ocorrencia",
+]
+
+PRIORITY_ORDER = {
+    "alta": 0,
+    "high": 0,
+    "media": 1,
+    "média": 1,
+    "medium": 1,
+    "baixa": 2,
+    "low": 2,
+}
+
+CRITICALITY_ORDER = {
+    "critica": 0,
+    "crítica": 0,
+    "critical": 0,
+    "alta": 1,
+    "high": 1,
+    "media": 2,
+    "média": 2,
+    "medium": 2,
+    "baixa": 3,
+    "low": 3,
+}
 
 STATUS_THEME = {
     "concluida": {"badge": "✅ Concluída", "callout": "[!TIP]", "tone": "Sucesso"},
@@ -78,6 +124,29 @@ def _normalize_date(value: str) -> str:
         except ValueError:
             continue
     return cleaned
+
+
+def _date_sort_key(value: str) -> tuple[int, str]:
+    normalized = _normalize_date(value)
+    if normalized:
+        return (0, normalized)
+    return (1, "9999-99-99")
+
+
+def _priority_rank(value: str) -> int:
+    normalized = _norm(value).lower()
+    for key, rank in PRIORITY_ORDER.items():
+        if key in normalized:
+            return rank
+    return 99
+
+
+def _criticality_rank(value: str) -> int:
+    normalized = _norm(value).lower()
+    for key, rank in CRITICALITY_ORDER.items():
+        if key in normalized:
+            return rank
+    return 99
 
 
 def _format_cell(key: str, value: str) -> str:
@@ -155,6 +224,53 @@ def read_rows(csv_path: Path) -> list[dict[str, str]]:
     return rows
 
 
+def read_failure_rows(csv_path: Path) -> list[dict[str, str]]:
+    if not csv_path.exists():
+        raise RuntimeError(f"CSV de falhas não encontrado: {csv_path}")
+
+    with csv_path.open("r", encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        fieldnames = reader.fieldnames or []
+        missing = [name for name in REQUIRED_FAILURE_COLUMNS if name not in fieldnames]
+        if missing:
+            raise RuntimeError(
+                "failure_register.csv sem colunas obrigatórias: "
+                + ", ".join(missing)
+                + f". Esperado ao menos: {', '.join(REQUIRED_FAILURE_COLUMNS)}"
+            )
+
+        rows: list[dict[str, str]] = []
+        for row in reader:
+            normalized = {key: _norm(row.get(key, "")) for key in fieldnames}
+            if not any(normalized.values()):
+                continue
+            rows.append(normalized)
+
+    return rows
+
+
+def sort_queue_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    return sorted(
+        rows,
+        key=lambda row: (
+            _priority_rank(row.get("prioridade", "")),
+            _date_sort_key(row.get("data", "")),
+            _norm(row.get("id", "")).lower(),
+        ),
+    )
+
+
+def sort_failure_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    return sorted(
+        rows,
+        key=lambda row: (
+            _criticality_rank(row.get("impacto", "")),
+            _date_sort_key(row.get("ultima_ocorrencia", "") or row.get("data_registro", "")),
+            _norm(row.get("id", "")).lower(),
+        ),
+    )
+
+
 def build_table(rows: list[dict[str, str]]) -> str:
     headers = ["ID", "Status", "Tema", "Responsável", "Data"]
     keys = ["id", "status", "tema", "responsavel", "data"]
@@ -209,6 +325,44 @@ def build_cards(rows: list[dict[str, str]]) -> str:
     return "\n".join(blocks).rstrip() + "\n"
 
 
+def build_failures_table(rows: list[dict[str, str]]) -> str:
+    headers = [
+        "ID",
+        "Tipo",
+        "Descrição",
+        "Impacto",
+        "Status",
+        "Issue de Correção",
+        "Data",
+    ]
+
+    lines = [
+        "| " + " | ".join(headers) + " |",
+        "| " + " | ".join([":--"] * len(headers)) + " |",
+    ]
+
+    if not rows:
+        lines.append("| - | - | - | - | - | - | - |")
+        return "\n".join(lines)
+
+    for row in rows:
+        last_seen = _normalize_date(row.get("ultima_ocorrencia", ""))
+        registered = _normalize_date(row.get("data_registro", ""))
+        effective_date = last_seen or registered or "-"
+        values = [
+            _format_cell("id", row.get("id", "")),
+            _format_cell("tipo", row.get("tipo", "")),
+            _format_cell("descricao", row.get("descricao", "")),
+            _format_cell("impacto", row.get("impacto", "")),
+            _format_cell("status", row.get("status", "")),
+            _format_cell("issue_correcao", row.get("issue_correcao", "")),
+            _format_cell("data", effective_date),
+        ]
+        lines.append("| " + " | ".join(values) + " |")
+
+    return "\n".join(lines)
+
+
 def replace_block(content: str, begin_marker: str, end_marker: str, generated: str) -> str:
     if begin_marker not in content or end_marker not in content:
         raise RuntimeError(f"Marcadores {begin_marker}/{end_marker} não encontrados")
@@ -232,14 +386,18 @@ def self_check() -> None:
         "prefix\n"
         f"{QUEUE_BEGIN_MARKER}\nold\n{QUEUE_END_MARKER}\n"
         f"{CARDS_BEGIN_MARKER}\nold\n{CARDS_END_MARKER}\n"
+        f"{FAILURES_BEGIN_MARKER}\nold\n{FAILURES_END_MARKER}\n"
         "suffix\n"
     )
     table = "| A |\n| :-- |\n| B |"
     cards = "> card"
+    failures = "| F |"
     once = replace_block(sample, QUEUE_BEGIN_MARKER, QUEUE_END_MARKER, table)
     once = replace_block(once, CARDS_BEGIN_MARKER, CARDS_END_MARKER, cards)
+    once = replace_block(once, FAILURES_BEGIN_MARKER, FAILURES_END_MARKER, failures)
     twice = replace_block(once, QUEUE_BEGIN_MARKER, QUEUE_END_MARKER, table)
     twice = replace_block(twice, CARDS_BEGIN_MARKER, CARDS_END_MARKER, cards)
+    twice = replace_block(twice, FAILURES_BEGIN_MARKER, FAILURES_END_MARKER, failures)
     if once != twice:
         raise RuntimeError("Self-check falhou: substituição não é idempotente")
 
@@ -256,13 +414,16 @@ def main() -> int:
     self_check()
 
     try:
-        rows = read_rows(CSV_PATH)
+        rows = sort_queue_rows(read_rows(CSV_PATH))
+        failures_rows = sort_failure_rows(read_failure_rows(FAILURE_CSV_PATH))
         table = build_table(rows)
         cards = build_cards(rows)
+        failures_table = build_failures_table(failures_rows)
 
         original = HUB_PATH.read_text(encoding="utf-8")
         updated = replace_block(original, QUEUE_BEGIN_MARKER, QUEUE_END_MARKER, table)
         updated = replace_block(updated, CARDS_BEGIN_MARKER, CARDS_END_MARKER, cards)
+        updated = replace_block(updated, FAILURES_BEGIN_MARKER, FAILURES_END_MARKER, failures_table)
 
         if args.check:
             return 1 if updated != original else 0
