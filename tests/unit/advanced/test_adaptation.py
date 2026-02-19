@@ -77,7 +77,7 @@ class TestAdaptationMixin:
 
         out = neuron.forward(x, mode='inference')
 
-        assert 'u_adapted' not in out
+        assert 'u_adapted' in out
         assert 'adaptation_current' not in out
 
 
