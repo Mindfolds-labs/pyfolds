@@ -4,8 +4,8 @@
 
 [![PyPI](https://img.shields.io/badge/PyPI-pyfolds-blue)](https://pypi.org/project/pyfolds/)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-1.10%2B-orange)](https://pytorch.org/)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-orange)](https://pytorch.org/)
+[![License](https://img.shields.io/badge/License-Apache--2.0-green)](LICENSE)
 [![Docs](https://img.shields.io/badge/Docs-Organized-success)](docs/README.md)
 
 PyFolds é uma biblioteca de alta performance para computação bioinspirada sobre PyTorch, com foco em computação dendrítica não linear, rastreabilidade de estados e integração científica.
@@ -28,6 +28,24 @@ O framework abstrai a computação dendrítica em um pipeline modular para acele
 ```bash
 pip install pyfolds
 ```
+
+### Requisitos mínimos (alinhados ao `pyproject.toml`)
+
+- Python `>=3.8`
+- PyTorch `>=2.0.0`
+- torchvision `>=0.15.0`
+- numpy `>=1.24.0`
+- zstandard `>=0.21.0`
+- google-crc32c `>=1.5.0`
+- reedsolo `>=1.7.0`
+
+### Extras opcionais
+
+- `pip install pyfolds[full]` para stack completa (serialização, telemetria e utilitários extras).
+- `pip install pyfolds[serialization]` para codecs/formatos de serialização.
+- `pip install pyfolds[telemetry]` para visualização de métricas.
+- `pip install pyfolds[dev]` para lint/testes.
+- `pip install pyfolds[examples]` para dependências de exemplos.
 
 
 ## Documentation
