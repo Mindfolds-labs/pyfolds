@@ -9,7 +9,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 import pytest
-import torch
+torch = pytest.importorskip("torch", reason="PyTorch não instalado no ambiente de testes")
 from pyfolds.core import MPJRDConfig, MPJRDNeuron
 
 @pytest.fixture
