@@ -47,6 +47,7 @@ class TrainConfig:
     n_neurons: int = 24
     train_limit: int = 512
     test_limit: int = 128
+    min_viable_spike_rate: float = 0.02
 
 
 class SyntheticMNISTDataset(Dataset):
@@ -225,7 +226,8 @@ def run_training(config_override: TrainConfig | None = None) -> dict[str, object
         theta_min=0.3,
         theta_max=2.5,
         target_spike_rate=0.3,
-        homeostasis_eta=0.2,
+        # valor conservador para evitar oscilações fortes de disparo entre épocas
+        homeostasis_eta=0.05,
         plasticity_mode="both",
         tau_pre=20.0,
         tau_post=20.0,
@@ -248,22 +250,38 @@ def run_training(config_override: TrainConfig | None = None) -> dict[str, object
         model.train()
         model.mpjrd_layer.set_mode(LearningMode.ONLINE)
         epoch_loss = 0.0
+        train_rates: list[float] = []
+        train_saturation: list[float] = []
         for batch_idx, (images, labels) in enumerate(train_loader):
             images, labels = images.to(device), labels.to(device)
-            logits, _, _ = model(images, mode=LearningMode.ONLINE)
+            logits, spike_rate, out = model(images, mode=LearningMode.ONLINE)
             loss = criterion(logits, labels)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             epoch_loss += float(loss.item())
+            train_rates.append(spike_rate)
+            train_saturation.append(float(out.get("saturation_ratio", 0.0)))
             if batch_idx % 20 == 0:
                 logger.info("Epoch %d Batch %d loss=%.4f", epoch, batch_idx, float(loss.item()))
 
         acc, rate = evaluate(model, test_loader, device)
+        train_rate = float(sum(train_rates) / max(1, len(train_rates)))
+        train_sat = float(sum(train_saturation) / max(1, len(train_saturation)))
+
+        if train_rate < cfg.min_viable_spike_rate:
+            logger.warning(
+                "Mecanismo neuronal possivelmente hipoativo na época %d: train_rate=%.4f "
+                "(min=%.4f)",
+                epoch,
+                train_rate,
+                cfg.min_viable_spike_rate,
+            )
+
         best_acc = max(best_acc, acc)
         print_status(
             f"Época {epoch}/{cfg.epochs} loss={epoch_loss / max(1, len(train_loader)):.4f} "
-            f"test_acc={acc:.2f}% rate={rate:.4f}"
+            f"test_acc={acc:.2f}% rate={rate:.4f} train_rate={train_rate:.4f} sat={train_sat:.2%}"
         )
 
     elapsed = time.time() - start
