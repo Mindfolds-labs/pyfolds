@@ -149,17 +149,25 @@ class MPJRDSynapse(nn.Module):
         # post_rate é [1], pre_rate_filtered é [B] → resultado [B]
         hebb_ltp = (pre_rate_filtered * post_rate).clamp(0.0, 1.0)  # [B]
 
-        # Hebb LTD explícito (opcional): pre * (1 - post)
-        # Mantém compatibilidade: ratio=0.0 preserva comportamento legado.
+        # Hebb LTD explícito: pre * (1 - post)
         hebb_ltd = (pre_rate_filtered * (1.0 - post_rate)).clamp(0.0, 1.0)
-        hebb_effective = hebb_ltp - cfg.hebbian_ltd_ratio * hebb_ltd
+
+        # Neuromodulação robusta com separação de vias LTP/LTD.
+        # R>0 favorece LTP, R<0 favorece LTD.
+        # O clamp/tanh evita explosões numéricas quando o sinal externo oscila.
+        r_scaled = torch.tanh((R * cfg.neuromod_scale).clamp(-1.0, 1.0))
+        r_pos = torch.clamp(r_scaled, min=0.0, max=1.0)
+        r_neg = torch.clamp(-r_scaled, min=0.0, max=1.0)
+
+        ltp_drive = cfg.A_plus * hebb_ltp * r_pos
+        ltd_drive = cfg.A_minus * cfg.hebbian_ltd_ratio * hebb_ltd * (r_pos + r_neg)
+        hebb_effective = ltp_drive - ltd_drive
 
         # Ganho dependente do peso (tensor escalar)
         gain = 1.0 + cfg.beta_w * self.W
 
         # Delta de I (versão normalizada)
-        # R é [1], neuromod_scale é escalar
-        delta = effective_eta * (R * cfg.neuromod_scale) * hebb_effective * gain * dt  # [B]
+        delta = effective_eta * hebb_effective * gain * dt  # [B]
 
         # ✅ Atualização in-place (tensores)
         # Usa média do batch para atualizar I (sinapse única)
