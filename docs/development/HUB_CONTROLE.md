@@ -38,12 +38,12 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 <!-- HUB:QUEUE:BEGIN -->
 | ID | Status | Tema | Responsável | Data |
 | :-- | :-- | :-- | :-- | :-- |
-| ISSUE-001 | Planejada | Implementar LTD explícita em sinapses | Codex | 2026-02-19 |
-| ISSUE-002 | Planejada | Refatorar HUB com cards limpos e split view de links | Codex | 2026-02-19 |
-| ISSUE-003 | Planejada | Plano 1: Reposicionar issues no fluxo oficial do HUB | Codex | 2026-02-19 |
-| ISSUE-004 | Planejada | Plano 2: Sanear links e navegação documental | Codex | 2026-02-19 |
-| ISSUE-006 | Planejada | Plano 4: Consolidar correções de código e testes mínimos | Codex | 2026-02-19 |
-| ISSUE-005 | Planejada | Plano 3: Executar validações e registrar evidências no HUB | Codex | 2026-02-19 |
+| ISSUE-001 | Concluída | Implementar LTD explícita em sinapses | Codex | 2026-02-19 |
+| ISSUE-002 | Concluída | Refatorar HUB com cards limpos e split view de links | Codex | 2026-02-19 |
+| ISSUE-003 | Concluída | Plano 1: Reposicionar issues no fluxo oficial do HUB | Codex | 2026-02-19 |
+| ISSUE-004 | Concluída | Plano 2: Sanear links e navegação documental | Codex | 2026-02-19 |
+| ISSUE-006 | Concluída | Plano 4: Consolidar correções de código e testes mínimos | Codex | 2026-02-19 |
+| ISSUE-005 | Concluída | Plano 3: Executar validações e registrar evidências no HUB | Codex | 2026-02-19 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 Cards (UI limpa)
@@ -102,16 +102,6 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > **Prioridade:** `Alta` · **Área:** `Core/Testes/Docs`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-006-plano-4-consolidar-correcoes-codigo-testes.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-006-plano-4-consolidar-correcoes-codigo-testes.md)
-
-> [!WARNING]
-> **ISSUE-008** · Resiliência de testes sem torch (analisar + executar)
->
-> **Status:** 🚧 Em Progresso  
-> **Responsável:** Codex  
-> **Data:** 2026-02-19  
-> **Prioridade:** `Alta` · **Área:** `Testes/Infra`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-008-resiliencia-de-testes-sem-torch.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-008-resiliencia-de-testes-sem-torch.md)
 
 > [!TIP]
 > **ISSUE-005** · Plano 3: Executar validações e registrar evidências no HUB

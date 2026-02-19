@@ -1,17 +1,21 @@
 # EXEC-004-plano-2-sanear-links-documentacao
 
-## Ordem de execução
-Plano **2/4**.
+## Status
+✅ Concluída
 
-## Escopo
-Executar as atividades definidas em `ISSUE-004`.
+## Escopo executado
+- Execução do plano associado à `ISSUE-004`.
+- Revisão dos critérios de aceite e rastreabilidade.
+- Registro de evidências no fluxo HUB/fila.
 
-## Passos
-1. Revisar escopo e critérios de aceite da issue.
-2. Aplicar alterações mínimas necessárias.
-3. Rodar validações (`sync_hub`, `check_links`, `validate_docs_links`, `validate_issue_format`).
-4. Registrar evidências e atualizar status da fila.
+## Validações executadas
+- `python tools/sync_hub.py`
+- `python tools/sync_hub.py --check`
+- `python tools/check_links.py docs/ README.md`
+- `python tools/validate_docs_links.py`
+- `python tools/validate_issue_format.py docs/development/prompts/relatorios/ISSUE-00*.md`
 
-## Evidências esperadas
-- Saída dos comandos de validação.
-- Referências atualizadas no HUB.
+## Evidências
+- Fila de execução atualizada para status concluído (`execution_queue.csv`).
+- HUB sincronizado com cards refletindo status da fila.
+- Formato dos relatórios de issue padronizado no diretório canônico.
