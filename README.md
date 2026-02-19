@@ -1,5 +1,9 @@
 <div align="center">
 
+<img src="docs/_static/brand/pyfolds-readme-banner.svg" alt="PyFolds banner" width="100%" />
+
+<img src="src/pyfolds/assets/icons/pyfolds.svg" alt="PyFolds icon" width="112" />
+
 # PyFolds
 
 [![PyPI](https://img.shields.io/badge/PyPI-pyfolds-blue)](https://pypi.org/project/pyfolds/)
