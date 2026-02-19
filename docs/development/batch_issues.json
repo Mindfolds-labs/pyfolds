@@ -1,0 +1,14 @@
+{
+  "batch_id": "2026-02-Q1",
+  "created_at": "2026-02-19",
+  "issues": [
+    {
+      "issue_id": "ISSUE-039",
+      "titulo": "Implementar LTD explícita",
+      "prioridade": "Alta",
+      "area": "Core/Plasticidade",
+      "tags": ["core", "implementacao"],
+      "estimado_horas": 8
+    }
+  ]
+}

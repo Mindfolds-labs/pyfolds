@@ -1,64 +1,50 @@
-# ISSUE-[NNN]: [Título Descritivo com Verbo no Infinitivo]
+---
+id: "ISSUE-XXX"
+titulo: "Título da issue"
+prioridade: "Alta"
+area: "Core"
+normas:
+  - ABNT NBR ISO/IEC 25010
+  - IEEE 830
+---
 
-## Metadados
+# ISSUE-XXX: Título da issue
 
-| Campo | Valor |
-|-------|-------|
-| **Data** | YYYY-MM-DD |
-| **Autor** | [Nome ou Papel] |
-| **Issue de Origem** | ISSUE-[NNN] ou N/A |
-| **Normas de Referência** | [Normas aplicáveis] |
+## Objetivo
+Descreva em um parágrafo objetivo.
 
-## 1. Objetivo
-[Descrever em 2-3 frases o propósito da issue e o resultado esperado.]
+## Contexto Técnico
+Background técnico e dependências.
 
-## 2. Escopo
+## Análise Técnica
+Passos detalhados para IA executar.
 
-### 2.1 Inclui:
-- ✅ [Item 1]
-- ✅ [Item 2]
+## Requisitos Funcionais
+- [ ] RF-01
 
-### 2.2 Exclui:
-- ❌ [Item 1]
-- ❌ [Item 2]
+## Requisitos Não-Funcionais
+- [ ] RNF-01 Performance
+- [ ] RNF-02 Segurança
 
-## 3. Artefatos Gerados
+## Artefatos Esperados
+- Código
+- Testes
+- Documentação
 
-| Artefato | Localização | Descrição | Formato |
-|----------|-------------|-----------|---------|
-| [Nome] | [caminho/arquivo.ext] | [descrição] | [.md/.py/.csv] |
+## Critérios de Aceite
+- [ ] Critério 1
 
-## 4. Riscos
+## Riscos e Mitigações
+- Risco:
+- Mitigação:
 
-| ID | Risco | Probabilidade | Impacto | Mitigação |
-|----|-------|---------------|---------|-----------|
-| R01 | [descrição] | [Alta/Média/Baixa] | [Alto/Médio/Baixo] | [ação] |
-
-## 5. Critérios de Aceite
-- [ ] [Critério verificável 1]
-- [ ] [Critério verificável 2]
-
-## 6. PROMPT:EXECUTAR
-
+## PROMPT:EXECUTAR
 ```yaml
-fase: [NOME_DA_FASE]
-prioridade: [CRITICA/ALTA/MEDIA/BAIXA]
-responsavel: [CODEX/HUMANO/DUPLA]
-dependente: [ISSUE-XXX, ISSUE-YYY]
-
-acoes_imediatas:
-  - task: "Descrição da ação"
-    output: "caminho/do/arquivo/saida.ext"
-    prazo: "Xh"
-    comando: "comando opcional"
-
-validacao_automatica:
-  - tipo: "formato/links/testes"
-    ferramenta: "tools/validator.py"
-    criterio: "descrição do critério"
-
-pos_execucao:
-  - atualizar: "execution_queue.csv"
-  - sincronizar: "HUB"
-  - notificar: "canais aplicáveis"
+issue_id: "ISSUE-XXX"
+objetivo: "..."
 ```
+
+## Rastreabilidade (IEEE 830)
+| Requisito | Evidência |
+| --- | --- |
+| RF-01 | TODO |

@@ -1,0 +1,14 @@
+automation:
+  enable_auto_sync: true
+  enable_auto_validate: true
+  schedule: "0 9 * * 1-5"
+
+standards:
+  format: "abnt"
+  ieee_830: true
+  checksum_enabled: true
+
+paths:
+  relatorios: "docs/development/prompts/relatorios"
+  logs: "docs/development/prompts/logs"
+  templates: "docs/development/templates"

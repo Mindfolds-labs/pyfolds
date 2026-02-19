@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validador de formato para ISSUEs de IA."""
+"""Validação de relatórios de ISSUE com foco em ABNT/IEEE e links internos."""
 
 from __future__ import annotations
 
@@ -9,41 +9,74 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
+try:
+    import yaml
+except ImportError:
+    yaml = None
+
 REQUIRED_SECTIONS = [
-    r"^# ISSUE-\d{3}: .+",
-    r"^## Metadados$",
-    r"^## 1\. Objetivo$",
-    r"^## 2\. Escopo$",
-    r"^### 2\.1 Inclui:$",
-    r"^### 2\.2 Exclui:$",
-    r"^## 3\. Artefatos Gerados$",
-    r"^## 4\. Riscos$",
-    r"^## 5\. Critérios de Aceite$",
-    r"^## 6\. PROMPT:EXECUTAR$",
+    "## Objetivo",
+    "## Contexto Técnico",
+    "## Análise Técnica",
+    "## Requisitos Funcionais",
+    "## Requisitos Não-Funcionais",
+    "## Artefatos Esperados",
+    "## Critérios de Aceite",
+    "## Riscos e Mitigações",
+    "## PROMPT:EXECUTAR",
+    "## Rastreabilidade (IEEE 830)",
 ]
 
-PROMPT_YAML_RE = re.compile(r"## 6\. PROMPT:EXECUTAR\s+```yaml\n.*?\n```", re.DOTALL)
-FILENAME_RE = re.compile(r"^ISSUE-\d{3}-[a-z0-9-]+\.md$")
+
+def validate_yaml_header(filepath: Path) -> list[str]:
+    content = filepath.read_text(encoding="utf-8")
+    if not content.startswith("---\n"):
+        return ["Frontmatter YAML ausente"]
+    end = content.find("\n---\n", 4)
+    if end == -1:
+        return ["Frontmatter YAML não encerrado"]
+    block = content[4:end]
+    if yaml is None:
+        data = {}
+        for line in block.splitlines():
+            if ":" in line:
+                k, v = line.split(":", 1)
+                data[k.strip()] = v.strip()
+    else:
+        try:
+            data = yaml.safe_load(block)
+        except yaml.YAMLError as exc:
+            return [f"YAML inválido: {exc}"]
+    if not isinstance(data, dict) or "id" not in data:
+        return ["YAML sem campo obrigatório 'id'"]
+    return []
 
 
-def validate_issue_file(path: Path) -> list[str]:
+def check_required_sections(filepath: Path) -> list[str]:
+    content = filepath.read_text(encoding="utf-8")
+    return [f"Seção obrigatória ausente: {s}" for s in REQUIRED_SECTIONS if s not in content]
+
+
+def validate_structure(filepath: Path) -> list[str]:
+    errors = []
+    if not re.match(r"ISSUE-\d{3}-[a-z0-9-]+\.md$", filepath.name):
+        errors.append(f"Nome inválido: {filepath.name}")
+    content = filepath.read_text(encoding="utf-8")
+    if "```yaml" not in content:
+        errors.append("Bloco yaml do PROMPT:EXECUTAR ausente")
+    return errors
+
+
+def validate_links(filepath: Path) -> list[str]:
+    content = filepath.read_text(encoding="utf-8")
+    links = re.findall(r"\[[^\]]*\]\(([^)]+)\)", content)
     errors: list[str] = []
-
-    if not FILENAME_RE.match(path.name):
-        errors.append(f"Nome de arquivo inválido: {path.name}")
-
-    try:
-        content = path.read_text(encoding="utf-8")
-    except Exception as exc:  # pragma: no cover
-        return [f"Erro ao ler arquivo: {exc}"]
-
-    for pattern in REQUIRED_SECTIONS:
-        if not re.search(pattern, content, re.MULTILINE):
-            errors.append(f"Seção obrigatória não encontrada: {pattern}")
-
-    if not PROMPT_YAML_RE.search(content):
-        errors.append("Seção 'PROMPT:EXECUTAR' deve conter bloco ```yaml ... ```")
-
+    for link in links:
+        if link.startswith(("http://", "https://", "mailto:")):
+            continue
+        target = (filepath.parent / link).resolve()
+        if not target.exists():
+            errors.append(f"Link interno inexistente: {link}")
     return errors
 
 
@@ -55,32 +88,34 @@ def iter_issue_files(inputs: Iterable[str]) -> list[Path]:
             files.extend(sorted(p.glob("ISSUE-*.md")))
         else:
             files.extend(sorted(Path().glob(item)))
-    unique = sorted({f.resolve() for f in files})
-    return [Path(p) for p in unique]
+    return sorted({f.resolve() for f in files})
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Valida formato de ISSUEs de IA")
-    parser.add_argument("paths", nargs="+", help="Arquivos, diretórios ou globs de ISSUEs")
+    parser.add_argument("paths", nargs="+", help="Arquivos, diretórios ou globs")
     args = parser.parse_args()
-
     files = iter_issue_files(args.paths)
     if not files:
         print("⚠️ Nenhum arquivo ISSUE encontrado")
         return 1
 
-    has_error = False
-    for file in files:
-        errors = validate_issue_file(file)
+    failed = False
+    for f in files:
+        errors = [
+            *validate_yaml_header(Path(f)),
+            *validate_structure(Path(f)),
+            *check_required_sections(Path(f)),
+            *validate_links(Path(f)),
+        ]
         if errors:
-            has_error = True
-            print(f"❌ {file}")
+            failed = True
+            print(f"❌ {f}")
             for err in errors:
-                print(f"   - {err}")
+                print(f"  - {err}")
         else:
-            print(f"✅ {file}")
-
-    return 1 if has_error else 0
+            print(f"✅ {f}")
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

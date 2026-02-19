@@ -1,0 +1,21 @@
+name: generate-dashboard
+
+on:
+  push:
+    paths:
+      - 'docs/development/**'
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python tools/generate_html_dashboard.py
+      - name: Upload dashboard artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hub-dashboard
+          path: docs/development/generated/dashboard.html
