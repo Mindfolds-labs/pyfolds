@@ -9,6 +9,10 @@ Foram corrigidos cinco problemas de fidelidade computacional no `MPJRDNeuronAdva
 
 ## Mapa Bug → Mudança → Teste
 
+Config flags adicionadas para retrocompatibilidade auditável:
+- `stdp_input_source = "raw" | "stp"` (default `stp`).
+- `ltd_rule = "classic" | "current"` (default `current`).
+
 | Bug | Mudança implementada | Teste(s) de evidência |
 |---|---|---|
 | #1 Refratário absoluto violado por adaptação tardia | SFA agora é aplicada no `forward` da base antes do threshold via `_apply_sfa_before_threshold`; `AdaptationMixin.forward` não recalcula `spikes` e só atualiza corrente com spikes finais. | `tests/unit/neuron/test_refractory.py`, `tests/unit/neuron/test_adaptation_sfa.py` |
@@ -37,3 +41,12 @@ Rodada inicial dos novos testes falhou com sintomas esperados:
 1. Adicionar testes de regressão temporal multi-step para janelas STDP longas.
 2. Opcional: separar explicitamente `u_effective` no contrato de saída para telemetria científica.
 3. Alinhar lint global do repositório para tornar `ruff check .` green sem débito legado.
+
+
+## Comandos executados (evidência)
+- `pytest tests/unit/advanced/test_refractory.py -q`
+- `pytest tests/unit/advanced/test_adaptation.py -q`
+- `pytest tests/unit/advanced/test_stdp.py -q`
+- `pytest tests/integration/test_neuron_advanced.py -q`
+- `pytest -q`
+- `ruff check .` (falhas preexistentes fora do escopo).

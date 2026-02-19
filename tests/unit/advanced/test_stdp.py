@@ -97,3 +97,73 @@ class TestSTDPMixin:
         assert not torch.allclose(after, before)
         assert torch.all(after >= full_config.i_min)
         assert torch.all(after <= full_config.i_max)
+
+    def test_stdp_input_source_raw_vs_stp(self):
+        """raw deve detectar spike pré mesmo quando STP deprime abaixo do limiar."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        cfg_raw = pyfolds.MPJRDConfig(
+            n_dendrites=1,
+            n_synapses_per_dendrite=1,
+            stdp_input_source="raw",
+            spike_threshold=0.5,
+        )
+        cfg_stp = pyfolds.MPJRDConfig(
+            n_dendrites=1,
+            n_synapses_per_dendrite=1,
+            stdp_input_source="stp",
+            spike_threshold=0.5,
+        )
+
+        n_raw = pyfolds.MPJRDNeuronAdvanced(cfg_raw)
+        n_stp = pyfolds.MPJRDNeuronAdvanced(cfg_stp)
+
+        for n in (n_raw, n_stp):
+            n.u_stp.fill_(0.1)
+            n.R_stp.fill_(0.1)
+
+        x = torch.ones(1, 1, 1)
+        n_raw.forward(x, mode=LearningMode.ONLINE)
+        n_stp.forward(x, mode=LearningMode.ONLINE)
+
+        assert n_raw.trace_pre[0, 0, 0].item() > 0.0
+        assert n_stp.trace_pre[0, 0, 0].item() == 0.0
+
+    def test_ltd_rule_classic_vs_current(self):
+        """classic usa pre_spike; current preserva regra legada dependente de post."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        cfg_classic = pyfolds.MPJRDConfig(
+            n_dendrites=1,
+            n_synapses_per_dendrite=1,
+            ltd_rule="classic",
+            plasticity_mode="stdp",
+        )
+        cfg_current = pyfolds.MPJRDConfig(
+            n_dendrites=1,
+            n_synapses_per_dendrite=1,
+            ltd_rule="current",
+            plasticity_mode="stdp",
+        )
+        n_classic = pyfolds.MPJRDNeuronAdvanced(cfg_classic)
+        n_current = pyfolds.MPJRDNeuronAdvanced(cfg_current)
+
+        for n in (n_classic, n_current):
+            n._ensure_traces(1, torch.device("cpu"))
+            n.trace_post.fill_(1.0)
+            n.trace_pre.zero_()
+
+        x_no_pre = torch.zeros(1, 1, 1)
+        before_classic = n_classic.dendrites[0].synapses[0].I.item()
+        before_current = n_current.dendrites[0].synapses[0].I.item()
+
+        n_classic._update_stdp_traces(x_no_pre, torch.ones(1), dt=1.0)
+        n_current._update_stdp_traces(x_no_pre, torch.ones(1), dt=1.0)
+
+        after_classic = n_classic.dendrites[0].synapses[0].I.item()
+        after_current = n_current.dendrites[0].synapses[0].I.item()
+
+        assert after_classic == before_classic
+        assert after_current < before_current

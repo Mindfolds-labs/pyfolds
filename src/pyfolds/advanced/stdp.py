@@ -76,6 +76,13 @@ class STDPMixin:
             self.trace_pre = torch.zeros(batch_size, D, S, device=device)
             self.trace_post = torch.zeros(batch_size, D, S, device=device)
 
+    def _stdp_pre_spike_source(self, x: torch.Tensor, x_pre_stp: torch.Tensor | None) -> torch.Tensor:
+        """Resolve fonte de pré-spike para STDP conforme configuração."""
+        source = getattr(self.cfg, "stdp_input_source", "stp")
+        if source == "raw":
+            return x if x_pre_stp is None else x_pre_stp
+        return x
+
     def _update_stdp_traces(
         self, x: torch.Tensor, post_spike: torch.Tensor, dt: float = 1.0, x_pre_stp: torch.Tensor | None = None
     ):
@@ -99,7 +106,7 @@ class STDPMixin:
 
         # Spikes pré (detectados por amostra)
         spike_threshold = getattr(self.cfg, "spike_threshold", 0.5)
-        x_for_stdp = x if x_pre_stp is None else x_pre_stp
+        x_for_stdp = self._stdp_pre_spike_source(x, x_pre_stp)
         pre_spikes = (x_for_stdp > spike_threshold).float()  # [B, D, S]
 
         # Adiciona aos traços pré
@@ -112,7 +119,13 @@ class STDPMixin:
         # LTD: onde trace_post > threshold
         trace_threshold = getattr(self.cfg, "stdp_trace_threshold", 0.01)
         ltd_mask = (self.trace_post > trace_threshold).float()
-        delta_ltd = -self.A_minus * self.trace_post * ltd_mask * pre_spikes
+        ltd_rule = getattr(self.cfg, "ltd_rule", "current")
+        if ltd_rule == "classic":
+            ltd_drive = pre_spikes
+        else:
+            ltd_drive = post_expanded
+
+        delta_ltd = -self.A_minus * self.trace_post * ltd_mask * ltd_drive
 
         # LTP: onde trace_pre > threshold
         ltp_mask = (self.trace_pre > trace_threshold).float()

@@ -83,3 +83,30 @@ class TestBackpropMixin:
 
         assert neuron.dendrite_amplification[0] > 0
         assert torch.all(neuron.dendrite_amplification[1:] == 0)
+
+    def test_time_counter_advances_only_after_forward(self, full_config):
+        """Semântica temporal unificada: incremento ao final do passo."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        cfg = pyfolds.MPJRDConfig(
+            n_dendrites=1,
+            n_synapses_per_dendrite=1,
+            t_refrac_abs=2.0,
+            theta_init=0.01,
+            theta_min=0.001,
+            dendrite_integration_mode="wta_hard",
+            device="cpu",
+        )
+        neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+        for syn in neuron.dendrites[0].synapses:
+            syn.N.fill_(cfg.n_max)
+        neuron.dendrites[0]._invalidate_cache()
+        neuron.u_stp.fill_(1.0)
+        neuron.R_stp.fill_(1.0)
+
+        assert neuron.time_counter.item() == 0.0
+        out = neuron.forward(torch.ones(1, 1, 1) * 10.0, dt=1.0, collect_stats=False)
+        assert out["spikes"].item() == 1.0
+        assert neuron.last_spike_time.item() == 0.0
+        assert neuron.time_counter.item() == 1.0

@@ -10,6 +10,7 @@ def test_stdp_uses_pre_stp_input_for_pre_spike_detection():
         n_dendrites=1,
         n_synapses_per_dendrite=1,
         spike_threshold=0.5,
+        stdp_input_source="raw",
     )
     neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
 
@@ -26,7 +27,7 @@ def test_stdp_uses_pre_stp_input_for_pre_spike_detection():
 def test_stdp_ltd_depends_on_pre_spikes_not_post_spike_only():
     if not pyfolds.ADVANCED_AVAILABLE:
         return
-    cfg = MPJRDConfig(n_dendrites=1, n_synapses_per_dendrite=1, plasticity_mode="stdp")
+    cfg = MPJRDConfig(n_dendrites=1, n_synapses_per_dendrite=1, plasticity_mode="stdp", ltd_rule="classic")
     neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
 
     neuron._ensure_traces(1, torch.device("cpu"))
