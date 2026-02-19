@@ -5,7 +5,10 @@ on:
     paths:
       - docs/development/execution_queue.csv
       - tools/sync_hub.py
+      - tools/check_queue_governance.py
       - docs/development/HUB_CONTROLE.md
+      - docs/governance/GIT_CONFLICT_PREVENTION.md
+      - .github/workflows/validate_hub.yml
 
 jobs:
   validate-hub:
@@ -13,11 +16,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Validate queue governance rules
+        run: python tools/check_queue_governance.py --base-ref "${{ github.base_ref }}"
 
       - name: Validate HUB synchronization
         run: python tools/sync_hub.py --check
