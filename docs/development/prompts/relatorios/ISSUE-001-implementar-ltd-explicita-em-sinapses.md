@@ -1,5 +1,5 @@
 ---
-id: "ISSUE-039"
+id: "ISSUE-001"
 titulo: "Implementar LTD explícita em sinapses"
 prioridade: "Alta"
 area: "Core/Plasticidade"
@@ -9,7 +9,7 @@ normas:
   - ABNT NBR ISO/IEC 25010
   - IEEE 830
 ---
-# ISSUE-039: Implementar LTD explícita em sinapses
+# ISSUE-001: Implementar LTD explícita em sinapses
 
 ## Objetivo
 Descrever a implementação de forma orientada à execução por IA.
@@ -43,7 +43,7 @@ Detalhe passos de análise para IA.
 ## PROMPT:EXECUTAR
 ```yaml
 objetivo: "Implementar LTD explícita em sinapses"
-issue_id: "ISSUE-039"
+issue_id: "ISSUE-001"
 prioridade: "Alta"
 area: "Core/Plasticidade"
 ```
