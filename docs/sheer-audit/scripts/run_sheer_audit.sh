@@ -252,6 +252,88 @@ render_uml_if_possible() {
   fi
 }
 
+check_critical_architecture_violations() {
+  echo "[INFO] Avaliando violações arquiteturais críticas"
+  python3 - <<'PY'
+from __future__ import annotations
+
+import json
+import tomllib
+from fnmatch import fnmatch
+from pathlib import Path
+
+repo_model_path = Path("docs/sheer-audit/data/repo_model.json")
+config_path = Path("docs/sheer-audit/sheer.toml")
+
+repo_model = json.loads(repo_model_path.read_text(encoding="utf-8"))
+config = tomllib.loads(config_path.read_text(encoding="utf-8"))
+
+architecture_cfg = config.get("architecture", {})
+layers = architecture_cfg.get("layers", [])
+layer_paths = architecture_cfg.get("layer_paths", ["src/pyfolds"])
+forbidden_imports = architecture_cfg.get("forbidden_imports", [])
+enforce_layering = architecture_cfg.get("enforce_layering", False)
+
+layer_index = {layer: idx for idx, layer in enumerate(layers)}
+module_to_layer: dict[str, str] = {}
+
+for symbol in repo_model.get("symbols", []):
+    if symbol.get("kind") != "module":
+        continue
+
+    qname = symbol.get("qname") or ""
+    file_path = symbol.get("file") or ""
+    if not qname or not file_path:
+        continue
+
+    if not any(file_path.startswith(prefix) for prefix in layer_paths):
+        continue
+
+    parts = qname.split(".")
+    layer_name = parts[2] if len(parts) > 2 and parts[1] == "pyfolds" else (parts[1] if len(parts) > 1 else "")
+    if layer_name in layer_index:
+        module_to_layer[qname] = layer_name
+
+critical_violations: list[str] = []
+for edge in repo_model.get("edges", []):
+    if edge.get("type") != "IMPORT":
+        continue
+
+    src = (edge.get("src") or "").removeprefix("mod:")
+    dst = (edge.get("dst") or "").removeprefix("mod:")
+    if not src or not dst:
+        continue
+
+    if src.startswith("src.pyfolds") and dst.startswith("tests"):
+        critical_violations.append(f"Import proibido de testes em código fonte: {src} -> {dst}")
+
+    for rule in forbidden_imports:
+        src_pattern = (rule.get("src") or "*").removeprefix("mod:")
+        dst_pattern = (rule.get("dst") or "*").removeprefix("mod:")
+        severity = (rule.get("severity") or "critical").lower()
+        if severity == "critical" and fnmatch(src, src_pattern) and fnmatch(dst, dst_pattern):
+            critical_violations.append(
+                f"Regra forbidden_imports violada ({src_pattern} -> {dst_pattern}): {src} -> {dst}"
+            )
+
+    if enforce_layering:
+        src_layer = module_to_layer.get(src)
+        dst_layer = module_to_layer.get(dst)
+        if src_layer and dst_layer and layer_index[src_layer] < layer_index[dst_layer]:
+            critical_violations.append(
+                f"Dependência invertida entre camadas ({src_layer} -> {dst_layer}): {src} -> {dst}"
+            )
+
+if critical_violations:
+    print("[CRITICAL] Violações arquiteturais detectadas:")
+    for violation in sorted(set(critical_violations)):
+        print(f" - {violation}")
+    raise SystemExit(1)
+
+print("[INFO] Nenhuma violação arquitetural crítica detectada")
+PY
+}
+
 sync_sheerdocs() {
   echo "[INFO] Sincronizando artefatos para ${SHEERDOCS_DIR}"
   mkdir -p "${SHEERDOCS_DIR}/uml"
@@ -275,6 +357,7 @@ sync_sheerdocs() {
 validate_prereqs
 generate_outputs
 render_uml_if_possible
+check_critical_architecture_violations
 sync_sheerdocs
 
 echo "[INFO] Execução concluída com sucesso"

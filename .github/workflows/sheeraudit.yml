@@ -1,0 +1,148 @@
+name: Sheer Audit
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  shear-audit:
+    name: Run Sheer Audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install git+https://github.com/Mindfolds-labs/sheer-audit.git
+          sudo apt-get update
+          sudo apt-get install -y graphviz default-jre-headless plantuml
+
+      - name: Run Sheer audit script
+        run: bash docs/sheer-audit/scripts/run_sheer_audit.sh
+
+      - name: Upload code map artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sheer-audit-code-map-${{ github.run_id }}
+          path: |
+            docs/sheer-audit/data/code_map.json
+            docs/sheer-audit/data/code_map.md
+            docs/sheer-audit/data/repo_model.json
+
+      - name: Upload UML artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sheer-audit-uml-${{ github.run_id }}
+          path: |
+            docs/sheer-audit/data/uml/*.puml
+            docs/sheer-audit/data/uml/*.svg
+            docs/sheer-audit/data/uml/*.png
+
+      - name: Upload logs artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sheer-audit-logs-${{ github.run_id }}
+          path: |
+            docs/sheer-audit/reports/*.log
+            docs/sheer-audit/reports/*.txt
+            docs/sheer-audit/reports/*.md
+
+  publish-sheerdocs-main:
+    name: Update Sheer docs on main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: shear-audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install git+https://github.com/Mindfolds-labs/sheer-audit.git
+          sudo apt-get update
+          sudo apt-get install -y graphviz default-jre-headless plantuml
+
+      - name: Regenerate Sheer docs assets
+        run: bash docs/sheer-audit/scripts/run_sheer_audit.sh
+
+      - name: Update docs index with code map section
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          index_path = Path("docs/index.md")
+          code_map_path = Path("docs/sheer-audit/sheerdocs/code_map.md")
+
+          original = index_path.read_text(encoding="utf-8")
+          marker_start = "<!-- SHEER-CODEMAP:START -->"
+          marker_end = "<!-- SHEER-CODEMAP:END -->"
+
+          excerpt = "_Mapa do código indisponível._"
+          if code_map_path.exists():
+              lines = code_map_path.read_text(encoding="utf-8").splitlines()
+              body = [line for line in lines if not line.startswith("#")]
+              excerpt = "\n".join(body[:40]).strip() or excerpt
+
+          section = (
+              f"\n## Mapa do Código\n\n"
+              f"Atualizado automaticamente pelo Sheer Audit no merge para `main`.\n\n"
+              f"{marker_start}\n"
+              f"{excerpt}\n"
+              f"{marker_end}\n\n"
+              f"Consulte também: `docs/sheer-audit/sheerdocs/code_map.md`.\n"
+          )
+
+          if marker_start in original and marker_end in original:
+              start = original.index(marker_start)
+              end = original.index(marker_end) + len(marker_end)
+              updated = original[:start] + marker_start + "\n" + excerpt + "\n" + marker_end + original[end:]
+          elif "## Referências" in original:
+              updated = original.replace("## Referências", section + "\n## Referências", 1)
+          else:
+              updated = original.rstrip() + "\n" + section
+
+          index_path.write_text(updated, encoding="utf-8")
+          PY
+
+      - name: Commit and push sheerdocs updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/sheer-audit/sheerdocs docs/index.md
+          if git diff --cached --quiet; then
+            echo "No sheerdocs changes to commit"
+            exit 0
+          fi
+          git commit -m "docs: update Sheer Audit sheerdocs and code map index"
+          git push
