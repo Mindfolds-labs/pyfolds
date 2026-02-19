@@ -10,9 +10,28 @@ Garantir que toda mudança passe por:
 
 ## 2. Fluxo integrado
 
+### 2.0 Política de fases
+
+O workflow opera em três fases de governança documental:
+
+1. **Fase ativa**
+   - Aceita abertura de novas `ISSUE-*` para planejamento e execução.
+   - Fluxo completo `CRIAR → ANALISAR → EXECUTAR → FINALIZAR` habilitado.
+
+2. **Fase freeze**
+   - Novas `ISSUE-*` ficam restritas a correções críticas (ex.: regressão severa, segurança, bloqueio de release).
+   - Demandas não críticas devem ser adiadas para a próxima fase ativa.
+
+3. **Fase legado**
+   - `ISSUE-*` existentes permanecem como consulta histórica.
+   - Não há abertura de novas issues; priorizar manutenção mínima e rastreabilidade de encerramento.
+
+A fase vigente deve estar explícita nos templates e checklists de validação.
+
 ### 2.1 CRIAR (Humano)
 Entradas mínimas:
 - tipo da issue (`CODE`, `DOCS`, `TEST`, `ADR`, `GOVERNANCE`),
+- fase vigente (`ativa`, `freeze` ou `legado`),
 - justificativa,
 - escopo inclui/exclui,
 - artefatos concretos,
@@ -73,6 +92,7 @@ docs/development/HUB_CONTROLE.md
 2. Não expandir escopo além dos artefatos listados.
 3. Toda execução precisa de log e atualização da fila.
 4. Mudanças de arquitetura exigem ADR e atualização de índice.
+5. Mudanças estruturais só podem avançar com referência explícita de ADR aprovada.
 
 ## 5. Checklist rápido por issue
 - [ ] Relatório criado com template canônico.
