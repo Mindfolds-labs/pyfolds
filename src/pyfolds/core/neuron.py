@@ -317,13 +317,38 @@ class MPJRDNeuron(BaseNeuron):
         # ===== 2-4. INTEGRAÇÃO DENDRÍTICA → POTENCIAL → DISPARO =====
         integration_mode = getattr(self.cfg, "dendrite_integration_mode", "wta_hard")
 
+        theta_eff = self.theta
         if integration_mode == "nmda_shunting":
-            dend_out = self.dendrite_integration(v_dend, self.theta)
+            # Capacidade máxima do somático com NMDA+shunting (v_nmda <= 1):
+            # u_max = D² / (shunting_eps + shunting_strength * D)
+            d_float = float(self.cfg.n_dendrites)
+            u_cap = (d_float * d_float) / (
+                self.cfg.shunting_eps + self.cfg.shunting_strength * d_float
+            )
+            theta_cap = u_cap - 1e-3
+            theta_cap_tensor = torch.tensor([theta_cap], device=device, dtype=self.theta.dtype)
+            theta_eff = torch.minimum(theta_eff, theta_cap_tensor)
+            theta_max_eff = min(self.cfg.theta_max, theta_cap)
+            if self.cfg.theta_min <= theta_max_eff:
+                theta_eff = torch.clamp(theta_eff, min=self.cfg.theta_min, max=theta_max_eff)
+            else:
+                theta_eff = torch.clamp(theta_eff, max=theta_max_eff)
+
+            dend_out = self.dendrite_integration(v_dend, theta_eff)
             u = dend_out.u
             gated = dend_out.v_nmda
             dend_contribution = dend_out.contribution
         elif integration_mode == "wta_soft":
-            gated = torch.sigmoid(v_dend - (self.theta * 0.5))
+            theta_cap = float(self.cfg.n_dendrites) - 1e-3
+            theta_cap_tensor = torch.tensor([theta_cap], device=device, dtype=self.theta.dtype)
+            theta_eff = torch.minimum(theta_eff, theta_cap_tensor)
+            theta_max_eff = min(self.cfg.theta_max, theta_cap)
+            if self.cfg.theta_min <= theta_max_eff:
+                theta_eff = torch.clamp(theta_eff, min=self.cfg.theta_min, max=theta_max_eff)
+            else:
+                theta_eff = torch.clamp(theta_eff, max=theta_max_eff)
+
+            gated = torch.sigmoid(v_dend - (theta_eff * 0.5))
             u = gated.sum(dim=1)
             dend_contribution = None
         else:
@@ -333,7 +358,7 @@ class MPJRDNeuron(BaseNeuron):
             u = gated.sum(dim=1)
             dend_contribution = None
 
-        spikes = (u >= self.theta).float()
+        spikes = (u >= theta_eff).float()
 
         # ===== 5. ESTATÍSTICAS =====
         spike_rate = spikes.mean().item()

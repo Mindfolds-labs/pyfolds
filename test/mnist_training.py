@@ -79,7 +79,7 @@ class MnistMPJRDModel(nn.Module):
 
     def forward(self, x: torch.Tensor, mode: LearningMode) -> tuple[torch.Tensor, torch.Tensor]:
         batch = x.shape[0]
-        encoded = self.encoder(x.view(batch, -1)).view(
+        encoded = torch.sigmoid(self.encoder(x.view(batch, -1))).view(
             batch, self.n_neurons, self.cfg.n_dendrites, self.cfg.n_synapses_per_dendrite
         )
         out = self.hidden(encoded, mode=mode)
@@ -149,6 +149,7 @@ def run_training(cfg: TrainingConfig | None = None) -> dict[str, object]:
         model.train()
         model.hidden.set_mode(LearningMode.ONLINE)
         epoch_loss = 0.0
+        epoch_spike = 0.0
         for images, labels in train_loader:
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad(set_to_none=True)
@@ -157,7 +158,13 @@ def run_training(cfg: TrainingConfig | None = None) -> dict[str, object]:
             loss.backward()
             optimizer.step()
             epoch_loss += float(loss.item())
-        logger.info("epoch=%d loss=%.4f spike_rate=%.4f", epoch + 1, epoch_loss / max(1, len(train_loader)), float(spikes.mean().item()))
+            epoch_spike += float(spikes.mean().item())
+        logger.info(
+            "epoch=%d loss=%.4f spike_rate=%.4f",
+            epoch + 1,
+            epoch_loss / max(1, len(train_loader)),
+            epoch_spike / max(1, len(train_loader)),
+        )
 
     acc = _evaluate(model, test_loader, device)
 

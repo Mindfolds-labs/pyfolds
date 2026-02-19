@@ -100,7 +100,11 @@ class HomeostasisController(nn.Module):
 
         # 3. Mecanismo de resgate
         if rate < self.dead_neuron_threshold:
-            rescue_delta = -cfg.homeostasis_eta * self.dead_neuron_penalty_factor
+            gap = cfg.target_spike_rate - rate
+            rescue_delta = -max(
+                0.05,
+                cfg.homeostasis_eta * (0.5 + 2.0 * gap) * self.dead_neuron_penalty_factor,
+            )
             self.theta.add_(rescue_delta)
 
         # 4. Clamping
