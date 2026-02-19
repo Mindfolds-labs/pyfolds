@@ -1,65 +1,53 @@
 <svg width="1600" height="460" viewBox="0 0 1600 460" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">PyFolds README banner</title>
-  <desc id="desc">Dark blueprint banner with PyFolds technical logo and geometric lettering.</desc>
+  <desc id="desc">Clean PyFolds banner in blue and yellow without texture or hatch lines.</desc>
   <defs>
-    <linearGradient id="bg" x1="60" y1="24" x2="1540" y2="438" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#040A16"/>
-      <stop offset="0.55" stop-color="#071629"/>
-      <stop offset="1" stop-color="#0B1D35"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A122A"/>
+      <stop offset="1" stop-color="#111C3A"/>
     </linearGradient>
-    <linearGradient id="line" x1="0" y1="0" x2="1600" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#32AAFF" stop-opacity="0.05"/>
-      <stop offset="0.5" stop-color="#39B4FF" stop-opacity="0.28"/>
-      <stop offset="1" stop-color="#32AAFF" stop-opacity="0.05"/>
+    <linearGradient id="word" x1="540" y1="120" x2="1480" y2="350" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9CA9F0"/>
+      <stop offset="1" stop-color="#5B6FCA"/>
     </linearGradient>
-    <linearGradient id="blueFold" x1="110" y1="86" x2="485" y2="390" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#98B6FF"/>
-      <stop offset="1" stop-color="#4057A8"/>
+    <linearGradient id="wordGlow" x1="620" y1="130" x2="1490" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5DA77"/>
+      <stop offset="1" stop-color="#B7922F"/>
     </linearGradient>
-    <linearGradient id="goldFold" x1="220" y1="170" x2="430" y2="324" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFE79A"/>
-      <stop offset="1" stop-color="#C38A00"/>
+    <linearGradient id="b1" x1="100" y1="94" x2="430" y2="385" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2F3462"/>
+      <stop offset="1" stop-color="#121B46"/>
     </linearGradient>
-    <linearGradient id="wordBlue" x1="560" y1="98" x2="1440" y2="352" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#95AFFF"/>
-      <stop offset="1" stop-color="#5A73D0"/>
+    <linearGradient id="b2" x1="220" y1="60" x2="472" y2="270" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6E78C5"/>
+      <stop offset="1" stop-color="#4B5DAF"/>
     </linearGradient>
-    <linearGradient id="wordGold" x1="660" y1="132" x2="1500" y2="332" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFE18B"/>
-      <stop offset="1" stop-color="#C08A00"/>
+    <linearGradient id="b3" x1="330" y1="130" x2="506" y2="286" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8A93E2"/>
+      <stop offset="1" stop-color="#5B6CC4"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="222" y1="180" x2="344" y2="350" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5DA77"/>
+      <stop offset="1" stop-color="#B7922F"/>
     </linearGradient>
   </defs>
 
   <rect width="1600" height="460" rx="24" fill="url(#bg)"/>
 
-  <g opacity="0.95">
-    <path d="M0 55H1600" stroke="url(#line)" stroke-width="2"/>
-    <path d="M0 115H1600" stroke="url(#line)" stroke-width="2"/>
-    <path d="M0 175H1600" stroke="url(#line)" stroke-width="2"/>
-    <path d="M0 235H1600" stroke="url(#line)" stroke-width="2"/>
-    <path d="M0 295H1600" stroke="url(#line)" stroke-width="2"/>
-    <path d="M0 355H1600" stroke="url(#line)" stroke-width="2"/>
-    <path d="M90 0V460" stroke="url(#line)" stroke-width="2"/>
-    <path d="M250 0V460" stroke="url(#line)" stroke-width="2"/>
-    <path d="M410 0V460" stroke="url(#line)" stroke-width="2"/>
-    <path d="M730 0V460" stroke="url(#line)" stroke-width="2"/>
-    <path d="M980 0V460" stroke="url(#line)" stroke-width="2"/>
-    <path d="M1230 0V460" stroke="url(#line)" stroke-width="2"/>
-    <path d="M1450 0V460" stroke="url(#line)" stroke-width="2"/>
+  <g transform="translate(30,0)">
+    <path d="M38 174L215 58L289 106L112 222L38 174Z" fill="url(#b1)"/>
+    <path d="M217 56L388 170V276L217 162V56Z" fill="url(#b2)"/>
+    <path d="M400 186L479 236V338L400 288V186Z" fill="url(#b3)"/>
+
+    <path d="M72 239L158 182V448L72 392V239Z" fill="#1A2556"/>
+    <path d="M166 177H268C292 177 311 196 311 220V246L225 301L166 263V177Z" fill="#202D62"/>
+    <path d="M311 220V246L366 278L286 328L225 301L311 246V220Z" fill="url(#gold)"/>
+    <path d="M225 301L286 328V356C286 381 267 401 243 401H225V301Z" fill="url(#gold)"/>
+
+    <path d="M258 308L397 222V314L335 353H286L258 337V308Z" fill="#3E4F95"/>
+    <path d="M286 353L335 353C350 353 364 348 376 339L418 372C389 392 355 404 321 404H286V353Z" fill="#2A376F"/>
   </g>
 
-  <g>
-    <path d="M264 58L442 162V298L264 402L86 298V162L264 58Z" fill="url(#blueFold)"/>
-    <path d="M152 204L236 155V352L152 303V204Z" fill="#223E82"/>
-    <path d="M292 155L376 204V303L292 352V155Z" fill="#5C78D8"/>
-    <path d="M177 254L264 204L351 254L264 304L177 254Z" fill="#253F7B"/>
-    <path d="M220 179L333 244L286 272L173 206L220 179Z" fill="url(#goldFold)"/>
-    <path d="M234 279L347 344L300 372L187 307L234 279Z" fill="url(#goldFold)"/>
-    <path d="M264 58L442 162V298L264 402L86 298V162L264 58Z" stroke="#8EB0FF" stroke-opacity="0.55" stroke-width="3"/>
-  </g>
-
-  <g aria-label="PyFolds">
-    <text x="540" y="292" fill="url(#wordBlue)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="230" font-weight="800" letter-spacing="2">PyFolds</text>
-    <text x="552" y="300" fill="url(#wordGold)" fill-opacity="0.45" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="230" font-weight="800" letter-spacing="2">PyFolds</text>
-  </g>
+  <text x="560" y="292" fill="url(#word)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="230" font-weight="800" letter-spacing="2">PyFolds</text>
+  <text x="570" y="300" fill="url(#wordGlow)" fill-opacity="0.36" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="230" font-weight="800" letter-spacing="2">PyFolds</text>
 </svg>
