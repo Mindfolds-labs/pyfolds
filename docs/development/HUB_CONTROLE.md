@@ -50,24 +50,25 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 
 <!-- HUB:CARDS:BEGIN -->
 > [!NOTE]
-> <span style="display:inline-block;border:1px solid #9ec5fe;background:#f8fbff;padding:8px 12px;border-radius:8px;">**ISSUE-001** · Implementar LTD explícita em sinapses</span>
+> **ISSUE-001** · Implementar LTD explícita em sinapses
 >
 > **Status:** ⏳ Planejada  
 > **Responsável:** Codex  
 > **Data:** 2026-02-19  
 > **Prioridade:** `Alta` · **Área:** `Core/Plasticidade`  
 >
-> <a href="./prompts/relatorios/ISSUE-001-implementar-ltd-explicita-em-sinapses.md">📄 Relatório</a> · <a href="./prompts/execucoes/EXEC-001-correcoes-ordem-neuronal.md">🛠️ Execução</a>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-001-implementar-ltd-explicita-em-sinapses.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-001-correcoes-ordem-neuronal.md)
 
 > [!NOTE]
-> <span style="display:inline-block;border:1px solid #b7ebc6;background:#f6fff8;padding:8px 12px;border-radius:8px;">**ISSUE-002** · Refatorar HUB com cards limpos e split view de links</span>
+> **ISSUE-002** · Refatorar HUB com cards limpos e split view de links
 >
 > **Status:** ⏳ Planejada  
 > **Responsável:** Codex  
 > **Data:** 2026-02-19  
 > **Prioridade:** `Alta` · **Área:** `Governança/UX Docs`  
 >
-> <a href="./prompts/relatorios/ISSUE-002-refatorar-hub-cards-limpos-split-view-links.md">📄 Relatório</a> · <a href="./prompts/execucoes/EXEC-002-refatorar-hub-cards-limpos-split-view-links.md">🛠️ Execução</a>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-002-refatorar-hub-cards-limpos-split-view-links.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-002-refatorar-hub-cards-limpos-split-view-links.md)
+
 <!-- HUB:CARDS:END -->
 
    </td>
@@ -93,6 +94,12 @@ Fonte canônica: [`failure_register.csv`](./failure_register.csv).
 
 | ID | Tipo | Descrição | Impacto | Status | Issue de Correção |
 | :-- | :-- | :-- | :-- | :-- | :-- |
+
+<!-- HUB:FAILURES:BEGIN -->
+| ID | Tipo | Descrição | Impacto | Status | Issue de Correção | Data |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| - | - | - | - | - | - | - |
+<!-- HUB:FAILURES:END -->
 
 > Campos operacionais obrigatórios no CSV: `arquivo_afetado` e `caminho_log`.
 
