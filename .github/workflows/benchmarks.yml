@@ -31,7 +31,7 @@ jobs:
       - name: Run benchmarks and regenerate docs
         run: |
           python scripts/run_benchmarks.py --output docs/assets/benchmarks_results.json
-          python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/BENCHMARKS.md
+          python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/assets/BENCHMARKS.md
 
       - name: Commit results
         run: |
@@ -41,6 +41,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/assets/benchmarks_results.json docs/BENCHMARKS.md
+          git add docs/assets/benchmarks_results.json docs/assets/BENCHMARKS.md
           git commit -m "chore: update benchmark results"
           git push

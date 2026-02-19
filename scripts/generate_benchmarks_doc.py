@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gera docs/BENCHMARKS.md a partir de docs/assets/benchmarks_results.json."""
+"""Gera docs/assets/BENCHMARKS.md a partir de docs/assets/benchmarks_results.json."""
 
 from __future__ import annotations
 
@@ -121,9 +121,9 @@ def render(results: Dict[str, Any]) -> str:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Gera docs/BENCHMARKS.md a partir do JSON")
+    parser = argparse.ArgumentParser(description="Gera docs/assets/BENCHMARKS.md a partir do JSON")
     parser.add_argument("--input", type=Path, default=Path("docs/assets/benchmarks_results.json"))
-    parser.add_argument("--output", type=Path, default=Path("docs/BENCHMARKS.md"))
+    parser.add_argument("--output", type=Path, default=Path("docs/assets/BENCHMARKS.md"))
     args = parser.parse_args()
 
     data = json.loads(args.input.read_text(encoding="utf-8"))
