@@ -1,5 +1,7 @@
 # PyFolds Documentation
 
+![PyFolds banner](_static/brand/pyfolds-readme-banner.svg)
+
 Documentação técnica estruturada para uso, desenvolvimento, API e governança do PyFolds.
 
 ## Objetivo
