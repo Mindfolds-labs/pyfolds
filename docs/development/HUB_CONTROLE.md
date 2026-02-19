@@ -1,12 +1,9 @@
-# HUB_CONTROLE — Gestão de Issues e Conflitos de Agentes
+# HUB_CONTROLE — Fila Ativa de Execução
 
-> **ID do Documento:** DEV-HUB-CTRL-001  
-> **Status:** Ativo  
-> **Escopo:** Documentação interna de desenvolvimento e governança  
-> **Normas de Referência:** ISO/IEC 12207, IEEE 828, IEEE 730
+> **Status:** Ativo
+> **Fonte da fila:** [`execution_queue.csv`](./execution_queue.csv)
 
-## 1. Objetivo
-Centralizar a fila de execução de documentação e governança para evitar conflitos entre agentes e manter rastreabilidade.
+## Fila ativa
 
 ## 2. Escopo e Navegação
 Este HUB **não é documentação de usuário final**. Ele deve ser usado apenas por quem mantém a base documental e os artefatos de governança.
@@ -42,35 +39,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 <!-- HUB:QUEUE:BEGIN -->
 | ID | Status | Tema | Responsável | Data |
 | :-- | :-- | :-- | :-- | :-- |
-| ISSUE-001 | Concluída | Reestruturação sistêmica de /docs e raiz (governança v1.0.0) | Codex | 2026-02-16 |
-| ISSUE-002 | Concluída | Unificação e serialização da série de ADRs | Codex | 2026-02-16 |
-| ISSUE-003 | Concluída | Auditoria completa do repositório (docs + src + .github + examples + tests) | Codex | 2026-02-16 |
-| ISSUE-004 | Concluída | Consolidação do hub interno e navegação em docs/development | Codex | 2026-02-16 |
-| ISSUE-005 | Concluída | Consolidação total: implementar plano de ação da auditoria (3 sprints) | Codex | 2026-02-17 |
-| ISSUE-006 | Cancelada | Número reservado (não utilizado intencionalmente) | Codex | 2026-02-16 |
-| ISSUE-007 | Concluída | Consolidação final do workflow e normalização total de prompts | Codex | 2026-02-16 |
-| ISSUE-008 | Concluída | Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar | Codex | 2026-02-17 |
-| ISSUE-009 | Concluída | Padronização de formatos de ISSUEs para interação com IA | Codex | 2026-02-16 |
-| ISSUE-010 | Concluída | Consolidação final: fechamento das ISSUEs 001-009 e limpeza documental | Codex | 2026-02-16 |
-| ISSUE-010-ESPECIAL | Concluída | Corrigir estrutura docs/ - remover soltos e órfãos | Codex | 2026-02-17 |
-| ISSUE-011 | Concluída | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
-| ISSUE-011-ESPECIAL | Concluída | Consolidação de fluxo operacional e correção de cards/links | Codex | 2026-02-17 |
-| ISSUE-012 | Concluída | Auditoria de código em src + testes + ADR-035 | Codex | 2026-02-17 |
-| ISSUE-013 | Concluída | Estabilizar instalação editável em rede restrita e consolidar falhas da auditoria ADR-035 | Codex | 2026-02-17 |
-| ISSUE-014 | Concluída | Auditoria SRC/Testes ADR-035 + gate CI docs hub com Sphinx/MyST/PyData | Codex | 2026-02-17 |
-| ISSUE-015 | Concluída | Validar erros corrigidos + importacao pyfolds + suite completa + governanca | Codex | 2026-02-17 |
-| ISSUE-001 | Concluída | Adicionar dependência linkify-it-py para MyST Parser na documentação | Codex | 2026-02-17 |
-| ISSUE-017 | Concluída | Governança de numeração automática e entrega completa de ISSUE/EXEC | Codex | 2026-02-17 |
-| ISSUE-018 | Concluída | Padronização de relatórios e obrigatoriedade de sync HUB | Codex | 2026-02-17 |
-| ISSUE-019 | Concluída | Determinismo de relatórios e logs no workflow de prompts | Codex | 2026-02-17 |
-| ISSUE-020 | Concluída | Relatório CI Docs Hub e correções para Sphinx/MyST | Codex | 2026-02-17 |
-| ISSUE-021 | Planejada | Auditoria total do repositório com análise sênior (sem execução de mudanças de produto) | Codex | 2026-02-17 |
-| ISSUE-023 | Concluída | Auditoria corretiva de estabilidade runtime e consistência cross-módulo | Codex | 2026-02-17 |
-| ISSUE-022 | Concluída | Auditoria e correção do neurônio MPJRD (thread safety + validações + plasticidade) | Codex | 2026-02-17 |
-| ISSUE-025 | Concluída | Análise integral do pyfolds + execução direta + atualização de benchmark e ADR-037 | Codex | 2026-02-17 |
-| ISSUE-024 | Planejada | Revisão estética do HUB_CONTROLE com cards sincronizados por CSV | Codex | 2026-02-17 |
-| ISSUE-036 | Concluída | Auditoria do fluxo .fold/.mind + validação lógica + governança ADR/EXEC/HUB | Codex | 2026-02-18 |
-| ISSUE-038 | Concluída | Auditoria de prontidão para publicação no PyPI com checklist sênior e evidências de build | Codex | 2026-02-18 |
+| ISSUE-001 | Planejada | Implementar LTD explícita em sinapses | Codex | 2026-02-19 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 Cards
@@ -592,113 +561,21 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-020-relatorio-ci-docs-hub-sphinx-myst.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-020-relatorio-ci-docs-hub-e-correcoes-para-sphinx-myst.md)
 
+<!-- HUB:CARDS:BEGIN -->
 > [!NOTE]
-> **ISSUE-021** · Auditoria total do repositório com análise sênior (sem execução de mudanças de produto)
+> **ISSUE-001** · Implementar LTD explícita em sinapses
 >
 > **Status:** ⏳ Planejada  
 > **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Processo`  
+> **Data:** 2026-02-19  
+> **Prioridade:** `Alta` · **Área:** `Core/Plasticidade`  
 >
-> 📄 [Relatório](./prompts/relatorios/ISSUE-021-auditoria-total-repositorio-analise-senior.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-021-auditoria-total-repositorio-analise-senior.md)
+> 📄 [Relatório](./prompts/relatorios/ISSUE-001-implementar-ltd-explicita-em-sinapses.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-001-correcoes-ordem-neuronal.md)
 
-> [!TIP]
-> **ISSUE-023** · Auditoria corretiva de estabilidade runtime e consistência cross-módulo
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-023-auditoria-corretiva-estabilidade-runtime.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-023-auditoria-corretiva-estabilidade-runtime.md)
+<!-- HUB:CARDS:END -->
 
-> [!TIP]
-> **ISSUE-022** · Auditoria e correção do neurônio MPJRD (thread safety + validações + plasticidade)
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Core`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-022-auditoria-neuron-thread-safety-plasticidade.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-022-auditoria-neuron-thread-safety-plasticidade.md)
+## Histórico em legado
 
-> [!TIP]
-> **ISSUE-025** · Análise integral do pyfolds + execução direta + atualização de benchmark e ADR-037
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-025-analise-integral-benchmark-adr37.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-025-analise-integral-benchmark-adr37.md)
-
-> [!NOTE]
-> **ISSUE-024** · Revisão estética do HUB_CONTROLE com cards sincronizados por CSV
->
-> **Status:** ⏳ Planejada  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-024-correcao-tipos-telemetria-apis.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-024-revisao-estetica-hub-controle.md)
-
-> [!TIP]
-> **ISSUE-036** · Auditoria do fluxo .fold/.mind + validação lógica + governança ADR/EXEC/HUB
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-18  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-036-auditoria-fluxo-fold-mind-governanca.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-036-auditoria-fluxo-fold-mind-governanca.md)
-
-> [!TIP]
-> **ISSUE-038** · Auditoria de prontidão para publicação no PyPI com checklist sênior e evidências de build
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-18  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Release`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-038-auditoria-prontidao-publicacao-pypi.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-038-auditoria-prontidao-publicacao-pypi.md)
-
-<!-- END_CARDS -->
-
-### 4.2 Legenda visual de status
-
-- ✅ **Concluída**
-- 🚧 **Em Progresso**
-- ⏳ **Planejada**
-- ❌ **Bloqueada**
-- ⚪ **Cancelada**
-
-## 5. Fluxo Padrão para Novas Issues
-1. Registrar issue em `execution_queue.csv` e sincronizar automaticamente tabela e cards com `python tools/sync_hub.py`.
-2. Verificar se há ADR aplicável.
-3. Criar próximo ADR sequencial (`ADR-XXX-*`) quando necessário.
-4. Executar mudanças em branch dedicada.
-5. Confirmar os links de relatório/execução gerados no card da issue e atualizar índices de governança quando aplicável.
-
-## 6. Checklist de Fechamento
-- [ ] Links internos validados.
-- [ ] Índices atualizados (`docs/index.md`, `docs/README.md`, `docs/governance/adr/INDEX.md` quando aplicável).
-- [ ] Rastreabilidade de artefatos atualizada na tabela.
-- [ ] Conformidade com diretrizes IEEE/ISO revisada.
-
-## 7. Referências
-- ISO/IEC 12207 — Software Life Cycle Processes.
-- IEEE 828 — Software Configuration Management Plans.
-- IEEE 730 — Software Quality Assurance.
-
-## 8. Workflow e Sincronização
-
-```bash
-python tools/sync_hub.py
-python tools/sync_hub.py --check
-```
-
-> O processo de sincronização atualiza simultaneamente a tabela resumida e a seção de cards usando o CSV como fonte única de verdade.
-
-> Nota GitHub Actions: para o workflow de sincronização abrir PR automaticamente, habilite
-> **Settings > Actions > General > Workflow permissions > Allow GitHub Actions to create and approve pull requests**.
-
+- Relatórios/ISSUEs anteriores ao marco 2.0: [`docs/development/legado/issues/`](./legado/issues/)
+- Execuções/EXECs anteriores ao marco 2.0: [`docs/development/legado/execucoes/`](./legado/execucoes/)
+- Relatórios consolidados de arquivamento: [`docs/development/legado/relatorios/`](./legado/relatorios/)

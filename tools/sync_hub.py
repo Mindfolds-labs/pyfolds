@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -97,28 +96,6 @@ def _format_cell(key: str, value: str) -> str:
     return _escape_md(cleaned)
 
 
-def _slugify(value: str) -> str:
-    text = value.lower().strip()
-    swap = {
-        "á": "a",
-        "à": "a",
-        "â": "a",
-        "ã": "a",
-        "é": "e",
-        "ê": "e",
-        "í": "i",
-        "ó": "o",
-        "ô": "o",
-        "õ": "o",
-        "ú": "u",
-        "ç": "c",
-    }
-    for k, v in swap.items():
-        text = text.replace(k, v)
-    text = re.sub(r"[^a-z0-9]+", "-", text).strip("-")
-    return text or "sem-slug"
-
-
 def _status_theme(status: str) -> dict[str, str]:
     normalized = _norm(status).lower()
     for key, theme in STATUS_THEME.items():
@@ -127,16 +104,21 @@ def _status_theme(status: str) -> dict[str, str]:
     return DEFAULT_THEME
 
 
-def _discover_artifact_path(base_dir: Path, prefix: str, fallback_slug: str) -> str:
-    preferred = base_dir / f"{prefix}-{fallback_slug}.md"
-    if preferred.exists():
-        return f"./{preferred.relative_to(Path('docs/development')).as_posix()}"
+def _resolve_required_artifact(base_dir: Path, prefix: str) -> str:
+    """Resolve mandatory artifact path for active queue entries.
 
+    Legacy files are ignored because lookup is restricted to active directories
+    (`prompts/relatorios` and `prompts/execucoes`).
+    """
     matches = sorted(base_dir.glob(f"{prefix}-*.md"))
-    if matches:
-        return f"./{matches[0].relative_to(Path('docs/development')).as_posix()}"
-
-    return f"./{base_dir.relative_to(Path('docs/development')).as_posix()}/{prefix}-{fallback_slug}.md"
+    if not matches:
+        raise RuntimeError(
+            f"Artefato obrigatório ausente para {prefix} em {base_dir.as_posix()}"
+        )
+    if len(matches) > 1:
+        joined = ", ".join(path.name for path in matches)
+        raise RuntimeError(f"Artefato ambíguo para {prefix}: {joined}")
+    return f"./{matches[0].relative_to(Path('docs/development')).as_posix()}"
 
 
 def read_rows(csv_path: Path) -> list[dict[str, str]]:
@@ -160,6 +142,15 @@ def read_rows(csv_path: Path) -> list[dict[str, str]]:
             if not any(normalized.values()):
                 continue
             rows.append(normalized)
+
+    seen_ids: set[str] = set()
+    for row in rows:
+        issue_id = _norm(row.get("id", ""))
+        if not issue_id:
+            raise RuntimeError("Linha da fila sem ID")
+        if issue_id in seen_ids:
+            raise RuntimeError(f"ID duplicado na fila ativa: {issue_id}")
+        seen_ids.add(issue_id)
 
     return rows
 
@@ -193,10 +184,8 @@ def build_cards(rows: list[dict[str, str]]) -> str:
 
         issue_num = issue_id.replace("ISSUE", "").lstrip("-")
         exec_prefix = f"EXEC-{issue_num}" if issue_num else "EXEC"
-        tema_slug = _slugify(tema)
-
-        report_path = _discover_artifact_path(REPORTS_DIR, issue_id, tema_slug)
-        exec_path = _discover_artifact_path(EXECS_DIR, exec_prefix, tema_slug)
+        report_path = _resolve_required_artifact(REPORTS_DIR, issue_id)
+        exec_path = _resolve_required_artifact(EXECS_DIR, exec_prefix)
 
         theme = _status_theme(status)
         badge = theme["badge"]

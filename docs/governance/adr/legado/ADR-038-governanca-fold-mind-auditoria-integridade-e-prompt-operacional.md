@@ -1,7 +1,11 @@
 # ADR-038 — Governança do `.fold/.mind`: auditoria de integridade e prompt operacional padronizado
 
+**Nota de supersessão (2026-02-19):** este documento foi movido para legado e marcado como **Superseded**.
+ADR canônico vigente: `docs/governance/adr/ADR-038-auditoria-fold-mind-governanca-execucao.md`.
+Motivo: resolução de duplicidade de ADR-038, mantendo uma única referência oficial.
+
 ## Status
-Aceito
+Superseded
 
 ## Contexto
 Foi solicitada uma revisão objetiva do formato `.fold/.mind` para confirmar:
