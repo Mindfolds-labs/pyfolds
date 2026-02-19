@@ -11,6 +11,15 @@ Testes unitários/integrados e verificações de documentação.
 
 ## Perfis de execução
 
+### 0) Preflight sem Torch (tools/docs)
+Use quando o ambiente não possui PyTorch e o objetivo é validar tooling/documentação.
+
+```bash
+PYTHONPATH=src pytest tests/tools/ -q
+python tools/check_links.py docs/ README.md
+python tools/validate_docs_links.py
+```
+
 ### 1) Core-only (rápido)
 Use quando alterar API pública/imports, validações básicas e contratos centrais.
 
