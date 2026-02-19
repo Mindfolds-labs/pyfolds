@@ -56,6 +56,16 @@ class TestMPJRDNeuron:
         assert out['spikes'].shape == (batch_size,)
         assert 'R' in out
 
+    def test_forward_mode_override_is_reported(self, small_config):
+        """`forward(..., mode=...)` deve refletir o modo efetivo no retorno."""
+        neuron = pyfolds.MPJRDNeuron(small_config)
+        neuron.set_mode(LearningMode.ONLINE)
+        x = torch.randn(2, small_config.n_dendrites, small_config.n_synapses_per_dendrite)
+
+        out = neuron.forward(x, mode=LearningMode.INFERENCE, collect_stats=False)
+
+        assert out["mode"] == LearningMode.INFERENCE.value
+
     def test_online_plasticity_updates_when_not_deferred(self, small_config):
         """Modo ONLINE deve atualizar N/I quando defer_updates=False."""
         cfg = pyfolds.MPJRDConfig(

@@ -431,7 +431,7 @@ class MPJRDNeuron(BaseNeuron):
                 try:
                     self.telemetry.emit(forward_event(
                         step_id=sid,
-                        mode=self.mode.value,
+                        mode=effective_mode.value,
                         spike_rate=spike_rate,
                         theta=float(self.theta.item()),
                         r_hat=float(self.r_hat.item()),
@@ -479,7 +479,7 @@ class MPJRDNeuron(BaseNeuron):
             "N_mean": self.N.float().mean().item(),
             "W_mean": self.W.float().mean().item(),
             "I_mean": self.I.float().mean().item(),
-            "mode": self.mode.value,
+            "mode": effective_mode.value,
             "integration_mode": integration_mode,
         }
 
