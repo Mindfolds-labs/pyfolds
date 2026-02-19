@@ -92,6 +92,10 @@ class AdaptationMixin:
             theta = output.get('theta', getattr(self, 'theta', torch.tensor(4.5)))
             spikes_adapted = (u_adapted >= theta).float()
             
+            # Mantém consistência do contrato de saída para mixins seguintes
+            # (ex.: RefractoryMixin usa output['u'] para recomputar spikes).
+            output['u_raw'] = output['u']
+            output['u'] = u_adapted
             output['u_adapted'] = u_adapted
             output['spikes'] = spikes_adapted
             output['adaptation_current'] = self.adaptation_current.clone()

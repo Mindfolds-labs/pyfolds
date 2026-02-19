@@ -73,6 +73,13 @@ class ShortTermDynamicsMixin:
                 f"recebido {tuple(x.shape)}"
             )
 
+        # Mantém buffers de STP no mesmo device da entrada para evitar
+        # erro de device mismatch em cenários onde o chamador alterna device.
+        if self.u_stp.device != x.device:
+            self.u_stp = self.u_stp.to(x.device)
+        if self.R_stp.device != x.device:
+            self.R_stp = self.R_stp.to(x.device)
+
         # Detecta spikes pré com threshold configurável
         spike_threshold = getattr(self.cfg, 'spike_threshold', 0.5)
         pre_spikes = (x > spike_threshold).float().mean(dim=0)  # [D, S] - média no batch
