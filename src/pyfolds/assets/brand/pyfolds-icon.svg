@@ -1,29 +1,47 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PyFolds Origami Tech Icon">
   <defs>
-    <rect id="bg" width="512" height="512" rx="120" fill="#08142D"/>
-    
-    <linearGradient id="p_fold" x1="256" y1="150" x2="256" y2="362" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#3B7BFF"/>
-      <stop offset="1" stop-color="#142B5F"/>
+    <linearGradient id="bg_grad" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#08142D"/>
+      <stop offset="1" stop-color="#102B5F"/>
     </linearGradient>
-    
-    <linearGradient id="gold_accent" x1="230" y1="230" x2="330" y2="330" gradientUnits="userSpaceOnUse">
+    <linearGradient id="core_blue" x1="140" y1="112" x2="372" y2="388" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B7BFF"/>
+      <stop offset="1" stop-color="#1C3F8E"/>
+    </linearGradient>
+    <linearGradient id="accent_gold" x1="236" y1="212" x2="328" y2="310" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FFD86A"/>
       <stop offset="1" stop-color="#E5A800"/>
     </linearGradient>
+    
+    <pattern id="rd-texture" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M0 20 Q 10 0, 20 20 T 40 20" stroke="white" stroke-width="1.5" opacity="0.1" fill="none"/>
+        <path d="M0 10 Q 10 30, 20 10 T 40 10" stroke="white" stroke-width="1" opacity="0.05" fill="none"/>
+        <circle cx="10" cy="10" r="2" fill="white" opacity="0.1"/>
+        <circle cx="30" cy="30" r="1.5" fill="white" opacity="0.1"/>
+    </pattern>
+    
+    <mask id="texture-mask">
+      <rect x="0" y="0" width="512" height="512" fill="white"/>
+      <rect x="0" y="0" width="512" height="512" fill="url(#rd-texture)"/>
+    </mask>
   </defs>
 
-  <use href="#bg"/>
+  <rect x="0" y="0" width="512" height="512" rx="96" fill="url(#bg_grad)"/>
 
-  <path d="M0 256H512M256 0V512" stroke="white" stroke-opacity="0.03" stroke-width="1"/>
+  <g stroke="#BDC3C7" stroke-width="3" stroke-linejoin="round" mask="url(#texture-mask)">
+      
+    <path d="M150 120 L 220 160 V 380 L 150 340 V 120 Z" fill="url(#core_blue)"/>
+    <path d="M150 120 L 280 120 L 350 160 L 220 160 L 150 120 Z" fill="#2B63D6"/>
+    <path d="M350 160 V 240 L 280 280 L 220 240 V 160 L 350 160 Z" fill="#143574"/>
+    <path d="M220 240 L 280 280 L 220 320 L 160 280 L 220 240 Z" fill="#183B86"/>
 
-  <path d="M180 150H300C330 150 350 170 350 200V240C350 270 330 290 300 290H210V380H180V150Z" fill="url(#p_fold)" />
+    <path d="M280 180 L 380 180 L 420 220 L 320 220 L 280 180 Z" fill="url(#accent_gold)"/>
+    <path d="M320 220 L 420 220 L 380 260 L 280 260 L 320 220 Z" fill="#D49A00"/>
+    
+    <path d="M280 280 L 360 280 L 400 320 L 320 320 L 280 280 Z" fill="url(#accent_gold)"/>
+    <path d="M420 220 V 280 L 380 320 V 260 L 420 220 Z" fill="#E5A800"/>
+  </g>
   
-  <path d="M210 230L270 290H330L250 210L210 230Z" fill="#0A1F44" fill-opacity="0.6"/>
-  
-  <path d="M256 210L350 210L280 290L210 290L256 210Z" fill="url(#gold_accent)">
-    <animate attributeName="opacity" values="0.8;1;0.8" dur="4s" repeatCount="indefinite" />
-  </path>
-  
-  <path d="M180 150L210 180V380L180 350V150Z" fill="white" fill-opacity="0.1"/>
+  <rect x="150" y="120" width="270" height="260" fill="url(#rd-texture)" opacity="0.3" style="mix-blend-mode: overlay; pointer-events: none;"/>
+
 </svg>
