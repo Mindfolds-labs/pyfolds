@@ -80,7 +80,22 @@ output = model(x)
 print(output["spikes"])
 ```
 
-## 4. Benchmarks de serialização
+## 4. Política de depreciação da API pública
+
+Os aliases legados da v1 continuam disponíveis durante a série `1.x`, sempre emitindo `DeprecationWarning` para facilitar migração gradual.
+
+- `MPJRDConfig` → `NeuronConfig`
+- `MPJRDLayer` → `AdaptiveNeuronLayer`
+- `MPJRDNetwork` → `SpikingNetwork`
+
+Critérios objetivos adotados:
+- manutenção por ciclo mínimo de uma major completa (`1.x`),
+- aviso explícito no `CHANGELOG.md`,
+- estratégia de migração com mapeamento 1:1 para nomes canônicos v2.
+
+Versão-limite planejada: remoção dos aliases v1 em `2.0.0`.
+
+## 5. Benchmarks de serialização
 
 ```bash
 python scripts/run_benchmarks.py --output docs/assets/benchmarks_results.json
@@ -92,7 +107,7 @@ Interpretação rápida:
 - **Razão de compressão vs `none`:** valores menores que `1.0` indicam melhor compressão.
 - O workflow `.github/workflows/benchmarks.yml` executa periodicamente para atualização de artefatos.
 
-## 5. Portal de documentação
+## 6. Portal de documentação
 
 ### 5.1 Uso público
 - 📑 [Índice de Documentação](docs/README.md)
@@ -108,7 +123,7 @@ Interpretação rápida:
 - 🧾 [Registro de ADRs](docs/governance/adr/INDEX.md)
 - 🛡️ [Plano Mestre de Governança](docs/governance/MASTER_PLAN.md)
 
-## 6. Governança e qualidade (IEEE/ISO)
+## 7. Governança e qualidade (IEEE/ISO)
 
 O processo documental e técnico segue princípios de padronização e rastreabilidade, alinhados a:
 - **ISO/IEC 12207** (ciclo de vida de software),
@@ -125,14 +140,14 @@ Referências relevantes no repositório:
 - [solucoes_fold_mind.py](./docs/governance/solucoes_fold_mind.py)
 - [VISUAL_FINAL.txt](./docs/governance/VISUAL_FINAL.txt)
 
-## 7. Validação local
+## 8. Validação local
 
 ```bash
 python scripts/run_benchmarks.py
 python scripts/generate_benchmarks_doc.py --input docs/assets/benchmarks_results.json --output docs/assets/BENCHMARKS.md
 ```
 
-## 8. Workflow v6 (CRIAR → ANALISAR → EXECUTAR → FINALIZAR)
+## 9. Workflow v6 (CRIAR → ANALISAR → EXECUTAR → FINALIZAR)
 
 Fluxo operacional canônico para governança e execução de issues:
 
@@ -155,7 +170,7 @@ python tools/sync_hub.py --check
 PYTHONPATH=src pytest tests/ -v
 ```
 
-## 9. Links importantes (desenvolvimento)
+## 10. Links importantes (desenvolvimento)
 
 - 📁 [Portal de Prompts Operacionais](docs/development/prompts/README.md)
 - 🧾 [Relatórios canônicos](docs/development/prompts/relatorios/)
