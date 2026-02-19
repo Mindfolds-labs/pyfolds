@@ -1,47 +1,49 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PyFolds Origami Tech Icon">
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PyFolds Isometric Icon formed by PF letters">
   <defs>
-    <linearGradient id="bg_grad" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#08142D"/>
-      <stop offset="1" stop-color="#102B5F"/>
+    <linearGradient id="bg_light" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFC"/> <stop offset="1" stop-color="#E2E8F0"/> </linearGradient>
+
+    <linearGradient id="blue_face_light" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop stop-color="#3B82F6"/> <stop offset="1" stop-color="#1D4ED8"/> </linearGradient>
+    <linearGradient id="blue_face_dark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop stop-color="#1E40AF"/>
+      <stop offset="1" stop-color="#172554"/> </linearGradient>
+    <linearGradient id="blue_top" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop stop-color="#60A5FA"/> <stop offset="1" stop-color="#3B82F6"/>
     </linearGradient>
-    <linearGradient id="core_blue" x1="140" y1="112" x2="372" y2="388" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#3B7BFF"/>
-      <stop offset="1" stop-color="#1C3F8E"/>
+
+    <linearGradient id="gold_face_light" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop stop-color="#FCD34D"/> <stop offset="1" stop-color="#F59E0B"/> </linearGradient>
+    <linearGradient id="gold_face_dark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop stop-color="#D97706"/>
+      <stop offset="1" stop-color="#92400E"/>
     </linearGradient>
-    <linearGradient id="accent_gold" x1="236" y1="212" x2="328" y2="310" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFD86A"/>
-      <stop offset="1" stop-color="#E5A800"/>
+     <linearGradient id="gold_top" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop stop-color="#FDE68A"/> <stop offset="1" stop-color="#FCD34D"/>
     </linearGradient>
-    
-    <pattern id="rd-texture" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M0 20 Q 10 0, 20 20 T 40 20" stroke="white" stroke-width="1.5" opacity="0.1" fill="none"/>
-        <path d="M0 10 Q 10 30, 20 10 T 40 10" stroke="white" stroke-width="1" opacity="0.05" fill="none"/>
-        <circle cx="10" cy="10" r="2" fill="white" opacity="0.1"/>
-        <circle cx="30" cy="30" r="1.5" fill="white" opacity="0.1"/>
-    </pattern>
-    
-    <mask id="texture-mask">
-      <rect x="0" y="0" width="512" height="512" fill="white"/>
-      <rect x="0" y="0" width="512" height="512" fill="url(#rd-texture)"/>
-    </mask>
   </defs>
 
-  <rect x="0" y="0" width="512" height="512" rx="96" fill="url(#bg_grad)"/>
+  <rect x="0" y="0" width="512" height="512" rx="96" fill="url(#bg_light)"/>
 
-  <g stroke="#BDC3C7" stroke-width="3" stroke-linejoin="round" mask="url(#texture-mask)">
+  <g transform="translate(56, 56)">
       
-    <path d="M150 120 L 220 160 V 380 L 150 340 V 120 Z" fill="url(#core_blue)"/>
-    <path d="M150 120 L 280 120 L 350 160 L 220 160 L 150 120 Z" fill="#2B63D6"/>
-    <path d="M350 160 V 240 L 280 280 L 220 240 V 160 L 350 160 Z" fill="#143574"/>
-    <path d="M220 240 L 280 280 L 220 320 L 160 280 L 220 240 Z" fill="#183B86"/>
-
-    <path d="M280 180 L 380 180 L 420 220 L 320 220 L 280 180 Z" fill="url(#accent_gold)"/>
-    <path d="M320 220 L 420 220 L 380 260 L 280 260 L 320 220 Z" fill="#D49A00"/>
+    <path d="M100 100 L 180 140 V 360 L 100 320 V 100 Z" fill="url(#blue_face_light)"/>
+    <path d="M180 140 L 220 120 V 340 L 180 360 V 140 Z" fill="url(#blue_face_dark)"/>
+    <path d="M100 100 L 140 80 L 220 120 L 180 140 L 100 100 Z" fill="url(#blue_top)"/>
     
-    <path d="M280 280 L 360 280 L 400 320 L 320 320 L 280 280 Z" fill="url(#accent_gold)"/>
-    <path d="M420 220 V 280 L 380 320 V 260 L 420 220 Z" fill="#E5A800"/>
-  </g>
-  
-  <rect x="150" y="120" width="270" height="260" fill="url(#rd-texture)" opacity="0.3" style="mix-blend-mode: overlay; pointer-events: none;"/>
+    <path d="M140 80 L 300 80 L 340 100 L 180 100 L 140 80 Z" fill="url(#blue_top)"/>
+    <path d="M180 100 L 340 100 L 340 140 L 180 140 L 180 100 Z" fill="url(#blue_face_light)"/>
+    
+    <path d="M340 100 L 380 120 V 220 L 340 200 V 100 Z" fill="url(#blue_face_dark)"/> <path d="M340 140 L 340 200 L 220 260 L 220 200 L 340 140 Z" fill="url(#blue_face_light)"/> <path d="M220 260 L 180 240 L 180 200 L 220 220 L 220 260 Z" fill="#1E3A8A"/> <g filter="drop-shadow(-4px 4px 8px rgba(0,0,0,0.15))">
+        <path d="M240 110 L 360 110 L 400 130 L 280 130 L 240 110 Z" fill="url(#gold_top)"/>
+        <path d="M240 130 L 360 130 L 360 170 L 240 170 L 240 130 Z" fill="url(#gold_face_light)"/>
+        <path d="M360 130 L 400 130 L 400 170 L 360 170 L 360 130 Z" fill="url(#gold_face_dark)"/>
+    </g>
 
+    <g filter="drop-shadow(-4px 4px 8px rgba(0,0,0,0.15))">
+        <path d="M240 210 L 320 210 L 360 230 L 280 230 L 240 210 Z" fill="url(#gold_top)"/>
+        <path d="M240 230 L 320 230 L 320 270 L 240 270 L 240 230 Z" fill="url(#gold_face_light)"/>
+        <path d="M320 230 L 360 230 L 360 270 L 320 270 L 320 230 Z" fill="url(#gold_face_dark)"/>
+    </g>
+  </g>
 </svg>
