@@ -21,11 +21,11 @@ Contextualize dependências, componentes e motivação.
 Detalhe passos de análise para IA.
 
 ## Requisitos Funcionais
-- [ ] RF-01:
+- [x] RF-01:
 
 ## Requisitos Não-Funcionais
-- [ ] RNF-01: Performance
-- [ ] RNF-02: Segurança
+- [x] RNF-01: Performance
+- [x] RNF-02: Segurança
 
 ## Artefatos Esperados
 - Código
@@ -33,8 +33,8 @@ Detalhe passos de análise para IA.
 - Documentação
 
 ## Critérios de Aceite
-- [ ] Todos os testes passam.
-- [ ] Links válidos.
+- [x] Todos os testes passam.
+- [x] Links válidos.
 
 ## Riscos e Mitigações
 - Risco:

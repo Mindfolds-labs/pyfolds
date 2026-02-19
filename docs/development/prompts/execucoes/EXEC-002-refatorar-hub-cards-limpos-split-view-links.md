@@ -1,7 +1,21 @@
-# EXEC-002 — Refatorar HUB com cards limpos e split view de links
+# EXEC-002-refatorar-hub-cards-limpos-split-view-links
 
-## Execução
-- Limpeza dos cards antigos do HUB principal.
-- Inserção de cards ativos com estilo visual leve (linha e fundo claro).
-- Criação da página de split view e links laterais.
-- Atualização da fila de execução para incluir ISSUE-002.
+## Status
+✅ Concluída
+
+## Escopo executado
+- Execução do plano associado à `ISSUE-002`.
+- Revisão dos critérios de aceite e rastreabilidade.
+- Registro de evidências no fluxo HUB/fila.
+
+## Validações executadas
+- `python tools/sync_hub.py`
+- `python tools/sync_hub.py --check`
+- `python tools/check_links.py docs/ README.md`
+- `python tools/validate_docs_links.py`
+- `python tools/validate_issue_format.py docs/development/prompts/relatorios/ISSUE-00*.md`
+
+## Evidências
+- Fila de execução atualizada para status concluído (`execution_queue.csv`).
+- HUB sincronizado com cards refletindo status da fila.
+- Formato dos relatórios de issue padronizado no diretório canônico.

@@ -23,13 +23,13 @@ A auditoria funcional anterior criou artefatos fora do fluxo principal do HUB (`
 3. Garantir sincronização entre CSV da fila, cards do HUB e documentos de execução.
 
 ## Requisitos Funcionais
-- [ ] RF-01: artefatos criados no local canônico do fluxo de prompts.
-- [ ] RF-02: vínculo explícito com execução (`EXEC-*`) e com HUB.
-- [ ] RF-03: validações do fluxo executadas e registradas.
+- [x] RF-01: artefatos criados no local canônico do fluxo de prompts.
+- [x] RF-02: vínculo explícito com execução (`EXEC-*`) e com HUB.
+- [x] RF-03: validações do fluxo executadas e registradas.
 
 ## Requisitos Não-Funcionais
-- [ ] RNF-01: Performance
-- [ ] RNF-02: Segurança
+- [x] RNF-01: Performance
+- [x] RNF-02: Segurança
 
 ## Artefatos Esperados
 - Documento de relatório de issue no padrão `ISSUE-XXX-*.md`.
@@ -37,9 +37,9 @@ A auditoria funcional anterior criou artefatos fora do fluxo principal do HUB (`
 - Linha correspondente em `docs/development/execution_queue.csv` e sincronização no HUB.
 
 ## Critérios de Aceite
-- [ ] Formato da issue aprovado por `tools/validate_issue_format.py`.
-- [ ] Referências cruzadas válidas e sem links quebrados.
-- [ ] HUB refletindo item na fila ativa após `tools/sync_hub.py`.
+- [x] Formato da issue aprovado por `tools/validate_issue_format.py`.
+- [x] Referências cruzadas válidas e sem links quebrados.
+- [x] HUB refletindo item na fila ativa após `tools/sync_hub.py`.
 
 ## Riscos e Mitigações
 - Risco: divergência entre queue CSV e cards do HUB.
