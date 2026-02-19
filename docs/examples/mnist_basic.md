@@ -114,22 +114,4 @@ def train(model, train_loader, epochs=5):
 - Neurônios especializados por classe.
 - Filamentos médios: 15-25 por sinapse ativa.
 
-- > ## 2. Carregar Dados MNIST
->
-> ```python
-> transform = torchvision.transforms.Compose([
->     torchvision.transforms.ToTensor(),
->     torchvision.transforms.Normalize((0.1307,), (0.3081,)),
->     torchvision.transforms.Lambda(lambda x: x.view(-1)),
-> ])
->
-> train_dataset = torchvision.datasets.MNIST(
->     './data', train=True, download=True, transform=transform
-> )
-> test_dataset = torchvision.datasets.MNIST(
->     './data', train=False, download=True, transform=transform
-> )
->
-> train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-> test_loader = DataLoader(test_dataset, batch_size=1000, shuffle=False)
-> ```
+
