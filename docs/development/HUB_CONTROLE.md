@@ -53,60 +53,70 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
     <td width="68%" valign="top">
 
 <!-- HUB:CARDS:BEGIN -->
-> [!NOTE]
+> [!TIP]
 > **ISSUE-001** · Implementar LTD explícita em sinapses
 >
-> **Status:** ⏳ Planejada  
+> **Status:** ✅ Concluída  
 > **Responsável:** Codex  
 > **Data:** 2026-02-19  
 > **Prioridade:** `Alta` · **Área:** `Core/Plasticidade`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-001-implementar-ltd-explicita-em-sinapses.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-001-correcoes-ordem-neuronal.md)
 
-> [!NOTE]
+> [!TIP]
 > **ISSUE-002** · Refatorar HUB com cards limpos e split view de links
 >
-> **Status:** ⏳ Planejada  
+> **Status:** ✅ Concluída  
 > **Responsável:** Codex  
 > **Data:** 2026-02-19  
 > **Prioridade:** `Alta` · **Área:** `Governança/UX Docs`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-002-refatorar-hub-cards-limpos-split-view-links.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-002-refatorar-hub-cards-limpos-split-view-links.md)
 
-> [!NOTE]
+> [!TIP]
 > **ISSUE-003** · Plano 1: Reposicionar issues no fluxo oficial do HUB
 >
-> **Status:** ⏳ Planejada  
+> **Status:** ✅ Concluída  
 > **Responsável:** Codex  
 > **Data:** 2026-02-19  
 > **Prioridade:** `Alta` · **Área:** `Governança/Fluxo`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-003-plano-1-reposicionar-issues-no-hub.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-003-plano-1-reposicionar-issues-no-hub.md)
 
-> [!NOTE]
+> [!TIP]
 > **ISSUE-004** · Plano 2: Sanear links e navegação documental
 >
-> **Status:** ⏳ Planejada  
+> **Status:** ✅ Concluída  
 > **Responsável:** Codex  
 > **Data:** 2026-02-19  
 > **Prioridade:** `Alta` · **Área:** `Documentação/Qualidade`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-004-plano-2-sanear-links-documentacao.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-004-plano-2-sanear-links-documentacao.md)
 
-> [!NOTE]
+> [!TIP]
 > **ISSUE-006** · Plano 4: Consolidar correções de código e testes mínimos
 >
-> **Status:** ⏳ Planejada  
+> **Status:** ✅ Concluída  
 > **Responsável:** Codex  
 > **Data:** 2026-02-19  
 > **Prioridade:** `Alta` · **Área:** `Core/Testes/Docs`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-006-plano-4-consolidar-correcoes-codigo-testes.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-006-plano-4-consolidar-correcoes-codigo-testes.md)
 
-> [!NOTE]
+> [!WARNING]
+> **ISSUE-008** · Resiliência de testes sem torch (analisar + executar)
+>
+> **Status:** 🚧 Em Progresso  
+> **Responsável:** Codex  
+> **Data:** 2026-02-19  
+> **Prioridade:** `Alta` · **Área:** `Testes/Infra`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-008-resiliencia-de-testes-sem-torch.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-008-resiliencia-de-testes-sem-torch.md)
+
+> [!TIP]
 > **ISSUE-005** · Plano 3: Executar validações e registrar evidências no HUB
 >
-> **Status:** ⏳ Planejada  
+> **Status:** ✅ Concluída  
 > **Responsável:** Codex  
 > **Data:** 2026-02-19  
 > **Prioridade:** `Média` · **Área:** `Governança/Validação`  
