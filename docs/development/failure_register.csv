@@ -1,1 +1,1 @@
-id,tipo,descricao,impacto,status,issue_correcao,assinatura_erro,arquivo_afetado,caminho_log,data_registro,ultima_ocorrencia
+id,tipo,descricao,impacto,status,status_cobertura,issue_correcao,teste_regressao,evidencia_regressao,assinatura_erro,arquivo_afetado,caminho_log,data_registro,ultima_ocorrencia
