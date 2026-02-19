@@ -1,28 +1,41 @@
-<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <!-- Fundo hex grid sutil (opcional) -->
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="800" height="600" fill="#1a2f4d"/>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#3d5a80" stroke-width="0.5"/>
+  </pattern>
+  <rect width="800" height="600" fill="url(#grid)"/>
+  <path d="M 40 40 L 760 40 M 40 560 L 760 560 M 40 40 L 40 560 M 760 40 L 760 560" stroke="#4da6ff" stroke-width="1"/>
+  <text x="400" y="580" font-family="sans-serif" font-size="20" fill="#ffffff" text-anchor="middle">ORIGINAL ICON</text>
+
   <defs>
-    <pattern id="grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-      <path d="M 10 0 L 10 20 M 0 10 L 20 10" stroke="#2a3f5e" stroke-width="0.3" opacity="0.2"/>
-    </pattern>
+    <linearGradient id="blueMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2b4c7e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1f3a60;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#132540;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4af37;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#b3922f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8f7324;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+        <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="texture">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise"/>
+      <feDiffuseLighting in="noise" lighting-color="#ffffff" surfaceScale="1">
+        <feDistantLight azimuth="45" elevation="60"/>
+      </feDiffuseLighting>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
   </defs>
-  <rect width="200" height="200" fill="#0a1a2f" />
 
-  <!-- Hexágono principal (estrutura) -->
-  <polygon points="100,30 150,55 150,105 100,130 50,105 50,55" fill="none" stroke="#d4af37" stroke-width="2" stroke-opacity="0.5" />
+  <g transform="translate(400, 300) scale(1.2)" filter="url(#shadow)">
+    <path d="M -80 -120 L 0 -160 L 80 -120 L 80 0 L 0 40 L -80 0 Z" fill="url(#blueMetal)" filter="url(#texture)"/>
+    <path d="M -80 -120 L -120 -40 L -120 80 L -40 120 L -40 40 L 0 0 L -80 -120" fill="url(#blueMetal)" filter="url(#texture)"/>
+    <path d="M 80 -120 L 120 -40 L 120 80 L 40 120 L 40 40 L 0 0 L 80 -120" fill="url(#blueMetal)" filter="url(#texture)"/>
 
-  <!-- Dobraduras internas formando um "P" estilizado em origami -->
-  <path d="M100 55 L100 90 L120 105 L140 90 L120 75 L100 90 L80 75 L60 90 L80 105 L100 90 L100 130" 
-        fill="none" stroke="#d4af37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-
-  <!-- Sombra/detalhe para dar profundidade -->
-  <path d="M100 55 L100 90 L120 105 M100 90 L80 75 L60 90 M100 90 L120 75 L140 90 M100 90 L80 105" 
-        fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.2" stroke-linecap="round" />
-
-  <!-- Elemento de "fita" que reforça o P -->
-  <path d="M100 55 L100 70 L115 80 L130 70 L115 60 L100 70 L85 60 L70 70 L85 80 L100 70 L100 90" 
-        fill="none" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-
-  <!-- Destaque de luz (dourado) -->
-  <circle cx="140" cy="75" r="3" fill="#d4af37" opacity="0.8" />
-  <circle cx="75" cy="100" r="2" fill="#d4af37" opacity="0.6" />
+    <path d="M 0 0 L 40 40 L 40 120 L -40 160 L -40 80 L 0 40 Z" fill="url(#goldMetal)" filter="url(#texture)"/>
+    <path d="M -40 160 L 0 200 L 80 160 L 80 80 L 40 40 L 0 80 L -40 160" fill="url(#goldMetal)" filter="url(#texture)"/>
+  </g>
 </svg>
