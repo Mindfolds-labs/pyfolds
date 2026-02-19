@@ -47,22 +47,22 @@ class MPJRDConfig:
     i_decay_sleep: float = 0.99
     
     # ===== MECANISMO 3: DINÂMICA ST (u, R) =====
-    u0: float = 0.1
+    u0: float = 0.2
     R0: float = 1.0
-    U: float = 0.2
+    U: float = 0.3
     tau_fac: float = 100.0
     tau_rec: float = 800.0
     saturation_recovery_time: float = 60.0
     
     # ===== MECANISMO 4: HOMEOSTASE =====
-    theta_init: float = 4.5
-    theta_min: float = 2.0
-    theta_max: float = 8.0
+    theta_init: float = 1.5
+    theta_min: float = 0.5
+    theta_max: float = 6.0
     homeostasis_alpha: float = 0.1
-    homeostasis_eta: float = 0.05
+    homeostasis_eta: float = 0.1
     target_spike_rate: float = 0.1
     dead_neuron_threshold: float = 0.01
-    dead_neuron_penalty: float = 0.3
+    dead_neuron_penalty: float = 1.0
     
     # ✅ NOVO: Threshold para considerar sinapse ativa
     activity_threshold: float = 0.01
@@ -127,7 +127,7 @@ class MPJRDConfig:
     inhibition_trainable_i2e: bool = False
     
     # ===== NEUROMODULAÇÃO =====
-    neuromod_mode: NeuromodMode = "external"
+    neuromod_mode: NeuromodMode = "surprise"
     neuromod_scale: float = 1.0
     
     # Capacidade

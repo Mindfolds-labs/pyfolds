@@ -44,7 +44,9 @@ class MPJRDSynapse(nn.Module):
 
         # Inicialização do número de filamentos
         if init_n is None:
-            init_n = int(torch.randint(cfg.n_min, min(5, cfg.n_max + 1), (1,)).item())
+            low = max(cfg.n_min, cfg.n_max // 4)
+            high = max(low + 1, min(cfg.n_max + 1, (3 * cfg.n_max) // 4 + 1))
+            init_n = int(torch.randint(low, high, (1,)).item())
         self.register_buffer("N", torch.tensor([init_n], dtype=torch.int32))
 
         # Potencial interno
