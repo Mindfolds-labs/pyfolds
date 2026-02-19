@@ -137,7 +137,21 @@ def run_training(cfg: TrainingConfig | None = None) -> dict[str, object]:
     logger, log_path = setup_run_logging(app="mnist_training", console=False, level="INFO")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    mp_cfg = MPJRDConfig(n_dendrites=4, n_synapses_per_dendrite=8, plastic=True)
+    mp_cfg = MPJRDConfig(
+        n_dendrites=4,
+        n_synapses_per_dendrite=8,
+        plastic=True,
+        u0=0.2,
+        R0=1.0,
+        U=0.3,
+        theta_init=1.5,
+        theta_min=0.5,
+        theta_max=6.0,
+        homeostasis_eta=0.1,
+        dead_neuron_penalty=1.0,
+        w_scale=3.5,
+        neuromod_mode="surprise",
+    )
     model = MnistMPJRDModel(mp_cfg, n_neurons=cfg.n_neurons, device=device).to(device)
     optimizer = optim.Adam(model.parameters(), lr=cfg.learning_rate)
     criterion = nn.CrossEntropyLoss()
