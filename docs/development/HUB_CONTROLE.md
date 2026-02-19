@@ -31,7 +31,6 @@ Este HUB **não é documentação de usuário final**. Ele deve ser usado apenas
 ## Fila Próximas
 Fonte: [`execution_queue.csv`](execution_queue.csv).
 
-
 A fila abaixo é gerada automaticamente a partir de `docs/development/execution_queue.csv`.
 
 ### 4.0 Tabela Resumida
@@ -40,539 +39,75 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ID | Status | Tema | Responsável | Data |
 | :-- | :-- | :-- | :-- | :-- |
 | ISSUE-001 | Planejada | Implementar LTD explícita em sinapses | Codex | 2026-02-19 |
+| ISSUE-002 | Planejada | Refatorar HUB com cards limpos e split view de links | Codex | 2026-02-19 |
 <!-- HUB:QUEUE:END -->
 
-### 4.1 Cards
+### 4.1 Cards (UI limpa)
 
-<!-- HUB:CARDS:BEGIN -->
-> [!TIP]
-> **ISSUE-001** · Reestruturação sistêmica de /docs e raiz (governança v1.0.0)
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-001-docs-dependency-linkify.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-001-fix-linkify-dependency.md)
-
-> [!TIP]
-> **ISSUE-002** · Unificação e serialização da série de ADRs
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Governança/ADR`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-002-unificacao-e-serializacao-da-serie-de-adrs.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-002-unificacao-e-serializacao-da-serie-de-adrs.md)
-
-> [!TIP]
-> **ISSUE-003** · Auditoria completa do repositório (docs + src + .github + examples + tests)
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-003-auditoria-completa.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-003-auditoria-completa-do-repositorio-docs-src-github-examples-tests.md)
-
-> [!TIP]
-> **ISSUE-004** · Consolidação do hub interno e navegação em docs/development
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Desenvolvimento/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-004-consolidacao-do-hub-interno-e-navegacao-em-docs-development.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-004-consolidacao-do-hub-interno-e-navegacao-em-docs-development.md)
-
-> [!TIP]
-> **ISSUE-005** · Consolidação total: implementar plano de ação da auditoria (3 sprints)
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `all`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-005-consolidacao-total-implementar-plano-de-acao-da-auditoria-3-sprints.md)
-
-> [!IMPORTANT]
-> **ISSUE-006** · Número reservado (não utilizado intencionalmente)
->
-> **Status:** ⚪ Cancelada  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Média` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-006-numero-reservado-nao-utilizado-intencionalmente.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-006-numero-reservado-nao-utilizado-intencionalmente.md)
-
-> [!TIP]
-> **ISSUE-007** · Consolidação final do workflow e normalização total de prompts
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-007-consolidacao-final.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-007-consolidacao-final-do-workflow-e-normalizacao-total-de-prompts.md)
-
-> [!TIP]
-> **ISSUE-008** · Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-008-melhoria-workflow-prompts.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-008-melhorar-workflow-de-prompts-com-ciclo-criar-analisar-executar-finalizar.md)
-
-> [!TIP]
-> **ISSUE-009** · Padronização de formatos de ISSUEs para interação com IA
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-009-padronizacao-formatos-ia.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-009-padronizacao-de-formatos-de-issues-para-interacao-com-ia.md)
-
-> [!TIP]
-> **ISSUE-010** · Consolidação final: fechamento das ISSUEs 001-009 e limpeza documental
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-010-consolidacao-final-fechamento-das-issues-001-009-e-limpeza-documental.md)
-
-> [!TIP]
-> **ISSUE-010-ESPECIAL** · Corrigir estrutura docs/ - remover soltos e órfãos
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-010-ESPECIAL-corrigir-estrutura-docs-remover-soltos-e-orfaos.md)
-
-> [!TIP]
-> **ISSUE-011** · Consolidação de fluxo operacional e correção de cards/links
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-011-consolidacao-de-fluxo-operacional-e-correcao-de-cards-links.md)
-
-> [!TIP]
-> **ISSUE-011-ESPECIAL** · Consolidação de fluxo operacional e correção de cards/links
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-011-ESPECIAL-consolidacao-de-fluxo-operacional-e-correcao-de-cards-links.md)
-
-> [!TIP]
-> **ISSUE-012** · Auditoria de código em src + testes + ADR-035
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-012-auditoria-codigo-testes-adr35.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-012-auditoria-de-codigo-em-src-testes-adr-035.md)
-
-> [!TIP]
-> **ISSUE-013** · Estabilizar instalação editável em rede restrita e consolidar falhas da auditoria ADR-035
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-013-estabilizar-install-editavel-rede-restrita.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-013-estabilizar-instalacao-editavel-em-rede-restrita-e-consolidar-falhas-da-auditoria-adr-035.md)
-
-> [!TIP]
-> **ISSUE-014** · Auditoria SRC/Testes ADR-035 + gate CI docs hub com Sphinx/MyST/PyData
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-014-auditoria-src-testes-adr35-ci-docs-hub.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-014-auditoria-src-testes-adr-035-gate-ci-docs-hub-com-sphinx-myst-pydata.md)
-
-> [!TIP]
-> **ISSUE-015** · Validar erros corrigidos + importacao pyfolds + suite completa + governanca
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-015-validar-erros-imports-testes-e-governanca.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-015-validar-erros-corrigidos-importacao-pyfolds-suite-completa-governanca.md)
-
-> [!TIP]
-> **ISSUE-001** · Adicionar dependência linkify-it-py para MyST Parser na documentação
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `DOCS`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-001-docs-dependency-linkify.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-001-fix-linkify-dependency.md)
-
-> [!TIP]
-> **ISSUE-017** · Governança de numeração automática e entrega completa de ISSUE/EXEC
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `Governança/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-017-governanca-numeracao-automatica-prompts.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-017-governanca-numeracao-automatica-prompts.md)
-
-> [!TIP]
-> **ISSUE-018** · Padronização de relatórios e obrigatoriedade de sync HUB
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-018-padronizacao-relatorios-sync-hub-obrigatorio.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-018-padronizacao-relatorios-sync-hub-obrigatorio.md)
-
-> [!TIP]
-> **ISSUE-019** · Determinismo de relatórios e logs no workflow de prompts
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-019-determinismo-relatorios-logs-workflow-prompts.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-019-determinismo-relatorios-logs-workflow-prompts.md)
-
-> [!TIP]
-> **ISSUE-020** · Relatório CI Docs Hub e correções para Sphinx/MyST
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Documentação/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-020-relatorio-ci-docs-hub-sphinx-myst.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-020-relatorio-ci-docs-hub-e-correcoes-para-sphinx-myst.md)
-
-> [!NOTE]
-> **ISSUE-021** · Auditoria total do repositório com análise sênior (sem execução de mudanças de produto)
->
-> **Status:** ⏳ Planejada  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-021-auditoria-total-repositorio-analise-senior.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-021-auditoria-total-repositorio-analise-senior.md)
-
-> [!TIP]
-> **ISSUE-023** · Auditoria corretiva de estabilidade runtime e consistência cross-módulo
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-023-auditoria-corretiva-estabilidade-runtime.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-023-auditoria-corretiva-estabilidade-runtime.md)
-
-> [!TIP]
-> **ISSUE-022** · Auditoria e correção do neurônio MPJRD (thread safety + validações + plasticidade)
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Core`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-022-auditoria-neuron-thread-safety-plasticidade.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-022-auditoria-neuron-thread-safety-plasticidade.md)
-
-> [!TIP]
-> **ISSUE-025** · Análise integral do pyfolds + execução direta + atualização de benchmark e ADR-037
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-025-analise-integral-benchmark-adr37.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-025-analise-integral-benchmark-adr37.md)
-
-> [!NOTE]
-> **ISSUE-024** · Revisão estética do HUB_CONTROLE com cards sincronizados por CSV
->
-> **Status:** ⏳ Planejada  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-024-correcao-tipos-telemetria-apis.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-024-revisao-estetica-hub-controle.md)
-
-> [!TIP]
-> **ISSUE-036** · Auditoria do fluxo .fold/.mind + validação lógica + governança ADR/EXEC/HUB
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-18  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-036-auditoria-fluxo-fold-mind-governanca.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-036-auditoria-fluxo-fold-mind-governanca.md)
-
-> [!TIP]
-> **ISSUE-038** · Auditoria de prontidão para publicação no PyPI com checklist sênior e evidências de build
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-18  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Release`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-038-auditoria-prontidao-publicacao-pypi.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-038-auditoria-prontidao-publicacao-pypi.md)
-
-<!-- HUB:CARDS:END -->
-
-
-### 4.1 🔍 Detalhamento de Atividades (Cards)
-
-<!-- BEGIN_CARDS -->
-> [!TIP]
-> **ISSUE-001** · Reestruturação sistêmica de /docs e raiz (governança v1.0.0)
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-001-docs-dependency-linkify.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-001-fix-linkify-dependency.md)
-
-> [!TIP]
-> **ISSUE-002** · Unificação e serialização da série de ADRs
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Governança/ADR`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-002-unificacao-e-serializacao-da-serie-de-adrs.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-002-unificacao-e-serializacao-da-serie-de-adrs.md)
-
-> [!TIP]
-> **ISSUE-003** · Auditoria completa do repositório (docs + src + .github + examples + tests)
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-003-auditoria-completa.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-003-auditoria-completa-do-repositorio-docs-src-github-examples-tests.md)
-
-> [!TIP]
-> **ISSUE-004** · Consolidação do hub interno e navegação em docs/development
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Desenvolvimento/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-004-consolidacao-do-hub-interno-e-navegacao-em-docs-development.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-004-consolidacao-do-hub-interno-e-navegacao-em-docs-development.md)
-
-> [!TIP]
-> **ISSUE-005** · Consolidação total: implementar plano de ação da auditoria (3 sprints)
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `all`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-005-plano-acao-consolidacao.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-005-consolidacao-total-implementar-plano-de-acao-da-auditoria-3-sprints.md)
-
-> [!IMPORTANT]
-> **ISSUE-006** · Número reservado (não utilizado intencionalmente)
->
-> **Status:** ⚪ Cancelada  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Média` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-006-numero-reservado-nao-utilizado-intencionalmente.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-006-numero-reservado-nao-utilizado-intencionalmente.md)
-
-> [!TIP]
-> **ISSUE-007** · Consolidação final do workflow e normalização total de prompts
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-007-consolidacao-final.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-007-consolidacao-final-do-workflow-e-normalizacao-total-de-prompts.md)
-
-> [!TIP]
-> **ISSUE-008** · Melhorar workflow de prompts com ciclo Criar-Analisar-Executar-Finalizar
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-008-melhoria-workflow-prompts.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-008-melhorar-workflow-de-prompts-com-ciclo-criar-analisar-executar-finalizar.md)
-
-> [!TIP]
-> **ISSUE-009** · Padronização de formatos de ISSUEs para interação com IA
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Documentação/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-009-padronizacao-formatos-ia.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-009-padronizacao-de-formatos-de-issues-para-interacao-com-ia.md)
-
-> [!TIP]
-> **ISSUE-010** · Consolidação final: fechamento das ISSUEs 001-009 e limpeza documental
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-16  
-> **Prioridade:** `Alta` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-010-consolidacao-final-fechamento-das-issues-001-009-e-limpeza-documental.md)
-
-> [!TIP]
-> **ISSUE-010-ESPECIAL** · Corrigir estrutura docs/ - remover soltos e órfãos
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-010-ESPECIAL-corrigir-estrutura-docs.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-010-ESPECIAL-corrigir-estrutura-docs-remover-soltos-e-orfaos.md)
-
-> [!TIP]
-> **ISSUE-011** · Consolidação de fluxo operacional e correção de cards/links
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-011-consolidacao-de-fluxo-operacional-e-correcao-de-cards-links.md)
-
-> [!TIP]
-> **ISSUE-011-ESPECIAL** · Consolidação de fluxo operacional e correção de cards/links
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Documentação`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-011-ESPECIAL-consolidacao-fluxo.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-011-ESPECIAL-consolidacao-de-fluxo-operacional-e-correcao-de-cards-links.md)
-
-> [!TIP]
-> **ISSUE-012** · Auditoria de código em src + testes + ADR-035
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-012-auditoria-codigo-testes-adr35.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-012-auditoria-de-codigo-em-src-testes-adr-035.md)
-
-> [!TIP]
-> **ISSUE-013** · Estabilizar instalação editável em rede restrita e consolidar falhas da auditoria ADR-035
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-013-estabilizar-install-editavel-rede-restrita.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-013-estabilizar-instalacao-editavel-em-rede-restrita-e-consolidar-falhas-da-auditoria-adr-035.md)
-
-> [!TIP]
-> **ISSUE-014** · Auditoria SRC/Testes ADR-035 + gate CI docs hub com Sphinx/MyST/PyData
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-014-auditoria-src-testes-adr35-ci-docs-hub.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-014-auditoria-src-testes-adr-035-gate-ci-docs-hub-com-sphinx-myst-pydata.md)
-
-> [!TIP]
-> **ISSUE-015** · Validar erros corrigidos + importacao pyfolds + suite completa + governanca
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Código/Testes/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-015-validar-erros-imports-testes-e-governanca.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-015-validar-erros-corrigidos-importacao-pyfolds-suite-completa-governanca.md)
-
-> [!TIP]
-> **ISSUE-001** · Adicionar dependência linkify-it-py para MyST Parser na documentação
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `DOCS`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-001-docs-dependency-linkify.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-001-fix-linkify-dependency.md)
-
-> [!TIP]
-> **ISSUE-017** · Governança de numeração automática e entrega completa de ISSUE/EXEC
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Alta` · **Área:** `Governança/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-017-governanca-numeracao-automatica-prompts.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-017-governanca-numeracao-automatica-prompts.md)
-
-> [!TIP]
-> **ISSUE-018** · Padronização de relatórios e obrigatoriedade de sync HUB
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-018-padronizacao-relatorios-sync-hub-obrigatorio.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-018-padronizacao-relatorios-sync-hub-obrigatorio.md)
-
-> [!TIP]
-> **ISSUE-019** · Determinismo de relatórios e logs no workflow de prompts
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Governança/Processo`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-019-determinismo-relatorios-logs-workflow-prompts.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-019-determinismo-relatorios-logs-workflow-prompts.md)
-
-> [!TIP]
-> **ISSUE-020** · Relatório CI Docs Hub e correções para Sphinx/MyST
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-17  
-> **Prioridade:** `Crítica` · **Área:** `Documentação/Governança`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-020-relatorio-ci-docs-hub-sphinx-myst.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-020-relatorio-ci-docs-hub-e-correcoes-para-sphinx-myst.md)
+<table>
+  <tr>
+    <td width="68%" valign="top">
 
 <!-- HUB:CARDS:BEGIN -->
 > [!NOTE]
-> **ISSUE-001** · Implementar LTD explícita em sinapses
+> <span style="display:inline-block;border:1px solid #9ec5fe;background:#f8fbff;padding:8px 12px;border-radius:8px;">**ISSUE-001** · Implementar LTD explícita em sinapses</span>
 >
 > **Status:** ⏳ Planejada  
 > **Responsável:** Codex  
 > **Data:** 2026-02-19  
 > **Prioridade:** `Alta` · **Área:** `Core/Plasticidade`  
 >
-> 📄 [Relatório](./prompts/relatorios/ISSUE-001-implementar-ltd-explicita-em-sinapses.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-001-correcoes-ordem-neuronal.md)
+> <a href="./prompts/relatorios/ISSUE-001-implementar-ltd-explicita-em-sinapses.md">📄 Relatório</a> · <a href="./prompts/execucoes/EXEC-001-correcoes-ordem-neuronal.md">🛠️ Execução</a>
 
+> [!NOTE]
+> <span style="display:inline-block;border:1px solid #b7ebc6;background:#f6fff8;padding:8px 12px;border-radius:8px;">**ISSUE-002** · Refatorar HUB com cards limpos e split view de links</span>
+>
+> **Status:** ⏳ Planejada  
+> **Responsável:** Codex  
+> **Data:** 2026-02-19  
+> **Prioridade:** `Alta` · **Área:** `Governança/UX Docs`  
+>
+> <a href="./prompts/relatorios/ISSUE-002-refatorar-hub-cards-limpos-split-view-links.md">📄 Relatório</a> · <a href="./prompts/execucoes/EXEC-002-refatorar-hub-cards-limpos-split-view-links.md">🛠️ Execução</a>
 <!-- HUB:CARDS:END -->
+
+   </td>
+   <td width="32%" valign="top">
+
+#### Links rápidos
+
+<a href="./ISSUES_SPLIT_VIEW.md">🔀 Abrir página de Split View</a><br>
+<a href="./execution_queue.md">📋 Ver fila detalhada</a><br>
+<a href="./failure_register.csv">🧯 Ver registro de falhas</a>
+
+   </td>
+  </tr>
+</table>
+
+> Os cards de ISSUE históricos foram removidos deste HUB e permanecem em `./legado/`.
+
+## 5. Falhas Detectadas
+
+Fonte canônica: [`failure_register.csv`](./failure_register.csv).
+
+### 5.1 Esquema oficial de colunas
+
+| ID | Tipo | Descrição | Impacto | Status | Issue de Correção |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+
+> Campos operacionais obrigatórios no CSV: `arquivo_afetado` e `caminho_log`.
+
+### 5.2 Regra de identificação e deduplicação
+
+- **Regra de ID:** `FAIL-001`, `FAIL-002`, ... (sequencial, sem reutilização).
+- **Assinatura de deduplicação:** `assinatura_erro + arquivo_afetado`.
+- Se uma falha repetida chegar com a mesma assinatura no mesmo arquivo, atualizar `status`, `caminho_log` e metadados da linha existente em vez de abrir novo ID.
+
+### 5.3 Vínculo com a fila de execução
+
+- `execution_queue.csv` **alimenta** `failure_register.csv` durante a execução de cada ISSUE/EXEC, quando testes/checks capturam erro novo.
+- `failure_register.csv` **retroalimenta** `execution_queue.csv` na revisão de planejamento: falhas em aberto geram (ou atualizam) linhas de execução com `Issue de Correção`.
+- Momento de sincronização: no fechamento de cada execução e antes da atualização dos blocos `HUB:QUEUE` e `HUB:CARDS`.
+
 
 ## Histórico em legado
 
