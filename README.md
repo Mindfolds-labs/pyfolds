@@ -64,18 +64,18 @@ print(output["spikes"])
 
 ## 4. Política de depreciação da API pública
 
-Os aliases legados da v1 continuam disponíveis durante a série `2.x`, sempre emitindo `DeprecationWarning` para facilitar migração gradual.
+Os aliases legados da v1 continuam disponíveis durante a série `1.x`, sempre emitindo `DeprecationWarning` para facilitar migração gradual.
 
 - `MPJRDConfig` → `NeuronConfig`
 - `MPJRDLayer` → `AdaptiveNeuronLayer`
 - `MPJRDNetwork` → `SpikingNetwork`
 
 Critérios objetivos adotados:
-- manutenção por ciclo mínimo de uma major completa (`2.x`),
+- manutenção por ciclo mínimo de uma major completa (`1.x`),
 - aviso explícito no `CHANGELOG.md`,
 - estratégia de migração com mapeamento 1:1 para nomes canônicos v2.
 
-Versão-limite planejada: remoção dos aliases v1 em `3.0.0`.
+Versão-limite planejada: remoção dos aliases v1 em `2.0.0`.
 
 ## 5. Benchmarks de serialização
 

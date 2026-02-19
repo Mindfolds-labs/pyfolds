@@ -32,13 +32,13 @@ Para permitir upgrade incremental no mesmo release, a API mantém aliases legado
 
 | Marco | Regra | Resultado esperado |
 | --- | --- | --- |
-| `2.x` (janela de migração) | Aliases v1 continuam disponíveis com `DeprecationWarning`. | Compatibilidade para upgrade gradual. |
-| `3.0.0` (versão-limite) | Aliases v1 são removidos da superfície pública. | Importações legadas passam a falhar, exigindo nomes v2. |
+| `1.x` (janela de migração) | Aliases v1 continuam disponíveis com `DeprecationWarning`. | Compatibilidade para upgrade gradual. |
+| `2.0.0` (versão-limite) | Aliases v1 são removidos da superfície pública. | Importações legadas passam a falhar, exigindo nomes v2. |
 
 Critérios objetivos para a remoção:
 
-1. **Ciclos mínimos:** manter aliases por, no mínimo, um ciclo major completo (`2.x` inteiro) antes da remoção.
-2. **Aviso em changelog:** registrar explicitamente em `CHANGELOG.md` que aliases v1 serão removidos em `3.0.0`.
+1. **Ciclos mínimos:** manter aliases por, no mínimo, a janela de migração da série `1.x` antes da remoção.
+2. **Aviso em changelog:** registrar explicitamente em `CHANGELOG.md` que aliases v1 serão removidos em `2.0.0`.
 3. **Estratégia de migração:** orientar substituição direta de símbolos (`MPJRDConfig` → `NeuronConfig`, `MPJRDLayer` → `AdaptiveNeuronLayer`, `MPJRDNetwork` → `SpikingNetwork`) em documentação pública e notas de release.
 
 ## Garantias de release
@@ -46,7 +46,7 @@ Critérios objetivos para a remoção:
 1. Importar símbolos v2 diretamente de `pyfolds` deve funcionar.
 2. Importar símbolos v1 deve continuar funcional no mesmo release, com `DeprecationWarning`.
 3. O conjunto de `__all__` em `pyfolds` deve listar tanto os nomes canônicos v2 quanto aliases v1 enquanto a janela de migração estiver ativa.
-4. Enquanto `pyfolds.__version__ < 3.0.0`, acesso a aliases v1 deve seguir emitindo `DeprecationWarning` (coberto por teste de contrato).
+4. Enquanto `pyfolds.__version__ < 2.0.0`, acesso a aliases v1 deve seguir emitindo `DeprecationWarning` (coberto por teste de contrato).
 
 ## Referências de implementação e testes
 
