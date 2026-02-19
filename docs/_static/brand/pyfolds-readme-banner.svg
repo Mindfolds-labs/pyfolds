@@ -1,0 +1,65 @@
+<svg width="1600" height="460" viewBox="0 0 1600 460" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">PyFolds README banner</title>
+  <desc id="desc">Dark blueprint banner with PyFolds technical logo and geometric lettering.</desc>
+  <defs>
+    <linearGradient id="bg" x1="60" y1="24" x2="1540" y2="438" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#040A16"/>
+      <stop offset="0.55" stop-color="#071629"/>
+      <stop offset="1" stop-color="#0B1D35"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1600" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#32AAFF" stop-opacity="0.05"/>
+      <stop offset="0.5" stop-color="#39B4FF" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#32AAFF" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="blueFold" x1="110" y1="86" x2="485" y2="390" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#98B6FF"/>
+      <stop offset="1" stop-color="#4057A8"/>
+    </linearGradient>
+    <linearGradient id="goldFold" x1="220" y1="170" x2="430" y2="324" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE79A"/>
+      <stop offset="1" stop-color="#C38A00"/>
+    </linearGradient>
+    <linearGradient id="wordBlue" x1="560" y1="98" x2="1440" y2="352" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#95AFFF"/>
+      <stop offset="1" stop-color="#5A73D0"/>
+    </linearGradient>
+    <linearGradient id="wordGold" x1="660" y1="132" x2="1500" y2="332" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE18B"/>
+      <stop offset="1" stop-color="#C08A00"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="460" rx="24" fill="url(#bg)"/>
+
+  <g opacity="0.95">
+    <path d="M0 55H1600" stroke="url(#line)" stroke-width="2"/>
+    <path d="M0 115H1600" stroke="url(#line)" stroke-width="2"/>
+    <path d="M0 175H1600" stroke="url(#line)" stroke-width="2"/>
+    <path d="M0 235H1600" stroke="url(#line)" stroke-width="2"/>
+    <path d="M0 295H1600" stroke="url(#line)" stroke-width="2"/>
+    <path d="M0 355H1600" stroke="url(#line)" stroke-width="2"/>
+    <path d="M90 0V460" stroke="url(#line)" stroke-width="2"/>
+    <path d="M250 0V460" stroke="url(#line)" stroke-width="2"/>
+    <path d="M410 0V460" stroke="url(#line)" stroke-width="2"/>
+    <path d="M730 0V460" stroke="url(#line)" stroke-width="2"/>
+    <path d="M980 0V460" stroke="url(#line)" stroke-width="2"/>
+    <path d="M1230 0V460" stroke="url(#line)" stroke-width="2"/>
+    <path d="M1450 0V460" stroke="url(#line)" stroke-width="2"/>
+  </g>
+
+  <g>
+    <path d="M264 58L442 162V298L264 402L86 298V162L264 58Z" fill="url(#blueFold)"/>
+    <path d="M152 204L236 155V352L152 303V204Z" fill="#223E82"/>
+    <path d="M292 155L376 204V303L292 352V155Z" fill="#5C78D8"/>
+    <path d="M177 254L264 204L351 254L264 304L177 254Z" fill="#253F7B"/>
+    <path d="M220 179L333 244L286 272L173 206L220 179Z" fill="url(#goldFold)"/>
+    <path d="M234 279L347 344L300 372L187 307L234 279Z" fill="url(#goldFold)"/>
+    <path d="M264 58L442 162V298L264 402L86 298V162L264 58Z" stroke="#8EB0FF" stroke-opacity="0.55" stroke-width="3"/>
+  </g>
+
+  <g aria-label="PyFolds">
+    <text x="540" y="292" fill="url(#wordBlue)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="230" font-weight="800" letter-spacing="2">PyFolds</text>
+    <text x="552" y="300" fill="url(#wordGold)" fill-opacity="0.45" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="230" font-weight="800" letter-spacing="2">PyFolds</text>
+  </g>
+</svg>
