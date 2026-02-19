@@ -515,8 +515,13 @@ class MPJRDNeuron(BaseNeuron):
         x_mean = stats.x_mean
         post_rate_float = float(stats.post_rate)
 
+        if x_mean is None:
+            self.logger.warning("Sem x_mean acumulado; abortando aplicação de plasticidade")
+            return
+
         cfg = self.cfg
         device = self.theta.device
+        x_mean = x_mean.to(device)
 
         post_rate_float = max(0.0, min(1.0, post_rate_float))
         post_rate_t = torch.tensor([post_rate_float], device=device)
