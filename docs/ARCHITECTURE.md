@@ -60,12 +60,12 @@ Y \in \{0,1\}^{B}.
 Etapas funcionais:
 
 1. Integração local por ramo.
-2. Competição WTA (ramo vencedor).
-3. Soma somática pós-gating.
-4. Disparo por limiar \(\theta\).
+2. Integração dendrítica configurável (`wta_hard`, `wta_soft`, `nmda_shunting`).
+3. Soma somática pós-gating (ou saída equivalente do integrador).
+4. Disparo por limiar efetivo \(\theta_{eff}\).
 5. Homeostase (exceto inferência).
 6. Neuromodulação exógena/endógena.
-7. Acumulação estatística (modo batch).
+7. Acumulação estatística (modo batch) ou atualização local imediata (modo online).
 8. Emissão de telemetria.
 
 ### 3.2 Invariante arquitetural obrigatório
@@ -111,9 +111,9 @@ V_{b,d} = \sigma_d\!\left(\sum_{s=1}^{S} \psi(N_{d,s},W_{d,s},I_{d,s})\,X_{b,d,s
 G_{b,d} = \mathbb{1}\left[d=\arg\max_j V_{b,j}\right],
 \]
 \[
-U_b = \sum_{d=1}^{D} G_{b,d}V_{b,d},
+U_b = f_{int}(V_b, \theta),
 \qquad
-Y_b = \mathbb{1}[U_b\ge\theta].
+Y_b = \mathbb{1}[U_b\ge\theta_{eff}].
 \]
 
 ---
@@ -139,4 +139,4 @@ Y_b = \mathbb{1}[U_b\ge\theta].
 
 ## 7) Referência de fluxo visual
 
-Fluxo detalhado em Mermaid: `docs/architecture/blueprints/dendritic_processing_flow.mmd`.
+Fluxo detalhado em Mermaid: `docs/architecture/blueprints/sources/dendritic_processing_flow.mmd`.

@@ -9,6 +9,6 @@
 - [blueprints/sources/architecture.mmd](blueprints/sources/architecture.mmd)
 
 ## Decisões e evolução
-- [ADR Index](../governance/adr/INDEX.md)
+- [ADR 0001](../adr/0001-import-contract-and-release-readiness.md)
 
 [← Voltar para docs](../README.md) | [Hub](../DEVELOPMENT_HUB.md)

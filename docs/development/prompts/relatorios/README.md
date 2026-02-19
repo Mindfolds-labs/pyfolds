@@ -1,12 +1,14 @@
-# Relatórios de Issues
+# Relatórios de Issues (arquivo histórico)
 
-## Guia rápido
-- Use o template `../../templates/ISSUE-IA-TEMPLATE.md`.
-- Gere arquivos automaticamente com `tools/create_issue_report.py`.
-- Valide sempre com `tools/validate_issue_format.py`.
+Este diretório mantém os relatórios `ISSUE-*` como **histórico de governança**.
 
-## Seções obrigatórias
-Objetivo, Contexto Técnico, Análise Técnica, RF, RNF, Artefatos, Critérios, Riscos, PROMPT:EXECUTAR, Rastreabilidade.
+> **Status atual (ADR 0040):** não abrir novas `ISSUE-*` por padrão na fase corrente.
 
-## Nomeação
-`ISSUE-XXX-slug.md`
+## Uso recomendado
+- Consultar relatórios antigos para contexto e rastreabilidade.
+- Registrar novas execuções e finalizações no fluxo `EXEC-*`.
+- Preservar os arquivos existentes sem exclusão destrutiva.
+
+## Referências
+- [ADR 0040](../../../adr/0040-conclusao-do-ciclo-issue-e-foco-em-execucao.md)
+- [Portal de Prompts](../README.md)
