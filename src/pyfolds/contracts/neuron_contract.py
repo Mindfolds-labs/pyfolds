@@ -6,6 +6,8 @@ from typing import Dict, Sequence
 
 
 class MechanismStep(str, Enum):
+    """Enum com a ordem canônica dos mecanismos executados em um passo neuronal."""
+
     STP = "stp"
     INTEGRATION = "integration"
     SFA = "sfa"
@@ -30,6 +32,8 @@ CONTRACT_MECHANISM_ORDER = (
 
 @dataclass(frozen=True)
 class NeuronStepInput:
+    """Entrada mínima necessária para executar um passo (`step`) do neurônio."""
+
     x: object
     dt: float
     time_step: float
@@ -37,6 +41,8 @@ class NeuronStepInput:
 
 @dataclass(frozen=True)
 class StepExecutionTrace:
+    """Rastro de execução do passo contendo ordem e snapshots temporais."""
+
     mechanism_order: Sequence[MechanismStep]
     mechanism_time_snapshot: Dict[MechanismStep, float]
     time_step_before: float
@@ -45,16 +51,22 @@ class StepExecutionTrace:
 
 @dataclass(frozen=True)
 class NeuronStepOutput:
+    """Saída contratual de um passo com spikes, potencial somático e rastro."""
+
     spikes: object
     somatic: object
     step_trace: StepExecutionTrace
 
 
 class ContractViolation(ValueError):
+    """Erro lançado quando a saída de `step` viola o contrato formal."""
+
     pass
 
 
 def validate_step_output(output: NeuronStepOutput, dt: float) -> None:
+    """Valida invariantes de ordem e avanço temporal da execução de `step`."""
+
     trace = output.step_trace
     if tuple(trace.mechanism_order) != CONTRACT_MECHANISM_ORDER:
         raise ContractViolation(
