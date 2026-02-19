@@ -79,3 +79,18 @@ class TestAdaptationMixin:
 
         assert 'u_adapted' not in out
         assert 'adaptation_current' not in out
+
+
+    def test_forward_updates_u_for_downstream_mixins(self, full_config):
+        """Adaptação deve atualizar campo `u` para mixins posteriores (e.g., refratário)."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
+        x = torch.ones(2, full_config.n_dendrites, full_config.n_synapses_per_dendrite)
+
+        out = neuron.forward(x, mode='online')
+
+        assert 'u_raw' in out
+        assert 'u_adapted' in out
+        assert torch.allclose(out['u'], out['u_adapted'])
