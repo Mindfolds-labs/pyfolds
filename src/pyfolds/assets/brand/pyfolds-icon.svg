@@ -14,7 +14,7 @@
         <feDistantLight azimuth="45" elevation="60"/>
       </feDiffuseLighting>
       <feComposite operator="in" in2="SourceGraphic" result="texturedText"/>
-      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-opacity="0.5"/>
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-opacity="0.10"/>
     </filter>
 
     </defs>
