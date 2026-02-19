@@ -1,29 +1,20 @@
-"""PyFolds - Core Neural Computation Framework
+"""PyFolds public package surface.
 
-Módulos disponíveis diretamente:
-    - MPJRDConfig, MPJRDNeuron: Core neural computation
-    - MPJRDLayer, MPJRDNetwork: Network layers
-    - TelemetryController, MemorySink: Monitoring (for MindMetrics/MindAudit)
-    - LearningMode, ConnectionType: Enums and types
-
-Uso básico:
-    from pyfolds import MPJRDConfig, MPJRDNeuron, TelemetryController
-    
-    cfg = MPJRDConfig(n_dendrites=4)
-    neuron = MPJRDNeuron(cfg)
-    
-    # Telemetria para MindMetrics
-    telem = TelemetryController()
+This module exposes the v2 public API names as canonical imports and keeps
+v1 names as compatibility aliases with deprecation warnings.
 """
+
+from typing import Any, Dict
+import warnings
 
 __version__ = "1.0.2"
 
-# ===== CORE COMPONENTS =====
-from .core.config import MPJRDConfig
+# ===== CORE V2 SURFACE =====
+from .core.config import MPJRDConfig as NeuronConfig
 from .core.base import BaseNeuron, BasePlasticityRule
 from .core.neuron import MPJRDNeuron
-from .layers import MPJRDLayer, MPJRDWaveLayer
-from .network import MPJRDNetwork, MPJRDWaveNetwork, NetworkBuilder
+from .layers import MPJRDLayer as AdaptiveNeuronLayer, MPJRDWaveLayer
+from .network import MPJRDNetwork as SpikingNetwork, MPJRDWaveNetwork, NetworkBuilder
 from .core.neuron_v2 import MPJRDNeuronV2
 from .utils.types import LearningMode, ConnectionType
 from .utils.context import learning_mode
@@ -46,69 +37,60 @@ from .serialization import (
 )
 from .monitoring import HealthStatus, NeuronHealthCheck
 
-# ===== TELEMETRY (para MindMetrics/MindAudit) =====
+# High-level state contract returned by forward-like calls.
+NeuronState = Dict[str, Any]
+
+# ===== TELEMETRY =====
 from .telemetry import (
-    # Controller
     TelemetryController,
     TelemetryConfig,
-    
-    # Sinks
     Sink,
     NoOpSink,
     MemorySink,
     ConsoleSink,
     JSONLinesSink,
     DistributorSink,
-    
-    # Events
     forward_event,
     commit_event,
     sleep_event,
     forward_event_lazy,
     commit_event_lazy,
     sleep_event_lazy,
-    
-    # Buffer
     RingBuffer,
-    
-    # Decorator
     telemetry,
-    
-    # Types
     ForwardPayload,
     CommitPayload,
     SleepPayload,
 )
 
-# ===== ADVANCED (optional) =====
-try:
-    from .advanced import (
-        MPJRDNeuronAdvanced,
-        MPJRDLayerAdvanced,
-        MPJRDWaveNeuronAdvanced,
-        MPJRDWaveLayerAdvanced,
-    )
-    ADVANCED_AVAILABLE = True
-except Exception:
-    ADVANCED_AVAILABLE = False
-    MPJRDNeuronAdvanced = None
-    MPJRDLayerAdvanced = None
-    MPJRDWaveNeuronAdvanced = None
-    MPJRDWaveLayerAdvanced = None
+from .advanced import (
+    MPJRDNeuronAdvanced,
+    MPJRDLayerAdvanced,
+    MPJRDWaveNeuronAdvanced,
+    MPJRDWaveLayerAdvanced,
+)
+ADVANCED_AVAILABLE = True
 
-# ===== EXPORTS =====
+_V1_ALIAS_MAP = {
+    "MPJRDConfig": "NeuronConfig",
+    "MPJRDLayer": "AdaptiveNeuronLayer",
+    "MPJRDNetwork": "SpikingNetwork",
+}
+
 __all__ = [
-    # Core
-    "BaseNeuron",
-    "BasePlasticityRule",
-    "MPJRDConfig",
+    # v2 canonical names
+    "NeuronConfig",
+    "NeuronState",
     "MPJRDNeuron",
     "MPJRDNeuronV2",
-    "MPJRDLayer",
-    "MPJRDNetwork",
+    "AdaptiveNeuronLayer",
+    "SpikingNetwork",
     "MPJRDWaveLayer",
     "MPJRDWaveNetwork",
     "NetworkBuilder",
+    # Core supporting exports
+    "BaseNeuron",
+    "BasePlasticityRule",
     "MPJRDWaveConfig",
     "MPJRDWaveNeuron",
     "NeuronFactory",
@@ -128,15 +110,11 @@ __all__ = [
     "ecc_from_protection",
     "HealthStatus",
     "NeuronHealthCheck",
-    
-    # Types
+    # Types/helpers
     "LearningMode",
     "ConnectionType",
-    "NeuronFactory",
-    "NeuronType",
     "learning_mode",
-    
-    # Telemetry (para MindMetrics/MindAudit)
+    # Telemetry
     "TelemetryController",
     "TelemetryConfig",
     "Sink",
@@ -156,13 +134,27 @@ __all__ = [
     "ForwardPayload",
     "CommitPayload",
     "SleepPayload",
+    # Advanced
+    "MPJRDNeuronAdvanced",
+    "MPJRDLayerAdvanced",
+    "MPJRDWaveNeuronAdvanced",
+    "MPJRDWaveLayerAdvanced",
+    # v1 compatibility aliases
+    "MPJRDConfig",
+    "MPJRDLayer",
+    "MPJRDNetwork",
 ]
 
-# Add advanced if available
-if ADVANCED_AVAILABLE:
-    __all__.extend([
-        "MPJRDNeuronAdvanced",
-        "MPJRDLayerAdvanced",
-        "MPJRDWaveNeuronAdvanced",
-        "MPJRDWaveLayerAdvanced",
-    ])
+
+def __getattr__(name: str):
+    """Provide deprecated v1 aliases while keeping v2 names canonical."""
+    if name in _V1_ALIAS_MAP:
+        target_name = _V1_ALIAS_MAP[name]
+        warnings.warn(
+            f"'pyfolds.{name}' está depreciado e será removido em versão futura; "
+            f"use 'pyfolds.{target_name}'",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return globals()[target_name]
+    raise AttributeError(f"module 'pyfolds' has no attribute '{name}'")

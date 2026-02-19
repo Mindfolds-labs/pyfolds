@@ -4,6 +4,8 @@ These tests protect downstream projects that depend on top-level imports from
 ``pyfolds`` and ensure key classes/functions are still importable.
 """
 
+import warnings
+
 import pyfolds
 
 
@@ -12,16 +14,31 @@ def test_public_all_exports_are_importable():
     assert missing == [], f"Export(s) ausentes no módulo pyfolds: {missing}"
 
 
-def test_core_objects_can_be_instantiated():
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2)
+def test_v2_surface_is_canonical_and_instantiable():
+    cfg = pyfolds.NeuronConfig(n_dendrites=2)
     neuron = pyfolds.MPJRDNeuron(cfg)
-    layer = pyfolds.MPJRDLayer(1, cfg)
-    network = pyfolds.MPJRDNetwork()
+    layer = pyfolds.AdaptiveNeuronLayer(1, cfg)
+    network = pyfolds.SpikingNetwork()
     network.add_layer("input", layer)
 
     assert neuron is not None
     assert layer is not None
     assert network is not None
+
+
+def test_v1_aliases_emit_deprecation_warning_and_match_v2_targets():
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always", DeprecationWarning)
+        legacy_cfg = pyfolds.MPJRDConfig
+        legacy_layer = pyfolds.MPJRDLayer
+        legacy_network = pyfolds.MPJRDNetwork
+
+    assert legacy_cfg is pyfolds.NeuronConfig
+    assert legacy_layer is pyfolds.AdaptiveNeuronLayer
+    assert legacy_network is pyfolds.SpikingNetwork
+
+    assert len(caught) == 3
+    assert all(issubclass(item.category, DeprecationWarning) for item in caught)
 
 
 def test_telemetry_controller_basic_flow():
