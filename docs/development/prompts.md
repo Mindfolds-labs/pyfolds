@@ -14,6 +14,7 @@ Relatórios, logs e trilha de execução.
 - [Portal de prompts](prompts/README.md)
 - [Relatórios](prompts/relatorios/README.md)
 - [Logs](prompts/logs/)
+- [Fluxo faseado de execução](prompts/FLUXO-FASEADO-EXECUCAO.md)
 
 ## Referências
 - [HUB de Desenvolvimento](DEVELOPMENT_HUB.md)
