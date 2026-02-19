@@ -39,35 +39,33 @@ class AdaptationMixin:
             self.adaptation_current.shape[0] != batch_size):
             self.adaptation_current = torch.zeros(batch_size, device=device)
     
-    def _apply_adaptation(self, u: torch.Tensor, spikes: torch.Tensor,
-                           dt: float = 1.0) -> torch.Tensor:
-        """
-        Aplica corrente de adaptação ao potencial (POR AMOSTRA).
-        
-        Args:
-            u: Potencial somático [B]
-            spikes: Spikes do passo atual [B]
-            dt: Passo de tempo (ms)
-        
-        Returns:
-            Potencial adaptado [B]
-        """
+    def _apply_sfa_before_threshold(self, u: torch.Tensor, dt: float = 1.0) -> torch.Tensor:
+        """Aplica SFA antes do threshold, sem recalcular spikes."""
+        if dt <= 0:
+            raise ValueError(f"dt deve ser positivo para adaptação, recebido {dt}")
+
         batch_size = u.shape[0]
         device = u.device
-        
+
         self._ensure_adaptation_current(batch_size, device)
-        
-        # ✅ CORRIGIDO: decaimento escalar com math.exp
+
         decay = math.exp(-dt / self.adaptation_tau)
         self.adaptation_current.mul_(decay)
-        
-        # ✅ CORRIGIDO: incrementa onde houve spike (por amostra)
+
+        return u - self.adaptation_current
+
+    def _update_adaptation_from_spikes(self, spikes: torch.Tensor) -> None:
+        """Atualiza corrente de adaptação com spikes finais confirmados."""
         spike_mask = spikes > 0.5  # [B] booleano
         increment = self.adaptation_increment * spike_mask.float()
         self.adaptation_current.add_(increment)
         self.adaptation_current.clamp_(max=self.adaptation_max)
-        
-        return u - self.adaptation_current
+
+    def _apply_adaptation(self, u: torch.Tensor, spikes: torch.Tensor, dt: float = 1.0) -> torch.Tensor:
+        """Compat: aplica SFA pré-threshold e depois atualiza corrente por spikes."""
+        u_eff = self._apply_sfa_before_threshold(u, dt=dt)
+        self._update_adaptation_from_spikes(spikes)
+        return u_eff
     
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         """Forward pass com adaptação POR AMOSTRA."""
@@ -82,22 +80,13 @@ class AdaptationMixin:
                     "Campos obrigatórios ausentes em output para adaptação: "
                     f"{missing}. Campos disponíveis: {list(output.keys())}"
                 )
+            self._ensure_adaptation_current(output['u'].shape[0], output['u'].device)
+            self._update_adaptation_from_spikes(output['spikes'])
 
-            u_adapted = self._apply_adaptation(
-                output['u'], 
-                output['spikes'],
-                dt=kwargs.get('dt', 1.0)
-            )
-            
-            theta = output.get('theta', getattr(self, 'theta', torch.tensor(4.5)))
-            spikes_adapted = (u_adapted >= theta).float()
-            
-            # Mantém consistência do contrato de saída para mixins seguintes
-            # (ex.: RefractoryMixin usa output['u'] para recomputar spikes).
-            output['u_raw'] = output['u']
-            output['u'] = u_adapted
-            output['u_adapted'] = u_adapted
-            output['spikes'] = spikes_adapted
+            if 'u_raw' not in output:
+                output['u_raw'] = output['u']
+            if 'u_adapted' not in output:
+                output['u_adapted'] = output['u']
             output['adaptation_current'] = self.adaptation_current.clone()
         
         return output

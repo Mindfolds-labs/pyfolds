@@ -314,6 +314,13 @@ class MPJRDNeuron(BaseNeuron):
         for d_idx, dend in enumerate(self.dendrites):
             v_dend[:, d_idx] = dend(x[:, d_idx, :])
 
+        if hasattr(self, "dendrite_amplification"):
+            if getattr(self.cfg, "backprop_enabled", True):
+                amp = 1.0 + self.dendrite_amplification.to(device).unsqueeze(0)
+                max_gain = getattr(self.cfg, "backprop_max_gain", 2.0)
+                amp = amp.clamp(1.0, max_gain)
+                v_dend = v_dend * amp
+
         # ===== 2-4. INTEGRAÇÃO DENDRÍTICA → POTENCIAL → DISPARO =====
         integration_mode = getattr(self.cfg, "dendrite_integration_mode", "wta_hard")
 
@@ -358,7 +365,11 @@ class MPJRDNeuron(BaseNeuron):
             u = gated.sum(dim=1)
             dend_contribution = None
 
-        spikes = (u >= theta_eff).float()
+        u_threshold = u
+        if hasattr(self, "_apply_sfa_before_threshold"):
+            u_threshold = self._apply_sfa_before_threshold(u, dt=dt)
+
+        spikes = (u_threshold >= theta_eff).float()
 
         # ===== 5. ESTATÍSTICAS =====
         spike_rate = spikes.mean().item()
@@ -366,7 +377,13 @@ class MPJRDNeuron(BaseNeuron):
 
         # ===== 6. VALIDAÇÃO ANTES DE HOMEOSTASE =====
         if not (isinstance(spike_rate, float) and -0.1 <= spike_rate <= 1.1):
-            self.logger.warning(f"⚠️ spike_rate inválida: {spike_rate}, normalizando para 0.0")
+            self.logger.warning(
+                "event=rate_out_of_range metric=spike_rate value=%.6f expected=[0,1] "
+                "mode=%s integration_mode=%s action=clamp_to_valid_range",
+                spike_rate,
+                effective_mode.value if hasattr(effective_mode, "value") else str(effective_mode),
+                integration_mode,
+            )
             spike_rate = max(0.0, min(1.0, spike_rate))
 
         # ===== 7. HOMEOSTASE =====
@@ -452,6 +469,8 @@ class MPJRDNeuron(BaseNeuron):
         out = {
             "spikes": spikes,
             "u": u,
+            "u_raw": u,
+            "u_adapted": u_threshold,
             "v_dend": v_dend,
             "gated": gated,
             "theta": self.theta.clone(),

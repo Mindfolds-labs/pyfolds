@@ -18,6 +18,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `docs/ARCHITECTURE.md` diagram reference updated to `docs/architecture/blueprints/`.
 - `docs/development/execution_queue.csv` ISSUE-005 marked as partial in progress.
 
+- Fixed: refractory absolute respected; bAP applied; STDP LTD rule corrected; time counter updated; STDP uses pre-STP x.
+- Added configurability for STDP source (`stdp_input_source`) and LTD rule (`ltd_rule`) with backward-compatible defaults.
+
 ## [2.0.0] - 2026-02-16
 
 ### Added
