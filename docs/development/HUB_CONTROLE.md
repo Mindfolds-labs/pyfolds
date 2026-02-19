@@ -40,6 +40,10 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | :-- | :-- | :-- | :-- | :-- |
 | ISSUE-001 | Planejada | Implementar LTD explícita em sinapses | Codex | 2026-02-19 |
 | ISSUE-002 | Planejada | Refatorar HUB com cards limpos e split view de links | Codex | 2026-02-19 |
+| ISSUE-003 | Planejada | Plano 1: Reposicionar issues no fluxo oficial do HUB | Codex | 2026-02-19 |
+| ISSUE-004 | Planejada | Plano 2: Sanear links e navegação documental | Codex | 2026-02-19 |
+| ISSUE-006 | Planejada | Plano 4: Consolidar correções de código e testes mínimos | Codex | 2026-02-19 |
+| ISSUE-005 | Planejada | Plano 3: Executar validações e registrar evidências no HUB | Codex | 2026-02-19 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 Cards (UI limpa)
@@ -68,6 +72,46 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > **Prioridade:** `Alta` · **Área:** `Governança/UX Docs`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-002-refatorar-hub-cards-limpos-split-view-links.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-002-refatorar-hub-cards-limpos-split-view-links.md)
+
+> [!NOTE]
+> **ISSUE-003** · Plano 1: Reposicionar issues no fluxo oficial do HUB
+>
+> **Status:** ⏳ Planejada  
+> **Responsável:** Codex  
+> **Data:** 2026-02-19  
+> **Prioridade:** `Alta` · **Área:** `Governança/Fluxo`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-003-plano-1-reposicionar-issues-no-hub.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-003-plano-1-reposicionar-issues-no-hub.md)
+
+> [!NOTE]
+> **ISSUE-004** · Plano 2: Sanear links e navegação documental
+>
+> **Status:** ⏳ Planejada  
+> **Responsável:** Codex  
+> **Data:** 2026-02-19  
+> **Prioridade:** `Alta` · **Área:** `Documentação/Qualidade`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-004-plano-2-sanear-links-documentacao.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-004-plano-2-sanear-links-documentacao.md)
+
+> [!NOTE]
+> **ISSUE-006** · Plano 4: Consolidar correções de código e testes mínimos
+>
+> **Status:** ⏳ Planejada  
+> **Responsável:** Codex  
+> **Data:** 2026-02-19  
+> **Prioridade:** `Alta` · **Área:** `Core/Testes/Docs`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-006-plano-4-consolidar-correcoes-codigo-testes.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-006-plano-4-consolidar-correcoes-codigo-testes.md)
+
+> [!NOTE]
+> **ISSUE-005** · Plano 3: Executar validações e registrar evidências no HUB
+>
+> **Status:** ⏳ Planejada  
+> **Responsável:** Codex  
+> **Data:** 2026-02-19  
+> **Prioridade:** `Média` · **Área:** `Governança/Validação`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-005-plano-3-validacoes-e-evidencias-hub.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-005-plano-3-validacoes-e-evidencias-hub.md)
 
 <!-- HUB:CARDS:END -->
 

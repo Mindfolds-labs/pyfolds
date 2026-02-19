@@ -19,6 +19,7 @@ Portal de documentação do PyFolds v2.0/v3.0.
 - **[Science](science/README.md)**
 - **[Architecture](architecture/README.md)**
 - **[Governance](governance/README.md)**
+- **[Auditoria funcional 2026-02-19](governance/quality/PYFOLDS_AUDITORIA_FUNCIONAL_2026-02-19.md)**
 - **[Development](development/README.md)**
 
 ## 📎 Observação de compatibilidade
