@@ -154,6 +154,9 @@ class RefractoryMixin(TimedMixin):
         
         # Atualiza estado refratário
         self._update_refractory_batch(final_spikes, dt=kwargs.get('dt', 1.0))
+
+        if hasattr(self, '_update_adaptation_after_spike'):
+            self._update_adaptation_after_spike(final_spikes)
         
         return output
     

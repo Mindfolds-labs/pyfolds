@@ -10,6 +10,8 @@ NeuromodMode = Literal["external", "capacity", "surprise"]
 InhibitionMode = Literal["lateral", "feedback", "both", "none"]
 PlasticityMode = Literal["stdp", "hebbian", "both", "none"]
 RefracMode = Literal["absolute", "relative", "both"]
+STDPInputSource = Literal["raw", "stp"]
+LTDRule = Literal["classic", "current"]
 
 
 @dataclass(frozen=True)
@@ -117,6 +119,8 @@ class MPJRDConfig:
     A_plus: float = 0.01
     A_minus: float = 0.012
     stdp_trace_threshold: float = 0.01
+    stdp_input_source: STDPInputSource = "stp"
+    ltd_rule: LTDRule = "current"
 
     # ===== THRESHOLDS E REPRODUTIBILIDADE =====
     spike_threshold: float = 0.5
@@ -232,6 +236,18 @@ class MPJRDConfig:
         if not (0.0 < self.active_synapses_ratio <= 1.0):
             raise ValueError(
                 f"active_synapses_ratio must be in (0, 1], got {self.active_synapses_ratio}"
+            )
+
+        if self.stdp_input_source not in {"raw", "stp"}:
+            raise ValueError(
+                "stdp_input_source inválido: "
+                f"{self.stdp_input_source}. Use: 'raw' ou 'stp'"
+            )
+
+        if self.ltd_rule not in {"classic", "current"}:
+            raise ValueError(
+                "ltd_rule inválido: "
+                f"{self.ltd_rule}. Use: 'classic' ou 'current'"
             )
         
         # Warnings
