@@ -76,8 +76,15 @@ class STDPMixin:
             self.trace_pre = torch.zeros(batch_size, D, S, device=device)
             self.trace_post = torch.zeros(batch_size, D, S, device=device)
 
+    def _stdp_pre_spike_source(self, x: torch.Tensor, x_pre_stp: torch.Tensor | None) -> torch.Tensor:
+        """Resolve fonte de pré-spike para STDP conforme configuração."""
+        source = getattr(self.cfg, "stdp_input_source", "stp")
+        if source == "raw":
+            return x if x_pre_stp is None else x_pre_stp
+        return x
+
     def _update_stdp_traces(
-        self, x: torch.Tensor, post_spike: torch.Tensor, dt: float = 1.0
+        self, x: torch.Tensor, post_spike: torch.Tensor, dt: float = 1.0, x_pre_stp: torch.Tensor | None = None
     ):
         """Atualiza traços STDP e aplica deltas sinápticos vetorizados.
 
@@ -99,7 +106,8 @@ class STDPMixin:
 
         # Spikes pré (detectados por amostra)
         spike_threshold = getattr(self.cfg, "spike_threshold", 0.5)
-        pre_spikes = (x > spike_threshold).float()  # [B, D, S]
+        x_for_stdp = self._stdp_pre_spike_source(x, x_pre_stp)
+        pre_spikes = (x_for_stdp > spike_threshold).float()  # [B, D, S]
 
         # Adiciona aos traços pré
         self.trace_pre.add_(pre_spikes)

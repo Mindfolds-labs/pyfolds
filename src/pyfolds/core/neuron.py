@@ -375,7 +375,13 @@ class MPJRDNeuron(BaseNeuron):
 
         # ===== 6. VALIDAÇÃO ANTES DE HOMEOSTASE =====
         if not (isinstance(spike_rate, float) and -0.1 <= spike_rate <= 1.1):
-            self.logger.warning(f"⚠️ spike_rate inválida: {spike_rate}, normalizando para 0.0")
+            self.logger.warning(
+                "event=rate_out_of_range metric=spike_rate value=%.6f expected=[0,1] "
+                "mode=%s integration_mode=%s action=clamp_to_valid_range",
+                spike_rate,
+                effective_mode.value if hasattr(effective_mode, "value") else str(effective_mode),
+                integration_mode,
+            )
             spike_rate = max(0.0, min(1.0, spike_rate))
 
         # ===== 7. HOMEOSTASE =====

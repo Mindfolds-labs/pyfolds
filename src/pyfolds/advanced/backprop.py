@@ -119,6 +119,7 @@ class BackpropMixin(TimedMixin):
         dt = kwargs.get("dt", 1.0)
         current_time = self.time_counter.item()
 
+        current_time = self.time_counter.item()
         self._process_backprop_queue(current_time)
 
         output = super().forward(x, **kwargs)

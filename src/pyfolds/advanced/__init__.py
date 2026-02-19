@@ -60,8 +60,8 @@ class MPJRDNeuronAdvanced(
         1. Backpropagation: amplifica entrada baseado em spikes anteriores
         2. Short-term dynamics: modula entrada (facilitação/depressão)
         3. STDP: atualiza traços (não afeta forward atual)
-        4. Adaptation: modifica u (corrente de adaptação)
-        5. Refractory: bloqueia spikes (deve ser o último)
+        4. Adaptation: atualiza estado adaptativo (sem sobrescrever spike final)
+        5. Refractory: bloqueia spikes (autoridade final de spike)
         6. Base: forward base (WTA, homeostase, etc)
 
     Para inibição, use MPJRDLayerAdvanced em conjunto.

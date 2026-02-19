@@ -52,7 +52,7 @@ class AdaptationMixin:
         """
         batch_size = u.shape[0]
         device = u.device
-        
+
         self._ensure_adaptation_current(batch_size, device)
         
         # Decaimento ocorre antes da comparação com threshold.
