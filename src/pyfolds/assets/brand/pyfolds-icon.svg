@@ -1,49 +1,36 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PyFolds Master Visual Identity">
   <defs>
-    <linearGradient id="blue_structure" x1="100" y1="100" x2="400" y2="400" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#020617"/> 
-      <stop offset="0.5" stop-color="#1E1B4B"/>
-      <stop offset="1" stop-color="#312E81"/>
+    <linearGradient id="azul_profundo" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#020617"/> <stop offset="1" stop-color="#1E1B4B"/>
     </linearGradient>
     
-    <linearGradient id="gold_ribbon" x1="200" y1="200" x2="350" y2="350" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FBBF24"/> 
-      <stop offset="0.7" stop-color="#D97706"/>
-      <stop offset="1" stop-color="#92400E"/>
+    <linearGradient id="dourado_iluminacao" x1="256" y1="244" x2="332" y2="318" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBBF24"/> <stop offset="1" stop-color="#D97706"/>
     </linearGradient>
 
-    <pattern id="rd_texture" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
-      <path d="M0 5 Q 2.5 0, 5 5 T 10 5" stroke="white" stroke-width="0.5" opacity="0.08" fill="none"/>
-    </pattern>
-
-    <filter id="paper_fold" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+    <filter id="textura_luxo" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="noise"/>
+      <feDiffuseLighting in="noise" lighting-color="#ffffff" surfaceScale="2" result="diffuse">
+        <feDistantLight azimuth="45" elevation="60"/>
+      </feDiffuseLighting>
+      <feComposite operator="in" in2="SourceGraphic" result="texturedText"/>
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-opacity="0.5"/>
     </filter>
-  </defs>
 
-  <rect width="512" height="512" rx="110" fill="#020617"/>
-  <rect width="512" height="512" rx="110" fill="url(#rd_texture)"/>
+    </defs>
 
-  <g filter="url(#paper_fold)">
+  <rect width="512" height="512" rx="110" fill="url(#azul_profundo)"/>
+
+  <g filter="url(#textura_luxo)">
+    <path d="M131 181L256 107L381 181V331L256 405L131 331V181Z" fill="#1C3F8E" fill-opacity="0.3"/>
     
-    <g id="segment_p_stem">
-      <path d="M140 160 L 220 120 V 380 L 140 340 V 160 Z" fill="url(#blue_structure)"/>
-      <path d="M140 160 L 180 140 L 260 180 L 220 200 L 140 160 Z" fill="#3B82F6" fill-opacity="0.3"/>
-    </g>
+    <path d="M176 212L236 176V336L176 300V212Z" fill="#1E3A8A"/> <path d="M276 176L336 212V300L276 336V176Z" fill="#3B82F6" fill-opacity="0.8"/> <path d="M236 224L284 252L236 280L188 252L236 224Z" fill="#0F172A"/>
 
-    <g id="segment_p_loop">
-      <path d="M220 120 L 340 120 L 380 160 L 220 160 L 220 120 Z" fill="#1E3A8A"/>
-      <path d="M380 160 V 260 L 320 300 L 220 240 V 160 L 380 160 Z" fill="#1E1B4B"/>
-    </g>
-
-    <g id="segment_gold_ribbon">
-      <path d="M220 200 L 340 140 L 380 180 L 260 240 L 220 200 Z" fill="url(#gold_ribbon)"/>
-      <path d="M260 240 L 380 180 V 320 L 320 360 L 220 280 L 260 240 Z" fill="#D97706"/>
-      <path d="M260 240 L 320 270 L 260 300 L 200 270 L 260 240 Z" fill="#FDE68A" fill-opacity="0.4"/>
-    </g>
-
+    <path d="M256 244L332 288L280 318L204 274L256 244Z" fill="url(#dourado_iluminacao)">
+        <animate attributeName="fill-opacity" values="0.8;1;0.8" dur="4s" repeatCount="indefinite" />
+    </path>
   </g>
 
   <path d="M0 256H512M256 0V512" stroke="white" stroke-opacity="0.05" stroke-width="1"/>
-  <circle cx="256" cy="256" r="200" stroke="white" stroke-opacity="0.03" stroke-dasharray="5 5"/>
+  <circle cx="256" cy="256" r="150" stroke="white" stroke-opacity="0.03" stroke-dasharray="10 10"/>
 </svg>
