@@ -33,9 +33,11 @@ Cobrem estabilidade histórica:
 
 ## 4) Boas práticas por PR
 1. Adicionar teste para cada bug corrigido.
-2. Evitar testes frágeis dependentes de timing instável.
-3. Isolar fixtures e dados de teste reutilizáveis.
-4. Nomear testes com padrão `test_<comportamento>_<contexto>`.
+2. Toda falha registrada em `docs/development/failure_register.csv` deve ter teste de regressão associado **antes do fechamento**.
+3. O teste/evidência deve referenciar explicitamente o ID da falha (`FAIL-XXX`) no nome, docstring, comentário ou metadata do registro.
+4. Evitar testes frágeis dependentes de timing instável.
+5. Isolar fixtures e dados de teste reutilizáveis.
+6. Nomear testes com padrão `test_<comportamento>_<contexto>`.
 
 ## 5) Comandos locais
 ```bash
@@ -48,6 +50,7 @@ python -m compileall src/
 - Testes novos e antigos devem passar no CI.
 - Não introduzir redução relevante de cobertura em módulos críticos.
 - Alterações de comportamento devem atualizar docs e testes.
+- PRs que fecham falhas `FAIL-*` devem anexar evidência de regressão coberta e referência do respectivo ID.
 
 ## 7) Cenários mínimos por domínio
 - **Core neuronal:** soma, dendritos, sinapses, limites e broadcasting.

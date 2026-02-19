@@ -92,16 +92,18 @@ Fonte canônica: [`failure_register.csv`](./failure_register.csv).
 
 ### 5.1 Esquema oficial de colunas
 
-| ID | Tipo | Descrição | Impacto | Status | Issue de Correção |
-| :-- | :-- | :-- | :-- | :-- | :-- |
+| ID | Tipo | Descrição | Impacto | Status de Falha | Cobertura de Teste | Issue de Correção | Teste de Regressão |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
 
 <!-- HUB:FAILURES:BEGIN -->
-| ID | Tipo | Descrição | Impacto | Status | Issue de Correção | Data |
-| :-- | :-- | :-- | :-- | :-- | :-- | :-- |
-| - | - | - | - | - | - | - |
+| ID | Tipo | Descrição | Impacto | Status | Cobertura | Issue de Correção | Teste | Data |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| - | - | - | - | - | - | - | - | - |
 <!-- HUB:FAILURES:END -->
 
-> Campos operacionais obrigatórios no CSV: `arquivo_afetado` e `caminho_log`.
+> Campos operacionais obrigatórios no CSV: `arquivo_afetado`, `caminho_log`, `status_cobertura`, `teste_regressao` e `evidencia_regressao`.
+
+> Vocabulário oficial de `status_cobertura`: `aberta`, `em_correcao`, `coberta`, `validada`.
 
 ### 5.2 Regra de identificação e deduplicação
 
@@ -114,6 +116,7 @@ Fonte canônica: [`failure_register.csv`](./failure_register.csv).
 - `execution_queue.csv` **alimenta** `failure_register.csv` durante a execução de cada ISSUE/EXEC, quando testes/checks capturam erro novo.
 - `failure_register.csv` **retroalimenta** `execution_queue.csv` na revisão de planejamento: falhas em aberto geram (ou atualizam) linhas de execução com `Issue de Correção`.
 - Momento de sincronização: no fechamento de cada execução e antes da atualização dos blocos `HUB:QUEUE` e `HUB:CARDS`.
+- Política de fechamento: uma falha só pode sair de `aberta/em_correcao` para `coberta/validada` (ou status de issue encerrado) quando `teste_regressao` e `evidencia_regressao` estiverem preenchidos com referência explícita ao mesmo `FAIL-XXX`.
 
 
 ## Histórico em legado
