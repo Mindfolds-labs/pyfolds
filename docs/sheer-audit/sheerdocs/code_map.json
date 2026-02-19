@@ -1,0 +1,5302 @@
+{
+  "repo": {
+    "root": "/home/runner/work/pyfolds/pyfolds",
+    "name": "pyfolds",
+    "commit": null
+  },
+  "metrics": {
+    "python_files": 134,
+    "symbols": 948,
+    "edges": 1426,
+    "findings": 0,
+    "internal_import_edges": 101
+  },
+  "modules": [
+    {
+      "id": "mod:src.pyfolds",
+      "qname": "src.pyfolds",
+      "file": "src/pyfolds/__init__.py",
+      "imports": [
+        "mod:src.advanced",
+        "mod:src.core.base",
+        "mod:src.core.config",
+        "mod:src.core.factory",
+        "mod:src.core.neuron",
+        "mod:src.core.neuron_v2",
+        "mod:src.layers",
+        "mod:src.monitoring",
+        "mod:src.network",
+        "mod:src.serialization",
+        "mod:src.telemetry",
+        "mod:src.utils.context",
+        "mod:src.utils.types",
+        "mod:src.wave",
+        "mod:typing",
+        "mod:warnings"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.__getattr__",
+          "name": "__getattr__",
+          "qname": "src.pyfolds.__getattr__",
+          "line": 149,
+          "params": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.advanced",
+      "qname": "src.pyfolds.advanced",
+      "file": "src/pyfolds/advanced/__init__.py",
+      "imports": [
+        "mod:logging",
+        "mod:src.core.neuron",
+        "mod:src.layers.layer",
+        "mod:src.pyfolds.adaptation",
+        "mod:src.pyfolds.backprop",
+        "mod:src.pyfolds.inhibition",
+        "mod:src.pyfolds.refractory",
+        "mod:src.pyfolds.short_term",
+        "mod:src.pyfolds.stdp",
+        "mod:src.utils.logging",
+        "mod:src.wave",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.advanced.MPJRDLayerAdvanced",
+          "name": "MPJRDLayerAdvanced",
+          "qname": "src.pyfolds.advanced.MPJRDLayerAdvanced",
+          "line": 189,
+          "bases": [
+            "MPJRDLayer"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.advanced.MPJRDLayerAdvanced.__init__"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.advanced.MPJRDNeuronAdvanced",
+          "name": "MPJRDNeuronAdvanced",
+          "qname": "src.pyfolds.advanced.MPJRDNeuronAdvanced",
+          "line": 47,
+          "bases": [
+            "BackpropMixin",
+            "ShortTermDynamicsMixin",
+            "STDPMixin",
+            "AdaptationMixin",
+            "RefractoryMixin",
+            "MPJRDNeuronBase"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.advanced.MPJRDNeuronAdvanced.__init__",
+            "mtd:src.pyfolds.advanced.MPJRDNeuronAdvanced._init_advanced_mixins",
+            "mtd:src.pyfolds.advanced.MPJRDNeuronAdvanced.get_all_advanced_metrics",
+            "mtd:src.pyfolds.advanced.MPJRDNeuronAdvanced.reset_all_mechanisms"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.advanced.MPJRDWaveLayerAdvanced",
+          "name": "MPJRDWaveLayerAdvanced",
+          "qname": "src.pyfolds.advanced.MPJRDWaveLayerAdvanced",
+          "line": 212,
+          "bases": [
+            "MPJRDLayer"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.advanced.MPJRDWaveLayerAdvanced.__init__"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.advanced.MPJRDWaveNeuronAdvanced",
+          "name": "MPJRDWaveNeuronAdvanced",
+          "qname": "src.pyfolds.advanced.MPJRDWaveNeuronAdvanced",
+          "line": 174,
+          "bases": [
+            "BackpropMixin",
+            "ShortTermDynamicsMixin",
+            "STDPMixin",
+            "AdaptationMixin",
+            "RefractoryMixin",
+            "MPJRDWaveNeuronBase"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.advanced.MPJRDWaveNeuronAdvanced.__init__"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.advanced.adaptation",
+      "qname": "src.pyfolds.advanced.adaptation",
+      "file": "src/pyfolds/advanced/adaptation.py",
+      "imports": [
+        "mod:math",
+        "mod:src.pyfolds.utils.types",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.advanced.adaptation.AdaptationMixin",
+          "name": "AdaptationMixin",
+          "qname": "src.pyfolds.advanced.adaptation.AdaptationMixin",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.advanced.adaptation.AdaptationMixin._apply_adaptation",
+            "mtd:src.pyfolds.advanced.adaptation.AdaptationMixin._apply_sfa_before_threshold",
+            "mtd:src.pyfolds.advanced.adaptation.AdaptationMixin._ensure_adaptation_current",
+            "mtd:src.pyfolds.advanced.adaptation.AdaptationMixin._init_adaptation",
+            "mtd:src.pyfolds.advanced.adaptation.AdaptationMixin._update_adaptation_after_spike",
+            "mtd:src.pyfolds.advanced.adaptation.AdaptationMixin.forward"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.advanced.backprop",
+      "qname": "src.pyfolds.advanced.backprop",
+      "file": "src/pyfolds/advanced/backprop.py",
+      "imports": [
+        "mod:collections",
+        "mod:math",
+        "mod:src.pyfolds.advanced.time_mixin",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.advanced.backprop.BackpropMixin",
+          "name": "BackpropMixin",
+          "qname": "src.pyfolds.advanced.backprop.BackpropMixin",
+          "line": 12,
+          "bases": [
+            "TimedMixin"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.advanced.backprop.BackpropMixin._ensure_backprop_trace",
+            "mtd:src.pyfolds.advanced.backprop.BackpropMixin._init_backprop",
+            "mtd:src.pyfolds.advanced.backprop.BackpropMixin._process_backprop_queue",
+            "mtd:src.pyfolds.advanced.backprop.BackpropMixin._schedule_backprop",
+            "mtd:src.pyfolds.advanced.backprop.BackpropMixin.forward",
+            "mtd:src.pyfolds.advanced.backprop.BackpropMixin.get_backprop_metrics",
+            "mtd:src.pyfolds.advanced.backprop.BackpropMixin.reset_backprop"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.advanced.inhibition",
+      "qname": "src.pyfolds.advanced.inhibition",
+      "file": "src/pyfolds/advanced/inhibition.py",
+      "imports": [
+        "mod:logging",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.advanced.inhibition.InhibitionLayer",
+          "name": "InhibitionLayer",
+          "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer",
+          "line": 22,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionLayer.__init__",
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionLayer._create_lateral_kernel",
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionLayer._init_E2I_weights",
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionLayer._init_I2E_weights",
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionLayer.apply_inhibition",
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionLayer.extra_repr",
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionLayer.forward",
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionLayer.get_inhibition_metrics"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.advanced.inhibition.InhibitionMixin",
+          "name": "InhibitionMixin",
+          "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin",
+          "line": 325,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionMixin._init_inhibition",
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionMixin.forward",
+            "mtd:src.pyfolds.advanced.inhibition.InhibitionMixin.get_inhibition_metrics"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.advanced.refractory",
+      "qname": "src.pyfolds.advanced.refractory",
+      "file": "src/pyfolds/advanced/refractory.py",
+      "imports": [
+        "mod:src.pyfolds.advanced.time_mixin",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.advanced.refractory.RefractoryMixin",
+          "name": "RefractoryMixin",
+          "qname": "src.pyfolds.advanced.refractory.RefractoryMixin",
+          "line": 8,
+          "bases": [
+            "TimedMixin"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.advanced.refractory.RefractoryMixin._check_refractory_batch",
+            "mtd:src.pyfolds.advanced.refractory.RefractoryMixin._ensure_last_spike_time",
+            "mtd:src.pyfolds.advanced.refractory.RefractoryMixin._init_refractory",
+            "mtd:src.pyfolds.advanced.refractory.RefractoryMixin._update_refractory_batch",
+            "mtd:src.pyfolds.advanced.refractory.RefractoryMixin.forward",
+            "mtd:src.pyfolds.advanced.refractory.RefractoryMixin.get_refractory_metrics",
+            "mtd:src.pyfolds.advanced.refractory.RefractoryMixin.reset_refractory"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.advanced.short_term",
+      "qname": "src.pyfolds.advanced.short_term",
+      "file": "src/pyfolds/advanced/short_term.py",
+      "imports": [
+        "mod:math",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin",
+          "name": "ShortTermDynamicsMixin",
+          "qname": "src.pyfolds.advanced.short_term.ShortTermDynamicsMixin",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin._init_short_term",
+            "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin._update_short_term_dynamics",
+            "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin.forward"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.advanced.stdp",
+      "qname": "src.pyfolds.advanced.stdp",
+      "file": "src/pyfolds/advanced/stdp.py",
+      "imports": [
+        "mod:math",
+        "mod:src.pyfolds.utils.types",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.advanced.stdp.STDPMixin",
+          "name": "STDPMixin",
+          "qname": "src.pyfolds.advanced.stdp.STDPMixin",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.advanced.stdp.STDPMixin._ensure_traces",
+            "mtd:src.pyfolds.advanced.stdp.STDPMixin._init_stdp",
+            "mtd:src.pyfolds.advanced.stdp.STDPMixin._should_apply_stdp",
+            "mtd:src.pyfolds.advanced.stdp.STDPMixin._stdp_pre_spike_source",
+            "mtd:src.pyfolds.advanced.stdp.STDPMixin._update_stdp_traces",
+            "mtd:src.pyfolds.advanced.stdp.STDPMixin.forward"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.advanced.time_mixin",
+      "qname": "src.pyfolds.advanced.time_mixin",
+      "file": "src/pyfolds/advanced/time_mixin.py",
+      "imports": [
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.advanced.time_mixin.TimedMixin",
+          "name": "TimedMixin",
+          "qname": "src.pyfolds.advanced.time_mixin.TimedMixin",
+          "line": 6,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.advanced.time_mixin.TimedMixin._ensure_time_counter",
+            "mtd:src.pyfolds.advanced.time_mixin.TimedMixin._get_time",
+            "mtd:src.pyfolds.advanced.time_mixin.TimedMixin._increment_time"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.contracts",
+      "qname": "src.pyfolds.contracts",
+      "file": "src/pyfolds/contracts/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.backends",
+        "mod:src.pyfolds.neuron_contract"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.contracts.backends",
+      "qname": "src.pyfolds.contracts.backends",
+      "file": "src/pyfolds/contracts/backends.py",
+      "imports": [
+        "mod:__future__",
+        "mod:dataclasses",
+        "mod:numpy",
+        "mod:src.pyfolds.contracts.neuron_contract",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.contracts.backends.TensorFlowNeuronContractBackend",
+          "name": "TensorFlowNeuronContractBackend",
+          "qname": "src.pyfolds.contracts.backends.TensorFlowNeuronContractBackend",
+          "line": 88,
+          "bases": [
+            "_BaseContractBackend"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.contracts.backends.TensorFlowNeuronContractBackend.run_step"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.contracts.backends.TorchNeuronContractBackend",
+          "name": "TorchNeuronContractBackend",
+          "qname": "src.pyfolds.contracts.backends.TorchNeuronContractBackend",
+          "line": 40,
+          "bases": [
+            "_BaseContractBackend"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.contracts.backends.TorchNeuronContractBackend.run_step"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.contracts.backends._BaseContractBackend",
+          "name": "_BaseContractBackend",
+          "qname": "src.pyfolds.contracts.backends._BaseContractBackend",
+          "line": 32,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.contracts.backends._BaseContractBackend.__init__",
+            "mtd:src.pyfolds.contracts.backends._BaseContractBackend._trace"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.contracts.backends._State",
+          "name": "_State",
+          "qname": "src.pyfolds.contracts.backends._State",
+          "line": 25,
+          "bases": [],
+          "methods": []
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.contracts.neuron_contract",
+      "qname": "src.pyfolds.contracts.neuron_contract",
+      "file": "src/pyfolds/contracts/neuron_contract.py",
+      "imports": [
+        "mod:__future__",
+        "mod:dataclasses",
+        "mod:enum",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.contracts.neuron_contract.ContractViolation",
+          "name": "ContractViolation",
+          "qname": "src.pyfolds.contracts.neuron_contract.ContractViolation",
+          "line": 53,
+          "bases": [
+            "ValueError"
+          ],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.contracts.neuron_contract.MechanismStep",
+          "name": "MechanismStep",
+          "qname": "src.pyfolds.contracts.neuron_contract.MechanismStep",
+          "line": 8,
+          "bases": [
+            "str",
+            "Enum"
+          ],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.contracts.neuron_contract.NeuronStepInput",
+          "name": "NeuronStepInput",
+          "qname": "src.pyfolds.contracts.neuron_contract.NeuronStepInput",
+          "line": 32,
+          "bases": [],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.contracts.neuron_contract.NeuronStepOutput",
+          "name": "NeuronStepOutput",
+          "qname": "src.pyfolds.contracts.neuron_contract.NeuronStepOutput",
+          "line": 47,
+          "bases": [],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.contracts.neuron_contract.StepExecutionTrace",
+          "name": "StepExecutionTrace",
+          "qname": "src.pyfolds.contracts.neuron_contract.StepExecutionTrace",
+          "line": 39,
+          "bases": [],
+          "methods": []
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.contracts.neuron_contract.validate_step_output",
+          "name": "validate_step_output",
+          "qname": "src.pyfolds.contracts.neuron_contract.validate_step_output",
+          "line": 57,
+          "params": [
+            "output",
+            "dt"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.core",
+      "qname": "src.pyfolds.core",
+      "file": "src/pyfolds/core/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.accumulator",
+        "mod:src.pyfolds.base",
+        "mod:src.pyfolds.config",
+        "mod:src.pyfolds.dendrite",
+        "mod:src.pyfolds.dendrite_integration",
+        "mod:src.pyfolds.factory",
+        "mod:src.pyfolds.homeostasis",
+        "mod:src.pyfolds.neuromodulation",
+        "mod:src.pyfolds.neuron",
+        "mod:src.pyfolds.neuron_v2",
+        "mod:src.pyfolds.synapse"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.core.create_accumulator",
+          "name": "create_accumulator",
+          "qname": "src.pyfolds.core.create_accumulator",
+          "line": 108,
+          "params": [
+            "cfg",
+            "track_extra"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.core.create_neuron",
+          "name": "create_neuron",
+          "qname": "src.pyfolds.core.create_neuron",
+          "line": 74,
+          "params": [
+            "cfg"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.core.create_neuron_v2",
+          "name": "create_neuron_v2",
+          "qname": "src.pyfolds.core.create_neuron_v2",
+          "line": 100,
+          "params": [
+            "cfg"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.core.demo",
+          "name": "demo",
+          "qname": "src.pyfolds.core.demo",
+          "line": 131,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.core.accumulator",
+      "qname": "src.pyfolds.core.accumulator",
+      "file": "src/pyfolds/core/accumulator.py",
+      "imports": [
+        "mod:collections",
+        "mod:dataclasses",
+        "mod:threading",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.accumulator.AccumulatedStats",
+          "name": "AccumulatedStats",
+          "qname": "src.pyfolds.core.accumulator.AccumulatedStats",
+          "line": 12,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.core.accumulator.AccumulatedStats.__repr__",
+            "mtd:src.pyfolds.core.accumulator.AccumulatedStats.is_valid"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.core.accumulator.StatisticsAccumulator",
+          "name": "StatisticsAccumulator",
+          "qname": "src.pyfolds.core.accumulator.StatisticsAccumulator",
+          "line": 38,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.__init__",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator._update_history",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.accumulate",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.batch_count",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.enable_history",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.extra_repr",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.get_averages",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.has_data",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.history",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.plot_history",
+            "mtd:src.pyfolds.core.accumulator.StatisticsAccumulator.reset"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.core.accumulator.create_accumulator_from_config",
+          "name": "create_accumulator_from_config",
+          "qname": "src.pyfolds.core.accumulator.create_accumulator_from_config",
+          "line": 316,
+          "params": [
+            "config",
+            "track_extra"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.core.base",
+      "qname": "src.pyfolds.core.base",
+      "file": "src/pyfolds/core/base.py",
+      "imports": [
+        "mod:__future__",
+        "mod:abc",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.base.BaseNeuron",
+          "name": "BaseNeuron",
+          "qname": "src.pyfolds.core.base.BaseNeuron",
+          "line": 25,
+          "bases": [
+            "nn.Module",
+            "ABC"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.base.BaseNeuron.apply_plasticity",
+            "mtd:src.pyfolds.core.base.BaseNeuron.forward",
+            "mtd:src.pyfolds.core.base.BaseNeuron.get_metrics"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.core.base.BasePlasticityRule",
+          "name": "BasePlasticityRule",
+          "qname": "src.pyfolds.core.base.BasePlasticityRule",
+          "line": 12,
+          "bases": [
+            "ABC"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.base.BasePlasticityRule.update"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.core.config",
+      "qname": "src.pyfolds.core.config",
+      "file": "src/pyfolds/core/config.py",
+      "imports": [
+        "mod:dataclasses",
+        "mod:math",
+        "mod:typing",
+        "mod:warnings"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.config.MPJRDConfig",
+          "name": "MPJRDConfig",
+          "qname": "src.pyfolds.core.config.MPJRDConfig",
+          "line": 18,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.core.config.MPJRDConfig.__post_init__",
+            "mtd:src.pyfolds.core.config.MPJRDConfig.__repr__",
+            "mtd:src.pyfolds.core.config.MPJRDConfig.from_dict",
+            "mtd:src.pyfolds.core.config.MPJRDConfig.get_decay_rate",
+            "mtd:src.pyfolds.core.config.MPJRDConfig.get_preset",
+            "mtd:src.pyfolds.core.config.MPJRDConfig.get_ts",
+            "mtd:src.pyfolds.core.config.MPJRDConfig.to_dict",
+            "mtd:src.pyfolds.core.config.MPJRDConfig.validate_numerical_safety"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.core.dendrite",
+      "qname": "src.pyfolds.core.dendrite",
+      "file": "src/pyfolds/core/dendrite.py",
+      "imports": [
+        "mod:src.pyfolds.core.config",
+        "mod:src.pyfolds.core.synapse",
+        "mod:threading",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.dendrite.MPJRDDendrite",
+          "name": "MPJRDDendrite",
+          "qname": "src.pyfolds.core.dendrite.MPJRDDendrite",
+          "line": 11,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.I",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.N",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.R",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.W",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.__init__",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite._ensure_cache_valid",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite._invalidate_cache",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite._validate_finite",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.consolidate",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.extra_repr",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.forward",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.get_states",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.load_states",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.u",
+            "mtd:src.pyfolds.core.dendrite.MPJRDDendrite.update_synapses_rate_based"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.core.dendrite_integration",
+      "qname": "src.pyfolds.core.dendrite_integration",
+      "file": "src/pyfolds/core/dendrite_integration.py",
+      "imports": [
+        "mod:__future__",
+        "mod:src.pyfolds.core.config",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.dendrite_integration.DendriticIntegration",
+          "name": "DendriticIntegration",
+          "qname": "src.pyfolds.core.dendrite_integration.DendriticIntegration",
+          "line": 34,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.dendrite_integration.DendriticIntegration.__init__",
+            "mtd:src.pyfolds.core.dendrite_integration.DendriticIntegration._theta_dend",
+            "mtd:src.pyfolds.core.dendrite_integration.DendriticIntegration.extra_repr",
+            "mtd:src.pyfolds.core.dendrite_integration.DendriticIntegration.forward"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.core.dendrite_integration.DendriticOutput",
+          "name": "DendriticOutput",
+          "qname": "src.pyfolds.core.dendrite_integration.DendriticOutput",
+          "line": 20,
+          "bases": [
+            "NamedTuple"
+          ],
+          "methods": []
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.core.factory",
+      "qname": "src.pyfolds.core.factory",
+      "file": "src/pyfolds/core/factory.py",
+      "imports": [
+        "mod:__future__",
+        "mod:enum",
+        "mod:src.pyfolds.core.config",
+        "mod:typing",
+        "mod:warnings"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.factory.NeuronFactory",
+          "name": "NeuronFactory",
+          "qname": "src.pyfolds.core.factory.NeuronFactory",
+          "line": 20,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.core.factory.NeuronFactory.create",
+            "mtd:src.pyfolds.core.factory.NeuronFactory.is_registered",
+            "mtd:src.pyfolds.core.factory.NeuronFactory.register"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.core.factory.NeuronType",
+          "name": "NeuronType",
+          "qname": "src.pyfolds.core.factory.NeuronType",
+          "line": 12,
+          "bases": [
+            "Enum"
+          ],
+          "methods": []
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.core.factory.get_available_types",
+          "name": "get_available_types",
+          "qname": "src.pyfolds.core.factory.get_available_types",
+          "line": 129,
+          "params": []
+        },
+        {
+          "id": "fn:src.pyfolds.core.factory.infer_neuron_type",
+          "name": "infer_neuron_type",
+          "qname": "src.pyfolds.core.factory.infer_neuron_type",
+          "line": 116,
+          "params": [
+            "cfg"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.core.factory.register_default_neurons",
+          "name": "register_default_neurons",
+          "qname": "src.pyfolds.core.factory.register_default_neurons",
+          "line": 88,
+          "params": []
+        },
+        {
+          "id": "fn:src.pyfolds.core.factory.register_neuron",
+          "name": "register_neuron",
+          "qname": "src.pyfolds.core.factory.register_neuron",
+          "line": 78,
+          "params": [
+            "neuron_type"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.core.homeostasis",
+      "qname": "src.pyfolds.core.homeostasis",
+      "file": "src/pyfolds/core/homeostasis.py",
+      "imports": [
+        "mod:logging",
+        "mod:math",
+        "mod:src.pyfolds.core.config",
+        "mod:threading",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.homeostasis.HomeostasisController",
+          "name": "HomeostasisController",
+          "qname": "src.pyfolds.core.homeostasis.HomeostasisController",
+          "line": 12,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController.__init__",
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController._check_stability_change",
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController.extra_repr",
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController.homeostasis_error",
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController.is_stable",
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController.on_stable",
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController.on_unstable",
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController.reset",
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController.stability_ratio",
+            "mtd:src.pyfolds.core.homeostasis.HomeostasisController.update"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.core.neuromodulation",
+      "qname": "src.pyfolds.core.neuromodulation",
+      "file": "src/pyfolds/core/neuromodulation.py",
+      "imports": [
+        "mod:math",
+        "mod:src.pyfolds.core.config",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.neuromodulation.Neuromodulator",
+          "name": "Neuromodulator",
+          "qname": "src.pyfolds.core.neuromodulation.Neuromodulator",
+          "line": 20,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.neuromodulation.Neuromodulator.__init__",
+            "mtd:src.pyfolds.core.neuromodulation.Neuromodulator.extra_repr",
+            "mtd:src.pyfolds.core.neuromodulation.Neuromodulator.forward"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.core.neuron",
+      "qname": "src.pyfolds.core.neuron",
+      "file": "src/pyfolds/core/neuron.py",
+      "imports": [
+        "mod:src.pyfolds.core.accumulator",
+        "mod:src.pyfolds.core.base",
+        "mod:src.pyfolds.core.config",
+        "mod:src.pyfolds.core.dendrite",
+        "mod:src.pyfolds.core.dendrite_integration",
+        "mod:src.pyfolds.core.homeostasis",
+        "mod:src.pyfolds.core.neuromodulation",
+        "mod:src.pyfolds.utils.logging",
+        "mod:src.pyfolds.utils.types",
+        "mod:src.pyfolds.utils.validation",
+        "mod:threading",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
+          "name": "MPJRDNeuron",
+          "qname": "src.pyfolds.core.neuron.MPJRDNeuron",
+          "line": 43,
+          "bases": [
+            "BaseNeuron"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.I",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.N",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.W",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.__init__",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._apply_online_plasticity",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._compute_R_endogenous",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_stable",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_unstable",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._validate_input_device",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._validate_internal_devices",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.extra_repr",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.forward",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.get_metrics",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.protection",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.r_hat",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.set_mode",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.sleep",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.step",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.theta",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.to"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.core.neuron_v2",
+      "qname": "src.pyfolds.core.neuron_v2",
+      "file": "src/pyfolds/core/neuron_v2.py",
+      "imports": [
+        "mod:src.pyfolds.core.neuron",
+        "mod:src.pyfolds.utils.types",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.neuron_v2.MPJRDNeuronV2",
+          "name": "MPJRDNeuronV2",
+          "qname": "src.pyfolds.core.neuron_v2.MPJRDNeuronV2",
+          "line": 11,
+          "bases": [
+            "MPJRDNeuron"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2._telemetry_forward_event",
+            "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2.extra_repr",
+            "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2.forward"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.core.synapse",
+      "qname": "src.pyfolds.core.synapse",
+      "file": "src/pyfolds/core/synapse.py",
+      "imports": [
+        "mod:src.pyfolds.core.config",
+        "mod:src.pyfolds.utils.math",
+        "mod:src.pyfolds.utils.types",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.core.synapse.MPJRDSynapse",
+          "name": "MPJRDSynapse",
+          "qname": "src.pyfolds.core.synapse.MPJRDSynapse",
+          "line": 32,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.core.synapse.MPJRDSynapse.W",
+            "mtd:src.pyfolds.core.synapse.MPJRDSynapse.__init__",
+            "mtd:src.pyfolds.core.synapse.MPJRDSynapse._update_with_soft_saturation",
+            "mtd:src.pyfolds.core.synapse.MPJRDSynapse.consolidate",
+            "mtd:src.pyfolds.core.synapse.MPJRDSynapse.extra_repr",
+            "mtd:src.pyfolds.core.synapse.MPJRDSynapse.get_state",
+            "mtd:src.pyfolds.core.synapse.MPJRDSynapse.load_state",
+            "mtd:src.pyfolds.core.synapse.MPJRDSynapse.update"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.factory",
+      "qname": "src.pyfolds.factory",
+      "file": "src/pyfolds/factory.py",
+      "imports": [
+        "mod:__future__",
+        "mod:enum",
+        "mod:src.pyfolds.core.base",
+        "mod:src.pyfolds.core.config",
+        "mod:src.pyfolds.core.neuron",
+        "mod:src.pyfolds.wave.neuron",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.factory.NeuronFactory",
+          "name": "NeuronFactory",
+          "qname": "src.pyfolds.factory.NeuronFactory",
+          "line": 22,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.factory.NeuronFactory.create",
+            "mtd:src.pyfolds.factory.NeuronFactory.register"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.factory.NeuronType",
+          "name": "NeuronType",
+          "qname": "src.pyfolds.factory.NeuronType",
+          "line": 14,
+          "bases": [
+            "str",
+            "Enum"
+          ],
+          "methods": []
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.layers",
+      "qname": "src.pyfolds.layers",
+      "file": "src/pyfolds/layers/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.layer",
+        "mod:src.pyfolds.wave_layer"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.layers.layer",
+      "qname": "src.pyfolds.layers.layer",
+      "file": "src/pyfolds/layers/layer.py",
+      "imports": [
+        "mod:src.pyfolds.core.config",
+        "mod:src.pyfolds.core.neuron",
+        "mod:src.pyfolds.utils.types",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.layers.layer.MPJRDLayer",
+          "name": "MPJRDLayer",
+          "qname": "src.pyfolds.layers.layer.MPJRDLayer",
+          "line": 11,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.__init__",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer._prepare_input",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.apply_batch_update",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.extra_repr",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.forward",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.get_all_metrics",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.get_layer_metrics",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.n_dendrites",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.n_synapses",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.r_hat_mean",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.set_mode",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.sleep",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer.theta_mean"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.layers.wave_layer",
+      "qname": "src.pyfolds.layers.wave_layer",
+      "file": "src/pyfolds/layers/wave_layer.py",
+      "imports": [
+        "mod:src.pyfolds.layers.layer",
+        "mod:src.pyfolds.wave",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.layers.wave_layer.MPJRDWaveLayer",
+          "name": "MPJRDWaveLayer",
+          "qname": "src.pyfolds.layers.wave_layer.MPJRDWaveLayer",
+          "line": 10,
+          "bases": [
+            "MPJRDLayer"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.layers.wave_layer.MPJRDWaveLayer.__init__"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.monitoring",
+      "qname": "src.pyfolds.monitoring",
+      "file": "src/pyfolds/monitoring/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.health"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.monitoring.health",
+      "qname": "src.pyfolds.monitoring.health",
+      "file": "src/pyfolds/monitoring/health.py",
+      "imports": [
+        "mod:__future__",
+        "mod:enum",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.monitoring.health.HealthStatus",
+          "name": "HealthStatus",
+          "qname": "src.pyfolds.monitoring.health.HealthStatus",
+          "line": 11,
+          "bases": [
+            "Enum"
+          ],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
+          "name": "NeuronHealthCheck",
+          "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck",
+          "line": 19,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
+            "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.check"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
+          "name": "NeuronHealthMonitor",
+          "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor",
+          "line": 53,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
+            "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
+            "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.network",
+      "qname": "src.pyfolds.network",
+      "file": "src/pyfolds/network/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.builder",
+        "mod:src.pyfolds.network",
+        "mod:src.pyfolds.wave_network"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.network.builder",
+      "qname": "src.pyfolds.network.builder",
+      "file": "src/pyfolds/network/builder.py",
+      "imports": [
+        "mod:__future__",
+        "mod:src.pyfolds.core.config",
+        "mod:src.pyfolds.layers.layer",
+        "mod:src.pyfolds.network.network",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.network.builder.NetworkBuilder",
+          "name": "NetworkBuilder",
+          "qname": "src.pyfolds.network.builder.NetworkBuilder",
+          "line": 12,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.network.builder.NetworkBuilder.__init__",
+            "mtd:src.pyfolds.network.builder.NetworkBuilder.add_layer",
+            "mtd:src.pyfolds.network.builder.NetworkBuilder.build"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.network.network",
+      "qname": "src.pyfolds.network.network",
+      "file": "src/pyfolds/network/network.py",
+      "imports": [
+        "mod:collections",
+        "mod:src.pyfolds.layers",
+        "mod:src.pyfolds.utils.types",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.network.network.MPJRDNetwork",
+          "name": "MPJRDNetwork",
+          "qname": "src.pyfolds.network.network.MPJRDNetwork",
+          "line": 11,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.__init__",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork._has_cycle",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork._prepare_input_for_layer",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork._topological_sort",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.add_layer",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.apply_batch_update",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.build",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.connect",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.extra_repr",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.forward",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.get_all_metrics",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.get_network_metrics",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.set_mode",
+            "mtd:src.pyfolds.network.network.MPJRDNetwork.sleep"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.network.wave_network",
+      "qname": "src.pyfolds.network.wave_network",
+      "file": "src/pyfolds/network/wave_network.py",
+      "imports": [
+        "mod:src.pyfolds.layers",
+        "mod:src.pyfolds.network.network",
+        "mod:src.pyfolds.wave"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.network.wave_network.MPJRDWaveNetwork",
+          "name": "MPJRDWaveNetwork",
+          "qname": "src.pyfolds.network.wave_network.MPJRDWaveNetwork",
+          "line": 8,
+          "bases": [
+            "MPJRDNetwork"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.network.wave_network.MPJRDWaveNetwork.add_wave_layer"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.serialization",
+      "qname": "src.pyfolds.serialization",
+      "file": "src/pyfolds/serialization/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.ecc",
+        "mod:src.pyfolds.foldio",
+        "mod:src.pyfolds.versioned_checkpoint"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.serialization.ecc",
+      "qname": "src.pyfolds.serialization.ecc",
+      "file": "src/pyfolds/serialization/ecc.py",
+      "imports": [
+        "mod:__future__",
+        "mod:dataclasses",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.serialization.ecc.ECCCodec",
+          "name": "ECCCodec",
+          "qname": "src.pyfolds.serialization.ecc.ECCCodec",
+          "line": 17,
+          "bases": [
+            "Protocol"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.serialization.ecc.ECCCodec.decode",
+            "mtd:src.pyfolds.serialization.ecc.ECCCodec.encode"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.serialization.ecc.ECCResult",
+          "name": "ECCResult",
+          "qname": "src.pyfolds.serialization.ecc.ECCResult",
+          "line": 10,
+          "bases": [],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.serialization.ecc.NoECC",
+          "name": "NoECC",
+          "qname": "src.pyfolds.serialization.ecc.NoECC",
+          "line": 29,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.serialization.ecc.NoECC.decode",
+            "mtd:src.pyfolds.serialization.ecc.NoECC.encode"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.serialization.ecc.ReedSolomonECC",
+          "name": "ReedSolomonECC",
+          "qname": "src.pyfolds.serialization.ecc.ReedSolomonECC",
+          "line": 41,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.serialization.ecc.ReedSolomonECC.__init__",
+            "mtd:src.pyfolds.serialization.ecc.ReedSolomonECC.decode",
+            "mtd:src.pyfolds.serialization.ecc.ReedSolomonECC.encode"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.serialization.ecc.ecc_from_protection",
+          "name": "ecc_from_protection",
+          "qname": "src.pyfolds.serialization.ecc.ecc_from_protection",
+          "line": 73,
+          "params": [
+            "level"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.serialization.foldio",
+      "qname": "src.pyfolds.serialization.foldio",
+      "file": "src/pyfolds/serialization/foldio.py",
+      "imports": [
+        "mod:__future__",
+        "mod:dataclasses",
+        "mod:hashlib",
+        "mod:hmac",
+        "mod:importlib",
+        "mod:io",
+        "mod:json",
+        "mod:mmap",
+        "mod:numpy",
+        "mod:os",
+        "mod:pathlib",
+        "mod:platform",
+        "mod:src.pyfolds.serialization.ecc",
+        "mod:struct",
+        "mod:subprocess",
+        "mod:sys",
+        "mod:time",
+        "mod:torch",
+        "mod:typing",
+        "mod:warnings"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.serialization.foldio.FoldReader",
+          "name": "FoldReader",
+          "qname": "src.pyfolds.serialization.foldio.FoldReader",
+          "line": 375,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.serialization.foldio.FoldReader.__enter__",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader.__exit__",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader.__init__",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader._decompress",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader._ecc_codec",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader._read_at",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader._read_header_and_index",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader.list_chunks",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader.read_chunk_bytes",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader.read_json",
+            "mtd:src.pyfolds.serialization.foldio.FoldReader.read_torch"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.serialization.foldio.FoldSecurityError",
+          "name": "FoldSecurityError",
+          "qname": "src.pyfolds.serialization.foldio.FoldSecurityError",
+          "line": 95,
+          "bases": [
+            "RuntimeError"
+          ],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.serialization.foldio.FoldWriter",
+          "name": "FoldWriter",
+          "qname": "src.pyfolds.serialization.foldio.FoldWriter",
+          "line": 230,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.serialization.foldio.FoldWriter.__enter__",
+            "mtd:src.pyfolds.serialization.foldio.FoldWriter.__exit__",
+            "mtd:src.pyfolds.serialization.foldio.FoldWriter.__init__",
+            "mtd:src.pyfolds.serialization.foldio.FoldWriter._compress",
+            "mtd:src.pyfolds.serialization.foldio.FoldWriter.add_chunk",
+            "mtd:src.pyfolds.serialization.foldio.FoldWriter.finalize"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.serialization.foldio._TrustedFoldReader",
+          "name": "_TrustedFoldReader",
+          "qname": "src.pyfolds.serialization.foldio._TrustedFoldReader",
+          "line": 623,
+          "bases": [
+            "FoldReader"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.serialization.foldio._TrustedFoldReader.read_torch"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._build_nuclear_npz",
+          "name": "_build_nuclear_npz",
+          "qname": "src.pyfolds.serialization.foldio._build_nuclear_npz",
+          "line": 195,
+          "params": [
+            "neuron"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._canonical_json",
+          "name": "_canonical_json",
+          "qname": "src.pyfolds.serialization.foldio._canonical_json",
+          "line": 135,
+          "params": [
+            "obj"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._cfg_to_dict",
+          "name": "_cfg_to_dict",
+          "qname": "src.pyfolds.serialization.foldio._cfg_to_dict",
+          "line": 139,
+          "params": [
+            "cfg"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._collect_hyperparameters",
+          "name": "_collect_hyperparameters",
+          "qname": "src.pyfolds.serialization.foldio._collect_hyperparameters",
+          "line": 681,
+          "params": [
+            "neuron"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._crc32c_fallback",
+          "name": "_crc32c_fallback",
+          "qname": "src.pyfolds.serialization.foldio._crc32c_fallback",
+          "line": 88,
+          "params": [
+            "data"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._expression_summary",
+          "name": "_expression_summary",
+          "qname": "src.pyfolds.serialization.foldio._expression_summary",
+          "line": 637,
+          "params": [
+            "neuron"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._history_snapshot",
+          "name": "_history_snapshot",
+          "qname": "src.pyfolds.serialization.foldio._history_snapshot",
+          "line": 185,
+          "params": [
+            "neuron"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._init_crc32c_table",
+          "name": "_init_crc32c_table",
+          "qname": "src.pyfolds.serialization.foldio._init_crc32c_table",
+          "line": 71,
+          "params": []
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._json_bytes",
+          "name": "_json_bytes",
+          "qname": "src.pyfolds.serialization.foldio._json_bytes",
+          "line": 131,
+          "params": [
+            "obj"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._optional_import",
+          "name": "_optional_import",
+          "qname": "src.pyfolds.serialization.foldio._optional_import",
+          "line": 36,
+          "params": [
+            "module_name"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._reproducibility_metadata",
+          "name": "_reproducibility_metadata",
+          "qname": "src.pyfolds.serialization.foldio._reproducibility_metadata",
+          "line": 671,
+          "params": []
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._safe_git_hash",
+          "name": "_safe_git_hash",
+          "qname": "src.pyfolds.serialization.foldio._safe_git_hash",
+          "line": 151,
+          "params": []
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._sign_payload_ed25519",
+          "name": "_sign_payload_ed25519",
+          "qname": "src.pyfolds.serialization.foldio._sign_payload_ed25519",
+          "line": 688,
+          "params": [
+            "payload",
+            "private_key_pem"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._telemetry_snapshot",
+          "name": "_telemetry_snapshot",
+          "qname": "src.pyfolds.serialization.foldio._telemetry_snapshot",
+          "line": 163,
+          "params": [
+            "neuron",
+            "max_events"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio._verify_payload_signature_ed25519",
+          "name": "_verify_payload_signature_ed25519",
+          "qname": "src.pyfolds.serialization.foldio._verify_payload_signature_ed25519",
+          "line": 700,
+          "params": [
+            "payload",
+            "signature_hex",
+            "public_key_pem"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio.crc32c_u32",
+          "name": "crc32c_u32",
+          "qname": "src.pyfolds.serialization.foldio.crc32c_u32",
+          "line": 99,
+          "params": [
+            "data"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio.is_mind",
+          "name": "is_mind",
+          "qname": "src.pyfolds.serialization.foldio.is_mind",
+          "line": 921,
+          "params": [
+            "path"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio.is_mind_chunks",
+          "name": "is_mind_chunks",
+          "qname": "src.pyfolds.serialization.foldio.is_mind_chunks",
+          "line": 928,
+          "params": [
+            "chunks"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio.load_fold_or_mind",
+          "name": "load_fold_or_mind",
+          "qname": "src.pyfolds.serialization.foldio.load_fold_or_mind",
+          "line": 865,
+          "params": [
+            "path",
+            "neuron_class",
+            "map_location",
+            "trusted_torch_payload",
+            "signature_public_key_pem"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio.peek_fold_or_mind",
+          "name": "peek_fold_or_mind",
+          "qname": "src.pyfolds.serialization.foldio.peek_fold_or_mind",
+          "line": 844,
+          "params": [
+            "path",
+            "use_mmap"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio.peek_mind",
+          "name": "peek_mind",
+          "qname": "src.pyfolds.serialization.foldio.peek_mind",
+          "line": 859,
+          "params": [
+            "path",
+            "use_mmap"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio.read_nuclear_arrays",
+          "name": "read_nuclear_arrays",
+          "qname": "src.pyfolds.serialization.foldio.read_nuclear_arrays",
+          "line": 221,
+          "params": [
+            "path",
+            "use_mmap",
+            "verify"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio.save_fold_or_mind",
+          "name": "save_fold_or_mind",
+          "qname": "src.pyfolds.serialization.foldio.save_fold_or_mind",
+          "line": 716,
+          "params": [
+            "neuron",
+            "path",
+            "tags",
+            "include_history",
+            "include_telemetry",
+            "include_nuclear_arrays",
+            "compress",
+            "ecc",
+            "protection",
+            "extra_manifest",
+            "dataset_manifest",
+            "performance_manifest",
+            "fairness_manifest",
+            "explainability_manifest",
+            "compliance_manifest",
+            "audit_events",
+            "signature_private_key_pem",
+            "signature_key_id"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.serialization.foldio.sha256_hex",
+          "name": "sha256_hex",
+          "qname": "src.pyfolds.serialization.foldio.sha256_hex",
+          "line": 126,
+          "params": [
+            "data"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.serialization.versioned_checkpoint",
+      "qname": "src.pyfolds.serialization.versioned_checkpoint",
+      "file": "src/pyfolds/serialization/versioned_checkpoint.py",
+      "imports": [
+        "mod:__future__",
+        "mod:dataclasses",
+        "mod:datetime",
+        "mod:hashlib",
+        "mod:pathlib",
+        "mod:subprocess",
+        "mod:torch",
+        "mod:typing",
+        "mod:warnings"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
+          "name": "VersionedCheckpoint",
+          "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
+          "line": 16,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._cfg_dict",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_hash",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.save"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.telemetry",
+      "qname": "src.pyfolds.telemetry",
+      "file": "src/pyfolds/telemetry/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.controller",
+        "mod:src.pyfolds.decorator",
+        "mod:src.pyfolds.events",
+        "mod:src.pyfolds.ringbuffer",
+        "mod:src.pyfolds.sinks",
+        "mod:src.pyfolds.types"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.telemetry.controller",
+      "qname": "src.pyfolds.telemetry.controller",
+      "file": "src/pyfolds/telemetry/controller.py",
+      "imports": [
+        "mod:dataclasses",
+        "mod:enum",
+        "mod:logging",
+        "mod:random",
+        "mod:src.pyfolds.telemetry.events",
+        "mod:src.pyfolds.telemetry.ringbuffer",
+        "mod:src.pyfolds.telemetry.sinks",
+        "mod:threading",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.telemetry.controller.TelemetryConfig",
+          "name": "TelemetryConfig",
+          "qname": "src.pyfolds.telemetry.controller.TelemetryConfig",
+          "line": 38,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.controller.TelemetryConfig.__post_init__"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.controller.TelemetryController",
+          "name": "TelemetryController",
+          "qname": "src.pyfolds.telemetry.controller.TelemetryController",
+          "line": 72,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.__init__",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController._increment_step",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.clear",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.emit",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.enabled",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.get_stats",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.get_telemetry_metrics",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.should_emit",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.should_emit_sample",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.snapshot",
+            "mtd:src.pyfolds.telemetry.controller.TelemetryController.step_count"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.controller.TelemetryProfile",
+          "name": "TelemetryProfile",
+          "qname": "src.pyfolds.telemetry.controller.TelemetryProfile",
+          "line": 14,
+          "bases": [
+            "str",
+            "Enum"
+          ],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.controller.TelemetryStats",
+          "name": "TelemetryStats",
+          "qname": "src.pyfolds.telemetry.controller.TelemetryStats",
+          "line": 24,
+          "bases": [
+            "TypedDict"
+          ],
+          "methods": []
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.telemetry.decorator",
+      "qname": "src.pyfolds.telemetry.decorator",
+      "file": "src/pyfolds/telemetry/decorator.py",
+      "imports": [
+        "mod:functools",
+        "mod:src.pyfolds.telemetry.controller",
+        "mod:src.pyfolds.telemetry.events",
+        "mod:time",
+        "mod:typing"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.telemetry.decorator.telemetry",
+          "name": "telemetry",
+          "qname": "src.pyfolds.telemetry.decorator.telemetry",
+          "line": 10,
+          "params": [
+            "phase",
+            "sample_rate",
+            "capture_args",
+            "capture_return"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.telemetry.events",
+      "qname": "src.pyfolds.telemetry.events",
+      "file": "src/pyfolds/telemetry/events.py",
+      "imports": [
+        "mod:dataclasses",
+        "mod:time",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.telemetry.events.TelemetryEvent",
+          "name": "TelemetryEvent",
+          "qname": "src.pyfolds.telemetry.events.TelemetryEvent",
+          "line": 14,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.events.TelemetryEvent.payload"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.telemetry.events.commit_event",
+          "name": "commit_event",
+          "qname": "src.pyfolds.telemetry.events.commit_event",
+          "line": 94,
+          "params": [
+            "step_id",
+            "mode",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.telemetry.events.commit_event_lazy",
+          "name": "commit_event_lazy",
+          "qname": "src.pyfolds.telemetry.events.commit_event_lazy",
+          "line": 106,
+          "params": [
+            "step_id",
+            "mode",
+            "payload_fn",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.telemetry.events.forward_event",
+          "name": "forward_event",
+          "qname": "src.pyfolds.telemetry.events.forward_event",
+          "line": 43,
+          "params": [
+            "step_id",
+            "mode",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.telemetry.events.forward_event_lazy",
+          "name": "forward_event_lazy",
+          "qname": "src.pyfolds.telemetry.events.forward_event_lazy",
+          "line": 63,
+          "params": [
+            "step_id",
+            "mode",
+            "payload_fn",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.telemetry.events.sleep_event",
+          "name": "sleep_event",
+          "qname": "src.pyfolds.telemetry.events.sleep_event",
+          "line": 119,
+          "params": [
+            "step_id",
+            "mode",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.telemetry.events.sleep_event_lazy",
+          "name": "sleep_event_lazy",
+          "qname": "src.pyfolds.telemetry.events.sleep_event_lazy",
+          "line": 131,
+          "params": [
+            "step_id",
+            "mode",
+            "payload_fn",
+            "neuron_id"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.telemetry.ringbuffer",
+      "qname": "src.pyfolds.telemetry.ringbuffer",
+      "file": "src/pyfolds/telemetry/ringbuffer.py",
+      "imports": [
+        "mod:collections.abc",
+        "mod:threading",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.telemetry.ringbuffer.RingBuffer",
+          "name": "RingBuffer",
+          "qname": "src.pyfolds.telemetry.ringbuffer.RingBuffer",
+          "line": 10,
+          "bases": [
+            "Generic[T]"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.ringbuffer.RingBuffer.__init__",
+            "mtd:src.pyfolds.telemetry.ringbuffer.RingBuffer.__len__",
+            "mtd:src.pyfolds.telemetry.ringbuffer.RingBuffer.__repr__",
+            "mtd:src.pyfolds.telemetry.ringbuffer.RingBuffer.append",
+            "mtd:src.pyfolds.telemetry.ringbuffer.RingBuffer.capacity",
+            "mtd:src.pyfolds.telemetry.ringbuffer.RingBuffer.clear",
+            "mtd:src.pyfolds.telemetry.ringbuffer.RingBuffer.extend",
+            "mtd:src.pyfolds.telemetry.ringbuffer.RingBuffer.is_full",
+            "mtd:src.pyfolds.telemetry.ringbuffer.RingBuffer.snapshot"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.telemetry.sinks",
+      "qname": "src.pyfolds.telemetry.sinks",
+      "file": "src/pyfolds/telemetry/sinks.py",
+      "imports": [
+        "mod:abc",
+        "mod:json",
+        "mod:logging",
+        "mod:pathlib",
+        "mod:src.pyfolds.telemetry.events",
+        "mod:src.pyfolds.telemetry.ringbuffer",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.telemetry.sinks.ConsoleSink",
+          "name": "ConsoleSink",
+          "qname": "src.pyfolds.telemetry.sinks.ConsoleSink",
+          "line": 90,
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.sinks.ConsoleSink.__init__",
+            "mtd:src.pyfolds.telemetry.sinks.ConsoleSink.close",
+            "mtd:src.pyfolds.telemetry.sinks.ConsoleSink.emit",
+            "mtd:src.pyfolds.telemetry.sinks.ConsoleSink.flush"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.sinks.DistributorSink",
+          "name": "DistributorSink",
+          "qname": "src.pyfolds.telemetry.sinks.DistributorSink",
+          "line": 230,
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.sinks.DistributorSink.__init__",
+            "mtd:src.pyfolds.telemetry.sinks.DistributorSink.close",
+            "mtd:src.pyfolds.telemetry.sinks.DistributorSink.emit",
+            "mtd:src.pyfolds.telemetry.sinks.DistributorSink.flush"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.sinks.JSONLinesSink",
+          "name": "JSONLinesSink",
+          "qname": "src.pyfolds.telemetry.sinks.JSONLinesSink",
+          "line": 122,
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.sinks.JSONLinesSink.__enter__",
+            "mtd:src.pyfolds.telemetry.sinks.JSONLinesSink.__exit__",
+            "mtd:src.pyfolds.telemetry.sinks.JSONLinesSink.__init__",
+            "mtd:src.pyfolds.telemetry.sinks.JSONLinesSink._ensure_open",
+            "mtd:src.pyfolds.telemetry.sinks.JSONLinesSink._make_serializable",
+            "mtd:src.pyfolds.telemetry.sinks.JSONLinesSink.close",
+            "mtd:src.pyfolds.telemetry.sinks.JSONLinesSink.emit",
+            "mtd:src.pyfolds.telemetry.sinks.JSONLinesSink.flush"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.sinks.MemorySink",
+          "name": "MemorySink",
+          "qname": "src.pyfolds.telemetry.sinks.MemorySink",
+          "line": 59,
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.sinks.MemorySink.__init__",
+            "mtd:src.pyfolds.telemetry.sinks.MemorySink.clear",
+            "mtd:src.pyfolds.telemetry.sinks.MemorySink.close",
+            "mtd:src.pyfolds.telemetry.sinks.MemorySink.emit",
+            "mtd:src.pyfolds.telemetry.sinks.MemorySink.flush",
+            "mtd:src.pyfolds.telemetry.sinks.MemorySink.snapshot"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.sinks.NoOpSink",
+          "name": "NoOpSink",
+          "qname": "src.pyfolds.telemetry.sinks.NoOpSink",
+          "line": 46,
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.sinks.NoOpSink.close",
+            "mtd:src.pyfolds.telemetry.sinks.NoOpSink.emit",
+            "mtd:src.pyfolds.telemetry.sinks.NoOpSink.flush"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.sinks.Sink",
+          "name": "Sink",
+          "qname": "src.pyfolds.telemetry.sinks.Sink",
+          "line": 21,
+          "bases": [
+            "ABC"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.telemetry.sinks.Sink.__enter__",
+            "mtd:src.pyfolds.telemetry.sinks.Sink.__exit__",
+            "mtd:src.pyfolds.telemetry.sinks.Sink.close",
+            "mtd:src.pyfolds.telemetry.sinks.Sink.emit",
+            "mtd:src.pyfolds.telemetry.sinks.Sink.flush"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.telemetry.types",
+      "qname": "src.pyfolds.telemetry.types",
+      "file": "src/pyfolds/telemetry/types.py",
+      "imports": [
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.telemetry.types.CommitPayload",
+          "name": "CommitPayload",
+          "qname": "src.pyfolds.telemetry.types.CommitPayload",
+          "line": 23,
+          "bases": [
+            "TypedDict"
+          ],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.types.ForwardPayload",
+          "name": "ForwardPayload",
+          "qname": "src.pyfolds.telemetry.types.ForwardPayload",
+          "line": 6,
+          "bases": [
+            "TypedDict"
+          ],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.telemetry.types.SleepPayload",
+          "name": "SleepPayload",
+          "qname": "src.pyfolds.telemetry.types.SleepPayload",
+          "line": 33,
+          "bases": [
+            "TypedDict"
+          ],
+          "methods": []
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.tf",
+      "qname": "src.pyfolds.tf",
+      "file": "src/pyfolds/tf/__init__.py",
+      "imports": [
+        "mod:__future__",
+        "mod:importlib.util"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.tf.__getattr__",
+          "name": "__getattr__",
+          "qname": "src.pyfolds.tf.__getattr__",
+          "line": 26,
+          "params": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.tf.layers",
+      "qname": "src.pyfolds.tf.layers",
+      "file": "src/pyfolds/tf/layers.py",
+      "imports": [
+        "mod:__future__",
+        "mod:src.pyfolds.tf.neuron"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.tf.layers.MPJRDTFLayer",
+          "name": "MPJRDTFLayer",
+          "qname": "src.pyfolds.tf.layers.MPJRDTFLayer",
+          "line": 16,
+          "bases": [
+            "tf.keras.layers.Layer"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.tf.layers.MPJRDTFLayer.__init__",
+            "mtd:src.pyfolds.tf.layers.MPJRDTFLayer.call"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.tf.neuron",
+      "qname": "src.pyfolds.tf.neuron",
+      "file": "src/pyfolds/tf/neuron.py",
+      "imports": [
+        "mod:__future__",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.tf.neuron.MPJRDTFNeuronCell",
+          "name": "MPJRDTFNeuronCell",
+          "qname": "src.pyfolds.tf.neuron.MPJRDTFNeuronCell",
+          "line": 16,
+          "bases": [
+            "tf.keras.layers.Layer"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.tf.neuron.MPJRDTFNeuronCell.__init__",
+            "mtd:src.pyfolds.tf.neuron.MPJRDTFNeuronCell.call",
+            "mtd:src.pyfolds.tf.neuron.MPJRDTFNeuronCell.get_config",
+            "mtd:src.pyfolds.tf.neuron.MPJRDTFNeuronCell.get_initial_state",
+            "mtd:src.pyfolds.tf.neuron.MPJRDTFNeuronCell.output_size",
+            "mtd:src.pyfolds.tf.neuron.MPJRDTFNeuronCell.state_size",
+            "mtd:src.pyfolds.tf.neuron.MPJRDTFNeuronCell.step"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.utils",
+      "qname": "src.pyfolds.utils",
+      "file": "src/pyfolds/utils/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.device",
+        "mod:src.pyfolds.logging",
+        "mod:src.pyfolds.math",
+        "mod:src.pyfolds.types",
+        "mod:src.pyfolds.validation"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.utils.context",
+      "qname": "src.pyfolds.utils.context",
+      "file": "src/pyfolds/utils/context.py",
+      "imports": [
+        "mod:__future__",
+        "mod:contextlib",
+        "mod:src.pyfolds.core.base",
+        "mod:src.pyfolds.utils.types",
+        "mod:typing"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.utils.context.learning_mode",
+          "name": "learning_mode",
+          "qname": "src.pyfolds.utils.context.learning_mode",
+          "line": 13,
+          "params": [
+            "neuron",
+            "mode"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.utils.device",
+      "qname": "src.pyfolds.utils.device",
+      "file": "src/pyfolds/utils/device.py",
+      "imports": [
+        "mod:logging",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.utils.device.DeviceManager",
+          "name": "DeviceManager",
+          "qname": "src.pyfolds.utils.device.DeviceManager",
+          "line": 42,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.utils.device.DeviceManager.__init__",
+            "mtd:src.pyfolds.utils.device.DeviceManager._validate_device",
+            "mtd:src.pyfolds.utils.device.DeviceManager.check_consistency",
+            "mtd:src.pyfolds.utils.device.DeviceManager.to"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.utils.device.ensure_device",
+          "name": "ensure_device",
+          "qname": "src.pyfolds.utils.device.ensure_device",
+          "line": 35,
+          "params": [
+            "tensor",
+            "device"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.device.get_device",
+          "name": "get_device",
+          "qname": "src.pyfolds.utils.device.get_device",
+          "line": 28,
+          "params": [
+            "device"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.device.infer_device",
+          "name": "infer_device",
+          "qname": "src.pyfolds.utils.device.infer_device",
+          "line": 10,
+          "params": [
+            "inputs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.utils.logging",
+      "qname": "src.pyfolds.utils.logging",
+      "file": "src/pyfolds/utils/logging.py",
+      "imports": [
+        "mod:collections",
+        "mod:datetime",
+        "mod:json",
+        "mod:logging",
+        "mod:logging.handlers",
+        "mod:pathlib",
+        "mod:sys",
+        "mod:threading",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
+          "name": "CircularBufferFileHandler",
+          "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler",
+          "line": 278,
+          "bases": [
+            "logging.Handler"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.__init__",
+            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.emit"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.utils.logging.FixedLayoutFormatter",
+          "name": "FixedLayoutFormatter",
+          "qname": "src.pyfolds.utils.logging.FixedLayoutFormatter",
+          "line": 64,
+          "bases": [
+            "logging.Formatter"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.utils.logging.FixedLayoutFormatter.format"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.utils.logging.PyFoldsLogger",
+          "name": "PyFoldsLogger",
+          "qname": "src.pyfolds.utils.logging.PyFoldsLogger",
+          "line": 79,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.utils.logging.PyFoldsLogger.__init__",
+            "mtd:src.pyfolds.utils.logging.PyFoldsLogger.__new__",
+            "mtd:src.pyfolds.utils.logging.PyFoldsLogger.add_file_handler",
+            "mtd:src.pyfolds.utils.logging.PyFoldsLogger.get_logger",
+            "mtd:src.pyfolds.utils.logging.PyFoldsLogger.setup"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.utils.logging.StructuredFormatter",
+          "name": "StructuredFormatter",
+          "qname": "src.pyfolds.utils.logging.StructuredFormatter",
+          "line": 41,
+          "bases": [
+            "logging.Formatter"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.utils.logging.StructuredFormatter.format"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.utils.logging.build_log_path",
+          "name": "build_log_path",
+          "qname": "src.pyfolds.utils.logging.build_log_path",
+          "line": 338,
+          "params": [
+            "log_dir",
+            "app",
+            "version"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.logging.get_logger",
+          "name": "get_logger",
+          "qname": "src.pyfolds.utils.logging.get_logger",
+          "line": 213,
+          "params": [
+            "name"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.logging.next_log_path",
+          "name": "next_log_path",
+          "qname": "src.pyfolds.utils.logging.next_log_path",
+          "line": 321,
+          "params": [
+            "log_dir",
+            "app",
+            "version"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.logging.setup_logging",
+          "name": "setup_logging",
+          "qname": "src.pyfolds.utils.logging.setup_logging",
+          "line": 258,
+          "params": [
+            "log_file",
+            "level",
+            "structured",
+            "circular_buffer_lines",
+            "console",
+            "fixed_layout"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.logging.setup_run_logging",
+          "name": "setup_run_logging",
+          "qname": "src.pyfolds.utils.logging.setup_run_logging",
+          "line": 220,
+          "params": [
+            "app",
+            "version",
+            "log_dir",
+            "level",
+            "structured",
+            "fixed_layout",
+            "console",
+            "circular_buffer_lines"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.logging.trace",
+          "name": "trace",
+          "qname": "src.pyfolds.utils.logging.trace",
+          "line": 32,
+          "params": [
+            "self",
+            "message"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.utils.math",
+      "qname": "src.pyfolds.utils.math",
+      "file": "src/pyfolds/utils/math.py",
+      "imports": [
+        "mod:math",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.utils.math.calculate_vc_dimension",
+          "name": "calculate_vc_dimension",
+          "qname": "src.pyfolds.utils.math.calculate_vc_dimension",
+          "line": 105,
+          "params": [
+            "n_neurons",
+            "n_dendrites",
+            "n_synapses",
+            "avg_connections"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.math.clamp_R",
+          "name": "clamp_R",
+          "qname": "src.pyfolds.utils.math.clamp_R",
+          "line": 70,
+          "params": [
+            "r"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.math.clamp_rate",
+          "name": "clamp_rate",
+          "qname": "src.pyfolds.utils.math.clamp_rate",
+          "line": 55,
+          "params": [
+            "r"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.math.safe_div",
+          "name": "safe_div",
+          "qname": "src.pyfolds.utils.math.safe_div",
+          "line": 40,
+          "params": [
+            "x",
+            "y",
+            "eps"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.math.safe_weight_law",
+          "name": "safe_weight_law",
+          "qname": "src.pyfolds.utils.math.safe_weight_law",
+          "line": 8,
+          "params": [
+            "N",
+            "w_scale",
+            "max_log_val",
+            "enforce_checks"
+          ]
+        },
+        {
+          "id": "fn:src.pyfolds.utils.math.xavier_init",
+          "name": "xavier_init",
+          "qname": "src.pyfolds.utils.math.xavier_init",
+          "line": 85,
+          "params": [
+            "shape",
+            "gain"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.utils.types",
+      "qname": "src.pyfolds.utils.types",
+      "file": "src/pyfolds/utils/types.py",
+      "imports": [
+        "mod:dataclasses",
+        "mod:enum",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.utils.types.AdaptationConfig",
+          "name": "AdaptationConfig",
+          "qname": "src.pyfolds.utils.types.AdaptationConfig",
+          "line": 160,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.utils.types.AdaptationConfig.validate"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.utils.types.AdaptationOutput",
+          "name": "AdaptationOutput",
+          "qname": "src.pyfolds.utils.types.AdaptationOutput",
+          "line": 152,
+          "bases": [
+            "NamedTuple"
+          ],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.utils.types.ConnectionType",
+          "name": "ConnectionType",
+          "qname": "src.pyfolds.utils.types.ConnectionType",
+          "line": 76,
+          "bases": [
+            "Enum"
+          ],
+          "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.utils.types.LearningMode",
+          "name": "LearningMode",
+          "qname": "src.pyfolds.utils.types.LearningMode",
+          "line": 13,
+          "bases": [
+            "Enum"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.utils.types.LearningMode.description",
+            "mtd:src.pyfolds.utils.types.LearningMode.is_consolidating",
+            "mtd:src.pyfolds.utils.types.LearningMode.is_learning",
+            "mtd:src.pyfolds.utils.types.LearningMode.learning_rate_multiplier"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.utils.types.ModeConfig",
+          "name": "ModeConfig",
+          "qname": "src.pyfolds.utils.types.ModeConfig",
+          "line": 92,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.utils.types.ModeConfig.__post_init__",
+            "mtd:src.pyfolds.utils.types.ModeConfig.from_learning_mode",
+            "mtd:src.pyfolds.utils.types.ModeConfig.get_consolidation_factor",
+            "mtd:src.pyfolds.utils.types.ModeConfig.get_learning_rate"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.utils.types.normalize_learning_mode",
+          "name": "normalize_learning_mode",
+          "qname": "src.pyfolds.utils.types.normalize_learning_mode",
+          "line": 60,
+          "params": [
+            "mode"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.utils.validation",
+      "qname": "src.pyfolds.utils.validation",
+      "file": "src/pyfolds/utils/validation.py",
+      "imports": [
+        "mod:__future__",
+        "mod:functools",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:src.pyfolds.utils.validation.validate_device_consistency",
+          "name": "validate_device_consistency",
+          "qname": "src.pyfolds.utils.validation.validate_device_consistency",
+          "line": 11,
+          "params": []
+        },
+        {
+          "id": "fn:src.pyfolds.utils.validation.validate_input",
+          "name": "validate_input",
+          "qname": "src.pyfolds.utils.validation.validate_input",
+          "line": 36,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:src.pyfolds.wave",
+      "qname": "src.pyfolds.wave",
+      "file": "src/pyfolds/wave/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.config",
+        "mod:src.pyfolds.neuron"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.wave.config",
+      "qname": "src.pyfolds.wave.config",
+      "file": "src/pyfolds/wave/config.py",
+      "imports": [
+        "mod:dataclasses",
+        "mod:src.pyfolds.core.config",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.wave.config.MPJRDWaveConfig",
+          "name": "MPJRDWaveConfig",
+          "qname": "src.pyfolds.wave.config.MPJRDWaveConfig",
+          "line": 10,
+          "bases": [
+            "MPJRDConfig"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.wave.config.MPJRDWaveConfig.__post_init__"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.wave.neuron",
+      "qname": "src.pyfolds.wave.neuron",
+      "file": "src/pyfolds/wave/neuron.py",
+      "imports": [
+        "mod:__future__",
+        "mod:src.pyfolds.core.neuron",
+        "mod:src.pyfolds.utils.types",
+        "mod:src.pyfolds.utils.validation",
+        "mod:src.pyfolds.wave.config",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.wave.neuron.MPJRDWaveNeuron",
+          "name": "MPJRDWaveNeuron",
+          "qname": "src.pyfolds.wave.neuron.MPJRDWaveNeuron",
+          "line": 14,
+          "bases": [
+            "MPJRDNeuron"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.wave.neuron.MPJRDWaveNeuron.__init__",
+            "mtd:src.pyfolds.wave.neuron.MPJRDWaveNeuron._compute_latency",
+            "mtd:src.pyfolds.wave.neuron.MPJRDWaveNeuron._compute_phase",
+            "mtd:src.pyfolds.wave.neuron.MPJRDWaveNeuron._frequency_for_class",
+            "mtd:src.pyfolds.wave.neuron.MPJRDWaveNeuron._generate_wave_output",
+            "mtd:src.pyfolds.wave.neuron.MPJRDWaveNeuron.apply_plasticity",
+            "mtd:src.pyfolds.wave.neuron.MPJRDWaveNeuron.forward"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests",
+      "qname": "tests",
+      "file": "tests/__init__.py",
+      "imports": [],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.checkpoint",
+      "qname": "tests.checkpoint",
+      "file": "tests/checkpoint.py",
+      "imports": [
+        "mod:json",
+        "mod:logging",
+        "mod:pathlib",
+        "mod:time",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.checkpoint.CheckpointMixin",
+          "name": "CheckpointMixin",
+          "qname": "tests.checkpoint.CheckpointMixin",
+          "line": 12,
+          "bases": [],
+          "methods": [
+            "mtd:tests.checkpoint.CheckpointMixin.load",
+            "mtd:tests.checkpoint.CheckpointMixin.load_weights_only",
+            "mtd:tests.checkpoint.CheckpointMixin.save",
+            "mtd:tests.checkpoint.CheckpointMixin.save_weights_only"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.conftest",
+      "qname": "tests.conftest",
+      "file": "tests/conftest.py",
+      "imports": [
+        "mod:pathlib",
+        "mod:pyfolds.core",
+        "mod:pytest",
+        "mod:sys",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.conftest.batch_size",
+          "name": "batch_size",
+          "qname": "tests.conftest.batch_size",
+          "line": 54,
+          "params": []
+        },
+        {
+          "id": "fn:tests.conftest.device",
+          "name": "device",
+          "qname": "tests.conftest.device",
+          "line": 49,
+          "params": []
+        },
+        {
+          "id": "fn:tests.conftest.full_config",
+          "name": "full_config",
+          "qname": "tests.conftest.full_config",
+          "line": 26,
+          "params": []
+        },
+        {
+          "id": "fn:tests.conftest.small_config",
+          "name": "small_config",
+          "qname": "tests.conftest.small_config",
+          "line": 16,
+          "params": []
+        },
+        {
+          "id": "fn:tests.conftest.small_neuron",
+          "name": "small_neuron",
+          "qname": "tests.conftest.small_neuron",
+          "line": 44,
+          "params": [
+            "small_config"
+          ]
+        },
+        {
+          "id": "fn:tests.conftest.tiny_config",
+          "name": "tiny_config",
+          "qname": "tests.conftest.tiny_config",
+          "line": 35,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.integration",
+      "qname": "tests.integration",
+      "file": "tests/integration/__init__.py",
+      "imports": [],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.integration.test_advanced_integration",
+      "qname": "tests.integration.test_advanced_integration",
+      "file": "tests/integration/test_advanced_integration.py",
+      "imports": [
+        "mod:pyfolds.advanced",
+        "mod:pyfolds.core.config",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.integration.test_advanced_integration.test_all_mixins_together_smoke",
+          "name": "test_all_mixins_together_smoke",
+          "qname": "tests.integration.test_advanced_integration.test_all_mixins_together_smoke",
+          "line": 9,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.integration.test_mnist_file_logging",
+      "qname": "tests.integration.test_mnist_file_logging",
+      "file": "tests/integration/test_mnist_file_logging.py",
+      "imports": [
+        "mod:examples.mnist_file_logging",
+        "mod:pathlib",
+        "mod:pyfolds"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.integration.test_mnist_file_logging.test_pyfolds_imports_are_stable",
+          "name": "test_pyfolds_imports_are_stable",
+          "qname": "tests.integration.test_mnist_file_logging.test_pyfolds_imports_are_stable",
+          "line": 10,
+          "params": []
+        },
+        {
+          "id": "fn:tests.integration.test_mnist_file_logging.test_training_script_runs_end_to_end",
+          "name": "test_training_script_runs_end_to_end",
+          "qname": "tests.integration.test_mnist_file_logging.test_training_script_runs_end_to_end",
+          "line": 18,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.integration.test_neuron_advanced",
+      "qname": "tests.integration.test_neuron_advanced",
+      "file": "tests/integration/test_neuron_advanced.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.integration.test_neuron_advanced.TestAdvancedNeuron",
+          "name": "TestAdvancedNeuron",
+          "qname": "tests.integration.test_neuron_advanced.TestAdvancedNeuron",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:tests.integration.test_neuron_advanced.TestAdvancedNeuron.test_backprop_disabled_does_not_apply_dendritic_gain",
+            "mtd:tests.integration.test_neuron_advanced.TestAdvancedNeuron.test_full_pipeline"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.integration.test_temporal_sequence_stability",
+      "qname": "tests.integration.test_temporal_sequence_stability",
+      "file": "tests/integration/test_temporal_sequence_stability.py",
+      "imports": [
+        "mod:importlib.util",
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.integration.test_temporal_sequence_stability.forward_sequence",
+          "name": "forward_sequence",
+          "qname": "tests.integration.test_temporal_sequence_stability.forward_sequence",
+          "line": 11,
+          "params": [
+            "neuron",
+            "x_seq",
+            "dt"
+          ]
+        },
+        {
+          "id": "fn:tests.integration.test_temporal_sequence_stability.test_forward_sequence_torch_stability_minimal_criteria",
+          "name": "test_forward_sequence_torch_stability_minimal_criteria",
+          "qname": "tests.integration.test_temporal_sequence_stability.test_forward_sequence_torch_stability_minimal_criteria",
+          "line": 23,
+          "params": []
+        },
+        {
+          "id": "fn:tests.integration.test_temporal_sequence_stability.test_tf_sequence_equivalent_stability_minimal_criteria",
+          "name": "test_tf_sequence_equivalent_stability_minimal_criteria",
+          "qname": "tests.integration.test_temporal_sequence_stability.test_tf_sequence_equivalent_stability_minimal_criteria",
+          "line": 63,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.integration.test_training_loop",
+      "qname": "tests.integration.test_training_loop",
+      "file": "tests/integration/test_training_loop.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.integration.test_training_loop.TestTrainingLoop",
+          "name": "TestTrainingLoop",
+          "qname": "tests.integration.test_training_loop.TestTrainingLoop",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:tests.integration.test_training_loop.TestTrainingLoop.test_batch_training"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.performance",
+      "qname": "tests.performance",
+      "file": "tests/performance/__init__.py",
+      "imports": [],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.performance.test_batch_speed",
+      "qname": "tests.performance.test_batch_speed",
+      "file": "tests/performance/test_batch_speed.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:time",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.performance.test_batch_speed.TestBatchSpeed",
+          "name": "TestBatchSpeed",
+          "qname": "tests.performance.test_batch_speed.TestBatchSpeed",
+          "line": 11,
+          "bases": [],
+          "methods": [
+            "mtd:tests.performance.test_batch_speed.TestBatchSpeed.test_forward_speed"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.performance.test_memory_usage",
+      "qname": "tests.performance.test_memory_usage",
+      "file": "tests/performance/test_memory_usage.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:torch",
+        "mod:tracemalloc"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.performance.test_memory_usage.TestMemoryUsage",
+          "name": "TestMemoryUsage",
+          "qname": "tests.performance.test_memory_usage.TestMemoryUsage",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:tests.performance.test_memory_usage.TestMemoryUsage.test_memory_leak"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.test_concurrent_reads",
+      "qname": "tests.test_concurrent_reads",
+      "file": "tests/test_concurrent_reads.py",
+      "imports": [
+        "mod:concurrent.futures",
+        "mod:hashlib",
+        "mod:pyfolds.core.config",
+        "mod:pyfolds.core.neuron",
+        "mod:pyfolds.serialization",
+        "mod:pytest"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.test_concurrent_reads._build_neuron",
+          "name": "_build_neuron",
+          "qname": "tests.test_concurrent_reads._build_neuron",
+          "line": 11,
+          "params": []
+        },
+        {
+          "id": "fn:tests.test_concurrent_reads._read_signature",
+          "name": "_read_signature",
+          "qname": "tests.test_concurrent_reads._read_signature",
+          "line": 22,
+          "params": [
+            "path"
+          ]
+        },
+        {
+          "id": "fn:tests.test_concurrent_reads.test_parallel_reads_are_consistent",
+          "name": "test_parallel_reads_are_consistent",
+          "qname": "tests.test_concurrent_reads.test_parallel_reads_are_consistent",
+          "line": 35,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.test_corruption_detection",
+      "qname": "tests.test_corruption_detection",
+      "file": "tests/test_corruption_detection.py",
+      "imports": [
+        "mod:pyfolds.core.config",
+        "mod:pyfolds.core.neuron",
+        "mod:pyfolds.serialization",
+        "mod:pyfolds.serialization.foldio",
+        "mod:pytest",
+        "mod:struct"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.test_corruption_detection._build_neuron",
+          "name": "_build_neuron",
+          "qname": "tests.test_corruption_detection._build_neuron",
+          "line": 11,
+          "params": []
+        },
+        {
+          "id": "fn:tests.test_corruption_detection._write_base_fold",
+          "name": "_write_base_fold",
+          "qname": "tests.test_corruption_detection._write_base_fold",
+          "line": 22,
+          "params": [
+            "path"
+          ]
+        },
+        {
+          "id": "fn:tests.test_corruption_detection.test_bit_flip_is_detected",
+          "name": "test_bit_flip_is_detected",
+          "qname": "tests.test_corruption_detection.test_bit_flip_is_detected",
+          "line": 34,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.test_corruption_detection.test_huge_index_len_dos_guard",
+          "name": "test_huge_index_len_dos_guard",
+          "qname": "tests.test_corruption_detection.test_huge_index_len_dos_guard",
+          "line": 78,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.test_corruption_detection.test_invalid_magic_is_rejected",
+          "name": "test_invalid_magic_is_rejected",
+          "qname": "tests.test_corruption_detection.test_invalid_magic_is_rejected",
+          "line": 65,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.test_corruption_detection.test_partial_read_raises_eoferror",
+          "name": "test_partial_read_raises_eoferror",
+          "qname": "tests.test_corruption_detection.test_partial_read_raises_eoferror",
+          "line": 88,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.test_corruption_detection.test_truncation_is_detected",
+          "name": "test_truncation_is_detected",
+          "qname": "tests.test_corruption_detection.test_truncation_is_detected",
+          "line": 53,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.test_fold_corruption",
+      "qname": "tests.test_fold_corruption",
+      "file": "tests/test_fold_corruption.py",
+      "imports": [
+        "mod:pyfolds.core.config",
+        "mod:pyfolds.core.neuron",
+        "mod:pyfolds.serialization",
+        "mod:pytest"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.test_fold_corruption.test_fold_corruption_is_detected",
+          "name": "test_fold_corruption_is_detected",
+          "qname": "tests.test_fold_corruption.test_fold_corruption_is_detected",
+          "line": 13,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.test_fold_fuzz",
+      "qname": "tests.test_fold_fuzz",
+      "file": "tests/test_fold_fuzz.py",
+      "imports": [
+        "mod:os",
+        "mod:pyfolds.serialization",
+        "mod:pytest"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.test_fold_fuzz.test_fold_reader_rejects_random_payload",
+          "name": "test_fold_reader_rejects_random_payload",
+          "qname": "tests.test_fold_fuzz.test_fold_reader_rejects_random_payload",
+          "line": 13,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.test_stress_long",
+      "qname": "tests.test_stress_long",
+      "file": "tests/test_stress_long.py",
+      "imports": [
+        "mod:math",
+        "mod:pytest",
+        "mod:torch",
+        "mod:tracemalloc"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.test_stress_long.test_100k_steps_stability_and_memory_signals",
+          "name": "test_100k_steps_stability_and_memory_signals",
+          "qname": "tests.test_stress_long.test_100k_steps_stability_and_memory_signals",
+          "line": 16,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.tools.test_batch_create_issues",
+      "qname": "tests.tools.test_batch_create_issues",
+      "file": "tests/tools/test_batch_create_issues.py",
+      "imports": [
+        "mod:tools.batch_create_issues"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.tools.test_batch_create_issues.test_validate_batch_structure_duplicate_ids",
+          "name": "test_validate_batch_structure_duplicate_ids",
+          "qname": "tests.tools.test_batch_create_issues.test_validate_batch_structure_duplicate_ids",
+          "line": 4,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.tools.test_create_issue_report",
+      "qname": "tests.tools.test_create_issue_report",
+      "file": "tests/tools/test_create_issue_report.py",
+      "imports": [
+        "mod:tools.create_issue_report"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.tools.test_create_issue_report.test_generate_yaml_frontmatter_contains_id",
+          "name": "test_generate_yaml_frontmatter_contains_id",
+          "qname": "tests.tools.test_create_issue_report.test_generate_yaml_frontmatter_contains_id",
+          "line": 4,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.tools.test_link_validation",
+      "qname": "tests.tools.test_link_validation",
+      "file": "tests/tools/test_link_validation.py",
+      "imports": [
+        "mod:tools.validate_issue_format"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.tools.test_link_validation.test_validate_links_missing",
+          "name": "test_validate_links_missing",
+          "qname": "tests.tools.test_link_validation.test_validate_links_missing",
+          "line": 4,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.tools.test_sync_hub_auto",
+      "qname": "tests.tools.test_sync_hub_auto",
+      "file": "tests/tools/test_sync_hub_auto.py",
+      "imports": [
+        "mod:tools.sync_hub_auto"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.tools.test_sync_hub_auto.test_status_to_emoji_done",
+          "name": "test_status_to_emoji_done",
+          "qname": "tests.tools.test_sync_hub_auto.test_status_to_emoji_done",
+          "line": 4,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.tools.test_validate_issue_format",
+      "qname": "tests.tools.test_validate_issue_format",
+      "file": "tests/tools/test_validate_issue_format.py",
+      "imports": [
+        "mod:pathlib",
+        "mod:tools.validate_issue_format"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.tools.test_validate_issue_format.test_validate_structure_filename",
+          "name": "test_validate_structure_filename",
+          "qname": "tests.tools.test_validate_issue_format.test_validate_structure_filename",
+          "line": 6,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.training.mnist_cifar_training_reference",
+      "qname": "tests.training.mnist_cifar_training_reference",
+      "file": "tests/training/mnist_cifar_training_reference.py",
+      "imports": [
+        "mod:__future__",
+        "mod:dataclasses",
+        "mod:pyfolds",
+        "mod:torch",
+        "mod:torch.nn",
+        "mod:torch.optim",
+        "mod:torch.utils.data",
+        "mod:torchvision",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.training.mnist_cifar_training_reference.PyFoldsMLP",
+          "name": "PyFoldsMLP",
+          "qname": "tests.training.mnist_cifar_training_reference.PyFoldsMLP",
+          "line": 31,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:tests.training.mnist_cifar_training_reference.PyFoldsMLP.__init__",
+            "mtd:tests.training.mnist_cifar_training_reference.PyFoldsMLP.forward"
+          ]
+        },
+        {
+          "id": "cls:tests.training.mnist_cifar_training_reference.TrainingConfig",
+          "name": "TrainingConfig",
+          "qname": "tests.training.mnist_cifar_training_reference.TrainingConfig",
+          "line": 22,
+          "bases": [],
+          "methods": []
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:tests.training.mnist_cifar_training_reference.build_dataset",
+          "name": "build_dataset",
+          "qname": "tests.training.mnist_cifar_training_reference.build_dataset",
+          "line": 54,
+          "params": [
+            "cfg"
+          ]
+        },
+        {
+          "id": "fn:tests.training.mnist_cifar_training_reference.evaluate",
+          "name": "evaluate",
+          "qname": "tests.training.mnist_cifar_training_reference.evaluate",
+          "line": 111,
+          "params": [
+            "model",
+            "loader",
+            "device"
+          ]
+        },
+        {
+          "id": "fn:tests.training.mnist_cifar_training_reference.train_reference",
+          "name": "train_reference",
+          "qname": "tests.training.mnist_cifar_training_reference.train_reference",
+          "line": 84,
+          "params": [
+            "cfg"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit",
+      "qname": "tests.unit",
+      "file": "tests/unit/__init__.py",
+      "imports": [],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.advanced",
+      "qname": "tests.unit.advanced",
+      "file": "tests/unit/advanced/__init__.py",
+      "imports": [],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.advanced.test_adaptation",
+      "qname": "tests.unit.advanced.test_adaptation",
+      "file": "tests/unit/advanced/test_adaptation.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.advanced.test_adaptation.TestAdaptationMixin",
+          "name": "TestAdaptationMixin",
+          "qname": "tests.unit.advanced.test_adaptation.TestAdaptationMixin",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.advanced.test_adaptation.TestAdaptationMixin.test_adaptation_decay",
+            "mtd:tests.unit.advanced.test_adaptation.TestAdaptationMixin.test_adaptation_increment",
+            "mtd:tests.unit.advanced.test_adaptation.TestAdaptationMixin.test_adaptation_respects_string_inference_mode",
+            "mtd:tests.unit.advanced.test_adaptation.TestAdaptationMixin.test_forward_updates_u_for_downstream_mixins",
+            "mtd:tests.unit.advanced.test_adaptation.TestAdaptationMixin.test_initialization"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.advanced.test_backprop",
+      "qname": "tests.unit.advanced.test_backprop",
+      "file": "tests/unit/advanced/test_backprop.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.advanced.test_backprop.TestBackpropMixin",
+          "name": "TestBackpropMixin",
+          "qname": "tests.unit.advanced.test_backprop.TestBackpropMixin",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.advanced.test_backprop.TestBackpropMixin.test_backprop_queue",
+            "mtd:tests.unit.advanced.test_backprop.TestBackpropMixin.test_bap_proportional_uses_dendritic_contribution",
+            "mtd:tests.unit.advanced.test_backprop.TestBackpropMixin.test_dendrite_amplification_decay",
+            "mtd:tests.unit.advanced.test_backprop.TestBackpropMixin.test_initialization",
+            "mtd:tests.unit.advanced.test_backprop.TestBackpropMixin.test_time_counter_advances_only_after_forward"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.advanced.test_inhibition",
+      "qname": "tests.unit.advanced.test_inhibition",
+      "file": "tests/unit/advanced/test_inhibition.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.advanced.test_inhibition.TestInhibitionLayer",
+          "name": "TestInhibitionLayer",
+          "qname": "tests.unit.advanced.test_inhibition.TestInhibitionLayer",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_e2i_initialization_is_deterministic",
+            "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_forward_feedforward",
+            "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_initialization",
+            "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_lateral_kernel"
+          ]
+        },
+        {
+          "id": "cls:tests.unit.advanced.test_inhibition.TestInhibitionMixin",
+          "name": "TestInhibitionMixin",
+          "qname": "tests.unit.advanced.test_inhibition.TestInhibitionMixin",
+          "line": 75,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.advanced.test_inhibition.TestInhibitionMixin.test_forward_requires_initialized_inhibition"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.advanced.test_refractory",
+      "qname": "tests.unit.advanced.test_refractory",
+      "file": "tests/unit/advanced/test_refractory.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.advanced.test_refractory.TestRefractoryMixin",
+          "name": "TestRefractoryMixin",
+          "qname": "tests.unit.advanced.test_refractory.TestRefractoryMixin",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_check_refractory_periods",
+            "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_forward_increments_time_once",
+            "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_initialization",
+            "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_refractory_blocks_spikes",
+            "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_update_refractory"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.advanced.test_short_term",
+      "qname": "tests.unit.advanced.test_short_term",
+      "file": "tests/unit/advanced/test_short_term.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin",
+          "name": "TestShortTermDynamicsMixin",
+          "qname": "tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_initialization",
+            "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_tsodyks_markram_recovery",
+            "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_update_aligns_stp_buffers_to_input_device",
+            "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_update_no_spikes",
+            "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_update_with_spikes"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.advanced.test_stdp",
+      "qname": "tests.unit.advanced.test_stdp",
+      "file": "tests/unit/advanced/test_stdp.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.utils.types",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.advanced.test_stdp.TestSTDPMixin",
+          "name": "TestSTDPMixin",
+          "qname": "tests.unit.advanced.test_stdp.TestSTDPMixin",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_initialization",
+            "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_ltd_rule_classic_vs_current",
+            "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_pre_spike_updates_trace",
+            "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_should_apply_stdp",
+            "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_stdp_input_source_raw_vs_stp",
+            "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_stdp_updates_underlying_synapses_online",
+            "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_trace_decay"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.core",
+      "qname": "tests.unit.core",
+      "file": "tests/unit/core/__init__.py",
+      "imports": [],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.core.test_accumulator",
+      "qname": "tests.unit.core.test_accumulator",
+      "file": "tests/unit/core/test_accumulator.py",
+      "imports": [
+        "mod:collections",
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.core.test_accumulator.TestStatisticsAccumulator",
+          "name": "TestStatisticsAccumulator",
+          "qname": "tests.unit.core.test_accumulator.TestStatisticsAccumulator",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.core.test_accumulator.TestStatisticsAccumulator.test_accumulate",
+            "mtd:tests.unit.core.test_accumulator.TestStatisticsAccumulator.test_accumulate_rejects_invalid_shape",
+            "mtd:tests.unit.core.test_accumulator.TestStatisticsAccumulator.test_history_respects_max_len",
+            "mtd:tests.unit.core.test_accumulator.TestStatisticsAccumulator.test_initialization",
+            "mtd:tests.unit.core.test_accumulator.TestStatisticsAccumulator.test_reset_clears_state_and_history",
+            "mtd:tests.unit.core.test_accumulator.TestStatisticsAccumulator.test_track_extra_accumulates_scalars_and_vectors"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.core.test_config",
+      "qname": "tests.unit.core.test_config",
+      "file": "tests/unit/core/test_config.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.core.test_config.TestMPJRDConfig",
+          "name": "TestMPJRDConfig",
+          "qname": "tests.unit.core.test_config.TestMPJRDConfig",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_custom_values",
+            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_default_values",
+            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_dendritic_integration_validation",
+            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_negative_dt_validation",
+            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_validation",
+            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_numerical_safety_validation",
+            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_validation"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:tests.unit.core.test_config.test_hebbian_ltd_ratio_must_be_non_negative",
+          "name": "test_hebbian_ltd_ratio_must_be_non_negative",
+          "qname": "tests.unit.core.test_config.test_hebbian_ltd_ratio_must_be_non_negative",
+          "line": 73,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.core.test_config_advanced_order_flags",
+      "qname": "tests.unit.core.test_config_advanced_order_flags",
+      "file": "tests/unit/core/test_config_advanced_order_flags.py",
+      "imports": [
+        "mod:pyfolds.core",
+        "mod:pytest"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.core.test_config_advanced_order_flags.test_accepts_stdp_source_and_ltd_rule_flags",
+          "name": "test_accepts_stdp_source_and_ltd_rule_flags",
+          "qname": "tests.unit.core.test_config_advanced_order_flags.test_accepts_stdp_source_and_ltd_rule_flags",
+          "line": 5,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_config_advanced_order_flags.test_rejects_invalid_order_flags",
+          "name": "test_rejects_invalid_order_flags",
+          "qname": "tests.unit.core.test_config_advanced_order_flags.test_rejects_invalid_order_flags",
+          "line": 15,
+          "params": [
+            "kwargs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.core.test_dendrite",
+      "qname": "tests.unit.core.test_dendrite",
+      "file": "tests/unit/core/test_dendrite.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.core.test_dendrite.TestMPJRDDendrite",
+          "name": "TestMPJRDDendrite",
+          "qname": "tests.unit.core.test_dendrite.TestMPJRDDendrite",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.core.test_dendrite.TestMPJRDDendrite.test_forward",
+            "mtd:tests.unit.core.test_dendrite.TestMPJRDDendrite.test_initialization",
+            "mtd:tests.unit.core.test_dendrite.TestMPJRDDendrite.test_u_R_optional_state",
+            "mtd:tests.unit.core.test_dendrite.TestMPJRDDendrite.test_update_uses_local_pre_rate_per_synapse"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.core.test_factory",
+      "qname": "tests.unit.core.test_factory",
+      "file": "tests/unit/core/test_factory.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.core",
+        "mod:pyfolds.core.factory",
+        "mod:pyfolds.wave"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.core.test_factory.test_create_neuron_infers_standard_type",
+          "name": "test_create_neuron_infers_standard_type",
+          "qname": "tests.unit.core.test_factory.test_create_neuron_infers_standard_type",
+          "line": 8,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_factory.test_create_neuron_infers_wave_type",
+          "name": "test_create_neuron_infers_wave_type",
+          "qname": "tests.unit.core.test_factory.test_create_neuron_infers_wave_type",
+          "line": 13,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_factory.test_factory_raises_for_unregistered_type",
+          "name": "test_factory_raises_for_unregistered_type",
+          "qname": "tests.unit.core.test_factory.test_factory_raises_for_unregistered_type",
+          "line": 18,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.core.test_health_monitor",
+      "qname": "tests.unit.core.test_health_monitor",
+      "file": "tests/unit/core/test_health_monitor.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.monitoring",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.core.test_health_monitor.test_health_monitor_runs_and_scores",
+          "name": "test_health_monitor_runs_and_scores",
+          "qname": "tests.unit.core.test_health_monitor.test_health_monitor_runs_and_scores",
+          "line": 8,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.core.test_homeostasis",
+      "qname": "tests.unit.core.test_homeostasis",
+      "file": "tests/unit/core/test_homeostasis.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.core.test_homeostasis.TestHomeostasisController",
+          "name": "TestHomeostasisController",
+          "qname": "tests.unit.core.test_homeostasis.TestHomeostasisController",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.core.test_homeostasis.TestHomeostasisController.test_dead_neuron_rescue_has_minimum_strength",
+            "mtd:tests.unit.core.test_homeostasis.TestHomeostasisController.test_initialization",
+            "mtd:tests.unit.core.test_homeostasis.TestHomeostasisController.test_is_stable_accepts_tolerance",
+            "mtd:tests.unit.core.test_homeostasis.TestHomeostasisController.test_update",
+            "mtd:tests.unit.core.test_homeostasis.TestHomeostasisController.test_update_limits_theta_step"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.core.test_input_validation_contract",
+      "qname": "tests.unit.core.test_input_validation_contract",
+      "file": "tests/unit/core/test_input_validation_contract.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.core.neuron",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.core.test_input_validation_contract._cfg",
+          "name": "_cfg",
+          "qname": "tests.unit.core.test_input_validation_contract._cfg",
+          "line": 10,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_input_validation_contract.test_layer_prepare_input_accepts_supported_shapes",
+          "name": "test_layer_prepare_input_accepts_supported_shapes",
+          "qname": "tests.unit.core.test_input_validation_contract.test_layer_prepare_input_accepts_supported_shapes",
+          "line": 27,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_input_validation_contract.test_layer_prepare_input_rejects_invalid_shape",
+          "name": "test_layer_prepare_input_rejects_invalid_shape",
+          "qname": "tests.unit.core.test_input_validation_contract.test_layer_prepare_input_rejects_invalid_shape",
+          "line": 41,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_input_validation_contract.test_neuron_rejects_input_from_different_device",
+          "name": "test_neuron_rejects_input_from_different_device",
+          "qname": "tests.unit.core.test_input_validation_contract.test_neuron_rejects_input_from_different_device",
+          "line": 20,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_input_validation_contract.test_neuron_rejects_non_tensor_input",
+          "name": "test_neuron_rejects_non_tensor_input",
+          "qname": "tests.unit.core.test_input_validation_contract.test_neuron_rejects_non_tensor_input",
+          "line": 14,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "qname": "tests.unit.core.test_monitoring_and_checkpoint",
+      "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
+      "imports": [
+        "mod:datetime",
+        "mod:pathlib",
+        "mod:pyfolds",
+        "mod:pyfolds.monitoring",
+        "mod:pyfolds.serialization"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron",
+          "name": "DummyNeuron",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron",
+          "line": 10,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.__init__",
+            "mtd:tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.get_metrics"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_health_check_critical_for_dead_neurons",
+          "name": "test_health_check_critical_for_dead_neurons",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_critical_for_dead_neurons",
+          "line": 18,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_health_check_uses_fallback_metrics_from_get_metrics_contract",
+          "name": "test_health_check_uses_fallback_metrics_from_get_metrics_contract",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_uses_fallback_metrics_from_get_metrics_contract",
+          "line": 27,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
+          "name": "test_versioned_checkpoint_metadata_created_at_is_utc",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
+          "line": 54,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_save_and_load",
+          "name": "test_versioned_checkpoint_save_and_load",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_save_and_load",
+          "line": 41,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.core.test_neuromodulation",
+      "qname": "tests.unit.core.test_neuromodulation",
+      "file": "tests/unit/core/test_neuromodulation.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.core.test_neuromodulation.TestNeuromodulator",
+          "name": "TestNeuromodulator",
+          "qname": "tests.unit.core.test_neuromodulation.TestNeuromodulator",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.core.test_neuromodulation.TestNeuromodulator.test_external_mode",
+            "mtd:tests.unit.core.test_neuromodulation.TestNeuromodulator.test_infers_output_device_from_tensor_inputs",
+            "mtd:tests.unit.core.test_neuromodulation.TestNeuromodulator.test_rejects_non_finite_inputs",
+            "mtd:tests.unit.core.test_neuromodulation.TestNeuromodulator.test_surprise_mode"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.core.test_neuron",
+      "qname": "tests.unit.core.test_neuron",
+      "file": "tests/unit/core/test_neuron.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.utils.types",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.core.test_neuron.TestMPJRDNeuron",
+          "name": "TestMPJRDNeuron",
+          "qname": "tests.unit.core.test_neuron.TestMPJRDNeuron",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.core.test_neuron.TestMPJRDNeuron.test_batch_plasticity_preserves_local_pre_synaptic_rate",
+            "mtd:tests.unit.core.test_neuron.TestMPJRDNeuron.test_forward",
+            "mtd:tests.unit.core.test_neuron.TestMPJRDNeuron.test_forward_mode_override_is_reported",
+            "mtd:tests.unit.core.test_neuron.TestMPJRDNeuron.test_initialization",
+            "mtd:tests.unit.core.test_neuron.TestMPJRDNeuron.test_modes",
+            "mtd:tests.unit.core.test_neuron.TestMPJRDNeuron.test_nmda_shunting_exposes_dendritic_contribution",
+            "mtd:tests.unit.core.test_neuron.TestMPJRDNeuron.test_nmda_theta_eff_caps_unreachable_threshold",
+            "mtd:tests.unit.core.test_neuron.TestMPJRDNeuron.test_online_plasticity_updates_when_not_deferred",
+            "mtd:tests.unit.core.test_neuron.TestMPJRDNeuron.test_step_alias"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.core.test_neuron_v2",
+      "qname": "tests.unit.core.test_neuron_v2",
+      "file": "tests/unit/core/test_neuron_v2.py",
+      "imports": [
+        "mod:concurrent.futures",
+        "mod:pyfolds",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.core.test_neuron_v2.test_cooperative_sum_uses_multiple_dendrites",
+          "name": "test_cooperative_sum_uses_multiple_dendrites",
+          "qname": "tests.unit.core.test_neuron_v2.test_cooperative_sum_uses_multiple_dendrites",
+          "line": 22,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_neuron_v2.test_forward_shapes_v2",
+          "name": "test_forward_shapes_v2",
+          "qname": "tests.unit.core.test_neuron_v2.test_forward_shapes_v2",
+          "line": 9,
+          "params": [
+            "small_config",
+            "batch_size"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.core.test_neuron_v2.test_step_id_thread_safe_increment_v2",
+          "name": "test_step_id_thread_safe_increment_v2",
+          "qname": "tests.unit.core.test_neuron_v2.test_step_id_thread_safe_increment_v2",
+          "line": 41,
+          "params": [
+            "small_config"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.core.test_neuron_v2.test_theta_eff_caps_unreachable_threshold",
+          "name": "test_theta_eff_caps_unreachable_threshold",
+          "qname": "tests.unit.core.test_neuron_v2.test_theta_eff_caps_unreachable_threshold",
+          "line": 54,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.core.test_synapse",
+      "qname": "tests.unit.core.test_synapse",
+      "file": "tests/unit/core/test_synapse.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.utils.types",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.core.test_synapse.TestMPJRDSynapse",
+          "name": "TestMPJRDSynapse",
+          "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_transfers_eligibility_and_decays_internal_potential",
+            "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_initialization",
+            "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_ltp",
+            "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_negative_neuromodulation_promotes_ltd",
+            "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_saturation_recovery_disables_protection_after_timeout",
+            "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_filters_inactive_pre_synaptic_activity",
+            "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_respects_plastic_flag",
+            "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_supports_explicit_hebbian_ltd_component",
+            "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_uses_absolute_dt_and_mode_multiplier"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.network.test_network_edge_cases",
+      "qname": "tests.unit.network.test_network_edge_cases",
+      "file": "tests/unit/network/test_network_edge_cases.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.network.test_network_edge_cases.test_prepare_input_with_single_dendrite_avoids_division_by_zero",
+          "name": "test_prepare_input_with_single_dendrite_avoids_division_by_zero",
+          "qname": "tests.unit.network.test_network_edge_cases.test_prepare_input_with_single_dendrite_avoids_division_by_zero",
+          "line": 8,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.neuron.test_adaptation_sfa",
+      "qname": "tests.unit.neuron.test_adaptation_sfa",
+      "file": "tests/unit/neuron/test_adaptation_sfa.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.neuron.test_adaptation_sfa.test_sfa_applies_before_threshold_and_reduces_spiking_probability",
+          "name": "test_sfa_applies_before_threshold_and_reduces_spiking_probability",
+          "qname": "tests.unit.neuron.test_adaptation_sfa.test_sfa_applies_before_threshold_and_reduces_spiking_probability",
+          "line": 5,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.neuron.test_backprop_bap",
+      "qname": "tests.unit.neuron.test_backprop_bap",
+      "file": "tests/unit/neuron/test_backprop_bap.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.neuron.test_backprop_bap.test_bap_amplification_changes_dendritic_computation_and_clamps_gain",
+          "name": "test_bap_amplification_changes_dendritic_computation_and_clamps_gain",
+          "qname": "tests.unit.neuron.test_backprop_bap.test_bap_amplification_changes_dendritic_computation_and_clamps_gain",
+          "line": 5,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.neuron.test_contract_conformance",
+      "qname": "tests.unit.neuron.test_contract_conformance",
+      "file": "tests/unit/neuron/test_contract_conformance.py",
+      "imports": [
+        "mod:numpy",
+        "mod:pyfolds.contracts",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.neuron.test_contract_conformance.test_torch_and_tf_contract_conformance_with_same_artificial_input_and_tolerance",
+          "name": "test_torch_and_tf_contract_conformance_with_same_artificial_input_and_tolerance",
+          "qname": "tests.unit.neuron.test_contract_conformance.test_torch_and_tf_contract_conformance_with_same_artificial_input_and_tolerance",
+          "line": 29,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.neuron.test_contract_conformance.test_torch_contract_invariants_order_and_time_step_end_of_step",
+          "name": "test_torch_contract_invariants_order_and_time_step_end_of_step",
+          "qname": "tests.unit.neuron.test_contract_conformance.test_torch_contract_invariants_order_and_time_step_end_of_step",
+          "line": 13,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.neuron.test_refractory",
+      "qname": "tests.unit.neuron.test_refractory",
+      "file": "tests/unit/neuron/test_refractory.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.neuron.test_refractory.test_absolute_refractory_is_inviolable",
+          "name": "test_absolute_refractory_is_inviolable",
+          "qname": "tests.unit.neuron.test_refractory.test_absolute_refractory_is_inviolable",
+          "line": 5,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.neuron.test_stp_stdp_contracts",
+      "qname": "tests.unit.neuron.test_stp_stdp_contracts",
+      "file": "tests/unit/neuron/test_stp_stdp_contracts.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.neuron.test_stp_stdp_contracts.test_stdp_reads_pre_stp_input_for_pre_spikes_and_ltd_uses_pre_spike_gate",
+          "name": "test_stdp_reads_pre_stp_input_for_pre_spikes_and_ltd_uses_pre_spike_gate",
+          "qname": "tests.unit.neuron.test_stp_stdp_contracts.test_stdp_reads_pre_stp_input_for_pre_spikes_and_ltd_uses_pre_spike_gate",
+          "line": 5,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.neuron.test_time_counter",
+      "qname": "tests.unit.neuron.test_time_counter",
+      "file": "tests/unit/neuron/test_time_counter.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.neuron.test_time_counter.test_time_counter_increments_at_end_of_forward_step",
+          "name": "test_time_counter_increments_at_end_of_forward_step",
+          "qname": "tests.unit.neuron.test_time_counter.test_time_counter_increments_at_end_of_forward_step",
+          "line": 5,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.serialization.test_foldio",
+      "qname": "tests.unit.serialization.test_foldio",
+      "file": "tests/unit/serialization/test_foldio.py",
+      "imports": [
+        "mod:mmap",
+        "mod:numpy",
+        "mod:pyfolds.core.config",
+        "mod:pyfolds.core.neuron",
+        "mod:pyfolds.serialization",
+        "mod:pyfolds.serialization.foldio",
+        "mod:pytest",
+        "mod:struct",
+        "mod:torch",
+        "mod:unittest"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.serialization.test_foldio._build_neuron",
+          "name": "_build_neuron",
+          "qname": "tests.unit.serialization.test_foldio._build_neuron",
+          "line": 40,
+          "params": [
+            "enable_telemetry"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio._build_writer_with_chunk",
+          "name": "_build_writer_with_chunk",
+          "qname": "tests.unit.serialization.test_foldio._build_writer_with_chunk",
+          "line": 346,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio._failing_write_after_first_call",
+          "name": "_failing_write_after_first_call",
+          "qname": "tests.unit.serialization.test_foldio._failing_write_after_first_call",
+          "line": 413,
+          "params": [
+            "original_write"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_crc32c_matches_known_vector",
+          "name": "test_crc32c_matches_known_vector",
+          "qname": "tests.unit.serialization.test_foldio.test_crc32c_matches_known_vector",
+          "line": 234,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_detects_corruption",
+          "name": "test_detects_corruption",
+          "qname": "tests.unit.serialization.test_foldio.test_detects_corruption",
+          "line": 143,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_ecc_from_protection_mapping",
+          "name": "test_ecc_from_protection_mapping",
+          "qname": "tests.unit.serialization.test_foldio.test_ecc_from_protection_mapping",
+          "line": 192,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_ecc_roundtrip_if_available",
+          "name": "test_ecc_roundtrip_if_available",
+          "qname": "tests.unit.serialization.test_foldio.test_ecc_roundtrip_if_available",
+          "line": 207,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_manifest_includes_governance_sections",
+          "name": "test_fold_manifest_includes_governance_sections",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_manifest_includes_governance_sections",
+          "line": 425,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_reader_bounds_validation_negative_values",
+          "name": "test_fold_reader_bounds_validation_negative_values",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_reader_bounds_validation_negative_values",
+          "line": 252,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_reader_bounds_validation_with_mmap",
+          "name": "test_fold_reader_bounds_validation_with_mmap",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_reader_bounds_validation_with_mmap",
+          "line": 238,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_reader_exit_closes_file_even_if_mmap_close_fails",
+          "name": "test_fold_reader_exit_closes_file_even_if_mmap_close_fails",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_reader_exit_closes_file_even_if_mmap_close_fails",
+          "line": 327,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_reader_header_len_validation",
+          "name": "test_fold_reader_header_len_validation",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_reader_header_len_validation",
+          "line": 288,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_reader_index_offset_validation",
+          "name": "test_fold_reader_index_offset_validation",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_reader_index_offset_validation",
+          "line": 277,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_reader_index_size_validation",
+          "name": "test_fold_reader_index_size_validation",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_reader_index_size_validation",
+          "line": 267,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_reader_reports_magic_values",
+          "name": "test_fold_reader_reports_magic_values",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_reader_reports_magic_values",
+          "line": 316,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_roundtrip_and_peek",
+          "name": "test_fold_roundtrip_and_peek",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_roundtrip_and_peek",
+          "line": 51,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_roundtrip_preserves_state_dict_after_forward_steps",
+          "name": "test_fold_roundtrip_preserves_state_dict_after_forward_steps",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_roundtrip_preserves_state_dict_after_forward_steps",
+          "line": 80,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_signature_roundtrip_if_cryptography_available",
+          "name": "test_fold_signature_roundtrip_if_cryptography_available",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_signature_roundtrip_if_cryptography_available",
+          "line": 450,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_writer_finalize_wraps_failures_with_phase",
+          "name": "test_fold_writer_finalize_wraps_failures_with_phase",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_writer_finalize_wraps_failures_with_phase",
+          "line": 393,
+          "params": [
+            "tmp_path",
+            "monkeypatch",
+            "phase",
+            "patcher",
+            "error_message"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_fold_writer_finalize_wraps_io_failure_with_phase_context",
+          "name": "test_fold_writer_finalize_wraps_io_failure_with_phase_context",
+          "qname": "tests.unit.serialization.test_foldio.test_fold_writer_finalize_wraps_io_failure_with_phase_context",
+          "line": 299,
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_hierarchical_hashes_present_in_metadata",
+          "name": "test_hierarchical_hashes_present_in_metadata",
+          "qname": "tests.unit.serialization.test_foldio.test_hierarchical_hashes_present_in_metadata",
+          "line": 171,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.serialization.test_foldio.test_training_then_save_with_telemetry_and_history_and_nuclear_arrays",
+          "name": "test_training_then_save_with_telemetry_and_history_and_nuclear_arrays",
+          "qname": "tests.unit.serialization.test_foldio.test_training_then_save_with_telemetry_and_history_and_nuclear_arrays",
+          "line": 107,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.telemetry",
+      "qname": "tests.unit.telemetry",
+      "file": "tests/unit/telemetry/__init__.py",
+      "imports": [],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.telemetry.test_controller",
+      "qname": "tests.unit.telemetry.test_controller",
+      "file": "tests/unit/telemetry/test_controller.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.telemetry.test_controller.TestTelemetryController",
+          "name": "TestTelemetryController",
+          "qname": "tests.unit.telemetry.test_controller.TestTelemetryController",
+          "line": 7,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.telemetry.test_controller.TestTelemetryController.test_get_stats",
+            "mtd:tests.unit.telemetry.test_controller.TestTelemetryController.test_initialization",
+            "mtd:tests.unit.telemetry.test_controller.TestTelemetryController.test_profile_heavy",
+            "mtd:tests.unit.telemetry.test_controller.TestTelemetryController.test_profile_light",
+            "mtd:tests.unit.telemetry.test_controller.TestTelemetryController.test_profile_off",
+            "mtd:tests.unit.telemetry.test_controller.TestTelemetryController.test_should_emit_sample",
+            "mtd:tests.unit.telemetry.test_controller.TestTelemetryController.test_snapshot_and_clear",
+            "mtd:tests.unit.telemetry.test_controller.TestTelemetryController.test_step_count_increments"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.telemetry.test_decorator",
+      "qname": "tests.unit.telemetry.test_decorator",
+      "file": "tests/unit/telemetry/test_decorator.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.telemetry.test_decorator.TestTelemetryDecorator",
+          "name": "TestTelemetryDecorator",
+          "qname": "tests.unit.telemetry.test_decorator.TestTelemetryDecorator",
+          "line": 7,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.telemetry.test_decorator.TestTelemetryDecorator.test_decorator_basic",
+            "mtd:tests.unit.telemetry.test_decorator.TestTelemetryDecorator.test_decorator_lazy_evaluation",
+            "mtd:tests.unit.telemetry.test_decorator.TestTelemetryDecorator.test_decorator_with_sample_rate"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.telemetry.test_events",
+      "qname": "tests.unit.telemetry.test_events",
+      "file": "tests/unit/telemetry/test_events.py",
+      "imports": [
+        "mod:dataclasses",
+        "mod:time",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.telemetry.test_events.TelemetryEvent",
+          "name": "TelemetryEvent",
+          "qname": "tests.unit.telemetry.test_events.TelemetryEvent",
+          "line": 14,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.telemetry.test_events.TelemetryEvent.payload"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:tests.unit.telemetry.test_events.commit_event",
+          "name": "commit_event",
+          "qname": "tests.unit.telemetry.test_events.commit_event",
+          "line": 95,
+          "params": [
+            "step_id",
+            "mode",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.telemetry.test_events.commit_event_lazy",
+          "name": "commit_event_lazy",
+          "qname": "tests.unit.telemetry.test_events.commit_event_lazy",
+          "line": 108,
+          "params": [
+            "step_id",
+            "mode",
+            "payload_fn",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.telemetry.test_events.forward_event",
+          "name": "forward_event",
+          "qname": "tests.unit.telemetry.test_events.forward_event",
+          "line": 43,
+          "params": [
+            "step_id",
+            "mode",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.telemetry.test_events.forward_event_lazy",
+          "name": "forward_event_lazy",
+          "qname": "tests.unit.telemetry.test_events.forward_event_lazy",
+          "line": 64,
+          "params": [
+            "step_id",
+            "mode",
+            "payload_fn",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.telemetry.test_events.sleep_event",
+          "name": "sleep_event",
+          "qname": "tests.unit.telemetry.test_events.sleep_event",
+          "line": 121,
+          "params": [
+            "step_id",
+            "mode",
+            "neuron_id"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.telemetry.test_events.sleep_event_lazy",
+          "name": "sleep_event_lazy",
+          "qname": "tests.unit.telemetry.test_events.sleep_event_lazy",
+          "line": 134,
+          "params": [
+            "step_id",
+            "mode",
+            "payload_fn",
+            "neuron_id"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.telemetry.test_ringbuffer",
+      "qname": "tests.unit.telemetry.test_ringbuffer",
+      "file": "tests/unit/telemetry/test_ringbuffer.py",
+      "imports": [
+        "mod:pyfolds.telemetry",
+        "mod:pytest",
+        "mod:threading"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.telemetry.test_ringbuffer.TestRingBuffer",
+          "name": "TestRingBuffer",
+          "qname": "tests.unit.telemetry.test_ringbuffer.TestRingBuffer",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.telemetry.test_ringbuffer.TestRingBuffer.test_append",
+            "mtd:tests.unit.telemetry.test_ringbuffer.TestRingBuffer.test_capacity_property",
+            "mtd:tests.unit.telemetry.test_ringbuffer.TestRingBuffer.test_clear",
+            "mtd:tests.unit.telemetry.test_ringbuffer.TestRingBuffer.test_empty_snapshot",
+            "mtd:tests.unit.telemetry.test_ringbuffer.TestRingBuffer.test_extend",
+            "mtd:tests.unit.telemetry.test_ringbuffer.TestRingBuffer.test_is_full",
+            "mtd:tests.unit.telemetry.test_ringbuffer.TestRingBuffer.test_len",
+            "mtd:tests.unit.telemetry.test_ringbuffer.TestRingBuffer.test_snapshot_with_none",
+            "mtd:tests.unit.telemetry.test_ringbuffer.TestRingBuffer.test_thread_safety"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.telemetry.test_sinks",
+      "qname": "tests.unit.telemetry.test_sinks",
+      "file": "tests/unit/telemetry/test_sinks.py",
+      "imports": [
+        "mod:json",
+        "mod:pyfolds",
+        "mod:pytest"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.telemetry.test_sinks.TestConsoleSink",
+          "name": "TestConsoleSink",
+          "qname": "tests.unit.telemetry.test_sinks.TestConsoleSink",
+          "line": 47,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.telemetry.test_sinks.TestConsoleSink.test_non_verbose",
+            "mtd:tests.unit.telemetry.test_sinks.TestConsoleSink.test_verbose"
+          ]
+        },
+        {
+          "id": "cls:tests.unit.telemetry.test_sinks.TestDistributorSink",
+          "name": "TestDistributorSink",
+          "qname": "tests.unit.telemetry.test_sinks.TestDistributorSink",
+          "line": 204,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.telemetry.test_sinks.TestDistributorSink.test_distributes_to_all_sinks",
+            "mtd:tests.unit.telemetry.test_sinks.TestDistributorSink.test_sink_failure_doesnt_affect_others"
+          ]
+        },
+        {
+          "id": "cls:tests.unit.telemetry.test_sinks.TestJSONLinesSink",
+          "name": "TestJSONLinesSink",
+          "qname": "tests.unit.telemetry.test_sinks.TestJSONLinesSink",
+          "line": 85,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.telemetry.test_sinks.TestJSONLinesSink.test_append_mode",
+            "mtd:tests.unit.telemetry.test_sinks.TestJSONLinesSink.test_depth_limit_serialization",
+            "mtd:tests.unit.telemetry.test_sinks.TestJSONLinesSink.test_emit_basic",
+            "mtd:tests.unit.telemetry.test_sinks.TestJSONLinesSink.test_non_serializable_fallback",
+            "mtd:tests.unit.telemetry.test_sinks.TestJSONLinesSink.test_tensor_serialization",
+            "mtd:tests.unit.telemetry.test_sinks.TestJSONLinesSink.test_truncate_mode"
+          ]
+        },
+        {
+          "id": "cls:tests.unit.telemetry.test_sinks.TestMemorySink",
+          "name": "TestMemorySink",
+          "qname": "tests.unit.telemetry.test_sinks.TestMemorySink",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.telemetry.test_sinks.TestMemorySink.test_capacity_limit",
+            "mtd:tests.unit.telemetry.test_sinks.TestMemorySink.test_clear",
+            "mtd:tests.unit.telemetry.test_sinks.TestMemorySink.test_emit"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.telemetry.test_types",
+      "qname": "tests.unit.telemetry.test_types",
+      "file": "tests/unit/telemetry/test_types.py",
+      "imports": [
+        "mod:pyfolds.telemetry"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.telemetry.test_types.TestPayloadTypes",
+          "name": "TestPayloadTypes",
+          "qname": "tests.unit.telemetry.test_types.TestPayloadTypes",
+          "line": 6,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.telemetry.test_types.TestPayloadTypes.test_commit_payload",
+            "mtd:tests.unit.telemetry.test_types.TestPayloadTypes.test_forward_payload",
+            "mtd:tests.unit.telemetry.test_types.TestPayloadTypes.test_sleep_payload"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.test_backend_contracts",
+      "qname": "tests.unit.test_backend_contracts",
+      "file": "tests/unit/test_backend_contracts.py",
+      "imports": [
+        "mod:importlib.util",
+        "mod:numpy",
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.test_backend_contracts._tf_forward_sequence_equivalent",
+          "name": "_tf_forward_sequence_equivalent",
+          "qname": "tests.unit.test_backend_contracts._tf_forward_sequence_equivalent",
+          "line": 52,
+          "params": [
+            "x_seq"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.test_backend_contracts.test_import_and_object_construction_v1_v2",
+          "name": "test_import_and_object_construction_v1_v2",
+          "qname": "tests.unit.test_backend_contracts.test_import_and_object_construction_v1_v2",
+          "line": 12,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_backend_contracts.test_tf_backend_conditional_shape_state_contracts",
+          "name": "test_tf_backend_conditional_shape_state_contracts",
+          "qname": "tests.unit.test_backend_contracts.test_tf_backend_conditional_shape_state_contracts",
+          "line": 70,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_backend_contracts.test_torch_backend_shape_and_state_contracts",
+          "name": "test_torch_backend_shape_and_state_contracts",
+          "qname": "tests.unit.test_backend_contracts.test_torch_backend_shape_and_state_contracts",
+          "line": 23,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.test_design_improvements",
+      "qname": "tests.unit.test_design_improvements",
+      "file": "tests/unit/test_design_improvements.py",
+      "imports": [
+        "mod:pyfolds.advanced",
+        "mod:pyfolds.core",
+        "mod:pyfolds.core.base",
+        "mod:pyfolds.factory",
+        "mod:pyfolds.network",
+        "mod:pyfolds.utils",
+        "mod:pyfolds.utils.context",
+        "mod:pytest"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.test_design_improvements.DummyNeuron",
+          "name": "DummyNeuron",
+          "qname": "tests.unit.test_design_improvements.DummyNeuron",
+          "line": 12,
+          "bases": [
+            "BaseNeuron"
+          ],
+          "methods": [
+            "mtd:tests.unit.test_design_improvements.DummyNeuron.__init__",
+            "mtd:tests.unit.test_design_improvements.DummyNeuron.apply_plasticity",
+            "mtd:tests.unit.test_design_improvements.DummyNeuron.forward",
+            "mtd:tests.unit.test_design_improvements.DummyNeuron.get_metrics",
+            "mtd:tests.unit.test_design_improvements.DummyNeuron.set_mode"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:tests.unit.test_design_improvements.test_factory_creates_builtin_types",
+          "name": "test_factory_creates_builtin_types",
+          "qname": "tests.unit.test_design_improvements.test_factory_creates_builtin_types",
+          "line": 31,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_design_improvements.test_factory_custom_registry_and_unknown_type",
+          "name": "test_factory_custom_registry_and_unknown_type",
+          "qname": "tests.unit.test_design_improvements.test_factory_custom_registry_and_unknown_type",
+          "line": 41,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_design_improvements.test_learning_mode_context_restores_even_on_error",
+          "name": "test_learning_mode_context_restores_even_on_error",
+          "qname": "tests.unit.test_design_improvements.test_learning_mode_context_restores_even_on_error",
+          "line": 52,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_design_improvements.test_network_builder_connects_layers_and_builds",
+          "name": "test_network_builder_connects_layers_and_builds",
+          "qname": "tests.unit.test_design_improvements.test_network_builder_connects_layers_and_builds",
+          "line": 66,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.test_layer_neuron_class",
+      "qname": "tests.unit.test_layer_neuron_class",
+      "file": "tests/unit/test_layer_neuron_class.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.core",
+        "mod:pyfolds.layers",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.test_layer_neuron_class.test_layer_accepts_neuron_v2",
+          "name": "test_layer_accepts_neuron_v2",
+          "qname": "tests.unit.test_layer_neuron_class.test_layer_accepts_neuron_v2",
+          "line": 11,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_layer_neuron_class.test_layer_forwards_dt_to_neurons",
+          "name": "test_layer_forwards_dt_to_neurons",
+          "qname": "tests.unit.test_layer_neuron_class.test_layer_forwards_dt_to_neurons",
+          "line": 35,
+          "params": [
+            "monkeypatch"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.test_layer_neuron_class.test_layer_has_no_legacy_neuron_class_attr",
+          "name": "test_layer_has_no_legacy_neuron_class_attr",
+          "qname": "tests.unit.test_layer_neuron_class.test_layer_has_no_legacy_neuron_class_attr",
+          "line": 29,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_layer_neuron_class.test_layer_rejects_invalid_neuron_cls",
+          "name": "test_layer_rejects_invalid_neuron_cls",
+          "qname": "tests.unit.test_layer_neuron_class.test_layer_rejects_invalid_neuron_cls",
+          "line": 22,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.test_learning_mode_consistency",
+      "qname": "tests.unit.test_learning_mode_consistency",
+      "file": "tests/unit/test_learning_mode_consistency.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.core",
+        "mod:pyfolds.layers",
+        "mod:pyfolds.network",
+        "mod:pyfolds.utils.types",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.test_learning_mode_consistency._make_layer",
+          "name": "_make_layer",
+          "qname": "tests.unit.test_learning_mode_consistency._make_layer",
+          "line": 11,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_learning_mode_consistency.test_layer_accepts_mode_enum",
+          "name": "test_layer_accepts_mode_enum",
+          "qname": "tests.unit.test_learning_mode_consistency.test_layer_accepts_mode_enum",
+          "line": 31,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_learning_mode_consistency.test_layer_accepts_mode_string",
+          "name": "test_layer_accepts_mode_string",
+          "qname": "tests.unit.test_learning_mode_consistency.test_layer_accepts_mode_string",
+          "line": 24,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_learning_mode_consistency.test_layer_rejects_invalid_mode",
+          "name": "test_layer_rejects_invalid_mode",
+          "qname": "tests.unit.test_learning_mode_consistency.test_layer_rejects_invalid_mode",
+          "line": 38,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_learning_mode_consistency.test_learning_mode_from_string",
+          "name": "test_learning_mode_from_string",
+          "qname": "tests.unit.test_learning_mode_consistency.test_learning_mode_from_string",
+          "line": 20,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_learning_mode_consistency.test_learning_mode_single_source",
+          "name": "test_learning_mode_single_source",
+          "qname": "tests.unit.test_learning_mode_consistency.test_learning_mode_single_source",
+          "line": 16,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_learning_mode_consistency.test_network_accepts_mode_string",
+          "name": "test_network_accepts_mode_string",
+          "qname": "tests.unit.test_learning_mode_consistency.test_network_accepts_mode_string",
+          "line": 45,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_learning_mode_consistency.test_network_rejects_invalid_mode",
+          "name": "test_network_rejects_invalid_mode",
+          "qname": "tests.unit.test_learning_mode_consistency.test_network_rejects_invalid_mode",
+          "line": 54,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.test_public_import_surface",
+      "qname": "tests.unit.test_public_import_surface",
+      "file": "tests/unit/test_public_import_surface.py",
+      "imports": [
+        "mod:packaging.version",
+        "mod:pyfolds",
+        "mod:warnings"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.test_public_import_surface.test_public_all_exports_are_importable",
+          "name": "test_public_all_exports_are_importable",
+          "qname": "tests.unit.test_public_import_surface.test_public_all_exports_are_importable",
+          "line": 14,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_public_import_surface.test_telemetry_controller_basic_flow",
+          "name": "test_telemetry_controller_basic_flow",
+          "qname": "tests.unit.test_public_import_surface.test_telemetry_controller_basic_flow",
+          "line": 55,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_public_import_surface.test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0",
+          "name": "test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0",
+          "qname": "tests.unit.test_public_import_surface.test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0",
+          "line": 31,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_public_import_surface.test_v2_surface_is_canonical_and_instantiable",
+          "name": "test_v2_surface_is_canonical_and_instantiable",
+          "qname": "tests.unit.test_public_import_surface.test_v2_surface_is_canonical_and_instantiable",
+          "line": 19,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.test_run_pyfolds_runner",
+      "qname": "tests.unit.test_run_pyfolds_runner",
+      "file": "tests/unit/test_run_pyfolds_runner.py",
+      "imports": [
+        "mod:pathlib",
+        "mod:subprocess",
+        "mod:sys"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.test_run_pyfolds_runner._run",
+          "name": "_run",
+          "qname": "tests.unit.test_run_pyfolds_runner._run",
+          "line": 10,
+          "params": [
+            "script_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.test_run_pyfolds_runner.test_runner_logs_runtime_error_and_propagates_exit_code",
+          "name": "test_runner_logs_runtime_error_and_propagates_exit_code",
+          "qname": "tests.unit.test_run_pyfolds_runner.test_runner_logs_runtime_error_and_propagates_exit_code",
+          "line": 34,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.test_run_pyfolds_runner.test_runner_logs_syntax_error",
+          "name": "test_runner_logs_syntax_error",
+          "qname": "tests.unit.test_run_pyfolds_runner.test_runner_logs_syntax_error",
+          "line": 19,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.test_run_pyfolds_runner.test_runner_retry_and_metrics_csv",
+          "name": "test_runner_retry_and_metrics_csv",
+          "qname": "tests.unit.test_run_pyfolds_runner.test_runner_retry_and_metrics_csv",
+          "line": 82,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.test_run_pyfolds_runner.test_runner_tee_prints_progress",
+          "name": "test_runner_tee_prints_progress",
+          "qname": "tests.unit.test_run_pyfolds_runner.test_runner_tee_prints_progress",
+          "line": 48,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.test_run_pyfolds_runner.test_runner_timeout_watchdog",
+          "name": "test_runner_timeout_watchdog",
+          "qname": "tests.unit.test_run_pyfolds_runner.test_runner_timeout_watchdog",
+          "line": 63,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.test_tf_backend",
+      "qname": "tests.unit.test_tf_backend",
+      "file": "tests/unit/test_tf_backend.py",
+      "imports": [
+        "mod:importlib.util",
+        "mod:pytest"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.test_tf_backend.test_importing_pyfolds_still_works_without_tensorflow",
+          "name": "test_importing_pyfolds_still_works_without_tensorflow",
+          "qname": "tests.unit.test_tf_backend.test_importing_pyfolds_still_works_without_tensorflow",
+          "line": 6,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_tf_backend.test_tf_backend_guard_when_tensorflow_is_missing",
+          "name": "test_tf_backend_guard_when_tensorflow_is_missing",
+          "qname": "tests.unit.test_tf_backend.test_tf_backend_guard_when_tensorflow_is_missing",
+          "line": 12,
+          "params": [
+            "monkeypatch"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.test_tf_backend.test_tf_cell_state_and_step_contract",
+          "name": "test_tf_cell_state_and_step_contract",
+          "qname": "tests.unit.test_tf_backend.test_tf_cell_state_and_step_contract",
+          "line": 24,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_tf_backend.test_tf_layer_integrates_with_keras_rnn",
+          "name": "test_tf_layer_integrates_with_keras_rnn",
+          "qname": "tests.unit.test_tf_backend.test_tf_layer_integrates_with_keras_rnn",
+          "line": 39,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.utils",
+      "qname": "tests.unit.utils",
+      "file": "tests/unit/utils/__init__.py",
+      "imports": [],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.utils.test_device",
+      "qname": "tests.unit.utils.test_device",
+      "file": "tests/unit/utils/test_device.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.utils",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.utils.test_device.TestDevice",
+          "name": "TestDevice",
+          "qname": "tests.unit.utils.test_device.TestDevice",
+          "line": 8,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.utils.test_device.TestDevice.test_get_device",
+            "mtd:tests.unit.utils.test_device.TestDevice.test_infer_device"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.utils.test_math",
+      "qname": "tests.unit.utils.test_math",
+      "file": "tests/unit/utils/test_math.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.utils",
+        "mod:pyfolds.utils.math",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.utils.test_math.TestMath",
+          "name": "TestMath",
+          "qname": "tests.unit.utils.test_math.TestMath",
+          "line": 9,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.utils.test_math.TestMath.test_clamp_R",
+            "mtd:tests.unit.utils.test_math.TestMath.test_clamp_rate",
+            "mtd:tests.unit.utils.test_math.TestMath.test_safe_div",
+            "mtd:tests.unit.utils.test_math.TestMath.test_safe_weight_law_is_bounded_and_finite"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.utils.test_types",
+      "qname": "tests.unit.utils.test_types",
+      "file": "tests/unit/utils/test_types.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pyfolds.utils.types"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.utils.test_types.TestTypes",
+          "name": "TestTypes",
+          "qname": "tests.unit.utils.test_types.TestTypes",
+          "line": 7,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.utils.test_types.TestTypes.test_connection_type",
+            "mtd:tests.unit.utils.test_types.TestTypes.test_learning_mode"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.utils.test_utils",
+      "qname": "tests.unit.utils.test_utils",
+      "file": "tests/unit/utils/test_utils.py",
+      "imports": [
+        "mod:logging",
+        "mod:os",
+        "mod:pathlib",
+        "mod:pyfolds.utils",
+        "mod:pyfolds.utils.logging",
+        "mod:pytest",
+        "mod:re",
+        "mod:subprocess",
+        "mod:tempfile",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.utils.test_utils.TestDevice",
+          "name": "TestDevice",
+          "qname": "tests.unit.utils.test_utils.TestDevice",
+          "line": 137,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.utils.test_utils.TestDevice.test_ensure_device_move",
+            "mtd:tests.unit.utils.test_utils.TestDevice.test_ensure_device_no_change",
+            "mtd:tests.unit.utils.test_utils.TestDevice.test_get_device_default",
+            "mtd:tests.unit.utils.test_utils.TestDevice.test_get_device_specific",
+            "mtd:tests.unit.utils.test_utils.TestDevice.test_infer_device_dict",
+            "mtd:tests.unit.utils.test_utils.TestDevice.test_infer_device_empty_dict",
+            "mtd:tests.unit.utils.test_utils.TestDevice.test_infer_device_none",
+            "mtd:tests.unit.utils.test_utils.TestDevice.test_infer_device_tensor_cpu",
+            "mtd:tests.unit.utils.test_utils.TestDevice.test_infer_device_tensor_cuda"
+          ]
+        },
+        {
+          "id": "cls:tests.unit.utils.test_utils.TestIntegration",
+          "name": "TestIntegration",
+          "qname": "tests.unit.utils.test_utils.TestIntegration",
+          "line": 502,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.utils.test_utils.TestIntegration.test_device_with_tensor_ops",
+            "mtd:tests.unit.utils.test_utils.TestIntegration.test_learning_mode_with_math",
+            "mtd:tests.unit.utils.test_utils.TestIntegration.test_logging_with_device"
+          ]
+        },
+        {
+          "id": "cls:tests.unit.utils.test_utils.TestLogging",
+          "name": "TestLogging",
+          "qname": "tests.unit.utils.test_utils.TestLogging",
+          "line": 294,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_build_log_path_increments_counter",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_get_logger",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_import_pyfolds_does_not_add_stream_handler",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_circular_buffer_file_handler",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_console_false_keeps_terminal_clean",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_file_handler",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_fixed_layout",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_setup_basic",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_trace_output",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_trace_silent_when_lower_level",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_module_levels",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_multiple_loggers_same_name",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_next_log_path_alias",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_pyfolds_logger_singleton",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_setup_run_logging_returns_logger_and_path",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_trace_level_defined",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_trace_method_exists"
+          ]
+        },
+        {
+          "id": "cls:tests.unit.utils.test_utils.TestMath",
+          "name": "TestMath",
+          "qname": "tests.unit.utils.test_utils.TestMath",
+          "line": 56,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.utils.test_utils.TestMath.test_calculate_vc_dimension",
+            "mtd:tests.unit.utils.test_utils.TestMath.test_clamp_R_float",
+            "mtd:tests.unit.utils.test_utils.TestMath.test_clamp_R_tensor",
+            "mtd:tests.unit.utils.test_utils.TestMath.test_clamp_rate_float",
+            "mtd:tests.unit.utils.test_utils.TestMath.test_clamp_rate_tensor",
+            "mtd:tests.unit.utils.test_utils.TestMath.test_safe_div_basic",
+            "mtd:tests.unit.utils.test_utils.TestMath.test_safe_div_by_zero",
+            "mtd:tests.unit.utils.test_utils.TestMath.test_xavier_init_gain",
+            "mtd:tests.unit.utils.test_utils.TestMath.test_xavier_init_shape"
+          ]
+        },
+        {
+          "id": "cls:tests.unit.utils.test_utils.TestTypes",
+          "name": "TestTypes",
+          "qname": "tests.unit.utils.test_utils.TestTypes",
+          "line": 212,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.utils.test_utils.TestTypes.test_connection_type",
+            "mtd:tests.unit.utils.test_utils.TestTypes.test_is_consolidating",
+            "mtd:tests.unit.utils.test_utils.TestTypes.test_is_learning",
+            "mtd:tests.unit.utils.test_utils.TestTypes.test_learning_mode_description",
+            "mtd:tests.unit.utils.test_utils.TestTypes.test_learning_mode_values",
+            "mtd:tests.unit.utils.test_utils.TestTypes.test_learning_rate_multiplier",
+            "mtd:tests.unit.utils.test_utils.TestTypes.test_mode_config_defaults",
+            "mtd:tests.unit.utils.test_utils.TestTypes.test_mode_config_get_consolidation_factor",
+            "mtd:tests.unit.utils.test_utils.TestTypes.test_mode_config_get_learning_rate"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:tests.unit.utils.test_validation",
+      "qname": "tests.unit.utils.test_validation",
+      "file": "tests/unit/utils/test_validation.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.utils.test_validation.test_neuron_forward_validation_dtype",
+          "name": "test_neuron_forward_validation_dtype",
+          "qname": "tests.unit.utils.test_validation.test_neuron_forward_validation_dtype",
+          "line": 15,
+          "params": [
+            "small_config"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.utils.test_validation.test_neuron_forward_validation_ndim",
+          "name": "test_neuron_forward_validation_ndim",
+          "qname": "tests.unit.utils.test_validation.test_neuron_forward_validation_ndim",
+          "line": 7,
+          "params": [
+            "small_config"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.wave.test_wave_config",
+      "qname": "tests.unit.wave.test_wave_config",
+      "file": "tests/unit/wave/test_wave_config.py",
+      "imports": [
+        "mod:pyfolds.wave",
+        "mod:pytest"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.wave.test_wave_config.test_wave_config_defaults_valid",
+          "name": "test_wave_config_defaults_valid",
+          "qname": "tests.unit.wave.test_wave_config.test_wave_config_defaults_valid",
+          "line": 6,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.wave.test_wave_config.test_wave_config_rejects_invalid_buffer",
+          "name": "test_wave_config_rejects_invalid_buffer",
+          "qname": "tests.unit.wave.test_wave_config.test_wave_config_rejects_invalid_buffer",
+          "line": 12,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.wave.test_wave_layer_network",
+      "qname": "tests.unit.wave.test_wave_layer_network",
+      "file": "tests/unit/wave/test_wave_layer_network.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.wave.test_wave_layer_network.test_wave_layer_exposes_wave_outputs",
+          "name": "test_wave_layer_exposes_wave_outputs",
+          "qname": "tests.unit.wave.test_wave_layer_network.test_wave_layer_exposes_wave_outputs",
+          "line": 6,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.wave.test_wave_layer_network.test_wave_network_forwards_layer_kwargs",
+          "name": "test_wave_network_forwards_layer_kwargs",
+          "qname": "tests.unit.wave.test_wave_layer_network.test_wave_network_forwards_layer_kwargs",
+          "line": 19,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.wave.test_wave_neuron",
+      "qname": "tests.unit.wave.test_wave_neuron",
+      "file": "tests/unit/wave/test_wave_neuron.py",
+      "imports": [
+        "mod:pyfolds.wave",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.wave.test_wave_neuron.test_cooperative_integration_uses_multiple_dendrites",
+          "name": "test_cooperative_integration_uses_multiple_dendrites",
+          "qname": "tests.unit.wave.test_wave_neuron.test_cooperative_integration_uses_multiple_dendrites",
+          "line": 18,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.wave.test_wave_neuron.test_wave_outputs_quadrature_and_phase_range",
+          "name": "test_wave_outputs_quadrature_and_phase_range",
+          "qname": "tests.unit.wave.test_wave_neuron.test_wave_outputs_quadrature_and_phase_range",
+          "line": 6,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.wave.test_wave_neuron.test_wave_step_id_thread_safe_increment",
+          "name": "test_wave_step_id_thread_safe_increment",
+          "qname": "tests.unit.wave.test_wave_neuron.test_wave_step_id_thread_safe_increment",
+          "line": 32,
+          "params": []
+        }
+      ]
+    }
+  ]
+}

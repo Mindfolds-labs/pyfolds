@@ -1,0 +1,881 @@
+@startuml
+hide empty members
+
+
+class "src.pyfolds.advanced.MPJRDLayerAdvanced" {
+  +__init__()
+}
+class "src.pyfolds.advanced.MPJRDNeuronAdvanced" {
+  +__init__()
+  +_init_advanced_mixins()
+  +get_all_advanced_metrics()
+  +reset_all_mechanisms()
+}
+class "src.pyfolds.advanced.MPJRDWaveLayerAdvanced" {
+  +__init__()
+}
+class "src.pyfolds.advanced.MPJRDWaveNeuronAdvanced" {
+  +__init__()
+}
+
+class "src.pyfolds.advanced.adaptation.AdaptationMixin" {
+  +_apply_adaptation()
+  +_apply_sfa_before_threshold()
+  +_ensure_adaptation_current()
+  +_init_adaptation()
+  +_update_adaptation_after_spike()
+  +forward()
+}
+
+class "src.pyfolds.advanced.backprop.BackpropMixin" {
+  +_ensure_backprop_trace()
+  +_init_backprop()
+  +_process_backprop_queue()
+  +_schedule_backprop()
+  +forward()
+  +get_backprop_metrics()
+  +reset_backprop()
+}
+
+class "src.pyfolds.advanced.inhibition.InhibitionLayer" {
+  +__init__()
+  +_create_lateral_kernel()
+  +_init_E2I_weights()
+  +_init_I2E_weights()
+  +apply_inhibition()
+  +extra_repr()
+  +forward()
+  +get_inhibition_metrics()
+}
+class "src.pyfolds.advanced.inhibition.InhibitionMixin" {
+  +_init_inhibition()
+  +forward()
+  +get_inhibition_metrics()
+}
+
+class "src.pyfolds.advanced.refractory.RefractoryMixin" {
+  +_check_refractory_batch()
+  +_ensure_last_spike_time()
+  +_init_refractory()
+  +_update_refractory_batch()
+  +forward()
+  +get_refractory_metrics()
+  +reset_refractory()
+}
+
+class "src.pyfolds.advanced.short_term.ShortTermDynamicsMixin" {
+  +_init_short_term()
+  +_update_short_term_dynamics()
+  +forward()
+}
+
+class "src.pyfolds.advanced.stdp.STDPMixin" {
+  +_ensure_traces()
+  +_init_stdp()
+  +_should_apply_stdp()
+  +_stdp_pre_spike_source()
+  +_update_stdp_traces()
+  +forward()
+}
+
+class "src.pyfolds.advanced.time_mixin.TimedMixin" {
+  +_ensure_time_counter()
+  +_get_time()
+  +_increment_time()
+}
+
+
+class "src.pyfolds.contracts.backends.TensorFlowNeuronContractBackend" {
+  +run_step()
+}
+class "src.pyfolds.contracts.backends.TorchNeuronContractBackend" {
+  +run_step()
+}
+class "src.pyfolds.contracts.backends._BaseContractBackend" {
+  +__init__()
+  +_trace()
+}
+class "src.pyfolds.contracts.backends._State" {
+}
+
+class "src.pyfolds.contracts.neuron_contract.ContractViolation" {
+}
+class "src.pyfolds.contracts.neuron_contract.MechanismStep" {
+}
+class "src.pyfolds.contracts.neuron_contract.NeuronStepInput" {
+}
+class "src.pyfolds.contracts.neuron_contract.NeuronStepOutput" {
+}
+class "src.pyfolds.contracts.neuron_contract.StepExecutionTrace" {
+}
+
+
+class "src.pyfolds.core.accumulator.AccumulatedStats" {
+  +__repr__()
+  +is_valid()
+}
+class "src.pyfolds.core.accumulator.StatisticsAccumulator" {
+  +__init__()
+  +_update_history()
+  +accumulate()
+  +batch_count()
+  +enable_history()
+  +extra_repr()
+  +get_averages()
+  +has_data()
+  +history()
+  +plot_history()
+  +reset()
+}
+
+class "src.pyfolds.core.base.BaseNeuron" {
+  +apply_plasticity()
+  +forward()
+  +get_metrics()
+}
+class "src.pyfolds.core.base.BasePlasticityRule" {
+  +update()
+}
+
+class "src.pyfolds.core.config.MPJRDConfig" {
+  +__post_init__()
+  +__repr__()
+  +from_dict()
+  +get_decay_rate()
+  +get_preset()
+  +get_ts()
+  +to_dict()
+  +validate_numerical_safety()
+}
+
+class "src.pyfolds.core.dendrite.MPJRDDendrite" {
+  +I()
+  +N()
+  +R()
+  +W()
+  +__init__()
+  +_ensure_cache_valid()
+  +_invalidate_cache()
+  +_validate_finite()
+  +consolidate()
+  +extra_repr()
+  +forward()
+  +get_states()
+  +load_states()
+  +u()
+  +update_synapses_rate_based()
+}
+
+class "src.pyfolds.core.dendrite_integration.DendriticIntegration" {
+  +__init__()
+  +_theta_dend()
+  +extra_repr()
+  +forward()
+}
+class "src.pyfolds.core.dendrite_integration.DendriticOutput" {
+}
+
+class "src.pyfolds.core.factory.NeuronFactory" {
+  +create()
+  +is_registered()
+  +register()
+}
+class "src.pyfolds.core.factory.NeuronType" {
+}
+
+class "src.pyfolds.core.homeostasis.HomeostasisController" {
+  +__init__()
+  +_check_stability_change()
+  +extra_repr()
+  +homeostasis_error()
+  +is_stable()
+  +on_stable()
+  +on_unstable()
+  +reset()
+  +stability_ratio()
+  +update()
+}
+
+class "src.pyfolds.core.neuromodulation.Neuromodulator" {
+  +__init__()
+  +extra_repr()
+  +forward()
+}
+
+class "src.pyfolds.core.neuron.MPJRDNeuron" {
+  +I()
+  +N()
+  +W()
+  +__init__()
+  +_apply_online_plasticity()
+  +_compute_R_endogenous()
+  +_on_homeostasis_stable()
+  +_on_homeostasis_unstable()
+  +_validate_input_device()
+  +_validate_internal_devices()
+  +apply_plasticity()
+  +extra_repr()
+  +forward()
+  +get_metrics()
+  +protection()
+  +r_hat()
+  +set_mode()
+  +sleep()
+  +step()
+  +theta()
+  +to()
+}
+
+class "src.pyfolds.core.neuron_v2.MPJRDNeuronV2" {
+  +_telemetry_forward_event()
+  +extra_repr()
+  +forward()
+}
+
+class "src.pyfolds.core.synapse.MPJRDSynapse" {
+  +W()
+  +__init__()
+  +_update_with_soft_saturation()
+  +consolidate()
+  +extra_repr()
+  +get_state()
+  +load_state()
+  +update()
+}
+
+class "src.pyfolds.factory.NeuronFactory" {
+  +create()
+  +register()
+}
+class "src.pyfolds.factory.NeuronType" {
+}
+
+
+class "src.pyfolds.layers.layer.MPJRDLayer" {
+  +__init__()
+  +_prepare_input()
+  +apply_batch_update()
+  +extra_repr()
+  +forward()
+  +get_all_metrics()
+  +get_layer_metrics()
+  +n_dendrites()
+  +n_synapses()
+  +r_hat_mean()
+  +set_mode()
+  +sleep()
+  +theta_mean()
+}
+
+class "src.pyfolds.layers.wave_layer.MPJRDWaveLayer" {
+  +__init__()
+}
+
+
+class "src.pyfolds.monitoring.health.HealthStatus" {
+}
+class "src.pyfolds.monitoring.health.NeuronHealthCheck" {
+  +__init__()
+  +check()
+}
+class "src.pyfolds.monitoring.health.NeuronHealthMonitor" {
+  +__init__()
+  +check_health()
+  +get_health_score()
+}
+
+
+class "src.pyfolds.network.builder.NetworkBuilder" {
+  +__init__()
+  +add_layer()
+  +build()
+}
+
+class "src.pyfolds.network.network.MPJRDNetwork" {
+  +__init__()
+  +_has_cycle()
+  +_prepare_input_for_layer()
+  +_topological_sort()
+  +add_layer()
+  +apply_batch_update()
+  +build()
+  +connect()
+  +extra_repr()
+  +forward()
+  +get_all_metrics()
+  +get_network_metrics()
+  +set_mode()
+  +sleep()
+}
+
+class "src.pyfolds.network.wave_network.MPJRDWaveNetwork" {
+  +add_wave_layer()
+}
+
+
+class "src.pyfolds.serialization.ecc.ECCCodec" {
+  +decode()
+  +encode()
+}
+class "src.pyfolds.serialization.ecc.ECCResult" {
+}
+class "src.pyfolds.serialization.ecc.NoECC" {
+  +decode()
+  +encode()
+}
+class "src.pyfolds.serialization.ecc.ReedSolomonECC" {
+  +__init__()
+  +decode()
+  +encode()
+}
+
+class "src.pyfolds.serialization.foldio.FoldReader" {
+  +__enter__()
+  +__exit__()
+  +__init__()
+  +_decompress()
+  +_ecc_codec()
+  +_read_at()
+  +_read_header_and_index()
+  +list_chunks()
+  +read_chunk_bytes()
+  +read_json()
+  +read_torch()
+}
+class "src.pyfolds.serialization.foldio.FoldSecurityError" {
+}
+class "src.pyfolds.serialization.foldio.FoldWriter" {
+  +__enter__()
+  +__exit__()
+  +__init__()
+  +_compress()
+  +add_chunk()
+  +finalize()
+}
+class "src.pyfolds.serialization.foldio._TrustedFoldReader" {
+  +read_torch()
+}
+
+class "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint" {
+  +__init__()
+  +__repr__()
+  +_cfg_dict()
+  +_compute_hash()
+  +_git_hash()
+  +_metadata()
+  +load()
+  +save()
+}
+
+
+class "src.pyfolds.telemetry.controller.TelemetryConfig" {
+  +__post_init__()
+}
+class "src.pyfolds.telemetry.controller.TelemetryController" {
+  +__init__()
+  +_increment_step()
+  +clear()
+  +emit()
+  +enabled()
+  +get_stats()
+  +get_telemetry_metrics()
+  +should_emit()
+  +should_emit_sample()
+  +snapshot()
+  +step_count()
+}
+class "src.pyfolds.telemetry.controller.TelemetryProfile" {
+}
+class "src.pyfolds.telemetry.controller.TelemetryStats" {
+}
+
+
+class "src.pyfolds.telemetry.events.TelemetryEvent" {
+  +payload()
+}
+
+class "src.pyfolds.telemetry.ringbuffer.RingBuffer" {
+  +__init__()
+  +__len__()
+  +__repr__()
+  +append()
+  +capacity()
+  +clear()
+  +extend()
+  +is_full()
+  +snapshot()
+}
+
+class "src.pyfolds.telemetry.sinks.ConsoleSink" {
+  +__init__()
+  +close()
+  +emit()
+  +flush()
+}
+class "src.pyfolds.telemetry.sinks.DistributorSink" {
+  +__init__()
+  +close()
+  +emit()
+  +flush()
+}
+class "src.pyfolds.telemetry.sinks.JSONLinesSink" {
+  +__enter__()
+  +__exit__()
+  +__init__()
+  +_ensure_open()
+  +_make_serializable()
+  +close()
+  +emit()
+  +flush()
+}
+class "src.pyfolds.telemetry.sinks.MemorySink" {
+  +__init__()
+  +clear()
+  +close()
+  +emit()
+  +flush()
+  +snapshot()
+}
+class "src.pyfolds.telemetry.sinks.NoOpSink" {
+  +close()
+  +emit()
+  +flush()
+}
+class "src.pyfolds.telemetry.sinks.Sink" {
+  +__enter__()
+  +__exit__()
+  +close()
+  +emit()
+  +flush()
+}
+
+class "src.pyfolds.telemetry.types.CommitPayload" {
+}
+class "src.pyfolds.telemetry.types.ForwardPayload" {
+}
+class "src.pyfolds.telemetry.types.SleepPayload" {
+}
+
+
+class "src.pyfolds.tf.layers.MPJRDTFLayer" {
+  +__init__()
+  +call()
+}
+
+class "src.pyfolds.tf.neuron.MPJRDTFNeuronCell" {
+  +__init__()
+  +call()
+  +get_config()
+  +get_initial_state()
+  +output_size()
+  +state_size()
+  +step()
+}
+
+
+
+class "src.pyfolds.utils.device.DeviceManager" {
+  +__init__()
+  +_validate_device()
+  +check_consistency()
+  +to()
+}
+
+class "src.pyfolds.utils.logging.CircularBufferFileHandler" {
+  +__init__()
+  +emit()
+}
+class "src.pyfolds.utils.logging.FixedLayoutFormatter" {
+  +format()
+}
+class "src.pyfolds.utils.logging.PyFoldsLogger" {
+  +__init__()
+  +__new__()
+  +add_file_handler()
+  +get_logger()
+  +setup()
+}
+class "src.pyfolds.utils.logging.StructuredFormatter" {
+  +format()
+}
+
+
+class "src.pyfolds.utils.types.AdaptationConfig" {
+  +validate()
+}
+class "src.pyfolds.utils.types.AdaptationOutput" {
+}
+class "src.pyfolds.utils.types.ConnectionType" {
+}
+class "src.pyfolds.utils.types.LearningMode" {
+  +description()
+  +is_consolidating()
+  +is_learning()
+  +learning_rate_multiplier()
+}
+class "src.pyfolds.utils.types.ModeConfig" {
+  +__post_init__()
+  +from_learning_mode()
+  +get_consolidation_factor()
+  +get_learning_rate()
+}
+
+
+
+class "src.pyfolds.wave.config.MPJRDWaveConfig" {
+  +__post_init__()
+}
+
+class "src.pyfolds.wave.neuron.MPJRDWaveNeuron" {
+  +__init__()
+  +_compute_latency()
+  +_compute_phase()
+  +_frequency_for_class()
+  +_generate_wave_output()
+  +apply_plasticity()
+  +forward()
+}
+
+
+class "tests.checkpoint.CheckpointMixin" {
+  +load()
+  +load_weights_only()
+  +save()
+  +save_weights_only()
+}
+
+
+
+
+
+class "tests.integration.test_neuron_advanced.TestAdvancedNeuron" {
+  +test_backprop_disabled_does_not_apply_dendritic_gain()
+  +test_full_pipeline()
+}
+
+
+class "tests.integration.test_training_loop.TestTrainingLoop" {
+  +test_batch_training()
+}
+
+
+class "tests.performance.test_batch_speed.TestBatchSpeed" {
+  +test_forward_speed()
+}
+
+class "tests.performance.test_memory_usage.TestMemoryUsage" {
+  +test_memory_leak()
+}
+
+
+
+
+
+
+
+
+
+
+
+class "tests.training.mnist_cifar_training_reference.PyFoldsMLP" {
+  +__init__()
+  +forward()
+}
+class "tests.training.mnist_cifar_training_reference.TrainingConfig" {
+}
+
+
+
+class "tests.unit.advanced.test_adaptation.TestAdaptationMixin" {
+  +test_adaptation_decay()
+  +test_adaptation_increment()
+  +test_adaptation_respects_string_inference_mode()
+  +test_forward_updates_u_for_downstream_mixins()
+  +test_initialization()
+}
+
+class "tests.unit.advanced.test_backprop.TestBackpropMixin" {
+  +test_backprop_queue()
+  +test_bap_proportional_uses_dendritic_contribution()
+  +test_dendrite_amplification_decay()
+  +test_initialization()
+  +test_time_counter_advances_only_after_forward()
+}
+
+class "tests.unit.advanced.test_inhibition.TestInhibitionLayer" {
+  +test_e2i_initialization_is_deterministic()
+  +test_forward_feedforward()
+  +test_initialization()
+  +test_lateral_kernel()
+}
+class "tests.unit.advanced.test_inhibition.TestInhibitionMixin" {
+  +test_forward_requires_initialized_inhibition()
+}
+
+class "tests.unit.advanced.test_refractory.TestRefractoryMixin" {
+  +test_check_refractory_periods()
+  +test_forward_increments_time_once()
+  +test_initialization()
+  +test_refractory_blocks_spikes()
+  +test_update_refractory()
+}
+
+class "tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin" {
+  +test_initialization()
+  +test_tsodyks_markram_recovery()
+  +test_update_aligns_stp_buffers_to_input_device()
+  +test_update_no_spikes()
+  +test_update_with_spikes()
+}
+
+class "tests.unit.advanced.test_stdp.TestSTDPMixin" {
+  +test_initialization()
+  +test_ltd_rule_classic_vs_current()
+  +test_pre_spike_updates_trace()
+  +test_should_apply_stdp()
+  +test_stdp_input_source_raw_vs_stp()
+  +test_stdp_updates_underlying_synapses_online()
+  +test_trace_decay()
+}
+
+
+class "tests.unit.core.test_accumulator.TestStatisticsAccumulator" {
+  +test_accumulate()
+  +test_accumulate_rejects_invalid_shape()
+  +test_history_respects_max_len()
+  +test_initialization()
+  +test_reset_clears_state_and_history()
+  +test_track_extra_accumulates_scalars_and_vectors()
+}
+
+class "tests.unit.core.test_config.TestMPJRDConfig" {
+  +test_custom_values()
+  +test_default_values()
+  +test_dendritic_integration_validation()
+  +test_get_decay_rate_negative_dt_validation()
+  +test_get_decay_rate_validation()
+  +test_numerical_safety_validation()
+  +test_validation()
+}
+
+
+class "tests.unit.core.test_dendrite.TestMPJRDDendrite" {
+  +test_forward()
+  +test_initialization()
+  +test_u_R_optional_state()
+  +test_update_uses_local_pre_rate_per_synapse()
+}
+
+
+
+class "tests.unit.core.test_homeostasis.TestHomeostasisController" {
+  +test_dead_neuron_rescue_has_minimum_strength()
+  +test_initialization()
+  +test_is_stable_accepts_tolerance()
+  +test_update()
+  +test_update_limits_theta_step()
+}
+
+
+class "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron" {
+  +__init__()
+  +get_metrics()
+}
+
+class "tests.unit.core.test_neuromodulation.TestNeuromodulator" {
+  +test_external_mode()
+  +test_infers_output_device_from_tensor_inputs()
+  +test_rejects_non_finite_inputs()
+  +test_surprise_mode()
+}
+
+class "tests.unit.core.test_neuron.TestMPJRDNeuron" {
+  +test_batch_plasticity_preserves_local_pre_synaptic_rate()
+  +test_forward()
+  +test_forward_mode_override_is_reported()
+  +test_initialization()
+  +test_modes()
+  +test_nmda_shunting_exposes_dendritic_contribution()
+  +test_nmda_theta_eff_caps_unreachable_threshold()
+  +test_online_plasticity_updates_when_not_deferred()
+  +test_step_alias()
+}
+
+
+class "tests.unit.core.test_synapse.TestMPJRDSynapse" {
+  +test_consolidate_transfers_eligibility_and_decays_internal_potential()
+  +test_initialization()
+  +test_ltp()
+  +test_negative_neuromodulation_promotes_ltd()
+  +test_saturation_recovery_disables_protection_after_timeout()
+  +test_update_filters_inactive_pre_synaptic_activity()
+  +test_update_respects_plastic_flag()
+  +test_update_supports_explicit_hebbian_ltd_component()
+  +test_update_uses_absolute_dt_and_mode_multiplier()
+}
+
+
+
+
+
+
+
+
+
+
+class "tests.unit.telemetry.test_controller.TestTelemetryController" {
+  +test_get_stats()
+  +test_initialization()
+  +test_profile_heavy()
+  +test_profile_light()
+  +test_profile_off()
+  +test_should_emit_sample()
+  +test_snapshot_and_clear()
+  +test_step_count_increments()
+}
+
+class "tests.unit.telemetry.test_decorator.TestTelemetryDecorator" {
+  +test_decorator_basic()
+  +test_decorator_lazy_evaluation()
+  +test_decorator_with_sample_rate()
+}
+
+class "tests.unit.telemetry.test_events.TelemetryEvent" {
+  +payload()
+}
+
+class "tests.unit.telemetry.test_ringbuffer.TestRingBuffer" {
+  +test_append()
+  +test_capacity_property()
+  +test_clear()
+  +test_empty_snapshot()
+  +test_extend()
+  +test_is_full()
+  +test_len()
+  +test_snapshot_with_none()
+  +test_thread_safety()
+}
+
+class "tests.unit.telemetry.test_sinks.TestConsoleSink" {
+  +test_non_verbose()
+  +test_verbose()
+}
+class "tests.unit.telemetry.test_sinks.TestDistributorSink" {
+  +test_distributes_to_all_sinks()
+  +test_sink_failure_doesnt_affect_others()
+}
+class "tests.unit.telemetry.test_sinks.TestJSONLinesSink" {
+  +test_append_mode()
+  +test_depth_limit_serialization()
+  +test_emit_basic()
+  +test_non_serializable_fallback()
+  +test_tensor_serialization()
+  +test_truncate_mode()
+}
+class "tests.unit.telemetry.test_sinks.TestMemorySink" {
+  +test_capacity_limit()
+  +test_clear()
+  +test_emit()
+}
+
+class "tests.unit.telemetry.test_types.TestPayloadTypes" {
+  +test_commit_payload()
+  +test_forward_payload()
+  +test_sleep_payload()
+}
+
+
+class "tests.unit.test_design_improvements.DummyNeuron" {
+  +__init__()
+  +apply_plasticity()
+  +forward()
+  +get_metrics()
+  +set_mode()
+}
+
+
+
+
+
+
+
+class "tests.unit.utils.test_device.TestDevice" {
+  +test_get_device()
+  +test_infer_device()
+}
+
+class "tests.unit.utils.test_math.TestMath" {
+  +test_clamp_R()
+  +test_clamp_rate()
+  +test_safe_div()
+  +test_safe_weight_law_is_bounded_and_finite()
+}
+
+class "tests.unit.utils.test_types.TestTypes" {
+  +test_connection_type()
+  +test_learning_mode()
+}
+
+class "tests.unit.utils.test_utils.TestDevice" {
+  +test_ensure_device_move()
+  +test_ensure_device_no_change()
+  +test_get_device_default()
+  +test_get_device_specific()
+  +test_infer_device_dict()
+  +test_infer_device_empty_dict()
+  +test_infer_device_none()
+  +test_infer_device_tensor_cpu()
+  +test_infer_device_tensor_cuda()
+}
+class "tests.unit.utils.test_utils.TestIntegration" {
+  +test_device_with_tensor_ops()
+  +test_learning_mode_with_math()
+  +test_logging_with_device()
+}
+class "tests.unit.utils.test_utils.TestLogging" {
+  +test_build_log_path_increments_counter()
+  +test_get_logger()
+  +test_import_pyfolds_does_not_add_stream_handler()
+  +test_logger_circular_buffer_file_handler()
+  +test_logger_console_false_keeps_terminal_clean()
+  +test_logger_file_handler()
+  +test_logger_fixed_layout()
+  +test_logger_setup_basic()
+  +test_logger_trace_output()
+  +test_logger_trace_silent_when_lower_level()
+  +test_module_levels()
+  +test_multiple_loggers_same_name()
+  +test_next_log_path_alias()
+  +test_pyfolds_logger_singleton()
+  +test_setup_run_logging_returns_logger_and_path()
+  +test_trace_level_defined()
+  +test_trace_method_exists()
+}
+class "tests.unit.utils.test_utils.TestMath" {
+  +test_calculate_vc_dimension()
+  +test_clamp_R_float()
+  +test_clamp_R_tensor()
+  +test_clamp_rate_float()
+  +test_clamp_rate_tensor()
+  +test_safe_div_basic()
+  +test_safe_div_by_zero()
+  +test_xavier_init_gain()
+  +test_xavier_init_shape()
+}
+class "tests.unit.utils.test_utils.TestTypes" {
+  +test_connection_type()
+  +test_is_consolidating()
+  +test_is_learning()
+  +test_learning_mode_description()
+  +test_learning_mode_values()
+  +test_learning_rate_multiplier()
+  +test_mode_config_defaults()
+  +test_mode_config_get_consolidation_factor()
+  +test_mode_config_get_learning_rate()
+}
+
+
+
+
+
+@enduml
