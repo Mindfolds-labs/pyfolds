@@ -77,7 +77,13 @@ class TestMPJRDSynapse:
             mode=LearningMode.BATCH,
         )
 
-        expected_delta = tiny_config.i_eta * LearningMode.BATCH.learning_rate_multiplier * 2.0
+        expected_delta = (
+            tiny_config.i_eta
+            * tiny_config.A_plus
+            * torch.tanh(torch.tensor(tiny_config.neuromod_scale)).item()
+            * LearningMode.BATCH.learning_rate_multiplier
+            * 2.0
+        )
         assert syn.I.item() == pytest.approx(expected_delta, rel=1e-5)
 
     def test_saturation_recovery_disables_protection_after_timeout(self, tiny_config):
@@ -98,6 +104,28 @@ class TestMPJRDSynapse:
 
         assert syn.protection.item() is False
         assert syn.sat_time.item() == pytest.approx(0.0)
+
+
+    def test_negative_neuromodulation_promotes_ltd(self, tiny_config):
+        """Negative neuromodulation should bias update toward LTD."""
+        from pyfolds.core import MPJRDSynapse, MPJRDConfig
+
+        cfg = MPJRDConfig(**{
+            **tiny_config.to_dict(),
+            "hebbian_ltd_ratio": 1.0,
+            "i_ltp_th": 100.0,
+            "i_ltd_th": -100.0,
+            "ltd_threshold_saturated": -120.0,
+        })
+        syn = MPJRDSynapse(cfg, init_n=3)
+
+        syn.update(
+            pre_rate=torch.tensor([1.0]),
+            post_rate=torch.tensor([1.0]),
+            R=torch.tensor([-1.0]),
+        )
+
+        assert syn.I.item() <= 0.0
 
     def test_consolidate_transfers_eligibility_and_decays_internal_potential(self, tiny_config):
         """Consolidation should move eligibility into N and decay I."""
