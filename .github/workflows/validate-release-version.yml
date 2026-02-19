@@ -1,0 +1,41 @@
+name: Validate release version consistency
+
+on:
+  pull_request:
+    paths:
+      - pyproject.toml
+      - src/pyfolds/__init__.py
+      - src/pyfolds/core/__init__.py
+      - src/pyfolds/layers/__init__.py
+      - src/pyfolds/network/__init__.py
+      - src/pyfolds/telemetry/__init__.py
+      - docs/public/guides/engineering_patterns.md
+      - tools/check_release_versions.py
+      - .github/workflows/validate-release-version.yml
+  push:
+    branches: ["main"]
+    paths:
+      - pyproject.toml
+      - src/pyfolds/__init__.py
+      - src/pyfolds/core/__init__.py
+      - src/pyfolds/layers/__init__.py
+      - src/pyfolds/network/__init__.py
+      - src/pyfolds/telemetry/__init__.py
+      - docs/public/guides/engineering_patterns.md
+      - tools/check_release_versions.py
+      - .github/workflows/validate-release-version.yml
+
+jobs:
+  version-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check canonical release version consistency
+        run: python tools/check_release_versions.py
