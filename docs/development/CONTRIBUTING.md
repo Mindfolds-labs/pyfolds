@@ -4,3 +4,9 @@
 2. Adicione testes para mudanças comportamentais.
 3. Rode lint e suíte de testes antes do commit.
 4. Envie PR com descrição técnica e científica.
+
+## Governança de conflitos Git
+
+Consulte o documento canônico de prevenção de conflitos antes de abrir PR:
+
+- `../governance/GIT_CONFLICT_PREVENTION.md`

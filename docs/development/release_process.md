@@ -48,6 +48,13 @@ python tools/sync_hub.py --check
 - [ ] `python tools/sync_hub.py --check`.
 
 ### B. Governança
+
+### B.1 Pre-merge governance gates
+- [ ] `python tools/check_queue_governance.py --base-ref main`.
+- [ ] `python tools/sync_hub.py --check`.
+- [ ] `docs/development/execution_queue.csv` e `docs/development/HUB_CONTROLE.md` alterados em conjunto quando houver mudança de fila.
+- [ ] Regras do documento canônico validadas: `docs/governance/GIT_CONFLICT_PREVENTION.md`.
+
 - [ ] `CHANGELOG.md` atualizado.
 - [ ] `docs/development/execution_queue.csv` refletindo escopo da release.
 - [ ] `docs/development/HUB_CONTROLE.md` consistente.

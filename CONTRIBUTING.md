@@ -47,6 +47,7 @@ python tools/sync_hub.py --check
 - Workflow operacional de issues: `docs/development/prompts/README.md`
 - Workflow integrado (docs → código): `docs/development/WORKFLOW_INTEGRADO.md`
 - Processo de release: `docs/development/release_process.md`
+- Governança de prevenção de conflitos Git: `docs/governance/GIT_CONFLICT_PREVENTION.md`
 
 ## 5) Como criar uma nova Issue (Fluxo CRIAR → ANALISAR → EXECUTAR)
 1. **CRIAR:** `python tools/create_issue_report.py --issue-id ISSUE-XXX --tema "..." --prioridade "Alta" --area "Core"`
