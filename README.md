@@ -48,6 +48,17 @@ pip install pyfolds
 - `pip install pyfolds[examples]` para dependências de exemplos.
 
 
+## Brand oficial
+
+- Especificação do ícone: `docs/brand/ICON_SPEC.md`.
+- Asset canônico de documentação: `docs/_static/brand/`.
+- Asset para uso no pacote (quando necessário): `src/pyfolds/assets/brand/`.
+- Pipeline reprodutível de geração:
+
+```bash
+python docs/brand/render_assets.py
+```
+
 ## Documentation
 
 - Instale dependências de documentação:

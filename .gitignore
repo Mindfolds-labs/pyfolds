@@ -44,3 +44,5 @@ coverage.xml
 # Documentação gerada
 docs/_build/
 docs/api/generated/
+# Brand raster intermediates (gerados localmente)
+docs/_build/brand/

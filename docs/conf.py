@@ -50,7 +50,7 @@ myst_enable_extensions = [
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
-html_logo = "_static/brand/pyfolds-logo.svg"
+html_logo = "_static/brand/pyfolds-icon-dark.svg"
 html_favicon = "_static/brand/favicon.svg"
 
 html_theme_options = {
@@ -79,5 +79,4 @@ nitpicky = False
 suppress_warnings = [
     "toc.not_included",
 ]
-
 

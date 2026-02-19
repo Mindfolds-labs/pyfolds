@@ -21,7 +21,7 @@ Estabelecer uma base documental estável, navegável e consistente com padrões 
 
 ```{raw} html
 <div class="pyfolds-hero">
-  <img src="_static/brand/pyfolds-logo.svg" alt="PyFolds brand mark" class="pyfolds-hero-logo" />
+  <img src="_static/brand/pyfolds-icon-dark.svg" alt="PyFolds brand mark" class="pyfolds-hero-logo" />
   <p class="pyfolds-hero-subtitle">Framework neural com identidade visual técnica, dinâmica e orientada a engenharia.</p>
 </div>
 ```
