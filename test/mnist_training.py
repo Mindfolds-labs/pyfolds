@@ -12,6 +12,7 @@ Execução sugerida:
 
 from __future__ import annotations
 
+import argparse
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -198,5 +199,28 @@ def run_training(cfg: TrainingConfig | None = None) -> dict[str, object]:
     }
 
 
+def _build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Treino MNIST com MPJRD")
+    parser.add_argument("--epochs", type=int, default=TrainingConfig.epochs, help="Número de épocas")
+    parser.add_argument("--batch-size", type=int, default=TrainingConfig.batch_size, help="Tamanho do batch")
+    parser.add_argument(
+        "--learning-rate", type=float, default=TrainingConfig.learning_rate, help="Taxa de aprendizado"
+    )
+    parser.add_argument("--n-neurons", type=int, default=TrainingConfig.n_neurons, help="Neurônios MPJRD")
+    parser.add_argument("--train-limit", type=int, default=TrainingConfig.train_limit, help="Limite treino")
+    parser.add_argument("--test-limit", type=int, default=TrainingConfig.test_limit, help="Limite teste")
+    return parser
+
+
 if __name__ == "__main__":
-    run_training()
+    args = _build_arg_parser().parse_args()
+    run_training(
+        TrainingConfig(
+            epochs=args.epochs,
+            batch_size=args.batch_size,
+            learning_rate=args.learning_rate,
+            n_neurons=args.n_neurons,
+            train_limit=args.train_limit,
+            test_limit=args.test_limit,
+        )
+    )
