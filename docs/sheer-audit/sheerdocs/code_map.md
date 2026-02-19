@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `134`
-- Símbolos: `948`
+- Símbolos: `954`
 
 ## Módulos
 
@@ -766,17 +766,25 @@
 ### `tests.conftest`
 - Arquivo: `tests/conftest.py`
 - Imports:
+  - `mod:__future__`
+  - `mod:functools`
+  - `mod:importlib.util`
   - `mod:pathlib`
-  - `mod:pyfolds.core`
   - `mod:pytest`
   - `mod:sys`
 - Funções:
+  - `_core_symbols()`
+  - `_module_requires_torch(path)`
   - `batch_size()`
-  - `device()`
-  - `full_config()`
-  - `small_config()`
-  - `small_neuron(small_config)`
-  - `tiny_config()`
+  - `device(torch_module)`
+  - `full_config(_core_symbols)`
+  - `pytest_collection_modifyitems(config, items)`
+  - `pytest_configure(config)`
+  - `pytest_report_header(config)`
+  - `small_config(_core_symbols)`
+  - `small_neuron(small_config, _core_symbols)`
+  - `tiny_config(_core_symbols)`
+  - `torch_module()`
 
 ### `tests.integration`
 - Arquivo: `tests/integration/__init__.py`

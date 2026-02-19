@@ -8271,14 +8271,109 @@
       "decorators": []
     },
     {
+      "id": "fn:tests.conftest._module_requires_torch",
+      "kind": "function",
+      "name": "_module_requires_torch",
+      "qname": "tests.conftest._module_requires_torch",
+      "file": "tests/conftest.py",
+      "line": 25,
+      "doc": "Define se um módulo de teste depende de PyTorch.",
+      "params": [
+        "path"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "lru_cache(maxsize=1)"
+      ]
+    },
+    {
+      "id": "fn:tests.conftest.pytest_configure",
+      "kind": "function",
+      "name": "pytest_configure",
+      "qname": "tests.conftest.pytest_configure",
+      "file": "tests/conftest.py",
+      "line": 43,
+      "doc": null,
+      "params": [
+        "config"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.conftest.pytest_report_header",
+      "kind": "function",
+      "name": "pytest_report_header",
+      "qname": "tests.conftest.pytest_report_header",
+      "file": "tests/conftest.py",
+      "line": 50,
+      "doc": null,
+      "params": [
+        "config"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.conftest.pytest_collection_modifyitems",
+      "kind": "function",
+      "name": "pytest_collection_modifyitems",
+      "qname": "tests.conftest.pytest_collection_modifyitems",
+      "file": "tests/conftest.py",
+      "line": 56,
+      "doc": null,
+      "params": [
+        "config",
+        "items"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.conftest.torch_module",
+      "kind": "function",
+      "name": "torch_module",
+      "qname": "tests.conftest.torch_module",
+      "file": "tests/conftest.py",
+      "line": 68,
+      "doc": "Módulo torch disponível para testes dependentes de backend.",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "pytest.fixture"
+      ]
+    },
+    {
+      "id": "fn:tests.conftest._core_symbols",
+      "kind": "function",
+      "name": "_core_symbols",
+      "qname": "tests.conftest._core_symbols",
+      "file": "tests/conftest.py",
+      "line": 74,
+      "doc": "Carrega símbolos de core apenas quando torch está disponível.",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "pytest.fixture"
+      ]
+    },
+    {
       "id": "fn:tests.conftest.small_config",
       "kind": "function",
       "name": "small_config",
       "qname": "tests.conftest.small_config",
       "file": "tests/conftest.py",
-      "line": 16,
+      "line": 83,
       "doc": "Configuração pequena para testes rápidos.",
-      "params": [],
+      "params": [
+        "_core_symbols"
+      ],
       "returns": null,
       "bases": [],
       "decorators": [
@@ -8291,9 +8386,11 @@
       "name": "full_config",
       "qname": "tests.conftest.full_config",
       "file": "tests/conftest.py",
-      "line": 26,
+      "line": 94,
       "doc": "Configuração completa para testes de mecanismos avançados.",
-      "params": [],
+      "params": [
+        "_core_symbols"
+      ],
       "returns": null,
       "bases": [],
       "decorators": [
@@ -8306,9 +8403,11 @@
       "name": "tiny_config",
       "qname": "tests.conftest.tiny_config",
       "file": "tests/conftest.py",
-      "line": 35,
+      "line": 105,
       "doc": "Configuração mínima para testes de unidade.",
-      "params": [],
+      "params": [
+        "_core_symbols"
+      ],
       "returns": null,
       "bases": [],
       "decorators": [
@@ -8321,10 +8420,11 @@
       "name": "small_neuron",
       "qname": "tests.conftest.small_neuron",
       "file": "tests/conftest.py",
-      "line": 44,
+      "line": 116,
       "doc": "Neurônio com configuração pequena.",
       "params": [
-        "small_config"
+        "small_config",
+        "_core_symbols"
       ],
       "returns": null,
       "bases": [],
@@ -8338,9 +8438,11 @@
       "name": "device",
       "qname": "tests.conftest.device",
       "file": "tests/conftest.py",
-      "line": 49,
+      "line": 123,
       "doc": "Device para testes (CPU sempre).",
-      "params": [],
+      "params": [
+        "torch_module"
+      ],
       "returns": null,
       "bases": [],
       "decorators": [
@@ -8353,7 +8455,7 @@
       "name": "batch_size",
       "qname": "tests.conftest.batch_size",
       "file": "tests/conftest.py",
-      "line": 54,
+      "line": 129,
       "doc": "Batch size padrão para testes.",
       "params": [],
       "returns": null,
@@ -19500,6 +19602,24 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.conftest",
+      "dst": "mod:__future__",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.conftest",
+      "dst": "mod:functools",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.conftest",
+      "dst": "mod:importlib.util",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.conftest",
       "dst": "mod:pathlib",
       "meta": {}
     },
@@ -19516,9 +19636,39 @@
       "meta": {}
     },
     {
-      "type": "IMPORT",
+      "type": "CONTAINS",
       "src": "mod:tests.conftest",
-      "dst": "mod:pyfolds.core",
+      "dst": "fn:tests.conftest._module_requires_torch",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.conftest",
+      "dst": "fn:tests.conftest.pytest_configure",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.conftest",
+      "dst": "fn:tests.conftest.pytest_report_header",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.conftest",
+      "dst": "fn:tests.conftest.pytest_collection_modifyitems",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.conftest",
+      "dst": "fn:tests.conftest.torch_module",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.conftest",
+      "dst": "fn:tests.conftest._core_symbols",
       "meta": {}
     },
     {
@@ -23011,8 +23161,8 @@
   "findings": [],
   "metrics": {
     "python_files": 134,
-    "symbols": 948,
-    "edges": 1425,
+    "symbols": 954,
+    "edges": 1433,
     "findings": 0,
     "internal_import_edges": 101
   }

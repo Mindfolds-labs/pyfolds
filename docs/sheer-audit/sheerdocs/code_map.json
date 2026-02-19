@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 134,
-    "symbols": 948,
-    "edges": 1425,
+    "symbols": 954,
+    "edges": 1433,
     "findings": 0,
     "internal_import_edges": 101
   },
@@ -2736,55 +2736,117 @@
       "qname": "tests.conftest",
       "file": "tests/conftest.py",
       "imports": [
+        "mod:__future__",
+        "mod:functools",
+        "mod:importlib.util",
         "mod:pathlib",
-        "mod:pyfolds.core",
         "mod:pytest",
         "mod:sys"
       ],
       "classes": [],
       "functions": [
         {
+          "id": "fn:tests.conftest._core_symbols",
+          "name": "_core_symbols",
+          "qname": "tests.conftest._core_symbols",
+          "line": 74,
+          "params": []
+        },
+        {
+          "id": "fn:tests.conftest._module_requires_torch",
+          "name": "_module_requires_torch",
+          "qname": "tests.conftest._module_requires_torch",
+          "line": 25,
+          "params": [
+            "path"
+          ]
+        },
+        {
           "id": "fn:tests.conftest.batch_size",
           "name": "batch_size",
           "qname": "tests.conftest.batch_size",
-          "line": 54,
+          "line": 129,
           "params": []
         },
         {
           "id": "fn:tests.conftest.device",
           "name": "device",
           "qname": "tests.conftest.device",
-          "line": 49,
-          "params": []
+          "line": 123,
+          "params": [
+            "torch_module"
+          ]
         },
         {
           "id": "fn:tests.conftest.full_config",
           "name": "full_config",
           "qname": "tests.conftest.full_config",
-          "line": 26,
-          "params": []
+          "line": 94,
+          "params": [
+            "_core_symbols"
+          ]
+        },
+        {
+          "id": "fn:tests.conftest.pytest_collection_modifyitems",
+          "name": "pytest_collection_modifyitems",
+          "qname": "tests.conftest.pytest_collection_modifyitems",
+          "line": 56,
+          "params": [
+            "config",
+            "items"
+          ]
+        },
+        {
+          "id": "fn:tests.conftest.pytest_configure",
+          "name": "pytest_configure",
+          "qname": "tests.conftest.pytest_configure",
+          "line": 43,
+          "params": [
+            "config"
+          ]
+        },
+        {
+          "id": "fn:tests.conftest.pytest_report_header",
+          "name": "pytest_report_header",
+          "qname": "tests.conftest.pytest_report_header",
+          "line": 50,
+          "params": [
+            "config"
+          ]
         },
         {
           "id": "fn:tests.conftest.small_config",
           "name": "small_config",
           "qname": "tests.conftest.small_config",
-          "line": 16,
-          "params": []
+          "line": 83,
+          "params": [
+            "_core_symbols"
+          ]
         },
         {
           "id": "fn:tests.conftest.small_neuron",
           "name": "small_neuron",
           "qname": "tests.conftest.small_neuron",
-          "line": 44,
+          "line": 116,
           "params": [
-            "small_config"
+            "small_config",
+            "_core_symbols"
           ]
         },
         {
           "id": "fn:tests.conftest.tiny_config",
           "name": "tiny_config",
           "qname": "tests.conftest.tiny_config",
-          "line": 35,
+          "line": 105,
+          "params": [
+            "_core_symbols"
+          ]
+        },
+        {
+          "id": "fn:tests.conftest.torch_module",
+          "name": "torch_module",
+          "qname": "tests.conftest.torch_module",
+          "line": 68,
           "params": []
         }
       ]
