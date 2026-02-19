@@ -10,5 +10,5 @@ Este diretório mantém os relatórios `ISSUE-*` como **histórico de governanç
 - Preservar os arquivos existentes sem exclusão destrutiva.
 
 ## Referências
-- [ADR 0040](../../../adr/0040-conclusao-do-ciclo-issue-e-foco-em-execucao.md)
+- [ADR 0040](../../../governance/adr/legado/0040-conclusao-do-ciclo-issue-e-foco-em-execucao.md)
 - [Portal de Prompts](../README.md)
