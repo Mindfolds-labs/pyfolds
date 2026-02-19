@@ -36,6 +36,54 @@ api/index
 governance/index
 ```
 
+## Mapa do Código
+
+Atualizado automaticamente pelo Sheer Audit no merge para `main`.
+
+<!-- SHEER-CODEMAP:START -->
+- Repositório: `pyfolds`
+- Arquivos Python: `134`
+- Símbolos: `948`
+
+
+- Arquivo: `src/pyfolds/__init__.py`
+- Imports:
+  - `mod:src.advanced`
+  - `mod:src.core.base`
+  - `mod:src.core.config`
+  - `mod:src.core.factory`
+  - `mod:src.core.neuron`
+  - `mod:src.core.neuron_v2`
+  - `mod:src.layers`
+  - `mod:src.monitoring`
+  - `mod:src.network`
+  - `mod:src.serialization`
+  - `mod:src.telemetry`
+  - `mod:src.utils.context`
+  - `mod:src.utils.types`
+  - `mod:src.wave`
+  - `mod:typing`
+  - `mod:warnings`
+- Funções:
+  - `__getattr__(name)`
+
+- Arquivo: `src/pyfolds/advanced/__init__.py`
+- Imports:
+  - `mod:logging`
+  - `mod:src.core.neuron`
+  - `mod:src.layers.layer`
+  - `mod:src.pyfolds.adaptation`
+  - `mod:src.pyfolds.backprop`
+  - `mod:src.pyfolds.inhibition`
+  - `mod:src.pyfolds.refractory`
+  - `mod:src.pyfolds.short_term`
+  - `mod:src.pyfolds.stdp`
+  - `mod:src.utils.logging`
+  - `mod:src.wave`
+<!-- SHEER-CODEMAP:END -->
+
+Consulte também: `docs/sheer-audit/sheerdocs/code_map.md`.
+
 ## Referências
 - [README da documentação](README.md)
 - [Portal interno de prompts](development/prompts.md)
