@@ -57,7 +57,7 @@ where = ["src"]
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
-pyfolds = ["py.typed"]
+pyfolds = ["py.typed", "assets/brand/*.svg"]
 
 [tool.black]
 line-length = 88

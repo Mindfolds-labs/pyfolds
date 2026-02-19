@@ -5,3 +5,5 @@ sphinx-design>=0.6
 sphinxcontrib-mermaid>=1.0
 sphinxcontrib-plantuml>=0.30
 linkify-it-py>=2.0
+
+cairosvg>=2.7

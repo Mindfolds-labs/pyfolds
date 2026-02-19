@@ -25,3 +25,11 @@ Portal de documentação do PyFolds v2.0/v3.0.
 
 Esta reorganização é **lógica/navegacional** (índices e links).
 Nenhum documento técnico foi removido ou movido fisicamente.
+
+## 🎨 Brand & Assets
+
+- **[Especificação oficial do ícone](brand/ICON_SPEC.md)**
+- **[SVG mestre](brand/pyfolds-icon-master.svg)**
+- **[Pipeline de renderização](brand/render_assets.py)**
+- **[Assets finais (docs)](_static/brand/)**
+- **[Assets finais (pacote Python)](../src/pyfolds/assets/brand/)**
