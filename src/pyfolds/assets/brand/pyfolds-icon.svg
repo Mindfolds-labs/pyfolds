@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PyFolds icon master">
+  <defs>
+    <linearGradient id="bg" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#08142D"/>
+      <stop offset="1" stop-color="#102B5F"/>
+    </linearGradient>
+    <linearGradient id="core" x1="140" y1="112" x2="372" y2="388" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B7BFF"/>
+      <stop offset="1" stop-color="#1C3F8E"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="236" y1="212" x2="328" y2="310" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD86A"/>
+      <stop offset="1" stop-color="#E5A800"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="96" fill="url(#bg)"/>
+  <path d="M131 181L256 107L381 181V331L256 405L131 331V181Z" fill="url(#core)"/>
+  <path d="M176 212L236 176V336L176 300V212Z" fill="#143574"/>
+  <path d="M276 176L336 212V300L276 336V176Z" fill="#2B63D6"/>
+  <path d="M236 224L284 252L236 280L188 252L236 224Z" fill="#183B86"/>
+  <path d="M256 244L332 288L280 318L204 274L256 244Z" fill="url(#accent)"/>
+</svg>
