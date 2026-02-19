@@ -119,13 +119,7 @@ class STDPMixin:
         # LTD: onde trace_post > threshold
         trace_threshold = getattr(self.cfg, "stdp_trace_threshold", 0.01)
         ltd_mask = (self.trace_post > trace_threshold).float()
-        ltd_rule = getattr(self.cfg, "ltd_rule", "current")
-        if ltd_rule == "classic":
-            ltd_drive = pre_spikes
-        else:
-            ltd_drive = post_expanded
-
-        delta_ltd = -self.A_minus * self.trace_post * ltd_mask * ltd_drive
+        delta_ltd = -self.A_minus * self.trace_post * ltd_mask * pre_spikes
 
         # LTP: onde trace_pre > threshold
         ltp_mask = (self.trace_pre > trace_threshold).float()
@@ -208,7 +202,7 @@ class STDPMixin:
         stdp_applied = self._should_apply_stdp(mode)
 
         if stdp_applied:
-            self._update_stdp_traces(x, output["spikes"], dt=kwargs.get("dt", 1.0), x_pre_stp=x_pre_stp)
+            self._update_stdp_traces(x_pre_stp, output["spikes"], dt=kwargs.get("dt", 1.0))
 
         # Métricas
         if self.trace_pre is not None:

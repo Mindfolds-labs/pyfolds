@@ -1,52 +1,39 @@
-# REPORT_MPJRD_FIXES
+# REPORT MPJRD FIXES
 
 ## Resumo executivo
-Foram corrigidos cinco problemas de fidelidade computacional no `MPJRDNeuronAdvanced` com foco na ordem de execução dos mixins e no contrato biológico dos mecanismos avançados. As correções garantem: (1) SFA antes do threshold e sem sobrescrever spikes pós-refratário, (2) bAP com efeito real na dinâmica dendrítica, (3) STDP lendo o pré-spike original antes do STP, (4) `time_counter` avançando no fim do passo, e (5) LTD clássico dependente de `pre_spikes`.
+Foram corrigidos os bugs de ordem de execução e fidelidade computacional no `MPJRDNeuronAdvanced`: SFA agora atua antes do threshold, o refratário absoluto passou a ser inviolável, o bAP agora altera a computação dendrítica real, STDP lê `x` pré-STP, a regra LTD foi alinhada a Bi & Poo, e `time_counter` passou a incrementar no final do passo.
 
 ## Mini-Story Scrum
-- **User Story:** Como pesquisador, quero que o neurônio respeite refratário absoluto e aplique bAP e STDP corretamente, para garantir fidelidade e estabilidade.
-- **Definition of Done:** novos testes por mecanismo adicionados e passando, `pytest -q` verde, relatório e changelog atualizados.
+- **User Story**: Como pesquisador, quero que o neurônio respeite refratário absoluto e aplique bAP e STDP corretamente, para garantir fidelidade e estabilidade.
+- **Definition of Done**:
+  - Novos testes por mecanismo adicionados e passando.
+  - `pytest -q` passando na suíte.
+  - Relatório técnico de evidências e mapa Bug→Mudança→Teste.
 
 ## Mapa Bug → Mudança → Teste
 
-Config flags adicionadas para retrocompatibilidade auditável:
-- `stdp_input_source = "raw" | "stp"` (default `stp`).
-- `ltd_rule = "classic" | "current"` (default `current`).
-
-| Bug | Mudança implementada | Teste(s) de evidência |
+| Bug | Mudança implementada | Teste(s) |
 |---|---|---|
-| #1 Refratário absoluto violado por adaptação tardia | SFA agora é aplicada no `forward` da base antes do threshold via `_apply_sfa_before_threshold`; `AdaptationMixin.forward` não recalcula `spikes` e só atualiza corrente com spikes finais. | `tests/unit/neuron/test_refractory.py`, `tests/unit/neuron/test_adaptation_sfa.py` |
-| #2 bAP no-op | `dendrite_amplification` passou a multiplicar `v_dend` no `MPJRDNeuron.forward` com clamp por `backprop_max_gain`. | `tests/unit/neuron/test_backprop_bap.py` |
-| #3 STDP lia `x_modulated` | `ShortTermDynamicsMixin` passa `_x_pre_stp`; `STDPMixin.forward` consome e remove via `pop` e usa no detector de pré-spike. | `tests/unit/neuron/test_stp_stdp_contracts.py::test_stdp_uses_pre_stp_input_for_pre_spike_detection` |
-| #4 `time_counter` no início | `BackpropMixin.forward` agora processa com tempo atual e incrementa `time_counter` apenas ao final. | `tests/unit/neuron/test_time_counter.py` |
-| #5 LTD incorreta | `delta_ltd` ajustada para usar `pre_spikes` (regra Bi & Poo clássica). | `tests/unit/neuron/test_stp_stdp_contracts.py::test_stdp_ltd_depends_on_pre_spikes_not_post_spike_only` |
+| #1 Refratário violado por adaptação pós-processamento | SFA movida para antes do threshold na base (`u_eff = u - I_adapt`); `AdaptationMixin.forward` não recalcula `spikes`; atualização de adaptação ocorre após spikes confirmados pelo refratário. | `tests/unit/neuron/test_refractory.py`, `tests/unit/neuron/test_adaptation_sfa.py` |
+| #2 bAP no-op | `dendrite_amplification` aplicada em `v_dend` com `amp = clamp(1+amp, 1, backprop_max_gain)` antes da integração somática. | `tests/unit/neuron/test_backprop_bap.py` |
+| #3 STDP usando `x_modulated` | `ShortTermDynamicsMixin` passa `_x_pre_stp`; `STDPMixin` usa `kwargs.pop('_x_pre_stp', x)` como fonte de pre-spike. | `tests/unit/neuron/test_stp_stdp_contracts.py` |
+| #4 `time_counter` no início | Incremento movido para o final de `BackpropMixin.forward`. | `tests/unit/neuron/test_time_counter.py` |
+| #5 LTD incorreta | Fórmula LTD alterada para depender de `pre_spikes` (`-A_minus * trace_post * ltd_mask * pre_spikes`). | `tests/unit/neuron/test_stp_stdp_contracts.py` |
 
-## Evidência objetiva
-### Estado anterior (TDD vermelho)
-Rodada inicial dos novos testes falhou com sintomas esperados:
-- refratário/timing não respeitados,
-- bAP sem efeito computacional,
-- STDP pré-spike/LTD fora do contrato.
+## Evidências objetivas
+- Antes: testes e integrações esperavam `u_adapted` pós-refratário; esse fluxo permitia sobrescrever `spikes` após bloqueio refratário.
+- Agora: `spikes` finais permanecem bloqueados no refratário absoluto e SFA atua no `u` pré-threshold.
+- Execução de validação principal:
+  - `pytest -q` → **passou** (`262 passed, 2 skipped, 3 deselected`).
+  - `ruff .` não suportado pelo binário local (subcomando inválido); `ruff check .` executado, mas reporta issues históricas fora do escopo desta mudança.
 
-### Estado atual (TDD verde)
-- `pytest -q tests/unit/neuron/test_refractory.py tests/unit/neuron/test_adaptation_sfa.py tests/unit/neuron/test_backprop_bap.py tests/unit/neuron/test_stp_stdp_contracts.py tests/unit/neuron/test_time_counter.py` → **6 passed**.
-- `pytest -q` → **263 passed, 2 skipped, 3 deselected**.
-
-## Compatibilidade e risco (ITIL)
-- **Mudança de alto risco mitigada:** regras de spike/refratário e STDP alteradas com cobertura específica por mecanismo.
-- **Compatibilidade API:** API pública preservada; ajustes ficaram em funções internas e no fluxo interno de mixins.
-- **Rollback simples:** revert do commit único restaura comportamento anterior.
+## Notas de compatibilidade e risco
+- API pública preservada para uso de `MPJRDNeuronAdvanced`.
+- Campo `u_adapted` deixou de ser emitido; substituído por contrato explícito (`u_raw`, `u_eff`, `u`) refletindo etapa pré-threshold.
+- Risco residual baixo: ajustes focados em ordem/semântica temporal com cobertura unitária dedicada.
+- Rollback simples: reverter commit único da feature branch.
 
 ## Próximos passos
-1. Adicionar testes de regressão temporal multi-step para janelas STDP longas.
-2. Opcional: separar explicitamente `u_effective` no contrato de saída para telemetria científica.
-3. Alinhar lint global do repositório para tornar `ruff check .` green sem débito legado.
-
-
-## Comandos executados (evidência)
-- `pytest tests/unit/advanced/test_refractory.py -q`
-- `pytest tests/unit/advanced/test_adaptation.py -q`
-- `pytest tests/unit/advanced/test_stdp.py -q`
-- `pytest tests/integration/test_neuron_advanced.py -q`
-- `pytest -q`
-- `ruff check .` (falhas preexistentes fora do escopo).
+1. Opcional: padronizar lint CI para `ruff check .` (ou alinhar comando requerido).
+2. Adicionar teste de regressão temporal multi-step para delay bAP em 2–5 ms com valores controlados.
+3. Expandir testes STDP para janelas Δt positivas/negativas explícitas (LTP/LTD com sequência temporal controlada).

@@ -77,7 +77,7 @@ class TestAdaptationMixin:
 
         out = neuron.forward(x, mode='inference')
 
-        assert 'u_adapted' in out
+        assert 'u_eff' in out
         assert 'adaptation_current' not in out
 
 
@@ -92,5 +92,5 @@ class TestAdaptationMixin:
         out = neuron.forward(x, mode='online')
 
         assert 'u_raw' in out
-        assert 'u_adapted' in out
-        assert torch.allclose(out['u'], out['u_adapted'])
+        assert 'u_eff' in out
+        assert torch.allclose(out['u'], out['u_eff'])

@@ -40,53 +40,48 @@ class AdaptationMixin:
             self.adaptation_current = torch.zeros(batch_size, device=device)
     
     def _apply_sfa_before_threshold(self, u: torch.Tensor, dt: float = 1.0) -> torch.Tensor:
-        """Aplica SFA antes do threshold, sem recalcular spikes."""
-        if dt <= 0:
-            raise ValueError(f"dt deve ser positivo para adaptação, recebido {dt}")
-
+        """
+        Aplica SFA antes do threshold (u_eff = u - I_adapt).
+        
+        Args:
+            u: Potencial somático [B]
+            dt: Passo de tempo (ms)
+        
+        Returns:
+            Potencial adaptado [B]
+        """
         batch_size = u.shape[0]
         device = u.device
 
         self._ensure_adaptation_current(batch_size, device)
-
+        
+        # Decaimento ocorre antes da comparação com threshold.
         decay = math.exp(-dt / self.adaptation_tau)
         self.adaptation_current.mul_(decay)
 
         return u - self.adaptation_current
 
-    def _update_adaptation_from_spikes(self, spikes: torch.Tensor) -> None:
-        """Atualiza corrente de adaptação com spikes finais confirmados."""
-        spike_mask = spikes > 0.5  # [B] booleano
+    def _update_adaptation_after_spike(self, spikes: torch.Tensor) -> None:
+        """Atualiza I_adapt após spikes confirmados (pós-refratário)."""
+        spike_mask = spikes > 0.5
         increment = self.adaptation_increment * spike_mask.float()
         self.adaptation_current.add_(increment)
         self.adaptation_current.clamp_(max=self.adaptation_max)
 
-    def _apply_adaptation(self, u: torch.Tensor, spikes: torch.Tensor, dt: float = 1.0) -> torch.Tensor:
-        """Compat: aplica SFA pré-threshold e depois atualiza corrente por spikes."""
+    # Compatibilidade retroativa para testes/código legado.
+    def _apply_adaptation(self, u: torch.Tensor, spikes: torch.Tensor,
+                           dt: float = 1.0) -> torch.Tensor:
+        """Compat: aplica SFA antes do threshold e atualiza com spikes."""
         u_eff = self._apply_sfa_before_threshold(u, dt=dt)
-        self._update_adaptation_from_spikes(spikes)
+        self._update_adaptation_after_spike(spikes)
         return u_eff
     
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         """Forward pass com adaptação POR AMOSTRA."""
         output = super().forward(x, **kwargs)
-        
-        mode_val = normalize_learning_mode(kwargs.get('mode'))
-        if mode_val != LearningMode.INFERENCE:
-            required_fields = ('u', 'spikes')
-            missing = [field for field in required_fields if field not in output]
-            if missing:
-                raise KeyError(
-                    "Campos obrigatórios ausentes em output para adaptação: "
-                    f"{missing}. Campos disponíveis: {list(output.keys())}"
-                )
-            self._ensure_adaptation_current(output['u'].shape[0], output['u'].device)
-            self._update_adaptation_from_spikes(output['spikes'])
 
-            if 'u_raw' not in output:
-                output['u_raw'] = output['u']
-            if 'u_adapted' not in output:
-                output['u_adapted'] = output['u']
+        mode_val = normalize_learning_mode(kwargs.get('mode'))
+        if mode_val != LearningMode.INFERENCE and self.adaptation_current is not None:
             output['adaptation_current'] = self.adaptation_current.clone()
-        
+
         return output

@@ -1,30 +1,19 @@
 import torch
 import pyfolds
-from pyfolds.core import MPJRDConfig
 
 
-def test_time_counter_updates_at_end_of_forward_step():
-    if not pyfolds.ADVANCED_AVAILABLE:
-        return
-    cfg = MPJRDConfig(
-        n_dendrites=1,
-        n_synapses_per_dendrite=1,
-        t_refrac_abs=2.0,
-        theta_init=0.01,
-        theta_min=0.001,
-        dendrite_integration_mode="wta_hard",
-    )
+def test_time_counter_increments_at_end_of_forward_step():
+    cfg = pyfolds.MPJRDConfig(t_refrac_abs=2.0)
     neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
 
-    assert neuron.time_counter.item() == 0.0
-    for syn in neuron.dendrites[0].synapses:
-        syn.N.fill_(neuron.cfg.n_max)
-    neuron.dendrites[0]._invalidate_cache()
-    neuron.u_stp.fill_(1.0)
-    neuron.R_stp.fill_(1.0)
-    x = torch.ones(1, 1, 1) * 10.0
+    x = torch.ones(1, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
 
-    out = neuron.forward(x, dt=1.0, collect_stats=False, mode="online")
-    assert out["spikes"].item() == 1.0
-    assert neuron.last_spike_time.item() == 0.0
+    out0 = neuron.forward(x, dt=1.0)
     assert neuron.time_counter.item() == 1.0
+
+    out1 = neuron.forward(x, dt=1.0)
+    assert out1["refrac_blocked"][0].item() is True
+    assert neuron.time_counter.item() == 2.0
+
+    assert out0["spikes"][0].item() == 1.0
+    assert out1["spikes"][0].item() == 0.0

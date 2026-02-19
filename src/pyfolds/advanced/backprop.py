@@ -117,8 +117,7 @@ class BackpropMixin(TimedMixin):
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         """Forward pass com backpropagação."""
         dt = kwargs.get("dt", 1.0)
-        if dt <= 0:
-            raise ValueError(f"dt deve ser positivo para backprop, recebido {dt}")
+        current_time = self.time_counter.item()
 
         current_time = self.time_counter.item()
         self._process_backprop_queue(current_time)
@@ -137,6 +136,7 @@ class BackpropMixin(TimedMixin):
             output["backprop_trace_mean"] = self.backprop_trace.mean()
 
         self._increment_time(dt)
+
         return output
 
     def reset_backprop(self):

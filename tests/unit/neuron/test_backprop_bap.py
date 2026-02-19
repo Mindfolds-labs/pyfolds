@@ -1,35 +1,21 @@
 import torch
 import pyfolds
-from pyfolds.core import MPJRDConfig
 
 
-def test_bap_amplification_changes_dendritic_potential_and_is_clamped():
-    if not pyfolds.ADVANCED_AVAILABLE:
-        return
-    cfg = MPJRDConfig(
-        n_dendrites=2,
-        n_synapses_per_dendrite=1,
-        backprop_max_gain=1.2,
-    )
-    x = torch.ones(1, 2, 1)
-    neuron_base = pyfolds.MPJRDNeuronAdvanced(cfg)
-    neuron_amp = pyfolds.MPJRDNeuronAdvanced(cfg)
+def test_bap_amplification_changes_dendritic_computation_and_clamps_gain():
+    cfg = pyfolds.MPJRDConfig(backprop_max_gain=1.2)
+    base_neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+    amp_neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+    amp_neuron.load_state_dict(base_neuron.state_dict(), strict=False)
 
-    for neuron in (neuron_base, neuron_amp):
-        for d in neuron.dendrites:
-            for syn in d.synapses:
-                syn.N.fill_(neuron.cfg.n_max)
-            d._invalidate_cache()
-        neuron.u_stp.fill_(1.0)
-        neuron.R_stp.fill_(1.0)
+    x = torch.ones(1, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
 
-    neuron_base.dendrite_amplification.zero_()
-    out_base = neuron_base.forward(x, mode="inference", collect_stats=False)
+    base_neuron.dendrite_amplification.zero_()
+    baseline = base_neuron.forward(x, mode="inference")
 
-    neuron_amp.dendrite_amplification = torch.tensor([10.0, 0.0])
-    out_amp = neuron_amp.forward(x, mode="inference", collect_stats=False)
+    amp_neuron.dendrite_amplification.fill_(5.0)
+    amplified = amp_neuron.forward(x, mode="inference")
 
-    assert out_amp["v_dend"][0, 0] > out_base["v_dend"][0, 0]
-    # ganho efetivo maximo = backprop_max_gain
-    gain = out_amp["v_dend"][0, 0] / out_base["v_dend"][0, 0]
-    assert gain <= torch.tensor(cfg.backprop_max_gain + 1e-6)
+    ratio = (amplified["v_dend"] / baseline["v_dend"]).mean().item()
+    assert ratio > 1.0
+    assert ratio <= cfg.backprop_max_gain + 1e-4

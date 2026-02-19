@@ -315,11 +315,10 @@ class MPJRDNeuron(BaseNeuron):
             v_dend[:, d_idx] = dend(x[:, d_idx, :])
 
         if hasattr(self, "dendrite_amplification"):
-            if getattr(self.cfg, "backprop_enabled", True):
-                amp = 1.0 + self.dendrite_amplification.to(device).unsqueeze(0)
-                max_gain = getattr(self.cfg, "backprop_max_gain", 2.0)
-                amp = amp.clamp(1.0, max_gain)
-                v_dend = v_dend * amp
+            max_gain = getattr(self.cfg, "backprop_max_gain", 2.0)
+            amp = (1.0 + self.dendrite_amplification.to(device)).unsqueeze(0)
+            amp = amp.clamp(1.0, max_gain)
+            v_dend = v_dend * amp
 
         # ===== 2-4. INTEGRAÇÃO DENDRÍTICA → POTENCIAL → DISPARO =====
         integration_mode = getattr(self.cfg, "dendrite_integration_mode", "wta_hard")
@@ -365,11 +364,10 @@ class MPJRDNeuron(BaseNeuron):
             u = gated.sum(dim=1)
             dend_contribution = None
 
-        u_threshold = u
+        u_raw = u
         if hasattr(self, "_apply_sfa_before_threshold"):
-            u_threshold = self._apply_sfa_before_threshold(u, dt=dt)
-
-        spikes = (u_threshold >= theta_eff).float()
+            u = self._apply_sfa_before_threshold(u, dt=dt)
+        spikes = (u >= theta_eff).float()
 
         # ===== 5. ESTATÍSTICAS =====
         spike_rate = spikes.mean().item()
@@ -469,8 +467,8 @@ class MPJRDNeuron(BaseNeuron):
         out = {
             "spikes": spikes,
             "u": u,
-            "u_raw": u,
-            "u_adapted": u_threshold,
+            "u_raw": u_raw,
+            "u_eff": u,
             "v_dend": v_dend,
             "gated": gated,
             "theta": self.theta.clone(),
