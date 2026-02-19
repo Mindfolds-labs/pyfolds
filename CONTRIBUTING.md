@@ -47,3 +47,14 @@ python tools/sync_hub.py --check
 - Workflow operacional de issues: `docs/development/prompts/README.md`
 - Workflow integrado (docs → código): `docs/development/WORKFLOW_INTEGRADO.md`
 - Processo de release: `docs/development/release_process.md`
+
+## 5) Como criar uma nova Issue (Fluxo CRIAR → ANALISAR → EXECUTAR)
+1. **CRIAR:** `python tools/create_issue_report.py --issue-id ISSUE-XXX --tema "..." --prioridade "Alta" --area "Core"`
+2. **ANALISAR:** revisar requisitos no relatório criado em `docs/development/prompts/relatorios/`.
+3. **EXECUTAR:** implementar código e testes vinculados.
+4. **VALIDAR:** `python tools/validate_issue_format.py docs/development/prompts/relatorios/`.
+5. **SINCRONIZAR:** `python tools/sync_hub_auto.py`.
+
+Templates:
+- `docs/development/templates/ISSUE-IA-TEMPLATE.md`
+- `docs/development/templates/ISSUE-LOG-TEMPLATE.md`

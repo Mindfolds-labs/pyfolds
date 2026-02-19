@@ -26,6 +26,14 @@ Este HUB **não é documentação de usuário final**. Ele deve ser usado apenas
 
 ## 4. Fila de Execução
 
+## Dashboard KPIs
+- Dashboard HTML: [`generated/dashboard.html`](generated/dashboard.html)
+- Métricas JSON: [`generated/metrics.json`](generated/metrics.json)
+
+## Fila Próximas
+Fonte: [`execution_queue.csv`](execution_queue.csv).
+
+
 A fila abaixo é gerada automaticamente a partir de `docs/development/execution_queue.csv`.
 
 ### 4.0 Tabela Resumida
@@ -66,7 +74,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 
 ### 4.1 🔍 Detalhamento de Atividades (Cards)
 
-<!-- HUB:CARDS:BEGIN -->
+<!-- BEGIN_CARDS -->
 > [!TIP]
 > **ISSUE-001** · Reestruturação sistêmica de /docs e raiz (governança v1.0.0)
 >
@@ -357,7 +365,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-038-auditoria-prontidao-publicacao-pypi.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-038-auditoria-prontidao-publicacao-pypi.md)
 
-<!-- HUB:CARDS:END -->
+<!-- END_CARDS -->
 
 ### 4.2 Legenda visual de status
 
