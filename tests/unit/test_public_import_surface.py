@@ -6,6 +6,8 @@ These tests protect downstream projects that depend on top-level imports from
 
 import warnings
 
+from packaging.version import Version
+
 import pyfolds
 
 
@@ -26,7 +28,16 @@ def test_v2_surface_is_canonical_and_instantiable():
     assert network is not None
 
 
-def test_v1_aliases_emit_deprecation_warning_and_match_v2_targets():
+def test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_3_0():
+    removal_version = Version("3.0.0")
+    current_version = Version(pyfolds.__version__)
+
+    if current_version >= removal_version:
+        assert not hasattr(pyfolds, "MPJRDConfig")
+        assert not hasattr(pyfolds, "MPJRDLayer")
+        assert not hasattr(pyfolds, "MPJRDNetwork")
+        return
+
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always", DeprecationWarning)
         legacy_cfg = pyfolds.MPJRDConfig
