@@ -53,4 +53,4 @@ Passos:
 - [Relatórios](./relatorios/README.md)
 - [execution_queue.csv](../execution_queue.csv)
 - [HUB_CONTROLE.md](../HUB_CONTROLE.md)
-- [ADR 0040](../../adr/0040-conclusao-do-ciclo-issue-e-foco-em-execucao.md)
+- [ADR 0040](../../governance/adr/legado/0040-conclusao-do-ciclo-issue-e-foco-em-execucao.md)
