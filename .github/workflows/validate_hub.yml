@@ -4,8 +4,10 @@ on:
   pull_request:
     paths:
       - docs/development/execution_queue.csv
+      - docs/development/failure_register.csv
       - tools/sync_hub.py
       - tools/check_queue_governance.py
+      - tools/check_failure_regression_policy.py
       - docs/development/HUB_CONTROLE.md
       - docs/governance/GIT_CONFLICT_PREVENTION.md
       - .github/workflows/validate_hub.yml
@@ -26,6 +28,10 @@ jobs:
 
       - name: Validate queue governance rules
         run: python tools/check_queue_governance.py --base-ref "${{ github.base_ref }}"
+
+
+      - name: Validate failure regression policy
+        run: python tools/check_failure_regression_policy.py
 
       - name: Validate HUB synchronization
         run: python tools/sync_hub.py --check

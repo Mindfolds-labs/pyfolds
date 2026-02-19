@@ -58,7 +58,10 @@ REQUIRED_FAILURE_COLUMNS = [
     "descricao",
     "impacto",
     "status",
+    "status_cobertura",
     "issue_correcao",
+    "teste_regressao",
+    "evidencia_regressao",
     "data_registro",
     "ultima_ocorrencia",
 ]
@@ -332,7 +335,9 @@ def build_failures_table(rows: list[dict[str, str]]) -> str:
         "Descrição",
         "Impacto",
         "Status",
+        "Cobertura",
         "Issue de Correção",
+        "Teste",
         "Data",
     ]
 
@@ -342,7 +347,7 @@ def build_failures_table(rows: list[dict[str, str]]) -> str:
     ]
 
     if not rows:
-        lines.append("| - | - | - | - | - | - | - |")
+        lines.append("| - | - | - | - | - | - | - | - | - |")
         return "\n".join(lines)
 
     for row in rows:
@@ -355,7 +360,9 @@ def build_failures_table(rows: list[dict[str, str]]) -> str:
             _format_cell("descricao", row.get("descricao", "")),
             _format_cell("impacto", row.get("impacto", "")),
             _format_cell("status", row.get("status", "")),
+            _format_cell("status_cobertura", row.get("status_cobertura", "")),
             _format_cell("issue_correcao", row.get("issue_correcao", "")),
+            _format_cell("teste_regressao", row.get("teste_regressao", "")),
             _format_cell("data", effective_date),
         ]
         lines.append("| " + " | ".join(values) + " |")
