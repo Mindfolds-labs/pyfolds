@@ -3,7 +3,7 @@
 - **Status:** Aceito
 - **Data:** 2026-02-19
 - **Decisores:** Maintainers PyFOLDS
-- **Relacionados:** [ADR 0001](./0001-import-contract-and-release-readiness.md), [ADR 0040](./0040-conclusao-do-ciclo-issue-e-foco-em-execucao.md)
+- **Relacionados:** [ADR 0001](../governance/adr/legado/0001-import-contract-and-release-readiness.md), [ADR 0040](../governance/adr/legado/0040-conclusao-do-ciclo-issue-e-foco-em-execucao.md)
 
 ## Contexto
 
