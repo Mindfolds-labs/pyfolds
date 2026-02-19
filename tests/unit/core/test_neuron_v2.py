@@ -49,3 +49,20 @@ def test_step_id_thread_safe_increment_v2(small_config):
             fut.result()
 
     assert int(neuron.step_id.item()) == calls
+
+
+def test_theta_eff_caps_unreachable_threshold():
+    cfg = pyfolds.MPJRDConfig(n_dendrites=4, n_synapses_per_dendrite=2, theta_init=4.5)
+    neuron = pyfolds.MPJRDNeuronV2(cfg)
+
+    with torch.no_grad():
+        for dend in neuron.dendrites:
+            for syn in dend.synapses:
+                syn.N.fill_(cfg.n_max)
+            dend._invalidate_cache()
+
+    x = 10.0 * torch.ones(16, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
+    out = neuron(x, collect_stats=False)
+
+    assert out["somatic"].max().item() > (cfg.n_dendrites - 1e-3) * 0.5
+    assert out["spikes"].mean().item() > 0.0

@@ -46,3 +46,15 @@ class TestHomeostasisController:
         homeo.update(1.0)
 
         assert abs(homeo.theta.item() - initial) <= 0.5
+
+
+    def test_dead_neuron_rescue_has_minimum_strength(self, small_config):
+        """Resgate deve reduzir theta pelo menos 0.05 quando rate=0."""
+        from pyfolds.core import HomeostasisController
+
+        homeo = HomeostasisController(small_config)
+        initial = homeo.theta.item()
+
+        homeo.update(0.0)
+
+        assert (initial - homeo.theta.item()) >= 0.05

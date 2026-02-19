@@ -75,14 +75,23 @@ class MPJRDNeuronV2(MPJRDNeuron):
         v_dend = torch.einsum("ds,bds->bd", W, x)  # [B, D]
 
         # ===== 3. NÃO-LINEARIDADE LOCAL POR DENDRITO =====
-        # Ganho dendrítico = sigmoid(v_dend - θ/2)
-        dendritic_gain = torch.sigmoid(v_dend - (self.theta * 0.5))  # [B, D]
+        # Ganho dendrítico = sigmoid(v_dend - θ_eff/2)
+        # θ_eff nunca ultrapassa a capacidade máxima do somático no V2: soma de D sigmoides.
+        theta_cap = float(self.cfg.n_dendrites) - 1e-3
+        theta_cap_tensor = torch.tensor([theta_cap], device=device, dtype=self.theta.dtype)
+        theta_eff = torch.minimum(self.theta, theta_cap_tensor)
+        theta_max_eff = min(self.cfg.theta_max, theta_cap)
+        if self.cfg.theta_min <= theta_max_eff:
+            theta_eff = torch.clamp(theta_eff, min=self.cfg.theta_min, max=theta_max_eff)
+        else:
+            theta_eff = torch.clamp(theta_eff, max=theta_max_eff)
+        dendritic_gain = torch.sigmoid(v_dend - (theta_eff * 0.5))  # [B, D]
 
         # ===== 4. SOMA COOPERATIVA =====
         somatic = dendritic_gain.sum(dim=-1)  # [B]
 
         # ===== 5. DISPARO =====
-        spikes = (somatic >= self.theta).float()  # [B]
+        spikes = (somatic >= theta_eff).float()  # [B]
 
         # ===== 6. ESTATÍSTICAS =====
         spike_rate = spikes.mean().item()

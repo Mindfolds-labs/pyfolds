@@ -126,3 +126,29 @@ class TestMPJRDNeuron:
         
         neuron.set_mode(target)
         assert neuron.mode == target
+
+
+    def test_nmda_theta_eff_caps_unreachable_threshold(self):
+        """NMDA+shunting deve limitar theta efetivo à capacidade somática."""
+        cfg = pyfolds.MPJRDConfig(
+            n_dendrites=4,
+            n_synapses_per_dendrite=2,
+            theta_init=4.5,
+            dendrite_integration_mode="nmda_shunting",
+            shunting_eps=0.1,
+            shunting_strength=1.0,
+            device="cpu",
+        )
+        neuron = pyfolds.MPJRDNeuron(cfg)
+
+        with torch.no_grad():
+            for dend in neuron.dendrites:
+                for syn in dend.synapses:
+                    syn.N.fill_(cfg.n_max)
+                dend._invalidate_cache()
+
+        x = 10.0 * torch.ones(16, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
+        out = neuron(x, collect_stats=False)
+
+        assert out["u"].max().item() > 0.0
+        assert out["spikes"].mean().item() > 0.0
