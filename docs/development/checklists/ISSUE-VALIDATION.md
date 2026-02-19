@@ -18,8 +18,16 @@ Use este checklist antes de abrir PR com nova issue.
 - [ ] Todos os caminhos de artefato apontam para arquivos/pastas reais ou planejados.
 - [ ] Dependências entre ISSUEs (campo `dependente`) são válidas.
 - [ ] Links para ISSUEs citadas não estão quebrados.
+- [ ] A fase da issue (`ativa`, `freeze` ou `legado`) está explícita e compatível com o workflow vigente.
+- [ ] Mudanças estruturais (arquitetura, padrões de integração, contratos públicos) citam ADR aprovada.
+- [ ] Existe referência explícita ao identificador da ADR aplicável (ex.: `ADR 0041`).
 - [ ] A issue foi registrada em `docs/development/execution_queue.csv`.
 - [ ] O HUB foi sincronizado (`python tools/sync_hub.py`).
+
+## Regra de transição por fase
+- [ ] **Fase ativa:** permite novas `ISSUE-*`.
+- [ ] **Fase freeze:** permite nova issue apenas para correção crítica, com justificativa.
+- [ ] **Fase legado:** bloqueia abertura de nova issue; uso somente para consulta histórica.
 
 ## Validação automatizada
 - [ ] `python tools/validate_issue_format.py docs/development/prompts/relatorios/ISSUE-*.md`
