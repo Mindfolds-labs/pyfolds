@@ -116,7 +116,7 @@ class BackpropMixin(TimedMixin):
 
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         """Forward pass com backpropagação."""
-        self._increment_time(kwargs.get("dt", 1.0))
+        dt = kwargs.get("dt", 1.0)
         current_time = self.time_counter.item()
 
         self._process_backprop_queue(current_time)
@@ -133,6 +133,8 @@ class BackpropMixin(TimedMixin):
         output["dendrite_amplification"] = self.dendrite_amplification.clone()
         if self.backprop_trace is not None:
             output["backprop_trace_mean"] = self.backprop_trace.mean()
+
+        self._increment_time(dt)
 
         return output
 

@@ -127,7 +127,7 @@ class ShortTermDynamicsMixin:
         x_modulated = x * modulation.unsqueeze(0)  # [B, D, S]
         
         # Forward da próxima classe com entrada modulada
-        output = super().forward(x_modulated, **kwargs)  # type: ignore
+        output = super().forward(x_modulated, _x_pre_stp=x, **kwargs)  # type: ignore
         
         # Adiciona métricas de STP ao output
         output['u_stp_mean'] = self.u_stp.mean()

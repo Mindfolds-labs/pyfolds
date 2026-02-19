@@ -111,7 +111,7 @@ class STDPMixin:
         # LTD: onde trace_post > threshold
         trace_threshold = getattr(self.cfg, "stdp_trace_threshold", 0.01)
         ltd_mask = (self.trace_post > trace_threshold).float()
-        delta_ltd = -self.A_minus * self.trace_post * ltd_mask * post_expanded
+        delta_ltd = -self.A_minus * self.trace_post * ltd_mask * pre_spikes
 
         # LTP: onde trace_pre > threshold
         ltp_mask = (self.trace_pre > trace_threshold).float()
@@ -187,13 +187,14 @@ class STDPMixin:
         >>> n.I.shape
         torch.Size([1, 2])
         """
+        x_pre_stp = kwargs.pop("_x_pre_stp", x)
         output = super().forward(x, **kwargs)
 
         mode = kwargs.get("mode", getattr(self, "mode", LearningMode.ONLINE))
         stdp_applied = self._should_apply_stdp(mode)
 
         if stdp_applied:
-            self._update_stdp_traces(x, output["spikes"], dt=kwargs.get("dt", 1.0))
+            self._update_stdp_traces(x_pre_stp, output["spikes"], dt=kwargs.get("dt", 1.0))
 
         # Métricas
         if self.trace_pre is not None:
