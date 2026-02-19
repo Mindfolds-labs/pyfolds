@@ -36,6 +36,7 @@ class MPJRDConfig:
     i_eta: float = 0.01
     i_gamma: float = 0.99
     beta_w: float = 0.0
+    hebbian_ltd_ratio: float = 0.0
     i_ltp_th: float = 5.0
     i_ltd_th: float = -5.0
     ltd_threshold_saturated: float = -10.0
@@ -195,6 +196,12 @@ class MPJRDConfig:
 
         if self.neuromod_scale <= 0:
             raise ValueError(f"neuromod_scale must be > 0, got {self.neuromod_scale}")
+
+        if self.hebbian_ltd_ratio < 0:
+            raise ValueError(
+                "hebbian_ltd_ratio deve ser >= 0, "
+                f"recebido {self.hebbian_ltd_ratio}"
+            )
 
         valid_integration_modes = {"wta_hard", "wta_soft", "nmda_shunting"}
         if self.dendrite_integration_mode not in valid_integration_modes:

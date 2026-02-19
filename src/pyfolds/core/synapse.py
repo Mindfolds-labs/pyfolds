@@ -136,25 +136,30 @@ class MPJRDSynapse(nn.Module):
             effective_eta = cfg.i_eta
 
         # Normaliza entradas
-        pre_rate = clamp_rate(pre_rate)  # [B] ou [1]
-        post_rate = clamp_rate(post_rate)  # [1]
-        R = clamp_R(R)  # [1]
+        pre_rate = clamp_rate(pre_rate).to(self.I.device)  # [B] ou [1]
+        post_rate = clamp_rate(post_rate).to(self.I.device)  # [1]
+        R = clamp_R(R).to(self.I.device)  # [1]
 
         # ✅ FILTRO: ignora sinapses inativas
         # Se pre_rate < activity_threshold, considera como 0 para plasticidade
         active_mask = (pre_rate > cfg.activity_threshold).float()  # [B]
         pre_rate_filtered = pre_rate * active_mask  # [B]
 
-        # Hebb = pre * post (broadcast)
+        # Hebb LTP = pre * post (broadcast)
         # post_rate é [1], pre_rate_filtered é [B] → resultado [B]
-        hebb = (pre_rate_filtered * post_rate).clamp(0.0, 1.0)  # [B]
+        hebb_ltp = (pre_rate_filtered * post_rate).clamp(0.0, 1.0)  # [B]
+
+        # Hebb LTD explícito (opcional): pre * (1 - post)
+        # Mantém compatibilidade: ratio=0.0 preserva comportamento legado.
+        hebb_ltd = (pre_rate_filtered * (1.0 - post_rate)).clamp(0.0, 1.0)
+        hebb_effective = hebb_ltp - cfg.hebbian_ltd_ratio * hebb_ltd
 
         # Ganho dependente do peso (tensor escalar)
         gain = 1.0 + cfg.beta_w * self.W
 
         # Delta de I (versão normalizada)
         # R é [1], neuromod_scale é escalar
-        delta = effective_eta * (R * cfg.neuromod_scale) * hebb * gain * dt  # [B]
+        delta = effective_eta * (R * cfg.neuromod_scale) * hebb_effective * gain * dt  # [B]
 
         # ✅ Atualização in-place (tensores)
         # Usa média do batch para atualizar I (sinapse única)

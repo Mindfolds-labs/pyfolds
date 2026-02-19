@@ -68,3 +68,11 @@ class TestMPJRDConfig:
         """Valida limites dos novos parâmetros de integração dendrítica."""
         with pytest.raises(ValueError):
             pyfolds.MPJRDConfig(**kwargs)
+
+
+def test_hebbian_ltd_ratio_must_be_non_negative():
+    """Config should reject negative explicit LTD ratio."""
+    from pyfolds.core import MPJRDConfig
+
+    with pytest.raises(ValueError, match="hebbian_ltd_ratio"):
+        MPJRDConfig(hebbian_ltd_ratio=-0.1)

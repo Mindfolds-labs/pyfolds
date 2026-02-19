@@ -113,3 +113,26 @@ class TestMPJRDSynapse:
         assert syn.N.item() == 7
         assert syn.eligibility.item() == pytest.approx(0.0)
         assert syn.I.item() == pytest.approx(2.0)
+
+
+    def test_update_supports_explicit_hebbian_ltd_component(self, tiny_config):
+        """Explicit LTD term should reduce/update internal potential when configured."""
+        from pyfolds.core import MPJRDSynapse, MPJRDConfig
+
+        cfg = MPJRDConfig(**{
+            **tiny_config.to_dict(),
+            "hebbian_ltd_ratio": 1.0,
+            "i_ltp_th": 100.0,
+            "i_ltd_th": -100.0,
+            "ltd_threshold_saturated": -120.0,
+        })
+        syn = MPJRDSynapse(cfg, init_n=3)
+
+        syn.update(
+            pre_rate=torch.tensor([1.0]),
+            post_rate=torch.tensor([0.0]),
+            R=torch.tensor([1.0]),
+        )
+
+        assert syn.I.item() < 0.0
+        assert syn.eligibility.item() < 0.0
