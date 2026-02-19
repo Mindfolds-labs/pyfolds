@@ -113,3 +113,5 @@ def train(model, train_loader, epochs=5):
 - Acurácia: ~92-95% após 5 épocas.
 - Neurônios especializados por classe.
 - Filamentos médios: 15-25 por sinapse ativa.
+
+

@@ -38,14 +38,12 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 <!-- HUB:QUEUE:BEGIN -->
 | ID | Status | Tema | Responsável | Data |
 | :-- | :-- | :-- | :-- | :-- |
-| ISSUE-001 | Concluida | Implementar LTD explícita em sinapses | Codex | 2026-02-19 |
-| ISSUE-002 | Concluida | Refatorar HUB com cards limpos e split view de links | Codex | 2026-02-19 |
-| ISSUE-003 | Concluida | Plano 1: Reposicionar issues no fluxo oficial do HUB | Codex | 2026-02-19 |
-| ISSUE-004 | Concluida | Plano 2: Sanear links e navegação documental | Codex | 2026-02-19 |
-| ISSUE-006 | Concluida | Plano 4: Consolidar correções de código e testes mínimos | Codex | 2026-02-19 |
-| ISSUE-008 | Em Progresso | Resiliência de testes sem torch (analisar + executar) | Codex | 2026-02-19 |
-| ISSUE-005 | Concluida | Plano 3: Executar validações e registrar evidências no HUB | Codex | 2026-02-19 |
-| ISSUE-007 | Concluida | Consolidar docstrings públicas de contratos | Codex | 2026-02-19 |
+| ISSUE-001 | Planejada | Implementar LTD explícita em sinapses | Codex | 2026-02-19 |
+| ISSUE-002 | Planejada | Refatorar HUB com cards limpos e split view de links | Codex | 2026-02-19 |
+| ISSUE-003 | Planejada | Plano 1: Reposicionar issues no fluxo oficial do HUB | Codex | 2026-02-19 |
+| ISSUE-004 | Planejada | Plano 2: Sanear links e navegação documental | Codex | 2026-02-19 |
+| ISSUE-006 | Planejada | Plano 4: Consolidar correções de código e testes mínimos | Codex | 2026-02-19 |
+| ISSUE-005 | Planejada | Plano 3: Executar validações e registrar evidências no HUB | Codex | 2026-02-19 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 Cards (UI limpa)
@@ -124,16 +122,6 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > **Prioridade:** `Média` · **Área:** `Governança/Validação`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-005-plano-3-validacoes-e-evidencias-hub.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-005-plano-3-validacoes-e-evidencias-hub.md)
-
-> [!TIP]
-> **ISSUE-007** · Consolidar docstrings públicas de contratos
->
-> **Status:** ✅ Concluída  
-> **Responsável:** Codex  
-> **Data:** 2026-02-19  
-> **Prioridade:** `Média` · **Área:** `Core/API Docs`  
->
-> 📄 [Relatório](./prompts/relatorios/ISSUE-007-consolidar-docstrings-publicas-de-contratos.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-007-consolidar-docstrings-publicas-de-contratos.md)
 
 <!-- HUB:CARDS:END -->
 
