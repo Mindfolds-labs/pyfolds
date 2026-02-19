@@ -16,7 +16,7 @@ Uso básico:
     telem = TelemetryController()
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 # ===== CORE COMPONENTS =====
 from .core.config import MPJRDConfig
