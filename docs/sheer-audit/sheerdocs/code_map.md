@@ -770,7 +770,6 @@
   - `mod:pyfolds.core`
   - `mod:pytest`
   - `mod:sys`
-  - `mod:torch`
 - Funções:
   - `batch_size()`
   - `device()`

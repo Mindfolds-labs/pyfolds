@@ -7,7 +7,7 @@
   "metrics": {
     "python_files": 134,
     "symbols": 948,
-    "edges": 1426,
+    "edges": 1425,
     "findings": 0,
     "internal_import_edges": 101
   },
@@ -431,7 +431,7 @@
           "id": "cls:src.pyfolds.contracts.neuron_contract.ContractViolation",
           "name": "ContractViolation",
           "qname": "src.pyfolds.contracts.neuron_contract.ContractViolation",
-          "line": 53,
+          "line": 61,
           "bases": [
             "ValueError"
           ],
@@ -452,7 +452,7 @@
           "id": "cls:src.pyfolds.contracts.neuron_contract.NeuronStepInput",
           "name": "NeuronStepInput",
           "qname": "src.pyfolds.contracts.neuron_contract.NeuronStepInput",
-          "line": 32,
+          "line": 34,
           "bases": [],
           "methods": []
         },
@@ -460,7 +460,7 @@
           "id": "cls:src.pyfolds.contracts.neuron_contract.NeuronStepOutput",
           "name": "NeuronStepOutput",
           "qname": "src.pyfolds.contracts.neuron_contract.NeuronStepOutput",
-          "line": 47,
+          "line": 53,
           "bases": [],
           "methods": []
         },
@@ -468,7 +468,7 @@
           "id": "cls:src.pyfolds.contracts.neuron_contract.StepExecutionTrace",
           "name": "StepExecutionTrace",
           "qname": "src.pyfolds.contracts.neuron_contract.StepExecutionTrace",
-          "line": 39,
+          "line": 43,
           "bases": [],
           "methods": []
         }
@@ -478,7 +478,7 @@
           "id": "fn:src.pyfolds.contracts.neuron_contract.validate_step_output",
           "name": "validate_step_output",
           "qname": "src.pyfolds.contracts.neuron_contract.validate_step_output",
-          "line": 57,
+          "line": 67,
           "params": [
             "output",
             "dt"
@@ -2739,8 +2739,7 @@
         "mod:pathlib",
         "mod:pyfolds.core",
         "mod:pytest",
-        "mod:sys",
-        "mod:torch"
+        "mod:sys"
       ],
       "classes": [],
       "functions": [

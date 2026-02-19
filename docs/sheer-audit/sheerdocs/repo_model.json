@@ -1322,7 +1322,7 @@
       "qname": "src.pyfolds.contracts.neuron_contract.MechanismStep",
       "file": "src/pyfolds/contracts/neuron_contract.py",
       "line": 8,
-      "doc": null,
+      "doc": "Enum com a ordem canônica dos mecanismos executados em um passo neuronal.",
       "params": [],
       "returns": null,
       "bases": [
@@ -1337,8 +1337,8 @@
       "name": "NeuronStepInput",
       "qname": "src.pyfolds.contracts.neuron_contract.NeuronStepInput",
       "file": "src/pyfolds/contracts/neuron_contract.py",
-      "line": 32,
-      "doc": null,
+      "line": 34,
+      "doc": "Entrada mínima necessária para executar um passo (`step`) do neurônio.",
       "params": [],
       "returns": null,
       "bases": [],
@@ -1352,8 +1352,8 @@
       "name": "StepExecutionTrace",
       "qname": "src.pyfolds.contracts.neuron_contract.StepExecutionTrace",
       "file": "src/pyfolds/contracts/neuron_contract.py",
-      "line": 39,
-      "doc": null,
+      "line": 43,
+      "doc": "Rastro de execução do passo contendo ordem e snapshots temporais.",
       "params": [],
       "returns": null,
       "bases": [],
@@ -1367,8 +1367,8 @@
       "name": "NeuronStepOutput",
       "qname": "src.pyfolds.contracts.neuron_contract.NeuronStepOutput",
       "file": "src/pyfolds/contracts/neuron_contract.py",
-      "line": 47,
-      "doc": null,
+      "line": 53,
+      "doc": "Saída contratual de um passo com spikes, potencial somático e rastro.",
       "params": [],
       "returns": null,
       "bases": [],
@@ -1382,8 +1382,8 @@
       "name": "ContractViolation",
       "qname": "src.pyfolds.contracts.neuron_contract.ContractViolation",
       "file": "src/pyfolds/contracts/neuron_contract.py",
-      "line": 53,
-      "doc": null,
+      "line": 61,
+      "doc": "Erro lançado quando a saída de `step` viola o contrato formal.",
       "params": [],
       "returns": null,
       "bases": [
@@ -1397,8 +1397,8 @@
       "name": "validate_step_output",
       "qname": "src.pyfolds.contracts.neuron_contract.validate_step_output",
       "file": "src/pyfolds/contracts/neuron_contract.py",
-      "line": 57,
-      "doc": null,
+      "line": 67,
+      "doc": "Valida invariantes de ordem e avanço temporal da execução de `step`.",
       "params": [
         "output",
         "dt"
@@ -19518,12 +19518,6 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.conftest",
-      "dst": "mod:torch",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
-      "src": "mod:tests.conftest",
       "dst": "mod:pyfolds.core",
       "meta": {}
     },
@@ -23018,7 +23012,7 @@
   "metrics": {
     "python_files": 134,
     "symbols": 948,
-    "edges": 1426,
+    "edges": 1425,
     "findings": 0,
     "internal_import_edges": 101
   }
