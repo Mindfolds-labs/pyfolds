@@ -163,3 +163,25 @@ Se qualquer critério falhar, o card deve permanecer em **Review/Blocked**.
 - Revisão semanal do board para identificar cards órfãos (sem issue/sem PR/sem owner).
 - Revisão por release para garantir que nenhum item foi movido para **Done** sem HUB sincronizado.
 - Divergências devem abrir issue de governança (`type: GOVERNANCE`).
+
+
+### 6.7 Implementação no repositório
+A automação operacional deste fluxo está versionada em:
+- `.github/workflows/project-board-automation.yml`
+
+Pré-requisitos para funcionamento:
+1. Secret `PYFOLDS_BOARD_URL` com a URL do projeto `pyfolds-board` (ex.: `https://github.com/orgs/<org>/projects/<numero>`).
+2. Secret `PROJECTS_TOKEN` com permissões de `project`, `repo`, `read:org` (quando projeto em organização).
+3. Labels recomendadas para roteamento:
+   - `in progress`
+   - `blocked`
+   - `execution:done`
+   - `hub:sync`
+
+Comportamento implementado:
+- issue/PR aberta/reaberta entra no board e vai para `Backlog/To-Do`;
+- label `in progress` move para `In Progress`;
+- label `blocked`, PR em draft ou em revisão mantém em `Review/Blocked`;
+- fechamento sem `execution:done` + `hub:sync` retorna para `Review/Blocked`;
+- `Done` só é aplicado quando fechamento ocorre com os dois labels de evidência.
+
