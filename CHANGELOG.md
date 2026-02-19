@@ -15,6 +15,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Optional dependency group for examples with `torchvision` in `pyproject.toml`.
 
 ### Changed
+- Canonical release version unified to `2.0.0` across package metadata, public modules and docs examples.
 - `docs/ARCHITECTURE.md` diagram reference updated to `docs/architecture/blueprints/`.
 - `docs/development/execution_queue.csv` ISSUE-005 marked as partial in progress.
 
