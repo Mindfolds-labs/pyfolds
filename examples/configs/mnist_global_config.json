@@ -1,0 +1,39 @@
+{
+  "training": {
+    "batch_size": 192,
+    "epochs": 10,
+    "learning_rate": 0.001,
+    "n_neurons": 192,
+    "save_dir": "checkpoints_mnist_global"
+  },
+  "model": {
+    "n_dendrites": 4,
+    "n_synapses_per_dendrite": 16,
+    "dendrite_integration_mode": "wta_hard"
+  },
+  "learning": {
+    "mode": "online",
+    "plastic": true,
+    "defer_updates": true
+  },
+  "scientific_init": {
+    "n_min": 0,
+    "n_max": 31,
+    "w_scale": 5.0,
+    "i_eta": 0.01,
+    "i_gamma": 0.99,
+    "i_ltp_th": 5.0,
+    "i_ltd_th": -5.0,
+    "theta_init": 4.5,
+    "theta_min": 2.0,
+    "theta_max": 8.0,
+    "target_spike_rate": 0.1,
+    "homeostasis_eta": 0.05,
+    "plasticity_mode": "both",
+    "tau_pre": 20.0,
+    "tau_post": 20.0,
+    "A_plus": 0.01,
+    "A_minus": 0.012,
+    "random_seed": 42
+  }
+}
