@@ -225,29 +225,28 @@ class MPJRDSynapse(nn.Module):
     def consolidate(self, dt: float = 1.0) -> None:
         """
         Consolida o fator volátil em estável (two-factor consolidation).
-        
-        ✅ OTIMIZADO: usa i_decay_sleep da config
+
+        ✅ OTIMIZADO V2: Remoção TOTAL de sincronização D2H.
+        Matemática in-place pura, sem desvios baseados no conteúdo da VRAM.
         """
-        # Verifica se há elegibilidade
+        # .numel() é seguro pois lê apenas o metadado (shape) alocado na CPU Host
         if self.eligibility.numel() == 0:
             return
 
-        eligibility = self.eligibility.to(dtype=torch.float32)
-        if not torch.any(eligibility != 0):
-            return
-
-        # Transfere elegibilidade para N (sem .item() no caminho crítico)
-        transfer = eligibility * (self.cfg.consolidation_rate * abs(dt))
+        # 1. Matemática Vetorial sem Condicionais
+        # Se a elegibilidade for 0, delta_n será calculado como +0 automaticamente.
+        transfer = self.eligibility.to(dtype=torch.float32) * (self.cfg.consolidation_rate * abs(dt))
         delta_n = torch.round(transfer).to(dtype=self.N.dtype)
 
-        if torch.any(delta_n != 0):
-            self.N.add_(delta_n)
-            self.N.clamp_(self.cfg.n_min, self.cfg.n_max)
+        # 2. Adição Maciça In-Place
+        # Adicionar +0 na GPU é exponencialmente mais barato que sincronizar um torch.any()
+        self.N.add_(delta_n)
+        self.N.clamp_(self.cfg.n_min, self.cfg.n_max)
 
-        # Reseta elegibilidade
+        # 3. Reseta elegibilidade massivamente
         self.eligibility.zero_()
 
-        # ✅ Decaimento natural de I
+        # 4. Decaimento natural de I
         if self.I.numel() > 0:
             self.I.mul_(self.cfg.i_decay_sleep)
 
