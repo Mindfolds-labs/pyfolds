@@ -3591,7 +3591,7 @@
       "name": "get_state",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.get_state",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 253,
+      "line": 254,
       "doc": "Retorna estado completo da sinapse (sem .item() para tensores).",
       "params": [
         "self"
@@ -3606,7 +3606,7 @@
       "name": "load_state",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.load_state",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 264,
+      "line": 265,
       "doc": "Carrega estado na sinapse.",
       "params": [
         "self",
@@ -3622,7 +3622,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.extra_repr",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 277,
+      "line": 278,
       "doc": "Representação string da sinapse.",
       "params": [
         "self"
@@ -5034,7 +5034,7 @@
       "qname": "src.pyfolds.serialization.ecc.ReedSolomonECC",
       "file": "src/pyfolds/serialization/ecc.py",
       "line": 41,
-      "doc": "Codec Reed-Solomon opcional para correção de corrupção por chunk.",
+      "doc": "Codec Reed-Solomon opcional para correção de corrupção por chunk.\n\nOs dados são segmentados em blocos com tamanho máximo de ``255 - symbols``\n(limite de GF(2^8)), evitando crescimento de memória quadrático ao processar\nchunks grandes.",
       "params": [],
       "returns": null,
       "bases": [],
@@ -5046,7 +5046,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.serialization.ecc.ReedSolomonECC.__init__",
       "file": "src/pyfolds/serialization/ecc.py",
-      "line": 44,
+      "line": 49,
       "doc": null,
       "params": [
         "self",
@@ -5062,7 +5062,7 @@
       "name": "encode",
       "qname": "src.pyfolds.serialization.ecc.ReedSolomonECC.encode",
       "file": "src/pyfolds/serialization/ecc.py",
-      "line": 54,
+      "line": 63,
       "doc": null,
       "params": [
         "self",
@@ -5078,7 +5078,7 @@
       "name": "decode",
       "qname": "src.pyfolds.serialization.ecc.ReedSolomonECC.decode",
       "file": "src/pyfolds/serialization/ecc.py",
-      "line": 60,
+      "line": 75,
       "doc": null,
       "params": [
         "self",
@@ -5095,7 +5095,7 @@
       "name": "ecc_from_protection",
       "qname": "src.pyfolds.serialization.ecc.ecc_from_protection",
       "file": "src/pyfolds/serialization/ecc.py",
-      "line": 73,
+      "line": 105,
       "doc": "Mapeia nível de proteção em codec ECC.\n\nNíveis:\n    - off/none/0 -> NoECC\n    - low -> ReedSolomonECC(16)\n    - med -> ReedSolomonECC(32)\n    - high -> ReedSolomonECC(64)",
       "params": [
         "level"
@@ -5138,7 +5138,7 @@
       "name": "_init_crc32c_table",
       "qname": "src.pyfolds.serialization.foldio._init_crc32c_table",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 71,
+      "line": 72,
       "doc": "Inicializa tabela CRC32C na primeira chamada.",
       "params": [],
       "returns": null,
@@ -5151,7 +5151,7 @@
       "name": "_crc32c_fallback",
       "qname": "src.pyfolds.serialization.foldio._crc32c_fallback",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 88,
+      "line": 89,
       "doc": null,
       "params": [
         "data"
@@ -5166,7 +5166,7 @@
       "name": "FoldSecurityError",
       "qname": "src.pyfolds.serialization.foldio.FoldSecurityError",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 95,
+      "line": 96,
       "doc": "Erro de segurança ao desserializar payload torch.",
       "params": [],
       "returns": null,
@@ -5176,12 +5176,43 @@
       "decorators": []
     },
     {
+      "id": "fn:src.pyfolds.serialization.foldio._serialize_state_dict_safetensors",
+      "kind": "function",
+      "name": "_serialize_state_dict_safetensors",
+      "qname": "src.pyfolds.serialization.foldio._serialize_state_dict_safetensors",
+      "file": "src/pyfolds/serialization/foldio.py",
+      "line": 102,
+      "doc": null,
+      "params": [
+        "state_dict"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:src.pyfolds.serialization.foldio._deserialize_state_dict_safetensors",
+      "kind": "function",
+      "name": "_deserialize_state_dict_safetensors",
+      "qname": "src.pyfolds.serialization.foldio._deserialize_state_dict_safetensors",
+      "file": "src/pyfolds/serialization/foldio.py",
+      "line": 117,
+      "doc": null,
+      "params": [
+        "payload",
+        "map_location"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "fn:src.pyfolds.serialization.foldio.crc32c_u32",
       "kind": "function",
       "name": "crc32c_u32",
       "qname": "src.pyfolds.serialization.foldio.crc32c_u32",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 99,
+      "line": 128,
       "doc": "Retorna CRC32C (Castagnoli) como inteiro unsigned de 32 bits.",
       "params": [
         "data"
@@ -5196,7 +5227,7 @@
       "name": "sha256_hex",
       "qname": "src.pyfolds.serialization.foldio.sha256_hex",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 126,
+      "line": 155,
       "doc": "Retorna digest SHA-256 em formato hexadecimal.",
       "params": [
         "data"
@@ -5211,7 +5242,7 @@
       "name": "_json_bytes",
       "qname": "src.pyfolds.serialization.foldio._json_bytes",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 131,
+      "line": 160,
       "doc": null,
       "params": [
         "obj"
@@ -5226,7 +5257,7 @@
       "name": "_canonical_json",
       "qname": "src.pyfolds.serialization.foldio._canonical_json",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 135,
+      "line": 164,
       "doc": null,
       "params": [
         "obj"
@@ -5241,7 +5272,7 @@
       "name": "_cfg_to_dict",
       "qname": "src.pyfolds.serialization.foldio._cfg_to_dict",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 139,
+      "line": 168,
       "doc": null,
       "params": [
         "cfg"
@@ -5256,7 +5287,7 @@
       "name": "_safe_git_hash",
       "qname": "src.pyfolds.serialization.foldio._safe_git_hash",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 151,
+      "line": 180,
       "doc": null,
       "params": [],
       "returns": null,
@@ -5269,7 +5300,7 @@
       "name": "_telemetry_snapshot",
       "qname": "src.pyfolds.serialization.foldio._telemetry_snapshot",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 163,
+      "line": 192,
       "doc": null,
       "params": [
         "neuron",
@@ -5285,7 +5316,7 @@
       "name": "_history_snapshot",
       "qname": "src.pyfolds.serialization.foldio._history_snapshot",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 185,
+      "line": 214,
       "doc": null,
       "params": [
         "neuron"
@@ -5300,7 +5331,7 @@
       "name": "_build_nuclear_npz",
       "qname": "src.pyfolds.serialization.foldio._build_nuclear_npz",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 195,
+      "line": 224,
       "doc": null,
       "params": [
         "neuron"
@@ -5315,7 +5346,7 @@
       "name": "read_nuclear_arrays",
       "qname": "src.pyfolds.serialization.foldio.read_nuclear_arrays",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 221,
+      "line": 250,
       "doc": "Lê apenas o chunk `nuclear_arrays` para análises científicas parciais.",
       "params": [
         "path",
@@ -5332,7 +5363,7 @@
       "name": "FoldWriter",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 230,
+      "line": 259,
       "doc": "Writer do container .fold/.mind.",
       "params": [],
       "returns": null,
@@ -5345,7 +5376,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.__init__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 233,
+      "line": 262,
       "doc": null,
       "params": [
         "self",
@@ -5364,7 +5395,7 @@
       "name": "__enter__",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.__enter__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 247,
+      "line": 276,
       "doc": null,
       "params": [
         "self"
@@ -5379,7 +5410,7 @@
       "name": "__exit__",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.__exit__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 254,
+      "line": 283,
       "doc": null,
       "params": [
         "self",
@@ -5397,7 +5428,7 @@
       "name": "_compress",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter._compress",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 258,
+      "line": 287,
       "doc": null,
       "params": [
         "self",
@@ -5413,7 +5444,7 @@
       "name": "add_chunk",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.add_chunk",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 266,
+      "line": 295,
       "doc": "Adiciona chunk com compressão, integridade e ECC opcional.\n\nOrdem de escrita:\n    1. compressão (se habilitada)\n    2. checksum (CRC32C/SHA256) do conteúdo comprimido\n    3. codificação ECC do conteúdo comprimido\n    4. persistência: [header | comp | ecc]\n\nNa leitura a ordem é invertida: leitura -> ECC -> verificação -> descompressão.",
       "params": [
         "self",
@@ -5431,7 +5462,7 @@
       "name": "finalize",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.finalize",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 327,
+      "line": 356,
       "doc": null,
       "params": [
         "self",
@@ -5447,7 +5478,7 @@
       "name": "FoldReader",
       "qname": "src.pyfolds.serialization.foldio.FoldReader",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 375,
+      "line": 404,
       "doc": "Reader do container .fold/.mind com suporte a mmap.",
       "params": [],
       "returns": null,
@@ -5460,7 +5491,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.__init__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 378,
+      "line": 407,
       "doc": null,
       "params": [
         "self",
@@ -5477,7 +5508,7 @@
       "name": "__enter__",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.__enter__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 386,
+      "line": 415,
       "doc": null,
       "params": [
         "self"
@@ -5492,7 +5523,7 @@
       "name": "__exit__",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.__exit__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 393,
+      "line": 422,
       "doc": null,
       "params": [
         "self",
@@ -5510,7 +5541,7 @@
       "name": "_read_at",
       "qname": "src.pyfolds.serialization.foldio.FoldReader._read_at",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 417,
+      "line": 446,
       "doc": null,
       "params": [
         "self",
@@ -5527,7 +5558,7 @@
       "name": "_read_header_and_index",
       "qname": "src.pyfolds.serialization.foldio.FoldReader._read_header_and_index",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 440,
+      "line": 469,
       "doc": null,
       "params": [
         "self"
@@ -5542,7 +5573,7 @@
       "name": "list_chunks",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.list_chunks",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 512,
+      "line": 541,
       "doc": null,
       "params": [
         "self"
@@ -5557,7 +5588,7 @@
       "name": "_decompress",
       "qname": "src.pyfolds.serialization.foldio.FoldReader._decompress",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 515,
+      "line": 544,
       "doc": null,
       "params": [
         "self",
@@ -5574,7 +5605,7 @@
       "name": "_ecc_codec",
       "qname": "src.pyfolds.serialization.foldio.FoldReader._ecc_codec",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 523,
+      "line": 552,
       "doc": null,
       "params": [
         "self",
@@ -5590,7 +5621,7 @@
       "name": "read_chunk_bytes",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.read_chunk_bytes",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 531,
+      "line": 560,
       "doc": null,
       "params": [
         "self",
@@ -5607,7 +5638,7 @@
       "name": "read_json",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.read_json",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 598,
+      "line": 627,
       "doc": null,
       "params": [
         "self",
@@ -5619,19 +5650,18 @@
       "decorators": []
     },
     {
-      "id": "mtd:src.pyfolds.serialization.foldio.FoldReader.read_torch",
+      "id": "mtd:src.pyfolds.serialization.foldio.FoldReader.read_state_dict",
       "kind": "method",
-      "name": "read_torch",
-      "qname": "src.pyfolds.serialization.foldio.FoldReader.read_torch",
+      "name": "read_state_dict",
+      "qname": "src.pyfolds.serialization.foldio.FoldReader.read_state_dict",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 601,
+      "line": 630,
       "doc": null,
       "params": [
         "self",
         "name",
         "map_location",
-        "verify",
-        "trusted"
+        "verify"
       ],
       "returns": null,
       "bases": [],
@@ -5643,8 +5673,8 @@
       "name": "_TrustedFoldReader",
       "qname": "src.pyfolds.serialization.foldio._TrustedFoldReader",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 623,
-      "doc": "Reader dedicado para ambientes de confiança explícita.",
+      "line": 640,
+      "doc": "Reader dedicado para ambientes de confiança explícita (legado torch.save).",
       "params": [],
       "returns": null,
       "bases": [
@@ -5653,19 +5683,18 @@
       "decorators": []
     },
     {
-      "id": "mtd:src.pyfolds.serialization.foldio._TrustedFoldReader.read_torch",
+      "id": "mtd:src.pyfolds.serialization.foldio._TrustedFoldReader.read_torch_legacy",
       "kind": "method",
-      "name": "read_torch",
-      "qname": "src.pyfolds.serialization.foldio._TrustedFoldReader.read_torch",
+      "name": "read_torch_legacy",
+      "qname": "src.pyfolds.serialization.foldio._TrustedFoldReader.read_torch_legacy",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 626,
+      "line": 643,
       "doc": null,
       "params": [
         "self",
         "name",
         "map_location",
-        "verify",
-        "trusted"
+        "verify"
       ],
       "returns": null,
       "bases": [],
@@ -5677,7 +5706,7 @@
       "name": "_expression_summary",
       "qname": "src.pyfolds.serialization.foldio._expression_summary",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 637,
+      "line": 653,
       "doc": null,
       "params": [
         "neuron"
@@ -5692,7 +5721,7 @@
       "name": "_reproducibility_metadata",
       "qname": "src.pyfolds.serialization.foldio._reproducibility_metadata",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 671,
+      "line": 687,
       "doc": null,
       "params": [],
       "returns": null,
@@ -5705,7 +5734,7 @@
       "name": "_collect_hyperparameters",
       "qname": "src.pyfolds.serialization.foldio._collect_hyperparameters",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 681,
+      "line": 697,
       "doc": null,
       "params": [
         "neuron"
@@ -5720,7 +5749,7 @@
       "name": "_sign_payload_ed25519",
       "qname": "src.pyfolds.serialization.foldio._sign_payload_ed25519",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 688,
+      "line": 704,
       "doc": null,
       "params": [
         "payload",
@@ -5736,7 +5765,7 @@
       "name": "_verify_payload_signature_ed25519",
       "qname": "src.pyfolds.serialization.foldio._verify_payload_signature_ed25519",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 700,
+      "line": 716,
       "doc": null,
       "params": [
         "payload",
@@ -5753,7 +5782,7 @@
       "name": "save_fold_or_mind",
       "qname": "src.pyfolds.serialization.foldio.save_fold_or_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 716,
+      "line": 732,
       "doc": "Salva neurônio MPJRD em container .fold/.mind único e extensível.",
       "params": [
         "neuron",
@@ -5785,7 +5814,7 @@
       "name": "peek_fold_or_mind",
       "qname": "src.pyfolds.serialization.foldio.peek_fold_or_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 844,
+      "line": 853,
       "doc": "Inspeção rápida (header + índice + manifesto), sem carregar state_dict.",
       "params": [
         "path",
@@ -5801,7 +5830,7 @@
       "name": "peek_mind",
       "qname": "src.pyfolds.serialization.foldio.peek_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 859,
+      "line": 868,
       "doc": "Alias semântico para fluxos .mind.",
       "params": [
         "path",
@@ -5817,7 +5846,7 @@
       "name": "load_fold_or_mind",
       "qname": "src.pyfolds.serialization.foldio.load_fold_or_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 865,
+      "line": 874,
       "doc": "Carrega neurônio pelo chunk `torch_state` com validação por chunk.",
       "params": [
         "path",
@@ -5836,7 +5865,7 @@
       "name": "is_mind",
       "qname": "src.pyfolds.serialization.foldio.is_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 921,
+      "line": 944,
       "doc": "Regra de branding: arquivo com chunks IA explícitos é `.mind`.",
       "params": [
         "path"
@@ -5851,7 +5880,7 @@
       "name": "is_mind_chunks",
       "qname": "src.pyfolds.serialization.foldio.is_mind_chunks",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 928,
+      "line": 951,
       "doc": "Indica se um conjunto de chunks representa conteúdo com extensão `.mind`.",
       "params": [
         "chunks"
@@ -8061,7 +8090,7 @@
       "name": "safe_div",
       "qname": "src.pyfolds.utils.math.safe_div",
       "file": "src/pyfolds/utils/math.py",
-      "line": 40,
+      "line": 46,
       "doc": "Divisão segura com epsilon para evitar divisão por zero.\n\nArgs:\n    x: Numerador\n    y: Denominador\n    eps: Epsilon para evitar divisão por zero\n\nReturns:\n    x / (y + eps)",
       "params": [
         "x",
@@ -8078,7 +8107,7 @@
       "name": "clamp_rate",
       "qname": "src.pyfolds.utils.math.clamp_rate",
       "file": "src/pyfolds/utils/math.py",
-      "line": 55,
+      "line": 61,
       "doc": "Mantém taxa de disparo em [0, 1].\n\nArgs:\n    r: Taxa de disparo (tensor ou float)\n\nReturns:\n    Valor clampado em [0, 1]",
       "params": [
         "r"
@@ -8093,7 +8122,7 @@
       "name": "clamp_R",
       "qname": "src.pyfolds.utils.math.clamp_R",
       "file": "src/pyfolds/utils/math.py",
-      "line": 70,
+      "line": 76,
       "doc": "Mantém sinal neuromodulador em [-1, 1].\n\nArgs:\n    r: Sinal neuromodulador (tensor ou float)\n\nReturns:\n    Valor clampado em [-1, 1]",
       "params": [
         "r"
@@ -8108,7 +8137,7 @@
       "name": "xavier_init",
       "qname": "src.pyfolds.utils.math.xavier_init",
       "file": "src/pyfolds/utils/math.py",
-      "line": 85,
+      "line": 91,
       "doc": "Inicialização Xavier para pesos.\n\nArgs:\n    shape: Dimensões do tensor\n    gain: Ganho (1.0 para sigmoid/tanh, sqrt(2) para ReLU)\n\nReturns:\n    Tensor inicializado com distribuição normal * std",
       "params": [
         "shape",
@@ -8124,7 +8153,7 @@
       "name": "calculate_vc_dimension",
       "qname": "src.pyfolds.utils.math.calculate_vc_dimension",
       "file": "src/pyfolds/utils/math.py",
-      "line": 105,
+      "line": 111,
       "doc": "Calcula VC-dimension aproximado de uma rede MPJRD.\n\nA VC-dimension mede a capacidade de aprendizado da rede.\nFórmula: VC-dim ≈ N * D * log2(N * D * S * C)\n\nArgs:\n    n_neurons: Número de neurônios\n    n_dendrites: Número de dendritos por neurônio\n    n_synapses: Número de sinapses por dendrito\n    avg_connections: Média de conexões ativas (default: 1.0)\n\nReturns:\n    VC-dimension aproximada\n\nExample:\n    >>> vc = calculate_vc_dimension(100, 4, 32)\n    >>> print(f\"VC-dimension: {vc:.0f}\")",
       "params": [
         "n_neurons",
@@ -18676,6 +18705,18 @@
     {
       "type": "CONTAINS",
       "src": "mod:src.pyfolds.serialization.foldio",
+      "dst": "fn:src.pyfolds.serialization.foldio._serialize_state_dict_safetensors",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.serialization.foldio",
+      "dst": "fn:src.pyfolds.serialization.foldio._deserialize_state_dict_safetensors",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.serialization.foldio",
       "dst": "fn:src.pyfolds.serialization.foldio.crc32c_u32",
       "meta": {}
     },
@@ -18844,7 +18885,7 @@
     {
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.serialization.foldio.FoldReader",
-      "dst": "mtd:src.pyfolds.serialization.foldio.FoldReader.read_torch",
+      "dst": "mtd:src.pyfolds.serialization.foldio.FoldReader.read_state_dict",
       "meta": {}
     },
     {
@@ -18862,7 +18903,7 @@
     {
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.serialization.foldio._TrustedFoldReader",
-      "dst": "mtd:src.pyfolds.serialization.foldio._TrustedFoldReader.read_torch",
+      "dst": "mtd:src.pyfolds.serialization.foldio._TrustedFoldReader.read_torch_legacy",
       "meta": {}
     },
     {
@@ -24365,8 +24406,8 @@
   "findings": [],
   "metrics": {
     "python_files": 138,
-    "symbols": 1005,
-    "edges": 1503,
+    "symbols": 1007,
+    "edges": 1505,
     "findings": 0,
     "internal_import_edges": 104
   }

@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `138`
-- Símbolos: `1005`
+- Símbolos: `1007`
 
 ## Módulos
 
@@ -492,6 +492,7 @@
   - `_cfg_to_dict(cfg)`
   - `_collect_hyperparameters(neuron)`
   - `_crc32c_fallback(data)`
+  - `_deserialize_state_dict_safetensors(payload, map_location)`
   - `_expression_summary(neuron)`
   - `_history_snapshot(neuron)`
   - `_init_crc32c_table()`
@@ -499,6 +500,7 @@
   - `_optional_import(module_name)`
   - `_reproducibility_metadata()`
   - `_safe_git_hash()`
+  - `_serialize_state_dict_safetensors(state_dict)`
   - `_sign_payload_ed25519(payload, private_key_pem)`
   - `_telemetry_snapshot(neuron, max_events)`
   - `_verify_payload_signature_ed25519(payload, signature_hex, public_key_pem)`

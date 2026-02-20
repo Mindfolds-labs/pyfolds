@@ -376,7 +376,7 @@ class "src.pyfolds.serialization.foldio.FoldReader" {
   +list_chunks()
   +read_chunk_bytes()
   +read_json()
-  +read_torch()
+  +read_state_dict()
 }
 class "src.pyfolds.serialization.foldio.FoldSecurityError" {
 }
@@ -389,7 +389,7 @@ class "src.pyfolds.serialization.foldio.FoldWriter" {
   +finalize()
 }
 class "src.pyfolds.serialization.foldio._TrustedFoldReader" {
-  +read_torch()
+  +read_torch_legacy()
 }
 
 class "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint" {

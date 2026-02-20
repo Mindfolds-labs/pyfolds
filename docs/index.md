@@ -45,7 +45,7 @@ Atualizado automaticamente pelo Sheer Audit no merge para `main`.
 <!-- SHEER-CODEMAP:START -->
 - Repositório: `pyfolds`
 - Arquivos Python: `138`
-- Símbolos: `1005`
+- Símbolos: `1007`
 
 
 - Arquivo: `src/pyfolds/__init__.py`
