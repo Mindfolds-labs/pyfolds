@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 139,
-    "symbols": 1035,
-    "edges": 1544,
+    "symbols": 1042,
+    "edges": 1553,
     "findings": 0,
     "internal_import_edges": 104
   },
@@ -40,7 +40,7 @@
           "id": "fn:src.pyfolds.__getattr__",
           "name": "__getattr__",
           "qname": "src.pyfolds.__getattr__",
-          "line": 164,
+          "line": 166,
           "params": [
             "name"
           ]
@@ -1161,6 +1161,7 @@
       "imports": [
         "mod:__future__",
         "mod:enum",
+        "mod:hashlib",
         "mod:torch",
         "mod:typing"
       ],
@@ -1169,17 +1170,30 @@
           "id": "cls:src.pyfolds.monitoring.health.HealthStatus",
           "name": "HealthStatus",
           "qname": "src.pyfolds.monitoring.health.HealthStatus",
-          "line": 11,
+          "line": 12,
           "bases": [
             "Enum"
           ],
           "methods": []
         },
         {
+          "id": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+          "name": "ModelIntegrityMonitor",
+          "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+          "line": 102,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.__init__",
+            "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.check_integrity",
+            "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.compute_state_hash",
+            "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.set_baseline"
+          ]
+        },
+        {
           "id": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
           "name": "NeuronHealthCheck",
           "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck",
-          "line": 19,
+          "line": 20,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
@@ -1190,7 +1204,7 @@
           "id": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
           "name": "NeuronHealthMonitor",
           "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor",
-          "line": 53,
+          "line": 54,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
@@ -2462,7 +2476,7 @@
           "id": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
           "name": "CircularBufferFileHandler",
           "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler",
-          "line": 285,
+          "line": 284,
           "bases": [
             "logging.Handler"
           ],
@@ -2518,7 +2532,7 @@
           "id": "fn:src.pyfolds.utils.logging.build_log_path",
           "name": "build_log_path",
           "qname": "src.pyfolds.utils.logging.build_log_path",
-          "line": 382,
+          "line": 381,
           "params": [
             "log_dir",
             "app",
@@ -2529,7 +2543,7 @@
           "id": "fn:src.pyfolds.utils.logging.get_logger",
           "name": "get_logger",
           "qname": "src.pyfolds.utils.logging.get_logger",
-          "line": 216,
+          "line": 215,
           "params": [
             "name"
           ]
@@ -2538,7 +2552,7 @@
           "id": "fn:src.pyfolds.utils.logging.next_log_path",
           "name": "next_log_path",
           "qname": "src.pyfolds.utils.logging.next_log_path",
-          "line": 365,
+          "line": 364,
           "params": [
             "log_dir",
             "app",
@@ -2549,7 +2563,7 @@
           "id": "fn:src.pyfolds.utils.logging.setup_logging",
           "name": "setup_logging",
           "qname": "src.pyfolds.utils.logging.setup_logging",
-          "line": 263,
+          "line": 262,
           "params": [
             "log_file",
             "level",
@@ -2564,7 +2578,7 @@
           "id": "fn:src.pyfolds.utils.logging.setup_run_logging",
           "name": "setup_run_logging",
           "qname": "src.pyfolds.utils.logging.setup_run_logging",
-          "line": 223,
+          "line": 222,
           "params": [
             "app",
             "version",
@@ -4097,14 +4111,15 @@
         "mod:pyfolds",
         "mod:pyfolds.monitoring",
         "mod:pyfolds.serialization",
-        "mod:pytest"
+        "mod:pytest",
+        "mod:torch"
       ],
       "classes": [
         {
           "id": "cls:tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron",
           "name": "DummyNeuron",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron",
-          "line": 11,
+          "line": 12,
           "bases": [],
           "methods": [
             "mtd:tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.__init__",
@@ -4117,21 +4132,35 @@
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_health_check_critical_for_dead_neurons",
           "name": "test_health_check_critical_for_dead_neurons",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_critical_for_dead_neurons",
-          "line": 19,
+          "line": 20,
           "params": []
         },
         {
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_health_check_uses_fallback_metrics_from_get_metrics_contract",
           "name": "test_health_check_uses_fallback_metrics_from_get_metrics_contract",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_uses_fallback_metrics_from_get_metrics_contract",
-          "line": 28,
+          "line": 29,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_detects_unexpected_mutation",
+          "name": "test_model_integrity_monitor_detects_unexpected_mutation",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_detects_unexpected_mutation",
+          "line": 110,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_initializes_hash_on_first_check",
+          "name": "test_model_integrity_monitor_initializes_hash_on_first_check",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_initializes_hash_on_first_check",
+          "line": 129,
           "params": []
         },
         {
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
           "name": "test_versioned_checkpoint_metadata_created_at_is_utc",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
-          "line": 55,
+          "line": 56,
           "params": [
             "tmp_path"
           ]
@@ -4140,7 +4169,7 @@
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
           "name": "test_versioned_checkpoint_safetensors_roundtrip",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
-          "line": 86,
+          "line": 87,
           "params": [
             "tmp_path"
           ]
@@ -4149,7 +4178,7 @@
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_save_and_load",
           "name": "test_versioned_checkpoint_save_and_load",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_save_and_load",
-          "line": 42,
+          "line": 43,
           "params": [
             "tmp_path"
           ]
@@ -4158,7 +4187,7 @@
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises_on_mismatch",
           "name": "test_versioned_checkpoint_shape_validation_raises_on_mismatch",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises_on_mismatch",
-          "line": 69,
+          "line": 70,
           "params": [
             "tmp_path"
           ]

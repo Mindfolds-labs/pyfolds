@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `139`
-- Símbolos: `1035`
+- Símbolos: `1042`
 
 ## Módulos
 
@@ -373,10 +373,12 @@
 - Imports:
   - `mod:__future__`
   - `mod:enum`
+  - `mod:hashlib`
   - `mod:torch`
   - `mod:typing`
 - Classes:
   - `HealthStatus` (bases: Enum)
+  - `ModelIntegrityMonitor` (bases: (sem base explícita))
   - `NeuronHealthCheck` (bases: (sem base explícita))
   - `NeuronHealthMonitor` (bases: (sem base explícita))
 
@@ -1190,11 +1192,14 @@
   - `mod:pyfolds.monitoring`
   - `mod:pyfolds.serialization`
   - `mod:pytest`
+  - `mod:torch`
 - Classes:
   - `DummyNeuron` (bases: (sem base explícita))
 - Funções:
   - `test_health_check_critical_for_dead_neurons()`
   - `test_health_check_uses_fallback_metrics_from_get_metrics_contract()`
+  - `test_model_integrity_monitor_detects_unexpected_mutation()`
+  - `test_model_integrity_monitor_initializes_hash_on_first_check()`
   - `test_versioned_checkpoint_metadata_created_at_is_utc(tmp_path)`
   - `test_versioned_checkpoint_safetensors_roundtrip(tmp_path)`
   - `test_versioned_checkpoint_save_and_load(tmp_path)`
