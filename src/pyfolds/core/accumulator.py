@@ -227,14 +227,11 @@ class StatisticsAccumulator(nn.Module):
 
     def get_averages(self) -> AccumulatedStats:
         """Retorna médias de todas as estatísticas acumuladas."""
-        stats = AccumulatedStats()
-
-        if not self.has_data:
-            return stats
-
         with self._lock:
             if self.acc_count.item() <= 0:
-                return stats
+                return AccumulatedStats()
+
+            stats = AccumulatedStats()
             count = self.acc_count.float().clamp_min(1.0)
         
             stats.x_mean = self.acc_x / count

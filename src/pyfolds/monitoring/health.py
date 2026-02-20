@@ -100,48 +100,6 @@ class NeuronHealthMonitor:
 
 
 class WeightIntegrityMonitor:
-    """Monitora integridade de pesos por hash SHA-256 em janelas periódicas.
-
-    Útil para detectar corrupção silenciosa em execuções longas (ex.: bitflips em VRAM).
-    """
-
-    def __init__(self, model: torch.nn.Module, check_every_n_steps: int = 100):
-        self.model = model
-        self.check_every = max(1, int(check_every_n_steps))
-        self.step_count = 0
-        self.last_hash = self._compute_state_hash()
-
-    def _compute_state_hash(self) -> str:
-        hasher = hashlib.sha256()
-        for key, tensor in sorted(self.model.state_dict().items()):
-            if not torch.is_tensor(tensor):
-                continue
-            t = tensor.detach().contiguous()
-            hasher.update(key.encode("utf-8"))
-            hasher.update(str(t.dtype).encode("utf-8"))
-            hasher.update(str(tuple(t.shape)).encode("utf-8"))
-            hasher.update(t.cpu().numpy().tobytes())
-        return hasher.hexdigest()
-
-    def check_integrity(self) -> Dict[str, str | bool | int]:
-        self.step_count += 1
-        if self.step_count % self.check_every != 0:
-            return {"checked": False, "step": self.step_count}
-
-        current_hash = self._compute_state_hash()
-        ok = bool(current_hash == self.last_hash)
-        result = {
-            "checked": True,
-            "step": self.step_count,
-            "ok": ok,
-            "previous_hash": self.last_hash,
-            "current_hash": current_hash,
-        }
-        self.last_hash = current_hash
-        return result
-
-
-class WeightIntegrityMonitor:
     """Monitora corrupção silenciosa de pesos em runtime.
 
     Este monitor é focado em cenários de treino/inferência com aceleração em GPU,
@@ -179,3 +137,24 @@ class WeightIntegrityMonitor:
         self.last_hash = current_hash
         return {"checked": True, "ok": is_ok, "hash": current_hash}
 
+    def _compute_state_hash(self) -> str:
+        """Compatibilidade com versões antigas do monitor."""
+        return self._compute_hash()
+
+    def check_integrity(self) -> Dict[str, str | bool | int]:
+        """Compatibilidade com versões antigas do monitor."""
+        self.step_count += 1
+        if self.step_count % self.check_every != 0:
+            return {"checked": False, "step": self.step_count}
+
+        current_hash = self._compute_hash()
+        ok = bool(current_hash == self.last_hash)
+        result: Dict[str, str | bool | int] = {
+            "checked": True,
+            "step": self.step_count,
+            "ok": ok,
+            "previous_hash": self.last_hash,
+            "current_hash": current_hash,
+        }
+        self.last_hash = current_hash
+        return result

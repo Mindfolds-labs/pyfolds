@@ -324,14 +324,6 @@ class CircularBufferFileHandler(logging.Handler):
             self._buffer.extend(previous_lines[-capacity_lines:])
             self._line_count = len(self._buffer)
 
-    def _flush_to_disk(self) -> None:
-        content = "\n".join(self._buffer)
-        if content:
-            content += "\n"
-        self.path.write_text(content, encoding=self.encoding)
-        self._line_count = len(self._buffer)
-        self._last_flush = datetime.now()
-
     def emit(self, record: logging.LogRecord) -> None:
         try:
             message = self.format(record)
@@ -355,6 +347,7 @@ class CircularBufferFileHandler(logging.Handler):
         if content:
             content += "\n"
         self.path.write_text(content, encoding=self.encoding)
+        self._line_count = len(self._buffer)
         self._last_flush = datetime.utcnow()
         self._dirty = False
 
