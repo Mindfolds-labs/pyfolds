@@ -50,21 +50,8 @@ class MPJRDNeuronV2(MPJRDNeuron):
         self._validate_input_device(x)
         
         device = self.theta.device
-        B, D, S = x.shape
-
-        # Valida dimensões
-        if D != self.cfg.n_dendrites or S != self.cfg.n_synapses_per_dendrite:
-            self.logger.error(
-                "❌ Dimensão inválida: esperado (%s, %s), recebido (%s, %s)",
-                self.cfg.n_dendrites,
-                self.cfg.n_synapses_per_dendrite,
-                D,
-                S,
-            )
-            raise ValueError(
-                f"Esperado ({self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}), "
-                f"recebido ({D}, {S})"
-            )
+        x_reshaped, batch_shape = self._reshape_input_for_forward(x)
+        B, D, S = x_reshaped.shape
 
         # ===== 1. PESOS ESTRUTURAIS (Bartol log law) =====
         # Usa propriedade N da classe base (já está no device correto)
@@ -72,7 +59,7 @@ class MPJRDNeuronV2(MPJRDNeuron):
 
         # ===== 2. POTENCIAIS DENDRÍTICOS VETORIZADOS =====
         # v_dend = Σ(W * x) por dendrito
-        v_dend = torch.einsum("ds,bds->bd", W, x)  # [B, D]
+        v_dend = torch.einsum("ds,bds->bd", W, x_reshaped)  # [B, D]
 
         # ===== 3. NÃO-LINEARIDADE LOCAL POR DENDRITO =====
         # Ganho dendrítico = sigmoid(v_dend - θ_eff/2)
@@ -112,7 +99,7 @@ class MPJRDNeuronV2(MPJRDNeuron):
         # ===== 9. ACUMULAÇÃO (BATCH MODE) =====
         if collect_stats and effective_mode == LearningMode.BATCH and self.cfg.defer_updates:
             # Acumula para atualização posterior
-            self.stats_acc.accumulate(x.detach(), dendritic_gain.detach(), spikes.detach())
+            self.stats_acc.accumulate(x_reshaped.detach(), dendritic_gain.detach(), spikes.detach())
 
         # ===== 9b. ATUALIZAÇÃO IMEDIATA (ONLINE) =====
         if (
@@ -123,12 +110,17 @@ class MPJRDNeuronV2(MPJRDNeuron):
         ):
             # Aplica plasticidade online (implementado na classe base)
             self._apply_online_plasticity(
-                x=x.detach(),
+                x=x_reshaped.detach(),
                 post_rate=spike_rate,
                 R_tensor=R_tensor,
                 dt=dt,
                 mode=effective_mode,
             )
+
+        spikes = spikes.view(batch_shape)
+        somatic = somatic.view(batch_shape)
+        v_dend = v_dend.view(*batch_shape, D)
+        dendritic_gain = dendritic_gain.view(*batch_shape, D)
 
         # ===== 10. TELEMETRIA =====
         with self._telemetry_lock:
@@ -182,6 +174,32 @@ class MPJRDNeuronV2(MPJRDNeuron):
             "mode": self.mode.value,
             "device": str(device),
         }
+
+    def _reshape_input_for_forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Size]:
+        """Normaliza input para [B, D, S], preservando batch de dimensão arbitrária."""
+        if x.dim() < 3:
+            raise ValueError(
+                "Input deve ter ao menos 3 dimensões [..., dendrites, synapses], "
+                f"recebido shape={tuple(x.shape)}"
+            )
+
+        D = x.shape[-2]
+        S = x.shape[-1]
+        if D != self.cfg.n_dendrites or S != self.cfg.n_synapses_per_dendrite:
+            self.logger.error(
+                "❌ Dimensão inválida: esperado (..., %s, %s), recebido %s",
+                self.cfg.n_dendrites,
+                self.cfg.n_synapses_per_dendrite,
+                tuple(x.shape),
+            )
+            raise ValueError(
+                f"Esperado (..., {self.cfg.n_dendrites}, {self.cfg.n_synapses_per_dendrite}), "
+                f"recebido {tuple(x.shape)}"
+            )
+
+        batch_shape = x.shape[:-2]
+        x_reshaped = x.reshape(-1, D, S)
+        return x_reshaped, batch_shape
 
     def _telemetry_forward_event(
         self,
