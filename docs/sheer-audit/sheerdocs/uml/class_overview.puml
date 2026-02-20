@@ -732,7 +732,7 @@ class "tests.unit.core.test_accumulator.TestStatisticsAccumulator" {
   +test_track_extra_accumulates_scalars_and_vectors()
 }
 
-class "tests.unit.core.test_config.TestMPJRDConfig" {
+class "tests.unit.core.test_config.TestNeuronConfig" {
   +test_custom_values()
   +test_default_values()
   +test_dendritic_integration_validation()

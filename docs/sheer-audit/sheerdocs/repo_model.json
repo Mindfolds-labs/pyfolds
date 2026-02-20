@@ -465,7 +465,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.forward",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 119,
+      "line": 116,
       "doc": "Forward pass com backpropagação.",
       "params": [
         "self",
@@ -481,7 +481,7 @@
       "name": "reset_backprop",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.reset_backprop",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 142,
+      "line": 139,
       "doc": "Reseta estado de backpropagação.",
       "params": [
         "self"
@@ -496,7 +496,7 @@
       "name": "get_backprop_metrics",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.get_backprop_metrics",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 149,
+      "line": 146,
       "doc": "Retorna métricas de backpropagação.",
       "params": [
         "self"
@@ -11487,10 +11487,10 @@
       "decorators": []
     },
     {
-      "id": "cls:tests.unit.core.test_config.TestMPJRDConfig",
+      "id": "cls:tests.unit.core.test_config.TestNeuronConfig",
       "kind": "class",
-      "name": "TestMPJRDConfig",
-      "qname": "tests.unit.core.test_config.TestMPJRDConfig",
+      "name": "TestNeuronConfig",
+      "qname": "tests.unit.core.test_config.TestNeuronConfig",
       "file": "tests/unit/core/test_config.py",
       "line": 8,
       "doc": "Test configuration class.",
@@ -11500,10 +11500,10 @@
       "decorators": []
     },
     {
-      "id": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_default_values",
+      "id": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_default_values",
       "kind": "method",
       "name": "test_default_values",
-      "qname": "tests.unit.core.test_config.TestMPJRDConfig.test_default_values",
+      "qname": "tests.unit.core.test_config.TestNeuronConfig.test_default_values",
       "file": "tests/unit/core/test_config.py",
       "line": 11,
       "doc": "Test default values.",
@@ -11515,10 +11515,10 @@
       "decorators": []
     },
     {
-      "id": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_custom_values",
+      "id": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_custom_values",
       "kind": "method",
       "name": "test_custom_values",
-      "qname": "tests.unit.core.test_config.TestMPJRDConfig.test_custom_values",
+      "qname": "tests.unit.core.test_config.TestNeuronConfig.test_custom_values",
       "file": "tests/unit/core/test_config.py",
       "line": 17,
       "doc": "Test custom values.",
@@ -11530,10 +11530,10 @@
       "decorators": []
     },
     {
-      "id": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_validation",
+      "id": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_validation",
       "kind": "method",
       "name": "test_validation",
-      "qname": "tests.unit.core.test_config.TestMPJRDConfig.test_validation",
+      "qname": "tests.unit.core.test_config.TestNeuronConfig.test_validation",
       "file": "tests/unit/core/test_config.py",
       "line": 30,
       "doc": "Test validation.",
@@ -11545,10 +11545,10 @@
       "decorators": []
     },
     {
-      "id": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_validation",
+      "id": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_get_decay_rate_validation",
       "kind": "method",
       "name": "test_get_decay_rate_validation",
-      "qname": "tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_validation",
+      "qname": "tests.unit.core.test_config.TestNeuronConfig.test_get_decay_rate_validation",
       "file": "tests/unit/core/test_config.py",
       "line": 36,
       "doc": "Tau inválido deve gerar erro explícito.",
@@ -11560,10 +11560,10 @@
       "decorators": []
     },
     {
-      "id": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_negative_dt_validation",
+      "id": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_get_decay_rate_negative_dt_validation",
       "kind": "method",
       "name": "test_get_decay_rate_negative_dt_validation",
-      "qname": "tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_negative_dt_validation",
+      "qname": "tests.unit.core.test_config.TestNeuronConfig.test_get_decay_rate_negative_dt_validation",
       "file": "tests/unit/core/test_config.py",
       "line": 43,
       "doc": "dt negativo deve gerar erro explícito.",
@@ -11575,10 +11575,10 @@
       "decorators": []
     },
     {
-      "id": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_numerical_safety_validation",
+      "id": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_numerical_safety_validation",
       "kind": "method",
       "name": "test_numerical_safety_validation",
-      "qname": "tests.unit.core.test_config.TestMPJRDConfig.test_numerical_safety_validation",
+      "qname": "tests.unit.core.test_config.TestNeuronConfig.test_numerical_safety_validation",
       "file": "tests/unit/core/test_config.py",
       "line": 49,
       "doc": "Config deve validar parâmetros numéricos críticos.",
@@ -11590,10 +11590,10 @@
       "decorators": []
     },
     {
-      "id": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_dendritic_integration_validation",
+      "id": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_dendritic_integration_validation",
       "kind": "method",
       "name": "test_dendritic_integration_validation",
-      "qname": "tests.unit.core.test_config.TestMPJRDConfig.test_dendritic_integration_validation",
+      "qname": "tests.unit.core.test_config.TestNeuronConfig.test_dendritic_integration_validation",
       "file": "tests/unit/core/test_config.py",
       "line": 67,
       "doc": "Valida limites dos novos parâmetros de integração dendrítica.",
@@ -11773,7 +11773,7 @@
       "name": "test_create_neuron_infers_standard_type",
       "qname": "tests.unit.core.test_factory.test_create_neuron_infers_standard_type",
       "file": "tests/unit/core/test_factory.py",
-      "line": 8,
+      "line": 9,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11786,7 +11786,7 @@
       "name": "test_create_neuron_infers_wave_type",
       "qname": "tests.unit.core.test_factory.test_create_neuron_infers_wave_type",
       "file": "tests/unit/core/test_factory.py",
-      "line": 13,
+      "line": 14,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11799,7 +11799,7 @@
       "name": "test_factory_raises_for_unregistered_type",
       "qname": "tests.unit.core.test_factory.test_factory_raises_for_unregistered_type",
       "file": "tests/unit/core/test_factory.py",
-      "line": 18,
+      "line": 19,
       "doc": null,
       "params": [],
       "returns": null,
@@ -12676,7 +12676,7 @@
       "name": "test_update_filters_inactive_pre_synaptic_activity",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_filters_inactive_pre_synaptic_activity",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 53,
+      "line": 54,
       "doc": "Pre-synaptic activity below threshold should not change I/eligibility.",
       "params": [
         "self",
@@ -12692,7 +12692,7 @@
       "name": "test_update_uses_absolute_dt_and_mode_multiplier",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_uses_absolute_dt_and_mode_multiplier",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 69,
+      "line": 71,
       "doc": "Negative dt should be handled as absolute value in plasticity update.",
       "params": [
         "self",
@@ -12708,7 +12708,7 @@
       "name": "test_saturation_recovery_disables_protection_after_timeout",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_saturation_recovery_disables_protection_after_timeout",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 91,
+      "line": 93,
       "doc": "Protection mode should auto-disable after recovery timeout.",
       "params": [
         "self",
@@ -12724,7 +12724,7 @@
       "name": "test_negative_neuromodulation_promotes_ltd",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_negative_neuromodulation_promotes_ltd",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 111,
+      "line": 114,
       "doc": "Negative neuromodulation should bias update toward LTD.",
       "params": [
         "self",
@@ -12740,7 +12740,7 @@
       "name": "test_consolidate_transfers_eligibility_and_decays_internal_potential",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_transfers_eligibility_and_decays_internal_potential",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 132,
+      "line": 136,
       "doc": "Consolidation should move eligibility into N and decay I.",
       "params": [
         "self",
@@ -12756,7 +12756,7 @@
       "name": "test_update_supports_explicit_hebbian_ltd_component",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_supports_explicit_hebbian_ltd_component",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 148,
+      "line": 153,
       "doc": "Explicit LTD term should reduce/update internal potential when configured.",
       "params": [
         "self",
@@ -12772,7 +12772,7 @@
       "name": "test_consolidate_performs_distributed_sync_when_enabled",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_performs_distributed_sync_when_enabled",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 171,
+      "line": 177,
       "doc": "Consolidation should all-reduce plasticity buffers in distributed mode.",
       "params": [
         "self",
@@ -12788,7 +12788,7 @@
       "name": "test_consolidate_skips_distributed_sync_when_disabled",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_skips_distributed_sync_when_disabled",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 190,
+      "line": 197,
       "doc": "Distributed all-reduce should be skipped when config disables it.",
       "params": [
         "self",
@@ -21918,7 +21918,7 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.integration.test_advanced_integration",
-      "dst": "mod:pyfolds.core.config",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -22266,7 +22266,7 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.test_concurrent_reads",
-      "dst": "mod:pyfolds.core.config",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -22314,7 +22314,7 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.test_corruption_detection",
-      "dst": "mod:pyfolds.core.config",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -22386,7 +22386,7 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.test_fold_corruption",
-      "dst": "mod:pyfolds.core.config",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -23106,49 +23106,49 @@
     {
       "type": "CONTAINS",
       "src": "mod:tests.unit.core.test_config",
-      "dst": "cls:tests.unit.core.test_config.TestMPJRDConfig",
+      "dst": "cls:tests.unit.core.test_config.TestNeuronConfig",
       "meta": {}
     },
     {
       "type": "CONTAINS",
-      "src": "cls:tests.unit.core.test_config.TestMPJRDConfig",
-      "dst": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_default_values",
+      "src": "cls:tests.unit.core.test_config.TestNeuronConfig",
+      "dst": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_default_values",
       "meta": {}
     },
     {
       "type": "CONTAINS",
-      "src": "cls:tests.unit.core.test_config.TestMPJRDConfig",
-      "dst": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_custom_values",
+      "src": "cls:tests.unit.core.test_config.TestNeuronConfig",
+      "dst": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_custom_values",
       "meta": {}
     },
     {
       "type": "CONTAINS",
-      "src": "cls:tests.unit.core.test_config.TestMPJRDConfig",
-      "dst": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_validation",
+      "src": "cls:tests.unit.core.test_config.TestNeuronConfig",
+      "dst": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_validation",
       "meta": {}
     },
     {
       "type": "CONTAINS",
-      "src": "cls:tests.unit.core.test_config.TestMPJRDConfig",
-      "dst": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_validation",
+      "src": "cls:tests.unit.core.test_config.TestNeuronConfig",
+      "dst": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_get_decay_rate_validation",
       "meta": {}
     },
     {
       "type": "CONTAINS",
-      "src": "cls:tests.unit.core.test_config.TestMPJRDConfig",
-      "dst": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_negative_dt_validation",
+      "src": "cls:tests.unit.core.test_config.TestNeuronConfig",
+      "dst": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_get_decay_rate_negative_dt_validation",
       "meta": {}
     },
     {
       "type": "CONTAINS",
-      "src": "cls:tests.unit.core.test_config.TestMPJRDConfig",
-      "dst": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_numerical_safety_validation",
+      "src": "cls:tests.unit.core.test_config.TestNeuronConfig",
+      "dst": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_numerical_safety_validation",
       "meta": {}
     },
     {
       "type": "CONTAINS",
-      "src": "cls:tests.unit.core.test_config.TestMPJRDConfig",
-      "dst": "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_dendritic_integration_validation",
+      "src": "cls:tests.unit.core.test_config.TestNeuronConfig",
+      "dst": "mtd:tests.unit.core.test_config.TestNeuronConfig.test_dendritic_integration_validation",
       "meta": {}
     },
     {
@@ -23166,7 +23166,7 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.core.test_config_advanced_order_flags",
-      "dst": "mod:pyfolds.core",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -23227,6 +23227,12 @@
       "type": "CONTAINS",
       "src": "cls:tests.unit.core.test_dendrite.TestMPJRDDendrite",
       "dst": "mtd:tests.unit.core.test_dendrite.TestMPJRDDendrite.test_update_uses_local_pre_rate_per_synapse",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.unit.core.test_factory",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -24030,7 +24036,7 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.serialization.test_foldio",
-      "dst": "mod:pyfolds.core.config",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -24684,7 +24690,7 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.test_design_improvements",
-      "dst": "mod:pyfolds.core",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -24810,7 +24816,7 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.test_layer_neuron_class",
-      "dst": "mod:pyfolds.layers",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -24858,19 +24864,19 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.test_learning_mode_consistency",
-      "dst": "mod:pyfolds.core",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.test_learning_mode_consistency",
-      "dst": "mod:pyfolds.layers",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.test_learning_mode_consistency",
-      "dst": "mod:pyfolds.network",
+      "dst": "mod:pyfolds",
       "meta": {}
     },
     {
@@ -25712,7 +25718,7 @@
   "metrics": {
     "python_files": 140,
     "symbols": 1063,
-    "edges": 1579,
+    "edges": 1580,
     "findings": 0,
     "internal_import_edges": 105
   }

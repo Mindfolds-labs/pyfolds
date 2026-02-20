@@ -7,7 +7,7 @@
   "metrics": {
     "python_files": 140,
     "symbols": 1063,
-    "edges": 1579,
+    "edges": 1580,
     "findings": 0,
     "internal_import_edges": 105
   },
@@ -3062,8 +3062,8 @@
       "qname": "tests.integration.test_advanced_integration",
       "file": "tests/integration/test_advanced_integration.py",
       "imports": [
+        "mod:pyfolds",
         "mod:pyfolds.advanced",
-        "mod:pyfolds.core.config",
         "mod:torch"
       ],
       "classes": [],
@@ -3336,7 +3336,7 @@
       "imports": [
         "mod:concurrent.futures",
         "mod:hashlib",
-        "mod:pyfolds.core.config",
+        "mod:pyfolds",
         "mod:pyfolds.core.neuron",
         "mod:pyfolds.serialization",
         "mod:pytest"
@@ -3375,7 +3375,7 @@
       "qname": "tests.test_corruption_detection",
       "file": "tests/test_corruption_detection.py",
       "imports": [
-        "mod:pyfolds.core.config",
+        "mod:pyfolds",
         "mod:pyfolds.core.neuron",
         "mod:pyfolds.serialization",
         "mod:pyfolds.serialization.foldio",
@@ -3452,7 +3452,7 @@
       "qname": "tests.test_fold_corruption",
       "file": "tests/test_fold_corruption.py",
       "imports": [
-        "mod:pyfolds.core.config",
+        "mod:pyfolds",
         "mod:pyfolds.core.neuron",
         "mod:pyfolds.serialization",
         "mod:pytest"
@@ -3947,19 +3947,19 @@
       ],
       "classes": [
         {
-          "id": "cls:tests.unit.core.test_config.TestMPJRDConfig",
-          "name": "TestMPJRDConfig",
-          "qname": "tests.unit.core.test_config.TestMPJRDConfig",
+          "id": "cls:tests.unit.core.test_config.TestNeuronConfig",
+          "name": "TestNeuronConfig",
+          "qname": "tests.unit.core.test_config.TestNeuronConfig",
           "line": 8,
           "bases": [],
           "methods": [
-            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_custom_values",
-            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_default_values",
-            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_dendritic_integration_validation",
-            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_negative_dt_validation",
-            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_get_decay_rate_validation",
-            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_numerical_safety_validation",
-            "mtd:tests.unit.core.test_config.TestMPJRDConfig.test_validation"
+            "mtd:tests.unit.core.test_config.TestNeuronConfig.test_custom_values",
+            "mtd:tests.unit.core.test_config.TestNeuronConfig.test_default_values",
+            "mtd:tests.unit.core.test_config.TestNeuronConfig.test_dendritic_integration_validation",
+            "mtd:tests.unit.core.test_config.TestNeuronConfig.test_get_decay_rate_negative_dt_validation",
+            "mtd:tests.unit.core.test_config.TestNeuronConfig.test_get_decay_rate_validation",
+            "mtd:tests.unit.core.test_config.TestNeuronConfig.test_numerical_safety_validation",
+            "mtd:tests.unit.core.test_config.TestNeuronConfig.test_validation"
           ]
         }
       ],
@@ -3978,7 +3978,7 @@
       "qname": "tests.unit.core.test_config_advanced_order_flags",
       "file": "tests/unit/core/test_config_advanced_order_flags.py",
       "imports": [
-        "mod:pyfolds.core",
+        "mod:pyfolds",
         "mod:pytest"
       ],
       "classes": [],
@@ -4043,21 +4043,21 @@
           "id": "fn:tests.unit.core.test_factory.test_create_neuron_infers_standard_type",
           "name": "test_create_neuron_infers_standard_type",
           "qname": "tests.unit.core.test_factory.test_create_neuron_infers_standard_type",
-          "line": 8,
+          "line": 9,
           "params": []
         },
         {
           "id": "fn:tests.unit.core.test_factory.test_create_neuron_infers_wave_type",
           "name": "test_create_neuron_infers_wave_type",
           "qname": "tests.unit.core.test_factory.test_create_neuron_infers_wave_type",
-          "line": 13,
+          "line": 14,
           "params": []
         },
         {
           "id": "fn:tests.unit.core.test_factory.test_factory_raises_for_unregistered_type",
           "name": "test_factory_raises_for_unregistered_type",
           "qname": "tests.unit.core.test_factory.test_factory_raises_for_unregistered_type",
-          "line": 18,
+          "line": 19,
           "params": []
         }
       ]
@@ -4607,7 +4607,7 @@
       "imports": [
         "mod:mmap",
         "mod:numpy",
-        "mod:pyfolds.core.config",
+        "mod:pyfolds",
         "mod:pyfolds.core.neuron",
         "mod:pyfolds.serialization",
         "mod:pyfolds.serialization.foldio",
@@ -5171,8 +5171,8 @@
       "qname": "tests.unit.test_design_improvements",
       "file": "tests/unit/test_design_improvements.py",
       "imports": [
+        "mod:pyfolds",
         "mod:pyfolds.advanced",
-        "mod:pyfolds.core",
         "mod:pyfolds.core.base",
         "mod:pyfolds.factory",
         "mod:pyfolds.network",
@@ -5236,7 +5236,6 @@
       "imports": [
         "mod:pyfolds",
         "mod:pyfolds.core",
-        "mod:pyfolds.layers",
         "mod:pytest",
         "mod:torch"
       ],
@@ -5280,9 +5279,6 @@
       "file": "tests/unit/test_learning_mode_consistency.py",
       "imports": [
         "mod:pyfolds",
-        "mod:pyfolds.core",
-        "mod:pyfolds.layers",
-        "mod:pyfolds.network",
         "mod:pyfolds.utils.types",
         "mod:pytest",
         "mod:torch"

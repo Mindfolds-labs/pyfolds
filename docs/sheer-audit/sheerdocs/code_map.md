@@ -829,8 +829,8 @@
 ### `tests.integration.test_advanced_integration`
 - Arquivo: `tests/integration/test_advanced_integration.py`
 - Imports:
+  - `mod:pyfolds`
   - `mod:pyfolds.advanced`
-  - `mod:pyfolds.core.config`
   - `mod:torch`
 - Funções:
   - `test_all_mixins_together_smoke()`
@@ -927,7 +927,7 @@
 - Imports:
   - `mod:concurrent.futures`
   - `mod:hashlib`
-  - `mod:pyfolds.core.config`
+  - `mod:pyfolds`
   - `mod:pyfolds.core.neuron`
   - `mod:pyfolds.serialization`
   - `mod:pytest`
@@ -939,7 +939,7 @@
 ### `tests.test_corruption_detection`
 - Arquivo: `tests/test_corruption_detection.py`
 - Imports:
-  - `mod:pyfolds.core.config`
+  - `mod:pyfolds`
   - `mod:pyfolds.core.neuron`
   - `mod:pyfolds.serialization`
   - `mod:pyfolds.serialization.foldio`
@@ -957,7 +957,7 @@
 ### `tests.test_fold_corruption`
 - Arquivo: `tests/test_fold_corruption.py`
 - Imports:
-  - `mod:pyfolds.core.config`
+  - `mod:pyfolds`
   - `mod:pyfolds.core.neuron`
   - `mod:pyfolds.serialization`
   - `mod:pytest`
@@ -1129,14 +1129,14 @@
   - `mod:pytest`
   - `mod:torch`
 - Classes:
-  - `TestMPJRDConfig` (bases: (sem base explícita))
+  - `TestNeuronConfig` (bases: (sem base explícita))
 - Funções:
   - `test_hebbian_ltd_ratio_must_be_non_negative()`
 
 ### `tests.unit.core.test_config_advanced_order_flags`
 - Arquivo: `tests/unit/core/test_config_advanced_order_flags.py`
 - Imports:
-  - `mod:pyfolds.core`
+  - `mod:pyfolds`
   - `mod:pytest`
 - Funções:
   - `test_accepts_stdp_source_and_ltd_rule_flags()`
@@ -1338,7 +1338,7 @@
 - Imports:
   - `mod:mmap`
   - `mod:numpy`
-  - `mod:pyfolds.core.config`
+  - `mod:pyfolds`
   - `mod:pyfolds.core.neuron`
   - `mod:pyfolds.serialization`
   - `mod:pyfolds.serialization.foldio`
@@ -1454,8 +1454,8 @@
 ### `tests.unit.test_design_improvements`
 - Arquivo: `tests/unit/test_design_improvements.py`
 - Imports:
+  - `mod:pyfolds`
   - `mod:pyfolds.advanced`
-  - `mod:pyfolds.core`
   - `mod:pyfolds.core.base`
   - `mod:pyfolds.factory`
   - `mod:pyfolds.network`
@@ -1475,7 +1475,6 @@
 - Imports:
   - `mod:pyfolds`
   - `mod:pyfolds.core`
-  - `mod:pyfolds.layers`
   - `mod:pytest`
   - `mod:torch`
 - Funções:
@@ -1488,9 +1487,6 @@
 - Arquivo: `tests/unit/test_learning_mode_consistency.py`
 - Imports:
   - `mod:pyfolds`
-  - `mod:pyfolds.core`
-  - `mod:pyfolds.layers`
-  - `mod:pyfolds.network`
   - `mod:pyfolds.utils.types`
   - `mod:pytest`
   - `mod:torch`
