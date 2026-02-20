@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `140`
-- Símbolos: `1068`
+- Símbolos: `1069`
 
 ## Módulos
 
@@ -344,12 +344,14 @@
 ### `src.pyfolds.layers.layer`
 - Arquivo: `src/pyfolds/layers/layer.py`
 - Imports:
+  - `mod:contextlib`
   - `mod:src.pyfolds.core.config`
   - `mod:src.pyfolds.core.neuron`
   - `mod:src.pyfolds.utils.types`
   - `mod:torch`
   - `mod:torch.nn`
   - `mod:typing`
+  - `mod:warnings`
 - Classes:
   - `MPJRDLayer` (bases: nn.Module)
 

@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 140,
-    "symbols": 1068,
-    "edges": 1590,
+    "symbols": 1069,
+    "edges": 1593,
     "findings": 0,
     "internal_import_edges": 105
   },
@@ -1084,25 +1084,28 @@
       "qname": "src.pyfolds.layers.layer",
       "file": "src/pyfolds/layers/layer.py",
       "imports": [
+        "mod:contextlib",
         "mod:src.pyfolds.core.config",
         "mod:src.pyfolds.core.neuron",
         "mod:src.pyfolds.utils.types",
         "mod:torch",
         "mod:torch.nn",
-        "mod:typing"
+        "mod:typing",
+        "mod:warnings"
       ],
       "classes": [
         {
           "id": "cls:src.pyfolds.layers.layer.MPJRDLayer",
           "name": "MPJRDLayer",
           "qname": "src.pyfolds.layers.layer.MPJRDLayer",
-          "line": 11,
+          "line": 14,
           "bases": [
             "nn.Module"
           ],
           "methods": [
             "mtd:src.pyfolds.layers.layer.MPJRDLayer.__init__",
             "mtd:src.pyfolds.layers.layer.MPJRDLayer._prepare_input",
+            "mtd:src.pyfolds.layers.layer.MPJRDLayer._suppress_dict_backward_hook_warning",
             "mtd:src.pyfolds.layers.layer.MPJRDLayer.apply_batch_update",
             "mtd:src.pyfolds.layers.layer.MPJRDLayer.extra_repr",
             "mtd:src.pyfolds.layers.layer.MPJRDLayer.forward",
@@ -1891,7 +1894,7 @@
           "id": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
           "name": "VersionedCheckpoint",
           "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
-          "line": 33,
+          "line": 35,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",

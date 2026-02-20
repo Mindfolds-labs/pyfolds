@@ -267,6 +267,7 @@ class "src.pyfolds.factory.NeuronType" {
 class "src.pyfolds.layers.layer.MPJRDLayer" {
   +__init__()
   +_prepare_input()
+  +_suppress_dict_backward_hook_warning()
   +apply_batch_update()
   +extra_repr()
   +forward()

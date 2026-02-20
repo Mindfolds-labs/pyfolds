@@ -3808,7 +3808,7 @@
       "name": "MPJRDLayer",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 11,
+      "line": 14,
       "doc": "Camada de neurônios MPJRD para construção de redes neurais.\n\nCaracterísticas:\n    - Múltiplos neurônios em paralelo\n    - Processamento em batch eficiente\n    - Suporte a telemetria (repassada para neurônios)\n    - Métricas agregadas por camada\n    - Modos de aprendizado (online/batch/inference)\n\nArgs:\n    n_neurons: Número de neurônios na camada\n    cfg: Configuração dos neurônios (compartilhada)\n    name: Nome opcional para identificação\n    enable_telemetry: Se True, ativa telemetria nos neurônios\n    telemetry_profile: Perfil de telemetria ('off', 'light', 'heavy')\n    device: Device para os tensores (opcional)\n\nExample:\n    >>> cfg = MPJRDConfig(n_dendrites=4, n_synapses_per_dendrite=32)\n    >>> layer = MPJRDLayer(10, cfg, name=\"hidden1\", enable_telemetry=True)\n    >>> x = torch.randn(128, 10, 4, 32)  # [batch, neurons, dendrites, synapses]\n    >>> out = layer(x)\n    >>> print(out['spikes'].shape)  # [128, 10]",
       "params": [],
       "returns": null,
@@ -3823,7 +3823,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.__init__",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 38,
+      "line": 41,
       "doc": null,
       "params": [
         "self",
@@ -3845,7 +3845,7 @@
       "name": "n_dendrites",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.n_dendrites",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 84,
+      "line": 87,
       "doc": "Número de dendritos por neurônio (da config).",
       "params": [
         "self"
@@ -3862,7 +3862,7 @@
       "name": "n_synapses",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.n_synapses",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 89,
+      "line": 92,
       "doc": "Número de sinapses por dendrito (da config).",
       "params": [
         "self"
@@ -3879,7 +3879,7 @@
       "name": "theta_mean",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.theta_mean",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 94,
+      "line": 97,
       "doc": "Média dos thresholds de todos neurônios.",
       "params": [
         "self"
@@ -3896,7 +3896,7 @@
       "name": "r_hat_mean",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.r_hat_mean",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 103,
+      "line": 106,
       "doc": "Média das taxas de todos neurônios.",
       "params": [
         "self"
@@ -3913,7 +3913,7 @@
       "name": "forward",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.forward",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 111,
+      "line": 114,
       "doc": "Forward pass da camada.\n\nArgs:\n    x: Tensor de entrada. Formatos aceitos:\n        - [batch, n_neurons, n_dendrites, n_synapses] (completo)\n        - [batch, n_neurons, n_dendrites] (expande sinapses)\n        - [batch, n_dendrites, n_synapses] (mesmo para todos neurônios)\n    reward: Sinal de recompensa (opcional)\n    mode: Modo de aprendizado (opcional)\n\nReturns:\n    Dict com:\n        - spikes: [batch, n_neurons] spikes de cada neurônio\n        - spike_rates: [n_neurons] taxas médias por neurônio\n        - theta_values: [n_neurons] thresholds atuais\n        - r_hat_values: [n_neurons] médias móveis",
       "params": [
         "self",
@@ -3928,12 +3928,29 @@
       "decorators": []
     },
     {
+      "id": "mtd:src.pyfolds.layers.layer.MPJRDLayer._suppress_dict_backward_hook_warning",
+      "kind": "method",
+      "name": "_suppress_dict_backward_hook_warning",
+      "qname": "src.pyfolds.layers.layer.MPJRDLayer._suppress_dict_backward_hook_warning",
+      "file": "src/pyfolds/layers/layer.py",
+      "line": 250,
+      "doc": "Silencia warning conhecido do PyTorch para hooks com saída em dicionário.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "contextmanager"
+      ]
+    },
+    {
       "id": "mtd:src.pyfolds.layers.layer.MPJRDLayer._prepare_input",
       "kind": "method",
       "name": "_prepare_input",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer._prepare_input",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 244,
+      "line": 260,
       "doc": "Prepara entrada para o formato [batch, neurons, dendrites, synapses].\n\nArgs:\n    x: Tensor em vários formatos possíveis\n\nReturns:\n    Tensor no formato [batch, neurons, dendrites, synapses]\n\nRaises:\n    ValueError: Se formato for inválido",
       "params": [
         "self",
@@ -3949,7 +3966,7 @@
       "name": "set_mode",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.set_mode",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 308,
+      "line": 324,
       "doc": "Define modo de aprendizado para todos os neurônios.",
       "params": [
         "self",
@@ -3965,7 +3982,7 @@
       "name": "apply_batch_update",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.apply_batch_update",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 315,
+      "line": 331,
       "doc": "Aplica plasticidade acumulada em todos os neurônios.\nÚtil no modo BATCH após processar múltiplos exemplos.",
       "params": [
         "self",
@@ -3981,7 +3998,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.sleep",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 323,
+      "line": 339,
       "doc": "Ciclo de sono para consolidação two-factor em todos neurônios.\n\nArgs:\n    duration: Duração do sono em unidades de tempo",
       "params": [
         "self",
@@ -3997,7 +4014,7 @@
       "name": "get_all_metrics",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.get_all_metrics",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 333,
+      "line": 349,
       "doc": "Retorna métricas de todos os neurônios na camada.\n\nReturns:\n    Lista de dicionários com métricas de cada neurônio",
       "params": [
         "self"
@@ -4012,7 +4029,7 @@
       "name": "get_layer_metrics",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.get_layer_metrics",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 342,
+      "line": 358,
       "doc": "Retorna métricas agregadas da camada.\n\nReturns:\n    Dicionário com estatísticas da camada",
       "params": [
         "self"
@@ -4027,7 +4044,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.extra_repr",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 374,
+      "line": 390,
       "doc": "Representação string da camada.",
       "params": [
         "self"
@@ -6202,7 +6219,7 @@
       "name": "VersionedCheckpoint",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 33,
+      "line": 35,
       "doc": null,
       "params": [],
       "returns": null,
@@ -6215,7 +6232,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 49,
+      "line": 51,
       "doc": "Args:\n    model: Modelo a ser salvo/restaurado\n    version: Versão semântica do modelo (ex: \"2.0.0\")",
       "params": [
         "self",
@@ -6232,7 +6249,7 @@
       "name": "_cfg_dict",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._cfg_dict",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 58,
+      "line": 60,
       "doc": "Extrai configuração do modelo em formato dict.",
       "params": [
         "self"
@@ -6247,7 +6264,7 @@
       "name": "_git_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 73,
+      "line": 75,
       "doc": "Obtém hash atual do git para reprodutibilidade.",
       "params": [
         "self"
@@ -6262,7 +6279,7 @@
       "name": "_metadata",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 98,
+      "line": 100,
       "doc": "Gera metadados para o checkpoint.",
       "params": [
         "self",
@@ -6278,7 +6295,7 @@
       "name": "_register_safe_globals",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._register_safe_globals",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 112,
+      "line": 114,
       "doc": "Registra tipos permitidos para carregamento seguro (weights_only=True).",
       "params": [
         "cls"
@@ -6295,7 +6312,7 @@
       "name": "_to_weights_only_safe",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._to_weights_only_safe",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 135,
+      "line": 137,
       "doc": "Converte metadados para estrutura composta por tipos primitivos seguros.",
       "params": [
         "cls",
@@ -6313,7 +6330,7 @@
       "name": "_compute_plain_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_plain_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 162,
+      "line": 164,
       "doc": "Calcula hash SHA-256 puro do state_dict.",
       "params": [
         "self",
@@ -6329,7 +6346,7 @@
       "name": "_compute_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 175,
+      "line": 177,
       "doc": "Calcula digest de integridade do state dict (HMAC quando disponível).",
       "params": [
         "self",
@@ -6345,7 +6362,7 @@
       "name": "_verify_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 187,
+      "line": 189,
       "doc": null,
       "params": [
         "plain_digest",
@@ -6363,7 +6380,7 @@
       "name": "_resolve_safetensors_paths",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 206,
+      "line": 208,
       "doc": null,
       "params": [
         "path"
@@ -6380,7 +6397,7 @@
       "name": "_decode_with_ecc",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 215,
+      "line": 217,
       "doc": null,
       "params": [
         "raw_payload",
@@ -6399,7 +6416,7 @@
       "name": "_validate_shape_invariants",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 229,
+      "line": 231,
       "doc": "Valida shape dos tensores do checkpoint antes do load no modelo.",
       "params": [
         "model",
@@ -6417,7 +6434,7 @@
       "name": "save",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.save",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 243,
+      "line": 245,
       "doc": "Salva checkpoint e retorna payload persistido.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    extra_metadata: Metadados adicionais\n    compress: Usar compressão zip (recomendado para .pt)\n    use_safetensors: Usa formato seguro sem pickle para pesos\n    ecc_protection: Nível ECC de sidecar (off|low|med|high)\n\nReturns:\n    Dicionário com o checkpoint salvo",
       "params": [
         "self",
@@ -6436,7 +6453,7 @@
       "name": "_validate_model_shapes",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_model_shapes",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 314,
+      "line": 316,
       "doc": null,
       "params": [
         "model",
@@ -6454,7 +6471,7 @@
       "name": "load",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 337,
+      "line": 339,
       "doc": "Carrega checkpoint, valida hash e opcionalmente restaura modelo.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    model: Modelo para carregar o estado (opcional)\n    map_location: Device para carregar tensores\n    strict: Se True, valida hash e versão\n    expected_version: Versão esperada (opcional)\n\nReturns:\n    Dicionário com o checkpoint carregado\n\nRaises:\n    ValueError: Se hash/shape não coincidirem",
       "params": [
         "cls",
@@ -6476,7 +6493,7 @@
       "name": "load_secure",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load_secure",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 429,
+      "line": 431,
       "doc": "Carrega pesos via safetensors com validações rígidas de integridade.",
       "params": [
         "cls",
@@ -6495,7 +6512,7 @@
       "name": "__repr__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 459,
+      "line": 461,
       "doc": null,
       "params": [
         "self"
@@ -18726,6 +18743,18 @@
     {
       "type": "IMPORT",
       "src": "mod:src.pyfolds.layers.layer",
+      "dst": "mod:contextlib",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.layers.layer",
+      "dst": "mod:warnings",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.layers.layer",
       "dst": "mod:torch",
       "meta": {}
     },
@@ -18805,6 +18834,12 @@
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.layers.layer.MPJRDLayer",
       "dst": "mtd:src.pyfolds.layers.layer.MPJRDLayer.forward",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.layers.layer.MPJRDLayer",
+      "dst": "mtd:src.pyfolds.layers.layer.MPJRDLayer._suppress_dict_backward_hook_warning",
       "meta": {}
     },
     {
@@ -25855,8 +25890,8 @@
   "findings": [],
   "metrics": {
     "python_files": 140,
-    "symbols": 1068,
-    "edges": 1590,
+    "symbols": 1069,
+    "edges": 1593,
     "findings": 0,
     "internal_import_edges": 105
   }
