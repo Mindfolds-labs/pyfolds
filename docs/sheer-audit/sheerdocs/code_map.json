@@ -7,7 +7,7 @@
   "metrics": {
     "python_files": 140,
     "symbols": 1063,
-    "edges": 1580,
+    "edges": 1582,
     "findings": 0,
     "internal_import_edges": 105
   },
@@ -5456,8 +5456,10 @@
       "qname": "tests.unit.test_tf_backend",
       "file": "tests/unit/test_tf_backend.py",
       "imports": [
+        "mod:importlib",
         "mod:importlib.util",
-        "mod:pytest"
+        "mod:pytest",
+        "mod:sys"
       ],
       "classes": [],
       "functions": [
@@ -5465,14 +5467,14 @@
           "id": "fn:tests.unit.test_tf_backend.test_importing_pyfolds_still_works_without_tensorflow",
           "name": "test_importing_pyfolds_still_works_without_tensorflow",
           "qname": "tests.unit.test_tf_backend.test_importing_pyfolds_still_works_without_tensorflow",
-          "line": 6,
+          "line": 8,
           "params": []
         },
         {
           "id": "fn:tests.unit.test_tf_backend.test_tf_backend_guard_when_tensorflow_is_missing",
           "name": "test_tf_backend_guard_when_tensorflow_is_missing",
           "qname": "tests.unit.test_tf_backend.test_tf_backend_guard_when_tensorflow_is_missing",
-          "line": 12,
+          "line": 14,
           "params": [
             "monkeypatch"
           ]
@@ -5481,14 +5483,14 @@
           "id": "fn:tests.unit.test_tf_backend.test_tf_cell_state_and_step_contract",
           "name": "test_tf_cell_state_and_step_contract",
           "qname": "tests.unit.test_tf_backend.test_tf_cell_state_and_step_contract",
-          "line": 24,
+          "line": 27,
           "params": []
         },
         {
           "id": "fn:tests.unit.test_tf_backend.test_tf_layer_integrates_with_keras_rnn",
           "name": "test_tf_layer_integrates_with_keras_rnn",
           "qname": "tests.unit.test_tf_backend.test_tf_layer_integrates_with_keras_rnn",
-          "line": 39,
+          "line": 42,
           "params": []
         }
       ]

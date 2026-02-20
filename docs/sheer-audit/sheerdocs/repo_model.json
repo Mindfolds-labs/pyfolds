@@ -11183,7 +11183,7 @@
       "name": "test_stp_buffers_remain_registered_after_device_alignment",
       "qname": "tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_stp_buffers_remain_registered_after_device_alignment",
       "file": "tests/unit/advanced/test_short_term.py",
-      "line": 106,
+      "line": 105,
       "doc": "Realinhamento de device não deve remover buffers do state_dict.",
       "params": [
         "self",
@@ -14932,7 +14932,7 @@
       "name": "test_importing_pyfolds_still_works_without_tensorflow",
       "qname": "tests.unit.test_tf_backend.test_importing_pyfolds_still_works_without_tensorflow",
       "file": "tests/unit/test_tf_backend.py",
-      "line": 6,
+      "line": 8,
       "doc": null,
       "params": [],
       "returns": null,
@@ -14945,7 +14945,7 @@
       "name": "test_tf_backend_guard_when_tensorflow_is_missing",
       "qname": "tests.unit.test_tf_backend.test_tf_backend_guard_when_tensorflow_is_missing",
       "file": "tests/unit/test_tf_backend.py",
-      "line": 12,
+      "line": 14,
       "doc": null,
       "params": [
         "monkeypatch"
@@ -14960,7 +14960,7 @@
       "name": "test_tf_cell_state_and_step_contract",
       "qname": "tests.unit.test_tf_backend.test_tf_cell_state_and_step_contract",
       "file": "tests/unit/test_tf_backend.py",
-      "line": 24,
+      "line": 27,
       "doc": null,
       "params": [],
       "returns": null,
@@ -14973,7 +14973,7 @@
       "name": "test_tf_layer_integrates_with_keras_rnn",
       "qname": "tests.unit.test_tf_backend.test_tf_layer_integrates_with_keras_rnn",
       "file": "tests/unit/test_tf_backend.py",
-      "line": 39,
+      "line": 42,
       "doc": null,
       "params": [],
       "returns": null,
@@ -25032,7 +25032,19 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.test_tf_backend",
+      "dst": "mod:importlib",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.unit.test_tf_backend",
       "dst": "mod:importlib.util",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.unit.test_tf_backend",
+      "dst": "mod:sys",
       "meta": {}
     },
     {
@@ -25718,7 +25730,7 @@
   "metrics": {
     "python_files": 140,
     "symbols": 1063,
-    "edges": 1580,
+    "edges": 1582,
     "findings": 0,
     "internal_import_edges": 105
   }

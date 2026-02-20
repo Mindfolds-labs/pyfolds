@@ -1529,8 +1529,10 @@
 ### `tests.unit.test_tf_backend`
 - Arquivo: `tests/unit/test_tf_backend.py`
 - Imports:
+  - `mod:importlib`
   - `mod:importlib.util`
   - `mod:pytest`
+  - `mod:sys`
 - Funções:
   - `test_importing_pyfolds_still_works_without_tensorflow()`
   - `test_tf_backend_guard_when_tensorflow_is_missing(monkeypatch)`
