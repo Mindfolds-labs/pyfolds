@@ -23,8 +23,10 @@ from pyfolds.serialization.foldio import (
     HEADER_FMT,
     MAGIC,
     MAX_CHUNK_SIZE,
+    MAX_SAFETENSORS_HEADER_SIZE,
     FoldSecurityError,
     FoldWriter,
+    _validate_safetensors_payload,
     crc32c_u32,
 )
 
@@ -493,3 +495,19 @@ def test_fold_signature_roundtrip_if_cryptography_available(tmp_path):
             MPJRDNeuron,
             signature_public_key_pem=private_pem,
         )
+
+
+def test_validate_safetensors_payload_rejects_oversized_header():
+    oversized = MAX_SAFETENSORS_HEADER_SIZE + 1
+    payload = oversized.to_bytes(8, byteorder="little", signed=False) + b"{}"
+
+    with pytest.raises(FoldSecurityError, match="Header safetensors acima do limite defensivo"):
+        _validate_safetensors_payload(payload)
+
+
+def test_validate_safetensors_payload_rejects_invalid_json():
+    header = b"{invalid-json"
+    payload = len(header).to_bytes(8, byteorder="little", signed=False) + header
+
+    with pytest.raises(FoldSecurityError, match="Header safetensors inválido"):
+        _validate_safetensors_payload(payload)
