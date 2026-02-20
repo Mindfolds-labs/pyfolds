@@ -26,7 +26,13 @@ def safe_weight_law(
 
     n_clipped = torch.clamp(N.float(), min=0.0, max=float(2**30))
     w = torch.log2(1.0 + n_clipped) / w_scale
-    w_stable = torch.clamp(w, min=0.0, max=max_log_val)
+    w_stable = torch.nan_to_num(
+        w,
+        nan=0.0,
+        posinf=max_log_val,
+        neginf=0.0,
+    )
+    w_stable = torch.clamp(w_stable, min=0.0, max=max_log_val)
 
     if enforce_checks:
         if torch.isnan(w_stable).any():

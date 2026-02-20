@@ -39,35 +39,67 @@ class NoECC:
 
 
 class ReedSolomonECC:
-    """Codec Reed-Solomon opcional para correção de corrupção por chunk."""
+    """Codec Reed-Solomon opcional para correção de corrupção por chunk.
+
+    Os dados são segmentados em blocos com tamanho máximo de ``255 - symbols``
+    (limite de GF(2^8)), evitando crescimento de memória quadrático ao processar
+    chunks grandes.
+    """
 
     def __init__(self, symbols: int = 32):
         if symbols <= 0:
             raise ValueError("symbols deve ser > 0")
+        if symbols >= 255:
+            raise ValueError("symbols deve ser < 255")
+
         import reedsolo
 
         self._reedsolo = reedsolo
         self._codec = reedsolo.RSCodec(symbols)
         self.symbols = symbols
+        self.block_size = 255 - symbols
         self.name = f"rs({symbols})"
 
     def encode(self, data: bytes) -> ECCResult:
-        encoded = self._codec.encode(data)
-        ecc_len = len(encoded) - len(data)
-        ecc = encoded[-ecc_len:] if ecc_len > 0 else b""
-        return ECCResult(ecc_algo=self.name, ecc_bytes=ecc)
+        if not data:
+            return ECCResult(ecc_algo=self.name, ecc_bytes=b"")
+
+        parity = bytearray()
+        for offset in range(0, len(data), self.block_size):
+            block = data[offset: offset + self.block_size]
+            encoded = self._codec.encode(block)
+            parity.extend(encoded[len(block):])
+
+        return ECCResult(ecc_algo=self.name, ecc_bytes=bytes(parity))
 
     def decode(self, data: bytes, ecc_bytes: bytes) -> bytes:
         if not ecc_bytes:
             return data
-        try:
-            decoded = self._codec.decode(data + ecc_bytes)
-        except self._reedsolo.ReedSolomonError as exc:
-            raise RuntimeError(f"ECC decode falhou ({self.name}): {exc}") from exc
 
-        if isinstance(decoded, tuple):
-            decoded = decoded[0]
-        return decoded
+        decoded = bytearray()
+        ecc_offset = 0
+
+        for offset in range(0, len(data), self.block_size):
+            block = data[offset: offset + self.block_size]
+            parity_len = len(block) and self.symbols or 0
+            block_ecc = ecc_bytes[ecc_offset: ecc_offset + parity_len]
+            ecc_offset += parity_len
+
+            try:
+                recovered = self._codec.decode(block + block_ecc)
+            except self._reedsolo.ReedSolomonError as exc:
+                raise RuntimeError(f"ECC decode falhou ({self.name}): {exc}") from exc
+
+            if isinstance(recovered, tuple):
+                recovered = recovered[0]
+            decoded.extend(recovered)
+
+        if ecc_offset != len(ecc_bytes):
+            raise RuntimeError(
+                f"ECC decode falhou ({self.name}): tamanho de paridade inconsistente"
+            )
+
+        return bytes(decoded)
 
 
 def ecc_from_protection(level: str) -> ECCCodec:

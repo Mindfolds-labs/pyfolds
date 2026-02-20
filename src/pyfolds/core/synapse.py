@@ -232,14 +232,15 @@ class MPJRDSynapse(nn.Module):
         if self.eligibility.numel() == 0:
             return
 
-        if self.eligibility.item() == 0:
+        eligibility = self.eligibility.to(dtype=torch.float32)
+        if not torch.any(eligibility != 0):
             return
-        
-        # Transfere elegibilidade para N
-        transfer = self.eligibility.item() * self.cfg.consolidation_rate * abs(dt)
-        delta_n = int(round(transfer))
-        
-        if delta_n != 0:
+
+        # Transfere elegibilidade para N (sem .item() no caminho crítico)
+        transfer = eligibility * (self.cfg.consolidation_rate * abs(dt))
+        delta_n = torch.round(transfer).to(dtype=self.N.dtype)
+
+        if torch.any(delta_n != 0):
             self.N.add_(delta_n)
             self.N.clamp_(self.cfg.n_min, self.cfg.n_max)
 
