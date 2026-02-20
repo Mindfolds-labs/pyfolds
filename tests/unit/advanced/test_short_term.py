@@ -91,16 +91,15 @@ class TestShortTermDynamicsMixin:
         """Buffers de STP devem acompanhar device da entrada para evitar mismatch."""
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
-        if not torch.cuda.is_available():
-            pytest.skip("CUDA not available")
 
         neuron = pyfolds.MPJRDNeuronAdvanced(full_config).cpu()
-        x = torch.zeros(2, full_config.n_dendrites, full_config.n_synapses_per_dendrite, device='cuda')
+        target_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        x = torch.zeros(2, full_config.n_dendrites, full_config.n_synapses_per_dendrite, device=target_device)
 
         neuron._update_short_term_dynamics(x, dt=1.0)
 
-        assert neuron.u_stp.device.type == 'cuda'
-        assert neuron.R_stp.device.type == 'cuda'
+        assert neuron.u_stp.device.type == target_device.type
+        assert neuron.R_stp.device.type == target_device.type
 
 
     def test_stp_buffers_remain_registered_after_device_alignment(self, full_config):
