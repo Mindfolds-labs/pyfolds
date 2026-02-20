@@ -61,6 +61,7 @@
 | ADR-042 | Governança de execução integral de testes e dossiê de qualidade | Ativo | 2026-02-20 | [ADR-042-governanca-de-execucao-integral-de-testes-e-dossie-de-qualidade.md](ADR-042-governanca-de-execucao-integral-de-testes-e-dossie-de-qualidade.md) |
 | ADR-043 | Auditoria final integral de testes, imports e mecanismos | Ativo | 2026-02-20 | [ADR-043-auditoria-final-integral-testes-imports-e-mecanismos.md](ADR-043-auditoria-final-integral-testes-imports-e-mecanismos.md) |
 | ADR-044 | MindControl: cérebro externo e mutação runtime segura | Ativo | 2026-02-20 | [ADR-044-mindcontrol-cerebro-externo-e-mutacao-runtime-segura.md](ADR-044-mindcontrol-cerebro-externo-e-mutacao-runtime-segura.md) |
+| ADR-045 | Checkpoints seguros com safetensors, flush lazy e validação de shape | Ativo | 2026-02-20 | [ADR-045-checkpoints-seguros-com-safetensors-flush-lazy-e-shape-validation.md](ADR-045-checkpoints-seguros-com-safetensors-flush-lazy-e-shape-validation.md) |
 
 ## ADRs legados e superseded
 

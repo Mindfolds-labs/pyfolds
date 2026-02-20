@@ -55,7 +55,7 @@ from pyfolds.serialization import VersionedCheckpoint
 cfg = pyfolds.MPJRDConfig()
 model = pyfolds.MPJRDNeuron(cfg)
 
-ckpt = VersionedCheckpoint(model, version="2.0.0")
+ckpt = VersionedCheckpoint(model, version="2.0.2")
 ckpt.save("artifacts/neuron.pt", extra_metadata={"run": "exp-42"})
 
 loaded = VersionedCheckpoint.load("artifacts/neuron.pt", model=model)

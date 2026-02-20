@@ -107,6 +107,7 @@ class PyFoldsLogger:
         module_levels: Optional[dict] = None,
         structured: bool = False,
         circular_buffer_lines: Optional[int] = None,
+        circular_buffer_flush_interval_sec: float = 5.0,
         console: bool = False,
         fixed_layout: bool = False,
     ):
@@ -151,6 +152,7 @@ class PyFoldsLogger:
                 file_handler = CircularBufferFileHandler(
                     log_path,
                     capacity_lines=circular_buffer_lines,
+                    flush_interval_sec=circular_buffer_flush_interval_sec,
                     encoding="utf-8",
                 )
             else:
@@ -226,6 +228,7 @@ def setup_run_logging(
     fixed_layout: bool = True,
     console: bool = False,
     circular_buffer_lines: Optional[int] = None,
+    circular_buffer_flush_interval_sec: float = 5.0,
 ) -> Tuple[logging.Logger, Path]:
     """Configuração recomendada para execução (treino/debug em produção).
 
@@ -248,6 +251,7 @@ def setup_run_logging(
         log_file=log_path,
         structured=structured,
         circular_buffer_lines=circular_buffer_lines,
+        circular_buffer_flush_interval_sec=circular_buffer_flush_interval_sec,
         console=console,
         fixed_layout=fixed_layout,
     )
@@ -260,6 +264,7 @@ def setup_logging(
     level: int = logging.INFO,
     structured: bool = False,
     circular_buffer_lines: Optional[int] = None,
+    circular_buffer_flush_interval_sec: float = 5.0,
     console: bool = False,
     fixed_layout: bool = False,
 ) -> logging.Logger:
@@ -269,6 +274,7 @@ def setup_logging(
         log_file=log_file,
         structured=structured,
         circular_buffer_lines=circular_buffer_lines,
+        circular_buffer_flush_interval_sec=circular_buffer_flush_interval_sec,
         console=console,
         fixed_layout=fixed_layout,
     )
@@ -287,7 +293,13 @@ class CircularBufferFileHandler(logging.Handler):
         reescreve o arquivo inteiro (custo O(n) no tamanho do buffer).
     """
 
-    def __init__(self, path: Union[str, Path], capacity_lines: int, encoding: str = "utf-8"):
+    def __init__(
+        self,
+        path: Union[str, Path],
+        capacity_lines: int,
+        encoding: str = "utf-8",
+        flush_interval_sec: float = 5.0,
+    ):
         super().__init__()
         if capacity_lines <= 0:
             raise ValueError(
@@ -298,9 +310,12 @@ class CircularBufferFileHandler(logging.Handler):
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.encoding = encoding
         self.capacity_lines = capacity_lines
+        self.flush_interval_sec = max(0.0, float(flush_interval_sec))
         self._lock = Lock()
         self._buffer: Deque[str] = deque(maxlen=capacity_lines)
         self._line_count = 0
+        self._last_flush = datetime.utcnow()
+        self._dirty = False
 
         if self.path.exists():
             previous_lines = self.path.read_text(encoding=self.encoding).splitlines()
@@ -312,13 +327,32 @@ class CircularBufferFileHandler(logging.Handler):
             message = self.format(record)
             with self._lock:
                 self._buffer.append(message)
-                content = "\n".join(self._buffer)
-                if content:
-                    content += "\n"
-                self.path.write_text(content, encoding=self.encoding)
                 self._line_count = len(self._buffer)
+                self._dirty = True
+
+                elapsed = (datetime.utcnow() - self._last_flush).total_seconds()
+                should_flush = elapsed >= self.flush_interval_sec
+                if record.levelno >= logging.ERROR:
+                    should_flush = True
+
+                if should_flush:
+                    self._flush_to_disk()
         except Exception:
             self.handleError(record)
+
+    def _flush_to_disk(self) -> None:
+        content = "\n".join(self._buffer)
+        if content:
+            content += "\n"
+        self.path.write_text(content, encoding=self.encoding)
+        self._last_flush = datetime.utcnow()
+        self._dirty = False
+
+    def close(self) -> None:
+        with self._lock:
+            if self._dirty:
+                self._flush_to_disk()
+        super().close()
 
 
 def next_log_path(log_dir: Union[str, Path], app: str, version: str) -> Path:
