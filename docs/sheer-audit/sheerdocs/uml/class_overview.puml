@@ -286,6 +286,8 @@ class "src.pyfolds.layers.wave_layer.MPJRDWaveLayer" {
 
 class "src.pyfolds.monitoring.health.HealthStatus" {
 }
+class "src.pyfolds.monitoring.health.ModelIntegrityMonitor" {
+}
 class "src.pyfolds.monitoring.health.NeuronHealthCheck" {
   +__init__()
   +check()
@@ -296,15 +298,6 @@ class "src.pyfolds.monitoring.health.NeuronHealthMonitor" {
   +get_health_score()
 }
 class "src.pyfolds.monitoring.health.WeightIntegrityMonitor" {
-  +__init__()
-  +__init__()
-  +_compute_hash()
-  +_compute_state_hash()
-  +check()
-  +check_integrity()
-}
-class "src.pyfolds.monitoring.health.WeightIntegrityMonitor" {
-  +__init__()
   +__init__()
   +_compute_hash()
   +_compute_state_hash()
@@ -556,7 +549,6 @@ class "src.pyfolds.utils.device.DeviceManager" {
 
 class "src.pyfolds.utils.logging.CircularBufferFileHandler" {
   +__init__()
-  +_flush_to_disk()
   +_flush_to_disk()
   +close()
   +emit()

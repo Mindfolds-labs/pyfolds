@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `140`
-- Símbolos: `1062`
+- Símbolos: `1060`
 
 ## Módulos
 
@@ -214,6 +214,7 @@
 ### `src.pyfolds.core.dendrite`
 - Arquivo: `src/pyfolds/core/dendrite.py`
 - Imports:
+  - `mod:logging`
   - `mod:src.pyfolds.core.config`
   - `mod:src.pyfolds.core.synapse`
   - `mod:threading`
@@ -378,9 +379,9 @@
   - `mod:typing`
 - Classes:
   - `HealthStatus` (bases: Enum)
+  - `ModelIntegrityMonitor` (bases: WeightIntegrityMonitor)
   - `NeuronHealthCheck` (bases: (sem base explícita))
   - `NeuronHealthMonitor` (bases: (sem base explícita))
-  - `WeightIntegrityMonitor` (bases: (sem base explícita))
   - `WeightIntegrityMonitor` (bases: (sem base explícita))
 
 ### `src.pyfolds.monitoring.mindcontrol`
@@ -533,6 +534,7 @@
   - `mod:pathlib`
   - `mod:pickle`
   - `mod:shutil`
+  - `mod:src.pyfolds.serialization.ecc`
   - `mod:subprocess`
   - `mod:torch`
   - `mod:typing`
