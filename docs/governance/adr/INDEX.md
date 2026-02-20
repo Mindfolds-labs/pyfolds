@@ -56,6 +56,8 @@
 | ADR-037 | Análise integral de execução (ISSUE-025) e atualização contínua de benchmark | Ativo | 2026-02-17 | [ADR-037-analise-integral-issue-025-benchmark-refresh.md](ADR-037-analise-integral-issue-025-benchmark-refresh.md) |
 | ADR-038 | Auditoria contínua do formato `.fold/.mind` com governança de execução (ISSUE-036) | Ativo | 2026-02-18 | [ADR-038-auditoria-fold-mind-governanca-execucao.md](ADR-038-auditoria-fold-mind-governanca-execucao.md) |
 | ADR-039 | Auditoria de prontidão para publicação no PyPI (ISSUE-038) | Ativo | 2026-02-18 | [ADR-039-auditoria-prontidao-publicacao-pypi.md](ADR-039-auditoria-prontidao-publicacao-pypi.md) |
+| ADR-040 | Governança de execução: issues no HUB e plano ordenado 1→4 | Ativo | 2026-02-19 | [ADR-040-governanca-fluxo-issues-no-hub-e-planos-1-a-4.md](ADR-040-governanca-fluxo-issues-no-hub-e-planos-1-a-4.md) |
+| ADR-041 | Ordem de execução de mixins, homeostase pós-refratário e contrato de saída de layer | Ativo | 2026-02-20 | [ADR-041-ordem-de-execucao-de-mixins-homeostase-pos-refratario-e-contrato-de-saida-de-layer.md](ADR-041-ordem-de-execucao-de-mixins-homeostase-pos-refratario-e-contrato-de-saida-de-layer.md) |
 
 ## ADRs legados e superseded
 
