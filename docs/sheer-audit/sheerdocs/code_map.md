@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `135`
-- Símbolos: `965`
+- Símbolos: `966`
 
 ## Módulos
 
@@ -1171,6 +1171,7 @@
   - `test_forward_shapes_v2(small_config, batch_size)`
   - `test_step_id_thread_safe_increment_v2(small_config)`
   - `test_theta_eff_caps_unreachable_threshold()`
+  - `test_vectorization_and_forward_integrity_batch64()`
 
 ### `tests.unit.core.test_synapse`
 - Arquivo: `tests/unit/core/test_synapse.py`

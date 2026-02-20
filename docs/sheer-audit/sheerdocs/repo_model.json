@@ -11271,6 +11271,19 @@
       "decorators": []
     },
     {
+      "id": "fn:tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
+      "kind": "function",
+      "name": "test_vectorization_and_forward_integrity_batch64",
+      "qname": "tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
+      "file": "tests/unit/core/test_neuron_v2.py",
+      "line": 71,
+      "doc": "Valida vetorização em lote e estabilidade numérica do forward.",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mod:tests.unit.core.test_synapse",
       "kind": "module",
       "name": "test_synapse",
@@ -21516,6 +21529,12 @@
       "meta": {}
     },
     {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_neuron_v2",
+      "dst": "fn:tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
+      "meta": {}
+    },
+    {
       "type": "IMPORT",
       "src": "mod:tests.unit.core.test_synapse",
       "dst": "mod:pytest",
@@ -23403,8 +23422,8 @@
   "findings": [],
   "metrics": {
     "python_files": 135,
-    "symbols": 965,
-    "edges": 1445,
+    "symbols": 966,
+    "edges": 1446,
     "findings": 0,
     "internal_import_edges": 101
   }

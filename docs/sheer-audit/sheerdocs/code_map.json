@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 135,
-    "symbols": 965,
-    "edges": 1445,
+    "symbols": 966,
+    "edges": 1446,
     "findings": 0,
     "internal_import_edges": 101
   },
@@ -4014,6 +4014,13 @@
           "name": "test_theta_eff_caps_unreachable_threshold",
           "qname": "tests.unit.core.test_neuron_v2.test_theta_eff_caps_unreachable_threshold",
           "line": 54,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
+          "name": "test_vectorization_and_forward_integrity_batch64",
+          "qname": "tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
+          "line": 71,
           "params": []
         }
       ]
