@@ -465,7 +465,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.forward",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 123,
+      "line": 119,
       "doc": "Forward pass com backpropagação.",
       "params": [
         "self",
@@ -481,7 +481,7 @@
       "name": "reset_backprop",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.reset_backprop",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 146,
+      "line": 142,
       "doc": "Reseta estado de backpropagação.",
       "params": [
         "self"
@@ -496,7 +496,7 @@
       "name": "get_backprop_metrics",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.get_backprop_metrics",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 153,
+      "line": 149,
       "doc": "Retorna métricas de backpropagação.",
       "params": [
         "self"
@@ -2972,7 +2972,7 @@
       "name": "_install_gradient_health_monitor",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._install_gradient_health_monitor",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 139,
+      "line": 140,
       "doc": "Instala gancho de saneamento para gradientes com NaN/Inf.",
       "params": [
         "self"
@@ -2987,7 +2987,7 @@
       "name": "_gradient_health_monitor",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._gradient_health_monitor",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 143,
+      "line": 144,
       "doc": "Gatekeeper contra gradientes corrompidos por falhas de hardware.",
       "params": [
         "self",
@@ -3005,7 +3005,7 @@
       "name": "_validate_internal_devices",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._validate_internal_devices",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 157,
+      "line": 158,
       "doc": "Valida consistência de devices internos.",
       "params": [
         "self"
@@ -3020,7 +3020,7 @@
       "name": "_on_homeostasis_stable",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_stable",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 185,
+      "line": 186,
       "doc": "Callback quando homeostase se torna estável.",
       "params": [
         "self",
@@ -3036,7 +3036,7 @@
       "name": "_on_homeostasis_unstable",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_unstable",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 191,
+      "line": 192,
       "doc": "Callback quando homeostase se torna instável.",
       "params": [
         "self",
@@ -3052,7 +3052,7 @@
       "name": "N",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.N",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 201,
+      "line": 202,
       "doc": "Filamentos [dendrites, synapses].",
       "params": [
         "self"
@@ -3069,7 +3069,7 @@
       "name": "I",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.I",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 206,
+      "line": 207,
       "doc": "Potenciais internos [dendrites, synapses].",
       "params": [
         "self"
@@ -3086,7 +3086,7 @@
       "name": "W",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.W",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 211,
+      "line": 212,
       "doc": "Pesos [dendrites, synapses].",
       "params": [
         "self"
@@ -3103,7 +3103,7 @@
       "name": "protection",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.protection",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 216,
+      "line": 217,
       "doc": "Flags de proteção [dendrites, synapses].",
       "params": [
         "self"
@@ -3120,7 +3120,7 @@
       "name": "theta",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.theta",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 225,
+      "line": 226,
       "doc": null,
       "params": [
         "self"
@@ -3137,7 +3137,7 @@
       "name": "r_hat",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.r_hat",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 229,
+      "line": 230,
       "doc": null,
       "params": [
         "self"
@@ -3154,7 +3154,7 @@
       "name": "queue_runtime_injection",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.queue_runtime_injection",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 233,
+      "line": 234,
       "doc": "Enfileira mutação de parâmetro para aplicação assíncrona no próximo step.",
       "params": [
         "self",
@@ -3173,7 +3173,7 @@
       "name": "_refresh_config_references",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._refresh_config_references",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 241,
+      "line": 242,
       "doc": "Propaga nova configuração para submódulos que cacheiam ``cfg``.",
       "params": [
         "self"
@@ -3190,7 +3190,7 @@
       "name": "_apply_runtime_injections",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._apply_runtime_injections",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 254,
+      "line": 255,
       "doc": "Aplica injeções pendentes sem bloquear o caminho crítico do forward.",
       "params": [
         "self"
@@ -3207,7 +3207,7 @@
       "name": "set_mode",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.set_mode",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 304,
+      "line": 305,
       "doc": "Define modo de aprendizado.",
       "params": [
         "self",
@@ -3223,7 +3223,7 @@
       "name": "_compute_R_endogenous",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._compute_R_endogenous",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 319,
+      "line": 320,
       "doc": "Computa sinal neuromodulador interno.",
       "params": [
         "self",
@@ -3242,7 +3242,7 @@
       "name": "_validate_input_device",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._validate_input_device",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 341,
+      "line": 342,
       "doc": "Valida se input está no device correto.",
       "params": [
         "self",
@@ -3258,7 +3258,7 @@
       "name": "_apply_online_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._apply_online_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 352,
+      "line": 353,
       "doc": "Aplica regra local imediatamente (modo ONLINE sem defer).",
       "params": [
         "self",
@@ -3280,7 +3280,7 @@
       "name": "forward",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.forward",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 383,
+      "line": 384,
       "doc": "Forward pass do neurônio.\n\nArgs:\n    x: Tensor de entrada [batch, dendrites, synapses]\n    reward: Sinal de recompensa externo\n    mode: Modo de aprendizado (sobrescreve o atual)\n    collect_stats: Se deve coletar estatísticas\n    dt: Passo de tempo (ms)\n\nReturns:\n    Dict com spikes, potenciais e estatísticas",
       "params": [
         "self",
@@ -3303,7 +3303,7 @@
       "name": "step",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.step",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 608,
+      "line": 609,
       "doc": "API explícita de passo temporal (compatível com README).",
       "params": [
         "self",
@@ -3323,7 +3323,7 @@
       "name": "apply_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 628,
+      "line": 629,
       "doc": "Aplica plasticidade acumulada (deferred updates).\n\n✅ CORRIGIDO: Passa mode para as sinapses",
       "params": [
         "self",
@@ -3342,7 +3342,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.sleep",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 716,
+      "line": 717,
       "doc": "Ciclo de sono: consolida sinapses.",
       "params": [
         "self",
@@ -3360,7 +3360,7 @@
       "name": "to",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.to",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 741,
+      "line": 742,
       "doc": "Move neurônio para device e valida consistência.",
       "params": [
         "self",
@@ -3376,7 +3376,7 @@
       "name": "get_metrics",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.get_metrics",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 749,
+      "line": 750,
       "doc": "Retorna métricas consolidadas do neurônio.",
       "params": [
         "self"
@@ -3391,7 +3391,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.extra_repr",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 792,
+      "line": 793,
       "doc": null,
       "params": [
         "self"
@@ -4797,7 +4797,7 @@
       "name": "add_layer",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.add_layer",
       "file": "src/pyfolds/network/network.py",
-      "line": 56,
+      "line": 57,
       "doc": "Adiciona uma camada à rede.\n\nArgs:\n    name: Nome único da camada\n    layer: Camada MPJRDLayer\n\nReturns:\n    self (para encadeamento)",
       "params": [
         "self",
@@ -4814,7 +4814,7 @@
       "name": "connect",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.connect",
       "file": "src/pyfolds/network/network.py",
-      "line": 78,
+      "line": 79,
       "doc": "Conecta duas camadas com validação de ciclos.\n\nArgs:\n    from_layer: Nome da camada de origem\n    to_layer: Nome da camada de destino\n    weight_init: Inicialização dos pesos (padrão: 1.0)\n\nReturns:\n    self (para encadeamento)",
       "params": [
         "self",
@@ -4832,7 +4832,7 @@
       "name": "_has_cycle",
       "qname": "src.pyfolds.network.network.MPJRDNetwork._has_cycle",
       "file": "src/pyfolds/network/network.py",
-      "line": 123,
+      "line": 124,
       "doc": "Detecta ciclos no grafo de conexões usando DFS.\n\nArgs:\n    connections: Lista de tuplas (origem, destino)\n    \nReturns:\n    True se houver ciclo, False caso contrário",
       "params": [
         "self",
@@ -4848,7 +4848,7 @@
       "name": "_topological_sort",
       "qname": "src.pyfolds.network.network.MPJRDNetwork._topological_sort",
       "file": "src/pyfolds/network/network.py",
-      "line": 161,
+      "line": 162,
       "doc": "Ordenação topológica usando algoritmo de Kahn.\n\nReturns:\n    Lista de nomes de camadas em ordem topológica\n    \nRaises:\n    ValueError: Se houver ciclo no grafo",
       "params": [
         "self"
@@ -4863,7 +4863,7 @@
       "name": "_prepare_input_for_layer",
       "qname": "src.pyfolds.network.network.MPJRDNetwork._prepare_input_for_layer",
       "file": "src/pyfolds/network/network.py",
-      "line": 201,
+      "line": 202,
       "doc": "Prepara spikes de origem para entrada da camada destino.\n\n✅ OTIMIZADO: Distribui ativação entre dendritos de forma realista\n\nArgs:\n    spikes: Spikes da camada origem [B, from]\n    to_layer: Nome da camada destino\n    weights: Pesos da conexão [from, to]\n\nReturns:\n    Tensor [B, to, D, S] pronto para a camada destino",
       "params": [
         "self",
@@ -4881,7 +4881,7 @@
       "name": "build",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.build",
       "file": "src/pyfolds/network/network.py",
-      "line": 255,
+      "line": 256,
       "doc": "Constrói a rede (valida conexões, ordena topologicamente).\n\nReturns:\n    self (para encadeamento)",
       "params": [
         "self"
@@ -4896,7 +4896,7 @@
       "name": "forward",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.forward",
       "file": "src/pyfolds/network/network.py",
-      "line": 281,
+      "line": 282,
       "doc": "Forward pass da rede com ordenação topológica real.\n\nArgs:\n    x: Tensor de entrada (formato depende da primeira camada)\n    reward: Sinal de recompensa (opcional)\n    mode: Modo de aprendizado\n\nReturns:\n    Dict com:\n        - output: spikes da última camada [B, output_neurons]\n        - layers: saídas de todas as camadas\n        - final_layer: nome da última camada\n        - layer_order: ordem de processamento",
       "params": [
         "self",
@@ -4915,7 +4915,7 @@
       "name": "set_mode",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.set_mode",
       "file": "src/pyfolds/network/network.py",
-      "line": 377,
+      "line": 378,
       "doc": "Define modo de aprendizado para todas as camadas.",
       "params": [
         "self",
@@ -4931,7 +4931,7 @@
       "name": "apply_batch_update",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.apply_batch_update",
       "file": "src/pyfolds/network/network.py",
-      "line": 384,
+      "line": 385,
       "doc": "Aplica plasticidade acumulada em todas as camadas.\nÚtil no modo BATCH após processar múltiplos exemplos.",
       "params": [
         "self",
@@ -4947,7 +4947,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.sleep",
       "file": "src/pyfolds/network/network.py",
-      "line": 392,
+      "line": 393,
       "doc": "Ciclo de sono para consolidação two-factor em todas camadas.\n\nArgs:\n    duration: Duração do sono em unidades de tempo",
       "params": [
         "self",
@@ -4963,7 +4963,7 @@
       "name": "get_all_metrics",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.get_all_metrics",
       "file": "src/pyfolds/network/network.py",
-      "line": 402,
+      "line": 403,
       "doc": "Retorna métricas de todas as camadas.\n\nReturns:\n    Dict com métricas por camada",
       "params": [
         "self"
@@ -4978,7 +4978,7 @@
       "name": "get_network_metrics",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.get_network_metrics",
       "file": "src/pyfolds/network/network.py",
-      "line": 414,
+      "line": 415,
       "doc": "Retorna métricas agregadas da rede.\n\nReturns:\n    Dict com estatísticas da rede",
       "params": [
         "self"
@@ -4993,7 +4993,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.extra_repr",
       "file": "src/pyfolds/network/network.py",
-      "line": 440,
+      "line": 441,
       "doc": null,
       "params": [
         "self"
