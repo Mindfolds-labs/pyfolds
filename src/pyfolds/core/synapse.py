@@ -215,11 +215,12 @@ class MPJRDSynapse(nn.Module):
                     self.sat_time.zero_()
 
         # ===== Recuperação da saturação =====
-        if bool(self.protection.squeeze()):
-            self.sat_time.add_(dt)
-            if cfg.saturation_recovery_time > 0 and float(self.sat_time.item()) >= cfg.saturation_recovery_time:
-                self.protection.fill_(False)
-                self.sat_time.zero_()
+        # Atualização vetorial/máscara para evitar sync D2H via `.item()`.
+        self.sat_time.add_(self.protection.to(dtype=self.sat_time.dtype) * dt)
+        if cfg.saturation_recovery_time > 0:
+            recovery_mask = self.protection & (self.sat_time >= cfg.saturation_recovery_time)
+            self.protection.masked_fill_(recovery_mask, False)
+            self.sat_time.masked_fill_(recovery_mask, 0.0)
 
     @torch.no_grad()
     def consolidate(self, dt: float = 1.0) -> None:
