@@ -243,3 +243,31 @@ class TestDistributorSink:
         
         # Memory sink should still receive event
         assert len(mem_sink.snapshot()) == 1
+
+class TestBufferedJSONLinesSink:
+    """Test buffered JSON lines sink."""
+
+    def test_flushes_when_buffer_reaches_limit(self, tmp_path):
+        path = tmp_path / "buffered.jsonl"
+
+        with pyfolds.BufferedJSONLinesSink(path, buffer_size=2, truncate=True) as sink:
+            sink.emit(pyfolds.forward_event(1, "online"))
+            assert path.exists()
+            assert path.read_text() == ""
+
+            sink.emit(pyfolds.forward_event(2, "online"))
+            assert path.read_text().strip()
+
+        lines = path.read_text().strip().split("\n")
+        assert len(lines) == 2
+
+    def test_close_flushes_remaining_buffer(self, tmp_path):
+        path = tmp_path / "buffered-close.jsonl"
+
+        sink = pyfolds.BufferedJSONLinesSink(path, buffer_size=10, truncate=True)
+        sink.emit(pyfolds.forward_event(7, "online"))
+        sink.close()
+
+        lines = path.read_text().strip().split("\n")
+        assert len(lines) == 1
+        assert json.loads(lines[0])["step_id"] == 7

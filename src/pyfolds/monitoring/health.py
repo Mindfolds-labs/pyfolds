@@ -146,3 +146,42 @@ class ModelIntegrityMonitor:
             "expected_hash": self.expected_hash,
             "current_hash": current_hash,
         }
+
+
+class WeightIntegrityMonitor:
+    """Monitora corrupção silenciosa de pesos em runtime.
+
+    Este monitor é focado em cenários de treino/inferência com aceleração em GPU,
+    detectando alterações inesperadas no ``state_dict`` a cada ``N`` passos.
+    """
+
+    def __init__(self, model: torch.nn.Module, check_every_n_steps: int = 100):
+        self.model = model
+        self.check_every = max(1, int(check_every_n_steps))
+        self.step_count = 0
+        self.last_hash = self._compute_hash()
+
+    def _compute_hash(self) -> str:
+        hasher = hashlib.sha256()
+        state_dict = {k: v for k, v in sorted(self.model.state_dict().items())}
+
+        for key, tensor in state_dict.items():
+            if not torch.is_tensor(tensor):
+                continue
+            t_bytes = tensor.detach().contiguous().cpu().numpy().tobytes()
+            hasher.update(key.encode("utf-8"))
+            hasher.update(t_bytes)
+
+        return hasher.hexdigest()
+
+    def check(self) -> Dict[str, bool | str]:
+        self.step_count += 1
+        if self.step_count % self.check_every != 0:
+            return {"checked": False}
+
+        current_hash = self._compute_hash()
+        is_ok = current_hash == self.last_hash
+
+        # Atualizado após o check para permitir uso pós-step do otimizador.
+        self.last_hash = current_hash
+        return {"checked": True, "ok": is_ok, "hash": current_hash}

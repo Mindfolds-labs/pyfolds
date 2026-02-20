@@ -16,12 +16,16 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Public API deprecation policy for v1 aliases, including removal target in `2.0.0`, objective criteria (minimum major cycle, changelog notice, migration strategy), and contract test coverage.
 - `ModelIntegrityMonitor` para sanity check periódico de hash SHA-256 de pesos/buffers em runtime.
 - ADR-046 formalizando o monitoramento periódico de integridade de pesos como extensão de hardening da v2.0.2.
+- `WeightIntegrityMonitor` para verificação periódica de hash do estado de pesos em runtime.
+- `BufferedJSONLinesSink` para telemetria JSONL com escrita em lote.
+- `VersionedCheckpoint.load_secure(...)` com manifesto + validação rígida de hash/shape antes de `load_state_dict`.
+- ADR-047 formalizando o pacote de hardening final da release v2.0.3.
 
 ### Deprecated
 - v1 public aliases remain supported during `1.x` with `DeprecationWarning` and are scheduled for removal in `2.0.0`: `MPJRDConfig` (use `NeuronConfig`), `MPJRDLayer` (use `AdaptiveNeuronLayer`), and `MPJRDNetwork` (use `SpikingNetwork`).
 
 ### Changed
-- Canonical release version unified to `2.0.2` across package metadata, public modules and docs examples.
+- Canonical release version unified to `2.0.3` across package metadata, public modules and docs examples.
 - `docs/ARCHITECTURE.md` diagram reference updated to `docs/architecture/blueprints/`.
 - `docs/development/execution_queue.csv` ISSUE-005 marked as partial in progress.
 
