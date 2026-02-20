@@ -1,6 +1,6 @@
 """Ferramentas de monitoramento de saúde do modelo."""
 
-from .health import HealthStatus, ModelIntegrityMonitor, NeuronHealthCheck, NeuronHealthMonitor
+from .health import HealthStatus, NeuronHealthCheck, NeuronHealthMonitor, WeightIntegrityMonitor
 from .mindcontrol import (
     MindControl,
     MindControlEngine,
@@ -14,6 +14,7 @@ __all__ = [
     "ModelIntegrityMonitor",
     "NeuronHealthCheck",
     "NeuronHealthMonitor",
+    "WeightIntegrityMonitor",
     "MindControl",
     "MindControlEngine",
     "MindControlSink",
