@@ -937,12 +937,28 @@
       "decorators": []
     },
     {
+      "id": "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin._align_short_term_buffers_device",
+      "kind": "method",
+      "name": "_align_short_term_buffers_device",
+      "qname": "src.pyfolds.advanced.short_term.ShortTermDynamicsMixin._align_short_term_buffers_device",
+      "file": "src/pyfolds/advanced/short_term.py",
+      "line": 105,
+      "doc": "Realinha buffers STP para ``device`` preservando registro no módulo.",
+      "params": [
+        "self",
+        "device"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin.forward",
       "kind": "method",
       "name": "forward",
       "qname": "src.pyfolds.advanced.short_term.ShortTermDynamicsMixin.forward",
       "file": "src/pyfolds/advanced/short_term.py",
-      "line": 105,
+      "line": 110,
       "doc": "Forward pass com dinâmica de curto prazo.\n\n✅ SEMÂNTICA GLOBAL (agregado sobre batch)\n✅ CORRIGIDO: sem criação de tensores desnecessários\n\nArgs:\n    x: Tensor de entrada [B, D, S]\n    **kwargs: Argumentos adicionais (dt, etc.)\n\nReturns:\n    Dict com spikes, potenciais e métricas de STP",
       "params": [
         "self",
@@ -9908,6 +9924,22 @@
       "decorators": []
     },
     {
+      "id": "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_stp_buffers_remain_registered_after_device_alignment",
+      "kind": "method",
+      "name": "test_stp_buffers_remain_registered_after_device_alignment",
+      "qname": "tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_stp_buffers_remain_registered_after_device_alignment",
+      "file": "tests/unit/advanced/test_short_term.py",
+      "line": 106,
+      "doc": "Realinhamento de device não deve remover buffers do state_dict.",
+      "params": [
+        "self",
+        "full_config"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mod:tests.unit.advanced.test_stdp",
       "kind": "module",
       "name": "test_stdp",
@@ -13025,7 +13057,7 @@
       "name": "test_layer_rejects_invalid_neuron_cls",
       "qname": "tests.unit.test_layer_neuron_class.test_layer_rejects_invalid_neuron_cls",
       "file": "tests/unit/test_layer_neuron_class.py",
-      "line": 22,
+      "line": 24,
       "doc": null,
       "params": [],
       "returns": null,
@@ -13038,7 +13070,7 @@
       "name": "test_layer_has_no_legacy_neuron_class_attr",
       "qname": "tests.unit.test_layer_neuron_class.test_layer_has_no_legacy_neuron_class_attr",
       "file": "tests/unit/test_layer_neuron_class.py",
-      "line": 29,
+      "line": 31,
       "doc": null,
       "params": [],
       "returns": null,
@@ -13051,7 +13083,7 @@
       "name": "test_layer_forwards_dt_to_neurons",
       "qname": "tests.unit.test_layer_neuron_class.test_layer_forwards_dt_to_neurons",
       "file": "tests/unit/test_layer_neuron_class.py",
-      "line": 35,
+      "line": 37,
       "doc": null,
       "params": [
         "monkeypatch"
@@ -15284,6 +15316,12 @@
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin",
       "dst": "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin._update_short_term_dynamics",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin",
+      "dst": "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin._align_short_term_buffers_device",
       "meta": {}
     },
     {
@@ -20633,6 +20671,12 @@
       "meta": {}
     },
     {
+      "type": "CONTAINS",
+      "src": "cls:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin",
+      "dst": "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_stp_buffers_remain_registered_after_device_alignment",
+      "meta": {}
+    },
+    {
       "type": "IMPORT",
       "src": "mod:tests.unit.advanced.test_stdp",
       "dst": "mod:pytest",
@@ -23204,8 +23248,8 @@
   "findings": [],
   "metrics": {
     "python_files": 134,
-    "symbols": 956,
-    "edges": 1435,
+    "symbols": 958,
+    "edges": 1437,
     "findings": 0,
     "internal_import_edges": 101
   }

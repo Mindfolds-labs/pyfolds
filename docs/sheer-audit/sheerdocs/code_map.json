@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 134,
-    "symbols": 956,
-    "edges": 1435,
+    "symbols": 958,
+    "edges": 1437,
     "findings": 0,
     "internal_import_edges": 101
   },
@@ -286,6 +286,7 @@
           "line": 8,
           "bases": [],
           "methods": [
+            "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin._align_short_term_buffers_device",
             "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin._init_short_term",
             "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin._update_short_term_dynamics",
             "mtd:src.pyfolds.advanced.short_term.ShortTermDynamicsMixin.forward"
@@ -3550,6 +3551,7 @@
           "bases": [],
           "methods": [
             "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_initialization",
+            "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_stp_buffers_remain_registered_after_device_alignment",
             "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_tsodyks_markram_recovery",
             "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_update_aligns_stp_buffers_to_input_device",
             "mtd:tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin.test_update_no_spikes",
@@ -4807,7 +4809,7 @@
           "id": "fn:tests.unit.test_layer_neuron_class.test_layer_forwards_dt_to_neurons",
           "name": "test_layer_forwards_dt_to_neurons",
           "qname": "tests.unit.test_layer_neuron_class.test_layer_forwards_dt_to_neurons",
-          "line": 35,
+          "line": 37,
           "params": [
             "monkeypatch"
           ]
@@ -4816,14 +4818,14 @@
           "id": "fn:tests.unit.test_layer_neuron_class.test_layer_has_no_legacy_neuron_class_attr",
           "name": "test_layer_has_no_legacy_neuron_class_attr",
           "qname": "tests.unit.test_layer_neuron_class.test_layer_has_no_legacy_neuron_class_attr",
-          "line": 29,
+          "line": 31,
           "params": []
         },
         {
           "id": "fn:tests.unit.test_layer_neuron_class.test_layer_rejects_invalid_neuron_cls",
           "name": "test_layer_rejects_invalid_neuron_cls",
           "qname": "tests.unit.test_layer_neuron_class.test_layer_rejects_invalid_neuron_cls",
-          "line": 22,
+          "line": 24,
           "params": []
         }
       ]

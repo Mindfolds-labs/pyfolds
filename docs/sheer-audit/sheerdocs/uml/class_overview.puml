@@ -64,6 +64,7 @@ class "src.pyfolds.advanced.refractory.RefractoryMixin" {
 }
 
 class "src.pyfolds.advanced.short_term.ShortTermDynamicsMixin" {
+  +_align_short_term_buffers_device()
   +_init_short_term()
   +_update_short_term_dynamics()
   +forward()
@@ -623,6 +624,7 @@ class "tests.unit.advanced.test_refractory.TestRefractoryMixin" {
 
 class "tests.unit.advanced.test_short_term.TestShortTermDynamicsMixin" {
   +test_initialization()
+  +test_stp_buffers_remain_registered_after_device_alignment()
   +test_tsodyks_markram_recovery()
   +test_update_aligns_stp_buffers_to_input_device()
   +test_update_no_spikes()
