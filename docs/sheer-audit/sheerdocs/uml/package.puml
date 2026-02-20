@@ -132,6 +132,7 @@ package "tests.unit.test_run_pyfolds_runner" {}
 package "tests.unit.test_tf_backend" {}
 package "tests.unit.utils" {}
 package "tests.unit.utils.test_device" {}
+package "tests.unit.utils.test_logging" {}
 package "tests.unit.utils.test_math" {}
 package "tests.unit.utils.test_types" {}
 package "tests.unit.utils.test_utils" {}
@@ -215,7 +216,6 @@ package "tests.unit.wave.test_wave_neuron" {}
 "src.pyfolds.serialization" --> "src.pyfolds.foldio"
 "src.pyfolds.serialization" --> "src.pyfolds.versioned_checkpoint"
 "src.pyfolds.serialization.foldio" --> "src.pyfolds.serialization.ecc"
-"src.pyfolds.serialization.versioned_checkpoint" --> "src.pyfolds.serialization.ecc"
 "src.pyfolds.telemetry" --> "src.pyfolds.controller"
 "src.pyfolds.telemetry" --> "src.pyfolds.decorator"
 "src.pyfolds.telemetry" --> "src.pyfolds.events"

@@ -410,6 +410,7 @@ class "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint" {
   +_git_hash()
   +_metadata()
   +_resolve_safetensors_paths()
+  +_validate_model_shapes()
   +_validate_shape_invariants()
   +_verify_hash()
   +load()
@@ -533,9 +534,9 @@ class "src.pyfolds.utils.device.DeviceManager" {
 class "src.pyfolds.utils.logging.CircularBufferFileHandler" {
   +__init__()
   +_flush_to_disk()
+  +_flush_to_disk()
   +close()
   +emit()
-  +flush()
 }
 class "src.pyfolds.utils.logging.FixedLayoutFormatter" {
   +format()
@@ -870,6 +871,7 @@ class "tests.unit.utils.test_device.TestDevice" {
   +test_get_device()
   +test_infer_device()
 }
+
 
 class "tests.unit.utils.test_math.TestMath" {
   +test_clamp_R()

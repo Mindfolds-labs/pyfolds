@@ -5,11 +5,11 @@
     "commit": null
   },
   "metrics": {
-    "python_files": 138,
-    "symbols": 1030,
-    "edges": 1537,
+    "python_files": 139,
+    "symbols": 1035,
+    "edges": 1544,
     "findings": 0,
-    "internal_import_edges": 105
+    "internal_import_edges": 104
   },
   "modules": [
     {
@@ -1848,7 +1848,6 @@
         "mod:pathlib",
         "mod:pickle",
         "mod:shutil",
-        "mod:src.pyfolds.serialization.ecc",
         "mod:subprocess",
         "mod:torch",
         "mod:typing",
@@ -1859,7 +1858,7 @@
           "id": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
           "name": "VersionedCheckpoint",
           "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
-          "line": 28,
+          "line": 29,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
@@ -1871,6 +1870,7 @@
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_model_shapes",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load",
@@ -2462,16 +2462,16 @@
           "id": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
           "name": "CircularBufferFileHandler",
           "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler",
-          "line": 284,
+          "line": 285,
           "bases": [
             "logging.Handler"
           ],
           "methods": [
             "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.__init__",
             "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
+            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
             "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.close",
-            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.emit",
-            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.flush"
+            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.emit"
           ]
         },
         {
@@ -2518,7 +2518,7 @@
           "id": "fn:src.pyfolds.utils.logging.build_log_path",
           "name": "build_log_path",
           "qname": "src.pyfolds.utils.logging.build_log_path",
-          "line": 373,
+          "line": 382,
           "params": [
             "log_dir",
             "app",
@@ -2529,7 +2529,7 @@
           "id": "fn:src.pyfolds.utils.logging.get_logger",
           "name": "get_logger",
           "qname": "src.pyfolds.utils.logging.get_logger",
-          "line": 215,
+          "line": 216,
           "params": [
             "name"
           ]
@@ -2538,7 +2538,7 @@
           "id": "fn:src.pyfolds.utils.logging.next_log_path",
           "name": "next_log_path",
           "qname": "src.pyfolds.utils.logging.next_log_path",
-          "line": 356,
+          "line": 365,
           "params": [
             "log_dir",
             "app",
@@ -2549,13 +2549,13 @@
           "id": "fn:src.pyfolds.utils.logging.setup_logging",
           "name": "setup_logging",
           "qname": "src.pyfolds.utils.logging.setup_logging",
-          "line": 262,
+          "line": 263,
           "params": [
             "log_file",
             "level",
             "structured",
             "circular_buffer_lines",
-            "circular_flush_interval_sec",
+            "circular_buffer_flush_interval_sec",
             "console",
             "fixed_layout"
           ]
@@ -2564,7 +2564,7 @@
           "id": "fn:src.pyfolds.utils.logging.setup_run_logging",
           "name": "setup_run_logging",
           "qname": "src.pyfolds.utils.logging.setup_run_logging",
-          "line": 222,
+          "line": 223,
           "params": [
             "app",
             "version",
@@ -2574,7 +2574,7 @@
             "fixed_layout",
             "console",
             "circular_buffer_lines",
-            "circular_flush_interval_sec"
+            "circular_buffer_flush_interval_sec"
           ]
         },
         {
@@ -4140,7 +4140,7 @@
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
           "name": "test_versioned_checkpoint_safetensors_roundtrip",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
-          "line": 81,
+          "line": 86,
           "params": [
             "tmp_path"
           ]
@@ -4155,9 +4155,9 @@
           ]
         },
         {
-          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises",
-          "name": "test_versioned_checkpoint_shape_validation_raises",
-          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises",
+          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises_on_mismatch",
+          "name": "test_versioned_checkpoint_shape_validation_raises_on_mismatch",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises_on_mismatch",
           "line": 69,
           "params": [
             "tmp_path"
@@ -5391,6 +5391,48 @@
         }
       ],
       "functions": []
+    },
+    {
+      "id": "mod:tests.unit.utils.test_logging",
+      "qname": "tests.unit.utils.test_logging",
+      "file": "tests/unit/utils/test_logging.py",
+      "imports": [
+        "mod:logging",
+        "mod:pathlib",
+        "mod:pyfolds.utils.logging",
+        "mod:time"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.utils.test_logging._build_record",
+          "name": "_build_record",
+          "qname": "tests.unit.utils.test_logging._build_record",
+          "line": 8,
+          "params": [
+            "level",
+            "message"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.utils.test_logging.test_circular_buffer_flushes_immediately_on_error",
+          "name": "test_circular_buffer_flushes_immediately_on_error",
+          "qname": "tests.unit.utils.test_logging.test_circular_buffer_flushes_immediately_on_error",
+          "line": 35,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.utils.test_logging.test_circular_buffer_lazy_flush_by_interval",
+          "name": "test_circular_buffer_lazy_flush_by_interval",
+          "qname": "tests.unit.utils.test_logging.test_circular_buffer_lazy_flush_by_interval",
+          "line": 20,
+          "params": [
+            "tmp_path"
+          ]
+        }
+      ]
     },
     {
       "id": "mod:tests.unit.utils.test_math",

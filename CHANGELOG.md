@@ -16,6 +16,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - ADR traceability note in `src/pyfolds/serialization/foldio.py`.
 - Optional dependency group for examples with `torchvision` in `pyproject.toml`.
 - Public API deprecation policy for v1 aliases, including removal target in `2.0.0`, objective criteria (minimum major cycle, changelog notice, migration strategy), and contract test coverage.
+- `ModelIntegrityMonitor` para sanity check periódico de hash SHA-256 de pesos/buffers em runtime.
+- ADR-046 formalizando o monitoramento periódico de integridade de pesos como extensão de hardening da v2.0.2.
 
 ### Deprecated
 - v1 public aliases remain supported during `1.x` with `DeprecationWarning` and are scheduled for removal in `2.0.0`: `MPJRDConfig` (use `NeuronConfig`), `MPJRDLayer` (use `AdaptiveNeuronLayer`), and `MPJRDNetwork` (use `SpikingNetwork`).

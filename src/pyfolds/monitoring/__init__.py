@@ -11,6 +11,7 @@ from .mindcontrol import (
 
 __all__ = [
     "HealthStatus",
+    "ModelIntegrityMonitor",
     "NeuronHealthCheck",
     "NeuronHealthMonitor",
     "WeightIntegrityMonitor",

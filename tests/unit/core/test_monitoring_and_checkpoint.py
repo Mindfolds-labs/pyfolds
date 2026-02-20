@@ -3,8 +3,9 @@ from pathlib import Path
 
 import pytest
 import pyfolds
+import torch
 
-from pyfolds.monitoring import HealthStatus, NeuronHealthCheck
+from pyfolds.monitoring import HealthStatus, ModelIntegrityMonitor, NeuronHealthCheck
 from pyfolds.serialization import VersionedCheckpoint
 
 
@@ -104,3 +105,33 @@ def test_versioned_checkpoint_safetensors_roundtrip(tmp_path):
     loaded = VersionedCheckpoint.load(str(safetensor_path), model=neuron)
     assert loaded["metadata"]["backend"] == "safe"
     assert loaded["integrity_hash"] == payload["integrity_hash"]
+
+
+def test_model_integrity_monitor_detects_unexpected_mutation():
+    model = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4))
+    monitor = ModelIntegrityMonitor(model, check_every_n_steps=1)
+
+    baseline = monitor.set_baseline()
+    first = monitor.check_integrity()
+
+    assert first["integrity_ok"] is True
+    assert first["expected_hash"] == baseline
+
+    with torch.no_grad():
+        buf = next(model.buffers())
+        buf.add_(1)
+
+    second = monitor.check_integrity()
+    assert second["integrity_ok"] is False
+    assert second["current_hash"] != second["expected_hash"]
+
+
+def test_model_integrity_monitor_initializes_hash_on_first_check():
+    model = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4))
+    monitor = ModelIntegrityMonitor(model, check_every_n_steps=1)
+
+    payload = monitor.check_integrity()
+
+    assert payload["hash_initialized"] is True
+    assert isinstance(payload["current_hash"], str)
+    assert len(payload["current_hash"]) == 64

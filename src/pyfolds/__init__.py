@@ -38,6 +38,7 @@ from .serialization import (
 )
 from .monitoring import (
     HealthStatus,
+    ModelIntegrityMonitor,
     NeuronHealthCheck,
     MindControl,
     MindControlEngine,
@@ -119,6 +120,7 @@ __all__ = [
     "ECCProtector",
     "ecc_from_protection",
     "HealthStatus",
+    "ModelIntegrityMonitor",
     "NeuronHealthCheck",
     "MindControl",
     "MindControlEngine",
