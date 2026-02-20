@@ -1236,7 +1236,7 @@
       "name": "prepare_payload",
       "qname": "src.pyfolds.bridge.dispatcher.MindDispatcher.prepare_payload",
       "file": "src/pyfolds/bridge/dispatcher.py",
-      "line": 36,
+      "line": 40,
       "doc": "Mantém contrato legado do dispatcher para consumidores atuais.",
       "params": [
         "layer_id",
@@ -1256,7 +1256,7 @@
       "name": "get_topology_map",
       "qname": "src.pyfolds.bridge.dispatcher.MindDispatcher.get_topology_map",
       "file": "src/pyfolds/bridge/dispatcher.py",
-      "line": 60,
+      "line": 64,
       "doc": "Exporta estrutura em formato serializável sem dependências externas.",
       "params": [
         "network"
@@ -6315,7 +6315,7 @@
       "name": "VersionedCheckpoint",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 35,
+      "line": 33,
       "doc": null,
       "params": [],
       "returns": null,
@@ -6328,7 +6328,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 51,
+      "line": 49,
       "doc": "Args:\n    model: Modelo a ser salvo/restaurado\n    version: Versão semântica do modelo (ex: \"2.0.0\")",
       "params": [
         "self",
@@ -6345,7 +6345,7 @@
       "name": "_cfg_dict",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._cfg_dict",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 60,
+      "line": 58,
       "doc": "Extrai configuração do modelo em formato dict.",
       "params": [
         "self"
@@ -6360,7 +6360,7 @@
       "name": "_git_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 75,
+      "line": 73,
       "doc": "Obtém hash atual do git para reprodutibilidade.",
       "params": [
         "self"
@@ -6375,7 +6375,7 @@
       "name": "_metadata",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 100,
+      "line": 98,
       "doc": "Gera metadados para o checkpoint.",
       "params": [
         "self",
@@ -6391,7 +6391,7 @@
       "name": "_register_safe_globals",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._register_safe_globals",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 114,
+      "line": 112,
       "doc": "Registra tipos permitidos para carregamento seguro (weights_only=True).",
       "params": [
         "cls"
@@ -6403,12 +6403,30 @@
       ]
     },
     {
+      "id": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._load_checkpoint_with_filtered_warnings",
+      "kind": "method",
+      "name": "_load_checkpoint_with_filtered_warnings",
+      "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._load_checkpoint_with_filtered_warnings",
+      "file": "src/pyfolds/serialization/versioned_checkpoint.py",
+      "line": 142,
+      "doc": "Carrega checkpoint silenciando apenas UserWarnings de dicionário do PyTorch.",
+      "params": [
+        "path",
+        "map_location"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "staticmethod"
+      ]
+    },
+    {
       "id": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._to_weights_only_safe",
       "kind": "method",
       "name": "_to_weights_only_safe",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._to_weights_only_safe",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 143,
+      "line": 161,
       "doc": "Converte metadados para estrutura composta por tipos primitivos seguros.",
       "params": [
         "cls",
@@ -6426,7 +6444,7 @@
       "name": "_compute_plain_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_plain_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 170,
+      "line": 188,
       "doc": "Calcula hash SHA-256 puro do state_dict.",
       "params": [
         "self",
@@ -6442,7 +6460,7 @@
       "name": "_compute_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 183,
+      "line": 201,
       "doc": "Calcula digest de integridade do state dict (HMAC quando disponível).",
       "params": [
         "self",
@@ -6458,7 +6476,7 @@
       "name": "_verify_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 195,
+      "line": 213,
       "doc": null,
       "params": [
         "plain_digest",
@@ -6476,7 +6494,7 @@
       "name": "_resolve_safetensors_paths",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 214,
+      "line": 232,
       "doc": null,
       "params": [
         "path"
@@ -6493,7 +6511,7 @@
       "name": "_decode_with_ecc",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 223,
+      "line": 241,
       "doc": null,
       "params": [
         "raw_payload",
@@ -6512,7 +6530,7 @@
       "name": "_validate_shape_invariants",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 237,
+      "line": 255,
       "doc": "Valida shape dos tensores do checkpoint antes do load no modelo.",
       "params": [
         "model",
@@ -6530,7 +6548,7 @@
       "name": "save",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.save",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 251,
+      "line": 269,
       "doc": "Salva checkpoint e retorna payload persistido.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    extra_metadata: Metadados adicionais\n    compress: Usar compressão zip (recomendado para .pt)\n    use_safetensors: Usa formato seguro sem pickle para pesos\n    ecc_protection: Nível ECC de sidecar (off|low|med|high)\n\nReturns:\n    Dicionário com o checkpoint salvo",
       "params": [
         "self",
@@ -6549,7 +6567,7 @@
       "name": "_validate_model_shapes",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_model_shapes",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 322,
+      "line": 340,
       "doc": null,
       "params": [
         "model",
@@ -6567,7 +6585,7 @@
       "name": "load",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 345,
+      "line": 363,
       "doc": "Carrega checkpoint, valida hash e opcionalmente restaura modelo.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    model: Modelo para carregar o estado (opcional)\n    map_location: Device para carregar tensores\n    strict: Se True, valida hash e versão\n    expected_version: Versão esperada (opcional)\n\nReturns:\n    Dicionário com o checkpoint carregado\n\nRaises:\n    ValueError: Se hash/shape não coincidirem",
       "params": [
         "cls",
@@ -6589,7 +6607,7 @@
       "name": "load_secure",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load_secure",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 437,
+      "line": 455,
       "doc": "Carrega pesos via safetensors com validações rígidas de integridade.",
       "params": [
         "cls",
@@ -6608,7 +6626,7 @@
       "name": "__repr__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 467,
+      "line": 485,
       "doc": null,
       "params": [
         "self"
@@ -11622,6 +11640,19 @@
       "qname": "tests.unit.bridge.test_dispatcher.test_get_topology_map_uses_cfg_to_dict_when_available",
       "file": "tests/unit/bridge/test_dispatcher.py",
       "line": 33,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.bridge.test_dispatcher.test_capture_event_preserves_new_and_legacy_contract_keys",
+      "kind": "function",
+      "name": "test_capture_event_preserves_new_and_legacy_contract_keys",
+      "qname": "tests.unit.bridge.test_dispatcher.test_capture_event_preserves_new_and_legacy_contract_keys",
+      "file": "tests/unit/bridge/test_dispatcher.py",
+      "line": 38,
       "doc": null,
       "params": [],
       "returns": null,
@@ -20468,6 +20499,12 @@
     {
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
+      "dst": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._load_checkpoint_with_filtered_warnings",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
       "dst": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._to_weights_only_safe",
       "meta": {}
     },
@@ -23478,6 +23515,12 @@
       "meta": {}
     },
     {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.bridge.test_dispatcher",
+      "dst": "fn:tests.unit.bridge.test_dispatcher.test_capture_event_preserves_new_and_legacy_contract_keys",
+      "meta": {}
+    },
+    {
       "type": "IMPORT",
       "src": "mod:tests.unit.core.test_accumulator",
       "dst": "mod:pytest",
@@ -26187,8 +26230,8 @@
   "findings": [],
   "metrics": {
     "python_files": 143,
-    "symbols": 1082,
-    "edges": 1611,
+    "symbols": 1084,
+    "edges": 1613,
     "findings": 0,
     "internal_import_edges": 106
   }

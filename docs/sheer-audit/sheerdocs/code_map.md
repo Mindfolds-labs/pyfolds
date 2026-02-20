@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `143`
-- Símbolos: `1082`
+- Símbolos: `1084`
 
 ## Módulos
 
@@ -1142,6 +1142,7 @@
   - `_Layer` (bases: (sem base explícita))
   - `_Network` (bases: (sem base explícita))
 - Funções:
+  - `test_capture_event_preserves_new_and_legacy_contract_keys()`
   - `test_get_topology_map_uses_cfg_to_dict_when_available()`
   - `test_prepare_payload_tensor_fields_are_serializable()`
 

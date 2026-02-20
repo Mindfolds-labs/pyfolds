@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 143,
-    "symbols": 1082,
-    "edges": 1611,
+    "symbols": 1084,
+    "edges": 1613,
     "findings": 0,
     "internal_import_edges": 106
   },
@@ -1931,7 +1931,7 @@
           "id": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
           "name": "VersionedCheckpoint",
           "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
-          "line": 35,
+          "line": 33,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
@@ -1941,6 +1941,7 @@
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_plain_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._load_checkpoint_with_filtered_warnings",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._register_safe_globals",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
@@ -3998,6 +3999,13 @@
         }
       ],
       "functions": [
+        {
+          "id": "fn:tests.unit.bridge.test_dispatcher.test_capture_event_preserves_new_and_legacy_contract_keys",
+          "name": "test_capture_event_preserves_new_and_legacy_contract_keys",
+          "qname": "tests.unit.bridge.test_dispatcher.test_capture_event_preserves_new_and_legacy_contract_keys",
+          "line": 38,
+          "params": []
+        },
         {
           "id": "fn:tests.unit.bridge.test_dispatcher.test_get_topology_map_uses_cfg_to_dict_when_available",
           "name": "test_get_topology_map_uses_cfg_to_dict_when_available",
