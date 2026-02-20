@@ -23,11 +23,14 @@ class MutationCommand:
 class MutationQueue:
     """Thread-safe queue for deferred mutation application in neuron boundaries."""
 
-    def __init__(self) -> None:
-        self._queue: "queue.Queue[tuple[str, Any]]" = queue.Queue()
+    def __init__(self, maxsize: int = 1024) -> None:
+        self._queue: "queue.Queue[tuple[str, Any]]" = queue.Queue(maxsize=maxsize)
 
     def inject(self, param_name: str, value: Any) -> None:
-        self._queue.put((param_name, value))
+        try:
+            self._queue.put_nowait((param_name, value))
+        except queue.Full:
+            return
 
     def fetch_all(self) -> list[tuple[str, Any]]:
         mutations: list[tuple[str, Any]] = []

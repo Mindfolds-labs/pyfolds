@@ -19,6 +19,7 @@ import json
 import mmap
 import os
 import platform
+import shutil
 import struct
 import subprocess
 import sys
@@ -171,22 +172,20 @@ def crc32c_u32(data: bytes) -> int:
         stacklevel=2,
     )
 
-    # Fallback de CRC32C (Castagnoli) sem dependências externas.
-    # Implementação por bit refletido com polinômio reverso 0x82F63B78.
-    crc = 0xFFFFFFFF
-    for b in data:
-        crc ^= b
-        for _ in range(8):
-            if crc & 1:
-                crc = (crc >> 1) ^ 0x82F63B78
-            else:
-                crc >>= 1
-    return (~crc) & 0xFFFFFFFF
+    return _crc32c_fallback(data)
 
 
 def sha256_hex(data: bytes) -> str:
-    """Retorna digest SHA-256 em formato hexadecimal."""
-    return hashlib.sha256(data).hexdigest()
+    """Retorna digest de integridade (SHA-256 ou HMAC-SHA256 com chave de ambiente)."""
+    digest = hashlib.sha256(data).hexdigest()
+    key = os.getenv("PYFOLDS_INTEGRITY_KEY")
+    if not key:
+        return f"sha256:{digest}"
+    return "hmac-sha256:" + hmac.new(
+        key.encode("utf-8"),
+        digest.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
 
 
 def _json_bytes(obj: Any) -> bytes:
@@ -210,8 +209,11 @@ def _cfg_to_dict(cfg: Any) -> Any:
 
 
 def _safe_git_hash() -> str:
+    git_bin = shutil.which("git")
+    if not git_bin:
+        return "unknown"
     out = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
+        [git_bin, "rev-parse", "HEAD"],
         check=False,
         capture_output=True,
         text=True,
@@ -645,10 +647,8 @@ class FoldReader:
                     json.dumps(manifest_data, sort_keys=True, separators=(",", ":")).encode("utf-8")
                 )
                 if actual_manifest != expected_manifest:
-                    warnings.warn(
-                        "Manifest hash divergente: metadados podem estar corrompidos.",
-                        RuntimeWarning,
-                        stacklevel=2,
+                    raise FoldSecurityError(
+                        "Manifest hash divergente: metadados podem estar corrompidos ou adulterados."
                     )
 
         raw = self._decompress(comp, flags)
@@ -678,8 +678,13 @@ class _TrustedFoldReader(FoldReader):
         map_location: str = "cpu",
         verify: bool = True,
     ) -> Any:
+        if os.getenv("PYFOLDS_ALLOW_LEGACY_TORCH_LOAD", "0") != "1":
+            raise FoldSecurityError(
+                "Desserialização torch legada bloqueada por padrão. "
+                "Defina PYFOLDS_ALLOW_LEGACY_TORCH_LOAD=1 apenas em ambiente confiável."
+            )
         payload = self.read_chunk_bytes(name, verify=verify)
-        return torch.load(io.BytesIO(payload), map_location=map_location)
+        return torch.load(io.BytesIO(payload), map_location=map_location, weights_only=False)
 
 
 def _expression_summary(neuron: Any) -> Dict[str, Any]:
