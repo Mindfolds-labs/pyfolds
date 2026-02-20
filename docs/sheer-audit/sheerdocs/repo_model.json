@@ -942,7 +942,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.short_term.ShortTermDynamicsMixin.forward",
       "file": "src/pyfolds/advanced/short_term.py",
-      "line": 107,
+      "line": 105,
       "doc": "Forward pass com dinâmica de curto prazo.\n\n✅ SEMÂNTICA GLOBAL (agregado sobre batch)\n✅ CORRIGIDO: sem criação de tensores desnecessários\n\nArgs:\n    x: Tensor de entrada [B, D, S]\n    **kwargs: Argumentos adicionais (dt, etc.)\n\nReturns:\n    Dict com spikes, potenciais e métricas de STP",
       "params": [
         "self",
