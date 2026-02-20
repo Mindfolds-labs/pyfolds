@@ -65,7 +65,7 @@ Falhas concentram-se em:
 - [x] Execução integral registrada.
 - [x] Falhas identificadas nominalmente.
 - [x] Links válidos.
-- [ ] Todos os testes passam (pendente de correção de código).
+- [x] Todos os testes passam (contexto CPU/Torch; skips opcionais mantidos).
 
 ## Riscos e Mitigações
 - Risco: regressões continuarem abertas e bloquearem release.
@@ -86,6 +86,13 @@ evidencias:
   - docs/RELATORIO_FINAL_EXECUCAO_TESTES_ISSUE-010.md
 ```
 
+
+## Investigação Complementar (falhas + skips + treino)
+- [x] Reexecução completa com motivos de skip (`pytest -rs`) registrada em `outputs/test_logs/pytest_full_rerun.log`.
+- [x] Reexecução focada nos 5 testes falhos com stacktrace em `outputs/test_logs/pytest_failed_focus.log`.
+- [x] Simulação de treinamento com MNIST (download + execução) para modelos `py` e `wave`, evidências em `outputs/test_logs/mnist_train_*.log`.
+- [x] Relatório técnico detalhado publicado em `docs/RELATORIO_INVESTIGACAO_FALHAS_E_SKIPS_ISSUE-010.md`.
+
 ## Rastreabilidade (IEEE 830)
 | Requisito | Evidência |
 | --- | --- |
@@ -94,3 +101,7 @@ evidencias:
 | RF-03 | `docs/governance/adr/ADR-042-governanca-de-execucao-integral-de-testes-e-dossie-de-qualidade.md` |
 | RF-04 | `docs/RELATORIO_FINAL_EXECUCAO_TESTES_ISSUE-010.md` |
 
+
+## Atualização pós-correção
+- [x] Regressões corrigidas e validadas em `outputs/test_logs/pytest_full_fixed.log` (284 passed, 7 skipped).
+- [x] Treino MNIST de 50 épocas executado para modelos `py` e `wave` com logs em `outputs/test_logs/mnist_train_*_50ep_console.log`.

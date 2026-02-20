@@ -104,3 +104,13 @@ A execução foi completa, rastreável e alinhada à governança documental. O p
 - ADR vinculada: `docs/governance/adr/ADR-042-governanca-de-execucao-integral-de-testes-e-dossie-de-qualidade.md`
 - Issue vinculada: `docs/development/prompts/relatorios/ISSUE-010-falhas-regressivas-na-su-te-completa-de-testes.md`
 - Logs completos: `outputs/test_logs/`
+
+## 9. Investigação complementar (solicitação adicional)
+Após feedback, foi conduzida investigação específica dos testes falhos e pulados, incluindo simulação de treinamento com dataset real (MNIST) e confirmação operacional do ambiente com internet.
+
+Resumo:
+- Falhas persistem em 5 testes (clusters: `mode` str/enum, backprop-off vs ganho dendrítico, alias legado público).
+- Skips (7) foram explicados por dependências opcionais ausentes (TensorFlow, cryptography) e falta de CUDA.
+- Treino MNIST executado com sucesso para `py` e `wave` em 1 época (pipeline funcional).
+
+Relatório detalhado: `docs/RELATORIO_INVESTIGACAO_FALHAS_E_SKIPS_ISSUE-010.md`.

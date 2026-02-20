@@ -1,0 +1,542 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.19, pytest-9.0.2, pluggy-1.6.0 -- /root/.pyenv/versions/3.10.19/bin/python
+cachedir: .pytest_cache
+preflight: torch detectado
+rootdir: /workspace/pyfolds
+configfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)
+collecting ... collected 294 items / 3 deselected / 291 selected
+
+tests/integration/test_advanced_integration.py::test_all_mixins_together_smoke PASSED [  0%]
+tests/integration/test_mnist_file_logging.py::test_pyfolds_imports_are_stable PASSED [  0%]
+tests/integration/test_mnist_file_logging.py::test_training_script_runs_end_to_end PASSED [  1%]
+tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_full_pipeline PASSED [  1%]
+tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain PASSED [  1%]
+tests/integration/test_temporal_sequence_stability.py::test_forward_sequence_torch_stability_minimal_criteria PASSED [  2%]
+tests/integration/test_temporal_sequence_stability.py::test_tf_sequence_equivalent_stability_minimal_criteria SKIPPED [  2%]
+tests/integration/test_training_loop.py::TestTrainingLoop::test_batch_training PASSED [  2%]
+tests/performance/test_memory_usage.py::TestMemoryUsage::test_memory_leak PASSED [  3%]
+tests/test_corruption_detection.py::test_bit_flip_is_detected PASSED     [  3%]
+tests/test_corruption_detection.py::test_truncation_is_detected PASSED   [  3%]
+tests/test_corruption_detection.py::test_invalid_magic_is_rejected PASSED [  4%]
+tests/test_corruption_detection.py::test_huge_index_len_dos_guard PASSED [  4%]
+tests/test_corruption_detection.py::test_partial_read_raises_eoferror PASSED [  4%]
+tests/test_fold_corruption.py::test_fold_corruption_is_detected PASSED   [  5%]
+tests/test_fold_fuzz.py::test_fold_reader_rejects_random_payload PASSED  [  5%]
+tests/tools/test_batch_create_issues.py::test_validate_batch_structure_duplicate_ids PASSED [  5%]
+tests/tools/test_create_issue_report.py::test_generate_yaml_frontmatter_contains_id PASSED [  6%]
+tests/tools/test_link_validation.py::test_validate_links_missing PASSED  [  6%]
+tests/tools/test_sync_hub_auto.py::test_status_to_emoji_done PASSED      [  6%]
+tests/tools/test_validate_issue_format.py::test_validate_structure_filename PASSED [  7%]
+tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_initialization PASSED [  7%]
+tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_decay PASSED [  7%]
+tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_increment PASSED [  8%]
+tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_respects_string_inference_mode PASSED [  8%]
+tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_forward_updates_u_for_downstream_mixins PASSED [  8%]
+tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_initialization PASSED [  9%]
+tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_backprop_queue PASSED [  9%]
+tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_dendrite_amplification_decay PASSED [  9%]
+tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_bap_proportional_uses_dendritic_contribution PASSED [ 10%]
+tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_time_counter_advances_only_after_forward PASSED [ 10%]
+tests/unit/advanced/test_inhibition.py::TestInhibitionLayer::test_initialization PASSED [ 10%]
+tests/unit/advanced/test_inhibition.py::TestInhibitionLayer::test_lateral_kernel PASSED [ 11%]
+tests/unit/advanced/test_inhibition.py::TestInhibitionLayer::test_forward_feedforward PASSED [ 11%]
+tests/unit/advanced/test_inhibition.py::TestInhibitionLayer::test_apply_inhibition_accepts_u_values PASSED [ 12%]
+tests/unit/advanced/test_inhibition.py::TestInhibitionLayer::test_e2i_initialization_is_deterministic PASSED [ 12%]
+tests/unit/advanced/test_inhibition.py::TestInhibitionMixin::test_forward_requires_initialized_inhibition PASSED [ 12%]
+tests/unit/advanced/test_refractory.py::TestRefractoryMixin::test_initialization PASSED [ 13%]
+tests/unit/advanced/test_refractory.py::TestRefractoryMixin::test_check_refractory_periods PASSED [ 13%]
+tests/unit/advanced/test_refractory.py::TestRefractoryMixin::test_update_refractory PASSED [ 13%]
+tests/unit/advanced/test_refractory.py::TestRefractoryMixin::test_refractory_blocks_spikes PASSED [ 14%]
+tests/unit/advanced/test_refractory.py::TestRefractoryMixin::test_forward_increments_time_once PASSED [ 14%]
+tests/unit/advanced/test_refractory.py::TestRefractoryMixin::test_homeostasis_does_not_update_theta_in_refractory PASSED [ 14%]
+tests/unit/advanced/test_short_term.py::TestShortTermDynamicsMixin::test_initialization PASSED [ 15%]
+tests/unit/advanced/test_short_term.py::TestShortTermDynamicsMixin::test_update_no_spikes PASSED [ 15%]
+tests/unit/advanced/test_short_term.py::TestShortTermDynamicsMixin::test_update_with_spikes PASSED [ 15%]
+tests/unit/advanced/test_short_term.py::TestShortTermDynamicsMixin::test_tsodyks_markram_recovery PASSED [ 16%]
+tests/unit/advanced/test_short_term.py::TestShortTermDynamicsMixin::test_update_aligns_stp_buffers_to_input_device SKIPPED [ 16%]
+tests/unit/advanced/test_short_term.py::TestShortTermDynamicsMixin::test_stp_buffers_remain_registered_after_device_alignment PASSED [ 16%]
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_initialization PASSED [ 17%]
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_trace_decay PASSED [ 17%]
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_pre_spike_updates_trace PASSED [ 17%]
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_should_apply_stdp PASSED [ 18%]
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_stdp_updates_underlying_synapses_online PASSED [ 18%]
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_stdp_input_source_raw_vs_stp PASSED [ 18%]
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_ltd_rule_classic_vs_current PASSED [ 19%]
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_stdp_update_is_batch_size_invariant_for_identical_samples PASSED [ 19%]
+tests/unit/core/test_accumulator.py::TestStatisticsAccumulator::test_initialization PASSED [ 19%]
+tests/unit/core/test_accumulator.py::TestStatisticsAccumulator::test_accumulate PASSED [ 20%]
+tests/unit/core/test_accumulator.py::TestStatisticsAccumulator::test_history_respects_max_len PASSED [ 20%]
+tests/unit/core/test_accumulator.py::TestStatisticsAccumulator::test_accumulate_rejects_invalid_shape PASSED [ 20%]
+tests/unit/core/test_accumulator.py::TestStatisticsAccumulator::test_track_extra_accumulates_scalars_and_vectors PASSED [ 21%]
+tests/unit/core/test_accumulator.py::TestStatisticsAccumulator::test_reset_clears_state_and_history PASSED [ 21%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_default_values PASSED [ 21%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_custom_values PASSED [ 22%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_validation PASSED  [ 22%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_get_decay_rate_validation PASSED [ 23%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_get_decay_rate_negative_dt_validation PASSED [ 23%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_numerical_safety_validation PASSED [ 23%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs0] PASSED [ 24%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs1] PASSED [ 24%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs2] PASSED [ 24%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs3] PASSED [ 25%]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs4] PASSED [ 25%]
+tests/unit/core/test_config.py::test_hebbian_ltd_ratio_must_be_non_negative PASSED [ 25%]
+tests/unit/core/test_config_advanced_order_flags.py::test_accepts_stdp_source_and_ltd_rule_flags PASSED [ 26%]
+tests/unit/core/test_config_advanced_order_flags.py::test_rejects_invalid_order_flags[kwargs0] PASSED [ 26%]
+tests/unit/core/test_config_advanced_order_flags.py::test_rejects_invalid_order_flags[kwargs1] PASSED [ 26%]
+tests/unit/core/test_dendrite.py::TestMPJRDDendrite::test_initialization PASSED [ 27%]
+tests/unit/core/test_dendrite.py::TestMPJRDDendrite::test_forward PASSED [ 27%]
+tests/unit/core/test_dendrite.py::TestMPJRDDendrite::test_u_R_optional_state PASSED [ 27%]
+tests/unit/core/test_dendrite.py::TestMPJRDDendrite::test_update_uses_local_pre_rate_per_synapse PASSED [ 28%]
+tests/unit/core/test_factory.py::test_create_neuron_infers_standard_type PASSED [ 28%]
+tests/unit/core/test_factory.py::test_create_neuron_infers_wave_type PASSED [ 28%]
+tests/unit/core/test_factory.py::test_factory_raises_for_unregistered_type PASSED [ 29%]
+tests/unit/core/test_health_monitor.py::test_health_monitor_runs_and_scores PASSED [ 29%]
+tests/unit/core/test_homeostasis.py::TestHomeostasisController::test_initialization PASSED [ 29%]
+tests/unit/core/test_homeostasis.py::TestHomeostasisController::test_update PASSED [ 30%]
+tests/unit/core/test_homeostasis.py::TestHomeostasisController::test_is_stable_accepts_tolerance PASSED [ 30%]
+tests/unit/core/test_homeostasis.py::TestHomeostasisController::test_update_limits_theta_step PASSED [ 30%]
+tests/unit/core/test_homeostasis.py::TestHomeostasisController::test_dead_neuron_rescue_has_minimum_strength PASSED [ 31%]
+tests/unit/core/test_input_validation_contract.py::test_neuron_rejects_non_tensor_input PASSED [ 31%]
+tests/unit/core/test_input_validation_contract.py::test_neuron_rejects_input_from_different_device PASSED [ 31%]
+tests/unit/core/test_input_validation_contract.py::test_layer_prepare_input_accepts_supported_shapes PASSED [ 32%]
+tests/unit/core/test_input_validation_contract.py::test_layer_prepare_input_rejects_invalid_shape PASSED [ 32%]
+tests/unit/core/test_monitoring_and_checkpoint.py::test_health_check_critical_for_dead_neurons PASSED [ 32%]
+tests/unit/core/test_monitoring_and_checkpoint.py::test_health_check_uses_fallback_metrics_from_get_metrics_contract PASSED [ 33%]
+tests/unit/core/test_monitoring_and_checkpoint.py::test_versioned_checkpoint_save_and_load PASSED [ 33%]
+tests/unit/core/test_monitoring_and_checkpoint.py::test_versioned_checkpoint_metadata_created_at_is_utc PASSED [ 34%]
+tests/unit/core/test_neuromodulation.py::TestNeuromodulator::test_external_mode PASSED [ 34%]
+tests/unit/core/test_neuromodulation.py::TestNeuromodulator::test_surprise_mode PASSED [ 34%]
+tests/unit/core/test_neuromodulation.py::TestNeuromodulator::test_rejects_non_finite_inputs PASSED [ 35%]
+tests/unit/core/test_neuromodulation.py::TestNeuromodulator::test_infers_output_device_from_tensor_inputs PASSED [ 35%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_initialization PASSED [ 35%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_forward PASSED     [ 36%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_nmda_shunting_exposes_dendritic_contribution PASSED [ 36%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_step_alias PASSED  [ 36%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_forward_mode_override_is_reported PASSED [ 37%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_online_plasticity_updates_when_not_deferred PASSED [ 37%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_batch_plasticity_preserves_local_pre_synaptic_rate PASSED [ 37%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_modes[online] PASSED [ 38%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_modes[batch] PASSED [ 38%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_modes[inference] PASSED [ 38%]
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_nmda_theta_eff_caps_unreachable_threshold PASSED [ 39%]
+tests/unit/core/test_neuron_v2.py::test_forward_shapes_v2 PASSED         [ 39%]
+tests/unit/core/test_neuron_v2.py::test_cooperative_sum_uses_multiple_dendrites PASSED [ 39%]
+tests/unit/core/test_neuron_v2.py::test_step_id_thread_safe_increment_v2 PASSED [ 40%]
+tests/unit/core/test_neuron_v2.py::test_theta_eff_caps_unreachable_threshold PASSED [ 40%]
+tests/unit/core/test_neuron_v2.py::test_vectorization_and_forward_integrity_batch64 PASSED [ 40%]
+tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_initialization PASSED [ 41%]
+tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_ltp PASSED       [ 41%]
+tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_update_respects_plastic_flag PASSED [ 41%]
+tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_update_filters_inactive_pre_synaptic_activity PASSED [ 42%]
+tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_update_uses_absolute_dt_and_mode_multiplier PASSED [ 42%]
+tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_saturation_recovery_disables_protection_after_timeout PASSED [ 42%]
+tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_negative_neuromodulation_promotes_ltd PASSED [ 43%]
+tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_consolidate_transfers_eligibility_and_decays_internal_potential PASSED [ 43%]
+tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_update_supports_explicit_hebbian_ltd_component PASSED [ 43%]
+tests/unit/network/test_network_edge_cases.py::test_prepare_input_with_single_dendrite_avoids_division_by_zero PASSED [ 44%]
+tests/unit/neuron/test_adaptation_sfa.py::test_sfa_applies_before_threshold_and_reduces_spiking_probability PASSED [ 44%]
+tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain PASSED [ 45%]
+tests/unit/neuron/test_contract_conformance.py::test_torch_contract_invariants_order_and_time_step_end_of_step PASSED [ 45%]
+tests/unit/neuron/test_contract_conformance.py::test_torch_and_tf_contract_conformance_with_same_artificial_input_and_tolerance SKIPPED [ 45%]
+tests/unit/neuron/test_integration_stability.py::test_forward_clamps_non_finite_dendritic_sum PASSED [ 46%]
+tests/unit/neuron/test_refractory.py::test_absolute_refractory_is_inviolable PASSED [ 46%]
+tests/unit/neuron/test_stp_stdp_contracts.py::test_stdp_reads_pre_stp_input_for_pre_spikes_and_ltd_uses_pre_spike_gate PASSED [ 46%]
+tests/unit/neuron/test_time_counter.py::test_time_counter_increments_at_end_of_forward_step PASSED [ 47%]
+tests/unit/serialization/test_foldio.py::test_fold_roundtrip_and_peek PASSED [ 47%]
+tests/unit/serialization/test_foldio.py::test_fold_roundtrip_preserves_state_dict_after_forward_steps PASSED [ 47%]
+tests/unit/serialization/test_foldio.py::test_training_then_save_with_telemetry_and_history_and_nuclear_arrays PASSED [ 48%]
+tests/unit/serialization/test_foldio.py::test_detects_corruption PASSED  [ 48%]
+tests/unit/serialization/test_foldio.py::test_hierarchical_hashes_present_in_metadata PASSED [ 48%]
+tests/unit/serialization/test_foldio.py::test_ecc_from_protection_mapping PASSED [ 49%]
+tests/unit/serialization/test_foldio.py::test_ecc_roundtrip_if_available PASSED [ 49%]
+tests/unit/serialization/test_foldio.py::test_crc32c_matches_known_vector PASSED [ 49%]
+tests/unit/serialization/test_foldio.py::test_fold_reader_bounds_validation_with_mmap PASSED [ 50%]
+tests/unit/serialization/test_foldio.py::test_fold_reader_bounds_validation_negative_values PASSED [ 50%]
+tests/unit/serialization/test_foldio.py::test_fold_reader_index_size_validation PASSED [ 50%]
+tests/unit/serialization/test_foldio.py::test_fold_reader_index_offset_validation PASSED [ 51%]
+tests/unit/serialization/test_foldio.py::test_fold_reader_header_len_validation PASSED [ 51%]
+tests/unit/serialization/test_foldio.py::test_fold_writer_finalize_wraps_io_failure_with_phase_context PASSED [ 51%]
+tests/unit/serialization/test_foldio.py::test_fold_reader_reports_magic_values PASSED [ 52%]
+tests/unit/serialization/test_foldio.py::test_fold_reader_exit_closes_file_even_if_mmap_close_fails PASSED [ 52%]
+tests/unit/serialization/test_foldio.py::test_fold_writer_finalize_wraps_failures_with_phase[write_index-<lambda>-flush failed] PASSED [ 52%]
+tests/unit/serialization/test_foldio.py::test_fold_writer_finalize_wraps_failures_with_phase[fsync_index-<lambda>-fsync index failed] PASSED [ 53%]
+tests/unit/serialization/test_foldio.py::test_fold_writer_finalize_wraps_failures_with_phase[write_header-<lambda>-seek failed] PASSED [ 53%]
+tests/unit/serialization/test_foldio.py::test_fold_writer_finalize_wraps_failures_with_phase[write_header-<lambda>-write failed] PASSED [ 53%]
+tests/unit/serialization/test_foldio.py::test_fold_manifest_includes_governance_sections PASSED [ 54%]
+tests/unit/serialization/test_foldio.py::test_fold_signature_roundtrip_if_cryptography_available SKIPPEDdule named
+'cryptography')                                                          [ 54%]
+tests/unit/telemetry/test_controller.py::TestTelemetryController::test_initialization PASSED [ 54%]
+tests/unit/telemetry/test_controller.py::TestTelemetryController::test_profile_off PASSED [ 55%]
+tests/unit/telemetry/test_controller.py::TestTelemetryController::test_profile_light PASSED [ 55%]
+tests/unit/telemetry/test_controller.py::TestTelemetryController::test_profile_heavy PASSED [ 56%]
+tests/unit/telemetry/test_controller.py::TestTelemetryController::test_should_emit_sample PASSED [ 56%]
+tests/unit/telemetry/test_controller.py::TestTelemetryController::test_step_count_increments PASSED [ 56%]
+tests/unit/telemetry/test_controller.py::TestTelemetryController::test_snapshot_and_clear PASSED [ 57%]
+tests/unit/telemetry/test_controller.py::TestTelemetryController::test_get_stats PASSED [ 57%]
+tests/unit/telemetry/test_decorator.py::TestTelemetryDecorator::test_decorator_basic PASSED [ 57%]
+tests/unit/telemetry/test_decorator.py::TestTelemetryDecorator::test_decorator_with_sample_rate PASSED [ 58%]
+tests/unit/telemetry/test_decorator.py::TestTelemetryDecorator::test_decorator_lazy_evaluation PASSED [ 58%]
+tests/unit/telemetry/test_ringbuffer.py::TestRingBuffer::test_append PASSED [ 58%]
+tests/unit/telemetry/test_ringbuffer.py::TestRingBuffer::test_snapshot_with_none PASSED [ 59%]
+tests/unit/telemetry/test_ringbuffer.py::TestRingBuffer::test_empty_snapshot PASSED [ 59%]
+tests/unit/telemetry/test_ringbuffer.py::TestRingBuffer::test_len PASSED [ 59%]
+tests/unit/telemetry/test_ringbuffer.py::TestRingBuffer::test_clear PASSED [ 60%]
+tests/unit/telemetry/test_ringbuffer.py::TestRingBuffer::test_capacity_property PASSED [ 60%]
+tests/unit/telemetry/test_ringbuffer.py::TestRingBuffer::test_is_full PASSED [ 60%]
+tests/unit/telemetry/test_ringbuffer.py::TestRingBuffer::test_extend PASSED [ 61%]
+tests/unit/telemetry/test_ringbuffer.py::TestRingBuffer::test_thread_safety PASSED [ 61%]
+tests/unit/telemetry/test_sinks.py::TestMemorySink::test_emit PASSED     [ 61%]
+tests/unit/telemetry/test_sinks.py::TestMemorySink::test_capacity_limit PASSED [ 62%]
+tests/unit/telemetry/test_sinks.py::TestMemorySink::test_clear PASSED    [ 62%]
+tests/unit/telemetry/test_sinks.py::TestConsoleSink::test_verbose PASSED [ 62%]
+tests/unit/telemetry/test_sinks.py::TestConsoleSink::test_non_verbose PASSED [ 63%]
+tests/unit/telemetry/test_sinks.py::TestJSONLinesSink::test_emit_basic PASSED [ 63%]
+tests/unit/telemetry/test_sinks.py::TestJSONLinesSink::test_truncate_mode PASSED [ 63%]
+tests/unit/telemetry/test_sinks.py::TestJSONLinesSink::test_append_mode PASSED [ 64%]
+tests/unit/telemetry/test_sinks.py::TestJSONLinesSink::test_tensor_serialization PASSED [ 64%]
+tests/unit/telemetry/test_sinks.py::TestJSONLinesSink::test_depth_limit_serialization PASSED [ 64%]
+tests/unit/telemetry/test_sinks.py::TestJSONLinesSink::test_non_serializable_fallback PASSED [ 65%]
+tests/unit/telemetry/test_sinks.py::TestDistributorSink::test_distributes_to_all_sinks PASSED [ 65%]
+tests/unit/telemetry/test_sinks.py::TestDistributorSink::test_sink_failure_doesnt_affect_others PASSED [ 65%]
+tests/unit/telemetry/test_types.py::TestPayloadTypes::test_forward_payload PASSED [ 66%]
+tests/unit/telemetry/test_types.py::TestPayloadTypes::test_commit_payload PASSED [ 66%]
+tests/unit/telemetry/test_types.py::TestPayloadTypes::test_sleep_payload PASSED [ 67%]
+tests/unit/test_backend_contracts.py::test_import_and_object_construction_v1_v2 PASSED [ 67%]
+tests/unit/test_backend_contracts.py::test_torch_backend_shape_and_state_contracts PASSED [ 67%]
+tests/unit/test_backend_contracts.py::test_torch_backend_v2_accepts_multidim_batch_contract PASSED [ 68%]
+tests/unit/test_backend_contracts.py::test_tf_backend_conditional_shape_state_contracts SKIPPED [ 68%]
+tests/unit/test_design_improvements.py::test_factory_creates_builtin_types PASSED [ 68%]
+tests/unit/test_design_improvements.py::test_factory_custom_registry_and_unknown_type PASSED [ 69%]
+tests/unit/test_design_improvements.py::test_learning_mode_context_restores_even_on_error PASSED [ 69%]
+tests/unit/test_design_improvements.py::test_network_builder_connects_layers_and_builds PASSED [ 69%]
+tests/unit/test_layer_neuron_class.py::test_layer_accepts_neuron_v2 PASSED [ 70%]
+tests/unit/test_layer_neuron_class.py::test_layer_rejects_invalid_neuron_cls PASSED [ 70%]
+tests/unit/test_layer_neuron_class.py::test_layer_has_no_legacy_neuron_class_attr PASSED [ 70%]
+tests/unit/test_layer_neuron_class.py::test_layer_forwards_dt_to_neurons PASSED [ 71%]
+tests/unit/test_learning_mode_consistency.py::test_learning_mode_single_source PASSED [ 71%]
+tests/unit/test_learning_mode_consistency.py::test_learning_mode_from_string PASSED [ 71%]
+tests/unit/test_learning_mode_consistency.py::test_layer_accepts_mode_string PASSED [ 72%]
+tests/unit/test_learning_mode_consistency.py::test_layer_accepts_mode_enum PASSED [ 72%]
+tests/unit/test_learning_mode_consistency.py::test_layer_rejects_invalid_mode PASSED [ 72%]
+tests/unit/test_learning_mode_consistency.py::test_network_accepts_mode_string PASSED [ 73%]
+tests/unit/test_learning_mode_consistency.py::test_network_rejects_invalid_mode PASSED [ 73%]
+tests/unit/test_public_import_surface.py::test_public_all_exports_are_importable PASSED [ 73%]
+tests/unit/test_public_import_surface.py::test_v2_surface_is_canonical_and_instantiable PASSED [ 74%]
+tests/unit/test_public_import_surface.py::test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0 PASSED [ 74%]
+tests/unit/test_public_import_surface.py::test_telemetry_controller_basic_flow PASSED [ 74%]
+tests/unit/test_run_pyfolds_runner.py::test_runner_logs_syntax_error PASSED [ 75%]
+tests/unit/test_run_pyfolds_runner.py::test_runner_logs_runtime_error_and_propagates_exit_code PASSED [ 75%]
+tests/unit/test_run_pyfolds_runner.py::test_runner_tee_prints_progress PASSED [ 75%]
+tests/unit/test_run_pyfolds_runner.py::test_runner_timeout_watchdog PASSED [ 76%]
+tests/unit/test_run_pyfolds_runner.py::test_runner_retry_and_metrics_csv PASSED [ 76%]
+tests/unit/test_tf_backend.py::test_importing_pyfolds_still_works_without_tensorflow PASSED [ 76%]
+tests/unit/test_tf_backend.py::test_tf_backend_guard_when_tensorflow_is_missing PASSED [ 77%]
+tests/unit/test_tf_backend.py::test_tf_cell_state_and_step_contract SKIPPED [ 77%]
+tests/unit/test_tf_backend.py::test_tf_layer_integrates_with_keras_rnn SKIPPED [ 78%]
+tests/unit/utils/test_device.py::TestDevice::test_infer_device PASSED    [ 78%]
+tests/unit/utils/test_device.py::TestDevice::test_get_device PASSED      [ 78%]
+tests/unit/utils/test_math.py::TestMath::test_safe_div PASSED            [ 79%]
+tests/unit/utils/test_math.py::TestMath::test_clamp_rate PASSED          [ 79%]
+tests/unit/utils/test_math.py::TestMath::test_clamp_R PASSED             [ 79%]
+tests/unit/utils/test_math.py::TestMath::test_safe_weight_law_is_bounded_and_finite PASSED [ 80%]
+tests/unit/utils/test_types.py::TestTypes::test_learning_mode PASSED     [ 80%]
+tests/unit/utils/test_types.py::TestTypes::test_connection_type PASSED   [ 80%]
+tests/unit/utils/test_utils.py::TestMath::test_safe_div_basic PASSED     [ 81%]
+tests/unit/utils/test_utils.py::TestMath::test_safe_div_by_zero PASSED   [ 81%]
+tests/unit/utils/test_utils.py::TestMath::test_clamp_rate_tensor PASSED  [ 81%]
+tests/unit/utils/test_utils.py::TestMath::test_clamp_rate_float PASSED   [ 82%]
+tests/unit/utils/test_utils.py::TestMath::test_clamp_R_tensor PASSED     [ 82%]
+tests/unit/utils/test_utils.py::TestMath::test_clamp_R_float PASSED      [ 82%]
+tests/unit/utils/test_utils.py::TestMath::test_xavier_init_shape PASSED  [ 83%]
+tests/unit/utils/test_utils.py::TestMath::test_xavier_init_gain PASSED   [ 83%]
+tests/unit/utils/test_utils.py::TestMath::test_calculate_vc_dimension PASSED [ 83%]
+tests/unit/utils/test_utils.py::TestDevice::test_infer_device_none PASSED [ 84%]
+tests/unit/utils/test_utils.py::TestDevice::test_infer_device_tensor_cpu PASSED [ 84%]
+tests/unit/utils/test_utils.py::TestDevice::test_infer_device_tensor_cuda PASSED [ 84%]
+tests/unit/utils/test_utils.py::TestDevice::test_infer_device_dict PASSED [ 85%]
+tests/unit/utils/test_utils.py::TestDevice::test_infer_device_empty_dict PASSED [ 85%]
+tests/unit/utils/test_utils.py::TestDevice::test_ensure_device_no_change PASSED [ 85%]
+tests/unit/utils/test_utils.py::TestDevice::test_ensure_device_move PASSED [ 86%]
+tests/unit/utils/test_utils.py::TestDevice::test_get_device_default PASSED [ 86%]
+tests/unit/utils/test_utils.py::TestDevice::test_get_device_specific PASSED [ 86%]
+tests/unit/utils/test_utils.py::TestTypes::test_learning_mode_values PASSED [ 87%]
+tests/unit/utils/test_utils.py::TestTypes::test_learning_mode_description PASSED [ 87%]
+tests/unit/utils/test_utils.py::TestTypes::test_learning_rate_multiplier PASSED [ 87%]
+tests/unit/utils/test_utils.py::TestTypes::test_is_learning PASSED       [ 88%]
+tests/unit/utils/test_utils.py::TestTypes::test_is_consolidating PASSED  [ 88%]
+tests/unit/utils/test_utils.py::TestTypes::test_connection_type PASSED   [ 89%]
+tests/unit/utils/test_utils.py::TestTypes::test_mode_config_defaults PASSED [ 89%]
+tests/unit/utils/test_utils.py::TestTypes::test_mode_config_get_learning_rate PASSED [ 89%]
+tests/unit/utils/test_utils.py::TestTypes::test_mode_config_get_consolidation_factor PASSED [ 90%]
+tests/unit/utils/test_utils.py::TestLogging::test_trace_level_defined PASSED [ 90%]
+tests/unit/utils/test_utils.py::TestLogging::test_trace_method_exists PASSED [ 90%]
+tests/unit/utils/test_utils.py::TestLogging::test_get_logger PASSED      [ 91%]
+tests/unit/utils/test_utils.py::TestLogging::test_pyfolds_logger_singleton PASSED [ 91%]
+tests/unit/utils/test_utils.py::TestLogging::test_logger_setup_basic PASSED [ 91%]
+tests/unit/utils/test_utils.py::TestLogging::test_logger_trace_output PASSED [ 92%]
+tests/unit/utils/test_utils.py::TestLogging::test_logger_trace_silent_when_lower_level PASSED [ 92%]
+tests/unit/utils/test_utils.py::TestLogging::test_import_pyfolds_does_not_add_stream_handler PASSED [ 92%]
+tests/unit/utils/test_utils.py::TestLogging::test_setup_run_logging_returns_logger_and_path PASSED [ 93%]
+tests/unit/utils/test_utils.py::TestLogging::test_logger_file_handler PASSED [ 93%]
+tests/unit/utils/test_utils.py::TestLogging::test_logger_console_false_keeps_terminal_clean PASSED [ 93%]
+tests/unit/utils/test_utils.py::TestLogging::test_logger_fixed_layout PASSED [ 94%]
+tests/unit/utils/test_utils.py::TestLogging::test_build_log_path_increments_counter PASSED [ 94%]
+tests/unit/utils/test_utils.py::TestLogging::test_next_log_path_alias PASSED [ 94%]
+tests/unit/utils/test_utils.py::TestLogging::test_logger_circular_buffer_file_handler PASSED [ 95%]
+tests/unit/utils/test_utils.py::TestLogging::test_multiple_loggers_same_name PASSED [ 95%]
+tests/unit/utils/test_utils.py::TestLogging::test_module_levels PASSED   [ 95%]
+tests/unit/utils/test_utils.py::TestIntegration::test_logging_with_device PASSED [ 96%]
+tests/unit/utils/test_utils.py::TestIntegration::test_learning_mode_with_math PASSED [ 96%]
+tests/unit/utils/test_utils.py::TestIntegration::test_device_with_tensor_ops PASSED [ 96%]
+tests/unit/utils/test_validation.py::test_neuron_forward_validation_ndim PASSED [ 97%]
+tests/unit/utils/test_validation.py::test_neuron_forward_validation_dtype PASSED [ 97%]
+tests/unit/wave/test_wave_config.py::test_wave_config_defaults_valid PASSED [ 97%]
+tests/unit/wave/test_wave_config.py::test_wave_config_rejects_invalid_buffer PASSED [ 98%]
+tests/unit/wave/test_wave_layer_network.py::test_wave_layer_exposes_wave_outputs PASSED [ 98%]
+tests/unit/wave/test_wave_layer_network.py::test_wave_network_forwards_layer_kwargs PASSED [ 98%]
+tests/unit/wave/test_wave_neuron.py::test_wave_outputs_quadrature_and_phase_range PASSED [ 99%]
+tests/unit/wave/test_wave_neuron.py::test_cooperative_integration_uses_multiple_dendrites PASSED [ 99%]
+tests/unit/wave/test_wave_neuron.py::test_wave_step_id_thread_safe_increment PASSED [100%]
+
+=============================== warnings summary ===============================
+examples/mnist_file_logging.py:23
+examples/mnist_file_logging.py:23
+  /workspace/pyfolds/examples/mnist_file_logging.py:23: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    from pyfolds import LearningMode, MPJRDConfig, MPJRDLayer, VersionedCheckpoint
+
+examples/mnist_file_logging.py:23
+examples/mnist_file_logging.py:23
+  /workspace/pyfolds/examples/mnist_file_logging.py:23: DeprecationWarning: 'pyfolds.MPJRDLayer' está depreciado e será removido em versão futura; use 'pyfolds.AdaptiveNeuronLayer'
+    from pyfolds import LearningMode, MPJRDConfig, MPJRDLayer, VersionedCheckpoint
+
+tests/unit/core/test_input_validation_contract.py:6
+tests/unit/core/test_input_validation_contract.py:6
+  /workspace/pyfolds/tests/unit/core/test_input_validation_contract.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    from pyfolds import MPJRDConfig, MPJRDLayer
+
+tests/unit/core/test_input_validation_contract.py:6
+tests/unit/core/test_input_validation_contract.py:6
+  /workspace/pyfolds/tests/unit/core/test_input_validation_contract.py:6: DeprecationWarning: 'pyfolds.MPJRDLayer' está depreciado e será removido em versão futura; use 'pyfolds.AdaptiveNeuronLayer'
+    from pyfolds import MPJRDConfig, MPJRDLayer
+
+tests/unit/test_layer_neuron_class.py:6
+tests/unit/test_layer_neuron_class.py:6
+  /workspace/pyfolds/tests/unit/test_layer_neuron_class.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    from pyfolds import MPJRDConfig
+
+tests/integration/test_mnist_file_logging.py::test_pyfolds_imports_are_stable
+  /workspace/pyfolds/tests/integration/test_mnist_file_logging.py:12: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    assert hasattr(pyfolds, "MPJRDConfig")
+
+tests/integration/test_mnist_file_logging.py::test_pyfolds_imports_are_stable
+  /workspace/pyfolds/tests/integration/test_mnist_file_logging.py:13: DeprecationWarning: 'pyfolds.MPJRDLayer' está depreciado e será removido em versão futura; use 'pyfolds.AdaptiveNeuronLayer'
+    assert hasattr(pyfolds, "MPJRDLayer")
+
+tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain
+  /workspace/pyfolds/tests/integration/test_neuron_advanced.py:37: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/integration/test_temporal_sequence_stability.py::test_forward_sequence_torch_stability_minimal_criteria
+  /workspace/pyfolds/tests/integration/test_temporal_sequence_stability.py:24: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_bap_proportional_uses_dendritic_contribution
+  /workspace/pyfolds/tests/unit/advanced/test_backprop.py:69: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_time_counter_advances_only_after_forward
+  /workspace/pyfolds/tests/unit/advanced/test_backprop.py:92: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_stdp_input_source_raw_vs_stp
+  /workspace/pyfolds/tests/unit/advanced/test_stdp.py:106: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg_raw = pyfolds.MPJRDConfig(
+
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_stdp_input_source_raw_vs_stp
+  /workspace/pyfolds/tests/unit/advanced/test_stdp.py:112: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg_stp = pyfolds.MPJRDConfig(
+
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_ltd_rule_classic_vs_current
+  /workspace/pyfolds/tests/unit/advanced/test_stdp.py:138: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg_classic = pyfolds.MPJRDConfig(
+
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_ltd_rule_classic_vs_current
+  /workspace/pyfolds/tests/unit/advanced/test_stdp.py:144: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg_current = pyfolds.MPJRDConfig(
+
+tests/unit/advanced/test_stdp.py::TestSTDPMixin::test_stdp_update_is_batch_size_invariant_for_identical_samples
+  /workspace/pyfolds/tests/unit/advanced/test_stdp.py:177: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/core/test_config.py::TestMPJRDConfig::test_default_values
+  /workspace/pyfolds/tests/unit/core/test_config.py:13: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig()
+
+tests/unit/core/test_config.py::TestMPJRDConfig::test_custom_values
+  /workspace/pyfolds/tests/unit/core/test_config.py:19: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/core/test_config.py::TestMPJRDConfig::test_validation
+  /workspace/pyfolds/tests/unit/core/test_config.py:33: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    pyfolds.MPJRDConfig(n_min=10, n_max=5)
+
+tests/unit/core/test_config.py::TestMPJRDConfig::test_get_decay_rate_validation
+  /workspace/pyfolds/tests/unit/core/test_config.py:38: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig()
+
+tests/unit/core/test_config.py::TestMPJRDConfig::test_get_decay_rate_negative_dt_validation
+  /workspace/pyfolds/tests/unit/core/test_config.py:45: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig()
+
+tests/unit/core/test_config.py::TestMPJRDConfig::test_numerical_safety_validation
+  /workspace/pyfolds/tests/unit/core/test_config.py:52: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    pyfolds.MPJRDConfig(w_scale=0)
+
+tests/unit/core/test_config.py::TestMPJRDConfig::test_numerical_safety_validation
+  /workspace/pyfolds/tests/unit/core/test_config.py:55: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    pyfolds.MPJRDConfig(float_precision="float16")
+
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs0]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs1]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs2]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs3]
+tests/unit/core/test_config.py::TestMPJRDConfig::test_dendritic_integration_validation[kwargs4]
+  /workspace/pyfolds/tests/unit/core/test_config.py:70: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    pyfolds.MPJRDConfig(**kwargs)
+
+tests/unit/core/test_health_monitor.py::test_health_monitor_runs_and_scores
+  /workspace/pyfolds/tests/unit/core/test_health_monitor.py:9: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4, device="cpu")
+
+tests/unit/core/test_monitoring_and_checkpoint.py::test_versioned_checkpoint_save_and_load
+  /workspace/pyfolds/tests/unit/core/test_monitoring_and_checkpoint.py:42: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+
+tests/unit/core/test_monitoring_and_checkpoint.py::test_versioned_checkpoint_metadata_created_at_is_utc
+  /workspace/pyfolds/tests/unit/core/test_monitoring_and_checkpoint.py:55: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+
+tests/unit/core/test_neuromodulation.py::TestNeuromodulator::test_external_mode
+  /workspace/pyfolds/tests/unit/core/test_neuromodulation.py:13: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(neuromod_mode="external")
+
+tests/unit/core/test_neuromodulation.py::TestNeuromodulator::test_surprise_mode
+  /workspace/pyfolds/tests/unit/core/test_neuromodulation.py:23: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/core/test_neuromodulation.py::TestNeuromodulator::test_rejects_non_finite_inputs
+  /workspace/pyfolds/tests/unit/core/test_neuromodulation.py:37: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(neuromod_mode="surprise")
+
+tests/unit/core/test_neuromodulation.py::TestNeuromodulator::test_infers_output_device_from_tensor_inputs
+  /workspace/pyfolds/tests/unit/core/test_neuromodulation.py:50: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(neuromod_mode="surprise")
+
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_nmda_shunting_exposes_dendritic_contribution
+  /workspace/pyfolds/tests/unit/core/test_neuron.py:32: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_online_plasticity_updates_when_not_deferred
+  /workspace/pyfolds/tests/unit/core/test_neuron.py:71: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_batch_plasticity_preserves_local_pre_synaptic_rate
+  /workspace/pyfolds/tests/unit/core/test_neuron.py:96: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/core/test_neuron.py::TestMPJRDNeuron::test_nmda_theta_eff_caps_unreachable_threshold
+  /workspace/pyfolds/tests/unit/core/test_neuron.py:143: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/core/test_neuron_v2.py::test_cooperative_sum_uses_multiple_dendrites
+  /workspace/pyfolds/tests/unit/core/test_neuron_v2.py:23: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=2, theta_init=1.1)
+
+tests/unit/core/test_neuron_v2.py::test_theta_eff_caps_unreachable_threshold
+  /workspace/pyfolds/tests/unit/core/test_neuron_v2.py:55: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=4, n_synapses_per_dendrite=2, theta_init=4.5)
+
+tests/unit/core/test_neuron_v2.py::test_vectorization_and_forward_integrity_batch64
+  /workspace/pyfolds/tests/unit/core/test_neuron_v2.py:73: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=16, n_synapses_per_dendrite=8)
+
+tests/unit/network/test_network_edge_cases.py::test_prepare_input_with_single_dendrite_avoids_division_by_zero
+  /workspace/pyfolds/tests/unit/network/test_network_edge_cases.py:9: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=1, n_synapses_per_dendrite=4, device="cpu")
+
+tests/unit/network/test_network_edge_cases.py::test_prepare_input_with_single_dendrite_avoids_division_by_zero
+  /workspace/pyfolds/tests/unit/network/test_network_edge_cases.py:11: DeprecationWarning: 'pyfolds.MPJRDNetwork' está depreciado e será removido em versão futura; use 'pyfolds.SpikingNetwork'
+    net = pyfolds.MPJRDNetwork("single_dendrite")
+
+tests/unit/network/test_network_edge_cases.py::test_prepare_input_with_single_dendrite_avoids_division_by_zero
+  /workspace/pyfolds/tests/unit/network/test_network_edge_cases.py:12: DeprecationWarning: 'pyfolds.MPJRDLayer' está depreciado e será removido em versão futura; use 'pyfolds.AdaptiveNeuronLayer'
+    net.add_layer("in", pyfolds.MPJRDLayer(2, cfg, device=torch.device("cpu")))
+
+tests/unit/network/test_network_edge_cases.py::test_prepare_input_with_single_dendrite_avoids_division_by_zero
+  /workspace/pyfolds/tests/unit/network/test_network_edge_cases.py:13: DeprecationWarning: 'pyfolds.MPJRDLayer' está depreciado e será removido em versão futura; use 'pyfolds.AdaptiveNeuronLayer'
+    net.add_layer("out", pyfolds.MPJRDLayer(3, cfg, device=torch.device("cpu")))
+
+tests/unit/neuron/test_adaptation_sfa.py::test_sfa_applies_before_threshold_and_reduces_spiking_probability
+  /workspace/pyfolds/tests/unit/neuron/test_adaptation_sfa.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig()
+
+tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain
+  /workspace/pyfolds/tests/unit/neuron/test_backprop_bap.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(backprop_max_gain=1.2)
+
+tests/unit/neuron/test_integration_stability.py::test_forward_clamps_non_finite_dendritic_sum
+  /workspace/pyfolds/tests/unit/neuron/test_integration_stability.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig()
+
+tests/unit/neuron/test_refractory.py::test_absolute_refractory_is_inviolable
+  /workspace/pyfolds/tests/unit/neuron/test_refractory.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(t_refrac_abs=3.0, t_refrac_rel=5.0)
+
+tests/unit/neuron/test_stp_stdp_contracts.py::test_stdp_reads_pre_stp_input_for_pre_spikes_and_ltd_uses_pre_spike_gate
+  /workspace/pyfolds/tests/unit/neuron/test_stp_stdp_contracts.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/neuron/test_time_counter.py::test_time_counter_increments_at_end_of_forward_step
+  /workspace/pyfolds/tests/unit/neuron/test_time_counter.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(t_refrac_abs=2.0)
+
+tests/unit/serialization/test_foldio.py::test_fold_reader_exit_closes_file_even_if_mmap_close_fails
+  /workspace/pyfolds/tests/unit/serialization/test_foldio.py:340: RuntimeWarning: Erro ao fechar mmap de '/tmp/pytest-of-root/pytest-0/test_fold_reader_exit_closes_f0/cleanup.fold': forced close error
+    reader.__exit__(None, None, None)
+
+tests/unit/test_backend_contracts.py::test_import_and_object_construction_v1_v2
+  /workspace/pyfolds/tests/unit/test_backend_contracts.py:14: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
+
+tests/unit/test_backend_contracts.py::test_torch_backend_shape_and_state_contracts
+  /workspace/pyfolds/tests/unit/test_backend_contracts.py:25: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
+
+tests/unit/test_backend_contracts.py::test_torch_backend_v2_accepts_multidim_batch_contract
+  /workspace/pyfolds/tests/unit/test_backend_contracts.py:56: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
+
+tests/unit/test_public_import_surface.py::test_public_all_exports_are_importable
+  /workspace/pyfolds/tests/unit/test_public_import_surface.py:15: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    missing = [name for name in pyfolds.__all__ if not hasattr(pyfolds, name)]
+
+tests/unit/test_public_import_surface.py::test_public_all_exports_are_importable
+  /workspace/pyfolds/tests/unit/test_public_import_surface.py:15: DeprecationWarning: 'pyfolds.MPJRDLayer' está depreciado e será removido em versão futura; use 'pyfolds.AdaptiveNeuronLayer'
+    missing = [name for name in pyfolds.__all__ if not hasattr(pyfolds, name)]
+
+tests/unit/test_public_import_surface.py::test_public_all_exports_are_importable
+  /workspace/pyfolds/tests/unit/test_public_import_surface.py:15: DeprecationWarning: 'pyfolds.MPJRDNetwork' está depreciado e será removido em versão futura; use 'pyfolds.SpikingNetwork'
+    missing = [name for name in pyfolds.__all__ if not hasattr(pyfolds, name)]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /workspace/pyfolds/outputs/test_logs/pytest-junit-fixed.xml -
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_temporal_sequence_stability.py:57: TensorFlow não instalado neste ambiente.
+SKIPPED [1] tests/unit/advanced/test_short_term.py:95: CUDA not available
+SKIPPED [1] tests/unit/neuron/test_contract_conformance.py:30: could not import 'tensorflow': No module named 'tensorflow'
+SKIPPED [1] tests/unit/serialization/test_foldio.py:451: could not import 'cryptography.hazmat.primitives.serialization': No module named 'cryptography'
+SKIPPED [1] tests/unit/test_backend_contracts.py:81: TensorFlow não instalado neste ambiente.
+SKIPPED [1] tests/unit/test_tf_backend.py:25: could not import 'tensorflow': No module named 'tensorflow'
+SKIPPED [1] tests/unit/test_tf_backend.py:40: could not import 'tensorflow': No module named 'tensorflow'
+========== 284 passed, 7 skipped, 3 deselected, 64 warnings in 24.33s ==========

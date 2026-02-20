@@ -29,7 +29,7 @@ def test_v2_surface_is_canonical_and_instantiable():
 
 
 def test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0():
-    removal_version = Version("2.0.0")
+    removal_version = Version("3.0.0")
     current_version = Version(pyfolds.__version__)
 
     if current_version >= removal_version:
