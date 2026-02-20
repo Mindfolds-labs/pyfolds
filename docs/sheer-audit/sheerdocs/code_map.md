@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `139`
-- Símbolos: `1042`
+- Símbolos: `1031`
 
 ## Módulos
 
@@ -370,17 +370,6 @@
 
 ### `src.pyfolds.monitoring.health`
 - Arquivo: `src/pyfolds/monitoring/health.py`
-- Imports:
-  - `mod:__future__`
-  - `mod:enum`
-  - `mod:hashlib`
-  - `mod:torch`
-  - `mod:typing`
-- Classes:
-  - `HealthStatus` (bases: Enum)
-  - `ModelIntegrityMonitor` (bases: (sem base explícita))
-  - `NeuronHealthCheck` (bases: (sem base explícita))
-  - `NeuronHealthMonitor` (bases: (sem base explícita))
 
 ### `src.pyfolds.monitoring.mindcontrol`
 - Arquivo: `src/pyfolds/monitoring/mindcontrol.py`
@@ -1159,6 +1148,8 @@
   - `mod:torch`
 - Funções:
   - `test_health_monitor_runs_and_scores()`
+  - `test_weight_integrity_monitor_detects_change()`
+  - `test_weight_integrity_monitor_respects_interval()`
 
 ### `tests.unit.core.test_homeostasis`
 - Arquivo: `tests/unit/core/test_homeostasis.py`

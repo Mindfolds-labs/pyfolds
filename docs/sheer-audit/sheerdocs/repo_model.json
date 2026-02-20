@@ -4097,203 +4097,6 @@
       "decorators": []
     },
     {
-      "id": "cls:src.pyfolds.monitoring.health.HealthStatus",
-      "kind": "class",
-      "name": "HealthStatus",
-      "qname": "src.pyfolds.monitoring.health.HealthStatus",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 12,
-      "doc": "Estados de saúde operacional calculados pelo monitoramento.",
-      "params": [],
-      "returns": null,
-      "bases": [
-        "Enum"
-      ],
-      "decorators": []
-    },
-    {
-      "id": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "kind": "class",
-      "name": "NeuronHealthCheck",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 20,
-      "doc": "Monitora métricas de saúde e gera alertas de operação.",
-      "params": [],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
-      "kind": "method",
-      "name": "__init__",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 23,
-      "doc": null,
-      "params": [
-        "self",
-        "neuron",
-        "thresholds"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.check",
-      "kind": "method",
-      "name": "check",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck.check",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 31,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "kind": "class",
-      "name": "NeuronHealthMonitor",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 54,
-      "doc": "Monitor de saúde contínuo para execução longa.",
-      "params": [],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
-      "kind": "method",
-      "name": "__init__",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 57,
-      "doc": null,
-      "params": [
-        "self",
-        "neuron",
-        "check_every_n_steps"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
-      "kind": "method",
-      "name": "check_health",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 63,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
-      "kind": "method",
-      "name": "get_health_score",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 96,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
-      "kind": "class",
-      "name": "ModelIntegrityMonitor",
-      "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 102,
-      "doc": "Monitor de integridade de parâmetros para detecção periódica de corrupção.\n\nO monitor calcula um hash SHA-256 determinístico do estado atual de\nparâmetros e buffers do modelo. O uso recomendado é em fases de validação\nou inferência estável, nas quais o estado esperado não deve mutar.",
-      "params": [],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.__init__",
-      "kind": "method",
-      "name": "__init__",
-      "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor.__init__",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 110,
-      "doc": null,
-      "params": [
-        "self",
-        "model",
-        "check_every_n_steps"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.compute_state_hash",
-      "kind": "method",
-      "name": "compute_state_hash",
-      "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor.compute_state_hash",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 117,
-      "doc": null,
-      "params": [
-        "model"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": [
-        "staticmethod"
-      ]
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.set_baseline",
-      "kind": "method",
-      "name": "set_baseline",
-      "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor.set_baseline",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 129,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.check_integrity",
-      "kind": "method",
-      "name": "check_integrity",
-      "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor.check_integrity",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 133,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
       "id": "mod:src.pyfolds.monitoring.mindcontrol",
       "kind": "module",
       "name": "mindcontrol",
@@ -11635,6 +11438,32 @@
       "decorators": []
     },
     {
+      "id": "fn:tests.unit.core.test_health_monitor.test_weight_integrity_monitor_detects_change",
+      "kind": "function",
+      "name": "test_weight_integrity_monitor_detects_change",
+      "qname": "tests.unit.core.test_health_monitor.test_weight_integrity_monitor_detects_change",
+      "file": "tests/unit/core/test_health_monitor.py",
+      "line": 22,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_health_monitor.test_weight_integrity_monitor_respects_interval",
+      "kind": "function",
+      "name": "test_weight_integrity_monitor_respects_interval",
+      "qname": "tests.unit.core.test_health_monitor.test_weight_integrity_monitor_respects_interval",
+      "file": "tests/unit/core/test_health_monitor.py",
+      "line": 38,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mod:tests.unit.core.test_homeostasis",
       "kind": "module",
       "name": "test_homeostasis",
@@ -18503,120 +18332,6 @@
     },
     {
       "type": "IMPORT",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "mod:__future__",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "mod:hashlib",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "mod:enum",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "mod:typing",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "mod:torch",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "cls:src.pyfolds.monitoring.health.HealthStatus",
-      "meta": {}
-    },
-    {
-      "type": "INHERITS",
-      "src": "cls:src.pyfolds.monitoring.health.HealthStatus",
-      "dst": "cls:*.Enum",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.check",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.__init__",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.compute_state_hash",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.set_baseline",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.check_integrity",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
       "src": "mod:src.pyfolds.monitoring.mindcontrol",
       "dst": "mod:__future__",
       "meta": {}
@@ -22882,6 +22597,18 @@
       "meta": {}
     },
     {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_health_monitor",
+      "dst": "fn:tests.unit.core.test_health_monitor.test_weight_integrity_monitor_detects_change",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_health_monitor",
+      "dst": "fn:tests.unit.core.test_health_monitor.test_weight_integrity_monitor_respects_interval",
+      "meta": {}
+    },
+    {
       "type": "IMPORT",
       "src": "mod:tests.unit.core.test_homeostasis",
       "dst": "mod:pytest",
@@ -25240,12 +24967,23 @@
       "meta": {}
     }
   ],
-  "findings": [],
+  "findings": [
+    {
+      "code": "PARSE_ERROR",
+      "severity": "ERROR",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 102,
+      "column": 62,
+      "message": "invalid decimal literal (<unknown>, line 102)",
+      "hint": null,
+      "excerpt": null
+    }
+  ],
   "metrics": {
     "python_files": 139,
-    "symbols": 1042,
-    "edges": 1553,
-    "findings": 0,
+    "symbols": 1031,
+    "edges": 1536,
+    "findings": 1,
     "internal_import_edges": 104
   }
 }
