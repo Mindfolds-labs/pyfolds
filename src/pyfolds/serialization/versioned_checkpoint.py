@@ -19,6 +19,8 @@ import torch
 
 from .ecc import ReedSolomonECC, ecc_from_protection
 
+from pyfolds.core.config import MPJRDConfig
+
 try:
     from safetensors.torch import load_file as load_safetensors_file
     from safetensors.torch import save_file as save_safetensors_file
@@ -29,6 +31,8 @@ except ImportError:
 
 
 class VersionedCheckpoint:
+    _safe_globals_registered = False
+
     """
     Salva/recupera estado do modelo com metadados e hash de integridade.
 
@@ -102,7 +106,58 @@ class VersionedCheckpoint:
         }
         if extra:
             metadata.update(extra)
-        return metadata
+        return self._to_weights_only_safe(metadata)
+
+    @classmethod
+    def _register_safe_globals(cls) -> None:
+        """Registra tipos permitidos para carregamento seguro (weights_only=True)."""
+        if cls._safe_globals_registered:
+            return
+
+        safe_types = [
+            dict,
+            list,
+            tuple,
+            set,
+            str,
+            int,
+            float,
+            bool,
+            bytes,
+            type(None),
+        ]
+        safe_types.append(MPJRDConfig)
+
+        torch.serialization.add_safe_globals(safe_types)
+        cls._safe_globals_registered = True
+
+    @classmethod
+    def _to_weights_only_safe(cls, value: Any) -> Any:
+        """Converte metadados para estrutura composta por tipos primitivos seguros."""
+        if is_dataclass(value):
+            value = asdict(value)
+
+        if isinstance(value, dict):
+            return {str(k): cls._to_weights_only_safe(v) for k, v in value.items()}
+        if isinstance(value, (list, tuple, set)):
+            return [cls._to_weights_only_safe(v) for v in value]
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            return value
+        if isinstance(value, bytes):
+            return value.decode("utf-8", errors="replace")
+        if isinstance(value, Path):
+            return str(value)
+        if hasattr(value, "item") and callable(getattr(value, "item")):
+            try:
+                scalar = value.item()
+            except Exception:
+                scalar = None
+            if isinstance(scalar, (str, int, float, bool)) or scalar is None:
+                return scalar
+        if hasattr(value, "__dict__"):
+            safe_obj = {k: v for k, v in vars(value).items() if not k.startswith("_")}
+            return cls._to_weights_only_safe(safe_obj)
+        return repr(value)
 
     def _compute_plain_hash(self, state_dict: Dict[str, torch.Tensor]) -> str:
         """Calcula hash SHA-256 puro do state_dict."""
@@ -123,7 +178,9 @@ class VersionedCheckpoint:
         hmac_key = os.getenv("PYFOLDS_CHECKPOINT_HMAC_KEY")
         if not hmac_key:
             return f"sha256:{digest}"
-        signed = hmac.new(hmac_key.encode("utf-8"), digest.encode("utf-8"), hashlib.sha256).hexdigest()
+        signed = hmac.new(
+            hmac_key.encode("utf-8"), digest.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
         return f"hmac-sha256:{signed}"
 
     @staticmethod
@@ -132,11 +189,14 @@ class VersionedCheckpoint:
             hmac_key = os.getenv("PYFOLDS_CHECKPOINT_HMAC_KEY")
             if not hmac_key:
                 return False
-            expected = "hmac-sha256:" + hmac.new(
-                hmac_key.encode("utf-8"),
-                plain_digest.encode("utf-8"),
-                hashlib.sha256,
-            ).hexdigest()
+            expected = (
+                "hmac-sha256:"
+                + hmac.new(
+                    hmac_key.encode("utf-8"),
+                    plain_digest.encode("utf-8"),
+                    hashlib.sha256,
+                ).hexdigest()
+            )
             return hmac.compare_digest(expected, saved)
         if saved.startswith("sha256:"):
             return hmac.compare_digest(f"sha256:{plain_digest}", saved)
@@ -166,7 +226,9 @@ class VersionedCheckpoint:
         return codec.decode(raw_payload, ecc_bytes)
 
     @staticmethod
-    def _validate_shape_invariants(model: torch.nn.Module, state_dict: Dict[str, torch.Tensor]) -> None:
+    def _validate_shape_invariants(
+        model: torch.nn.Module, state_dict: Dict[str, torch.Tensor]
+    ) -> None:
         """Valida shape dos tensores do checkpoint antes do load no modelo."""
         for name, tensor in model.state_dict().items():
             loaded = state_dict.get(name)
@@ -207,10 +269,10 @@ class VersionedCheckpoint:
             "metadata": metadata,
             "integrity_hash": integrity_hash,
         }
-        
+
         # Cria diretório se necessário
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        
+
         file_path = Path(path)
 
         if use_safetensors:
@@ -219,7 +281,11 @@ class VersionedCheckpoint:
                     "use_safetensors=True, mas o pacote 'safetensors' não está instalado"
                 )
 
-            safetensor_path = file_path if file_path.suffix == ".safetensors" else file_path.with_suffix(".safetensors")
+            safetensor_path = (
+                file_path
+                if file_path.suffix == ".safetensors"
+                else file_path.with_suffix(".safetensors")
+            )
             save_safetensors_file(state, str(safetensor_path))
 
             ckpt = {
@@ -227,19 +293,27 @@ class VersionedCheckpoint:
                 "integrity_hash": integrity_hash,
                 "format": "safetensors",
             }
-            meta_path = safetensor_path.with_suffix(safetensor_path.suffix + ".meta.json")
-            meta_path.write_text(json.dumps(ckpt, ensure_ascii=False, indent=2), encoding="utf-8")
+            meta_path = safetensor_path.with_suffix(
+                safetensor_path.suffix + ".meta.json"
+            )
+            meta_path.write_text(
+                json.dumps(ckpt, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
         else:
             # Salva com ou sem compressão
             if compress:
-                torch.save(ckpt, path, pickle_protocol=5, _use_new_zipfile_serialization=True)
+                torch.save(
+                    ckpt, path, pickle_protocol=5, _use_new_zipfile_serialization=True
+                )
             else:
                 torch.save(ckpt, path)
 
         return ckpt
 
     @staticmethod
-    def _validate_model_shapes(model: torch.nn.Module, model_state: Dict[str, torch.Tensor]) -> None:
+    def _validate_model_shapes(
+        model: torch.nn.Module, model_state: Dict[str, torch.Tensor]
+    ) -> None:
         current_state = model.state_dict()
 
         missing_keys = sorted(set(current_state.keys()) - set(model_state.keys()))
@@ -304,6 +378,7 @@ class VersionedCheckpoint:
             ckpt["model_state"] = model_state
         else:
             try:
+                cls._register_safe_globals()
                 ckpt = torch.load(path, map_location=map_location, weights_only=True)
             except TypeError:
                 # Compatibilidade com versões do PyTorch sem argumento weights_only
@@ -317,7 +392,7 @@ class VersionedCheckpoint:
                     RuntimeWarning,
                 )
                 ckpt = torch.load(path, map_location=map_location, weights_only=False)
-        
+
         model_state = ckpt["model_state"]
         metadata = ckpt.get("metadata", {})
         saved_hash = ckpt.get("integrity_hash")
@@ -350,7 +425,6 @@ class VersionedCheckpoint:
 
         return ckpt
 
-
     @classmethod
     def load_secure(cls, manifest_path: str, model: torch.nn.Module) -> Dict[str, Any]:
         """Carrega pesos via safetensors com validações rígidas de integridade."""
@@ -374,7 +448,9 @@ class VersionedCheckpoint:
             verifier = cls(model=model, version="verify")
             plain_hash = verifier._compute_plain_hash(tensors)
             if not cls._verify_hash(plain_hash, saved_hash):
-                raise ValueError("Falha de integridade: hash do manifesto não confere com pesos")
+                raise ValueError(
+                    "Falha de integridade: hash do manifesto não confere com pesos"
+                )
 
         # Injeção somente após validações completas.
         model.load_state_dict(tensors, strict=True)

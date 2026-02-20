@@ -37,6 +37,7 @@ from ..utils.logging import get_logger
 # Telemetria (import opcional)
 try:
     from ..telemetry import forward_event, commit_event, sleep_event
+
     TELEMETRY_AVAILABLE = True
 except ImportError:
     TELEMETRY_AVAILABLE = False
@@ -45,7 +46,7 @@ except ImportError:
 class MPJRDNeuron(BaseNeuron):
     """
     Neurônio MPJRD completo.
-    
+
     ✅ OTIMIZADO:
         - Forward pass eficiente
         - Suporte a learning_rate_multiplier
@@ -55,34 +56,41 @@ class MPJRDNeuron(BaseNeuron):
         - ✅ Thread-safe telemetry
     """
 
-    def __init__(self, cfg: MPJRDConfig, enable_telemetry: bool = False,
-                 telemetry_profile: str = "off", name: Optional[str] = None):
+    def __init__(
+        self,
+        cfg: MPJRDConfig,
+        enable_telemetry: bool = False,
+        telemetry_profile: str = "off",
+        name: Optional[str] = None,
+    ):
         super().__init__()
         self.cfg = cfg
-        
+
         # ✅ LOGGER específico para este neurônio
         self.logger = get_logger(f"pyfolds.neuron.{name or id(self)}")
         self.logger.debug(f"🔧 Inicializando neurônio com config: {cfg}")
         self.logger.debug(f"   📊 D={cfg.n_dendrites}, S={cfg.n_synapses_per_dendrite}")
 
         # ===== COMPONENTES =====
-        self.dendrites = nn.ModuleList([
-            MPJRDDendrite(cfg, i) for i in range(cfg.n_dendrites)
-        ])
+        self.dendrites = nn.ModuleList(
+            [MPJRDDendrite(cfg, i) for i in range(cfg.n_dendrites)]
+        )
         self.logger.debug(f"   ✅ {len(self.dendrites)} dendritos criados")
-        
+
         self.homeostasis = HomeostasisController(cfg)
         self.neuromodulator = Neuromodulator(cfg)
-        
+
         # Registra callbacks de homeostase
         self.homeostasis.on_stable(self._on_homeostasis_stable)
         self.homeostasis.on_unstable(self._on_homeostasis_unstable)
-        
+
         # Sistema de acumulação unificado
         self.stats_acc = StatisticsAccumulator(
             cfg.n_dendrites, cfg.n_synapses_per_dendrite, cfg.eps
         )
-        self.logger.debug(f"   ✅ Accumulator criado (track_extra={self.stats_acc.track_extra})")
+        self.logger.debug(
+            f"   ✅ Accumulator criado (track_extra={self.stats_acc.track_extra})"
+        )
 
         # Integração dendrítica (substitui WTA hard)
         self.dendrite_integration = DendriticIntegration(cfg)
@@ -100,18 +108,27 @@ class MPJRDNeuron(BaseNeuron):
         self.register_buffer("sleep_count", torch.tensor(0))
         self.register_buffer("_theta_cap_buf", torch.zeros(1))
         self.logger.debug(f"   ✅ Modo inicial: {self.mode.value}")
-        
+
         # ===== THREAD SAFETY PARA TELEMETRIA =====
         self._telemetry_lock = Lock()
 
         # ===== FILA LOCK-FREE DE INJEÇÕES RUNTIME (MindControl) =====
-        self._runtime_injections: Queue[tuple[str, Any]] = Queue(maxsize=max(1, int(getattr(cfg, "runtime_queue_maxsize", 2048))))
+        self._runtime_injections: Queue[tuple[str, Any]] = Queue(
+            maxsize=max(1, int(getattr(cfg, "runtime_queue_maxsize", 2048)))
+        )
 
         # ===== TELEMETRIA =====
         self.register_buffer("step_id", torch.tensor(0, dtype=torch.int64))
-        self.register_buffer("_theta_cap_buf", torch.zeros(1, dtype=self.theta.dtype, device=self.theta.device))
+        self.register_buffer(
+            "_theta_cap_buf",
+            torch.zeros(1, dtype=self.theta.dtype, device=self.theta.device),
+        )
         if TELEMETRY_AVAILABLE and enable_telemetry:
-            from ..telemetry import TelemetryConfig, TelemetryController, TelemetryProfile
+            from ..telemetry import (
+                TelemetryConfig,
+                TelemetryController,
+                TelemetryProfile,
+            )
 
             profile_enum = (
                 TelemetryProfile(telemetry_profile)
@@ -125,49 +142,50 @@ class MPJRDNeuron(BaseNeuron):
                 memory_capacity=256 if is_light else 2000,
             )
             self.telemetry = TelemetryController(telem_cfg)
-            self.logger.debug(f"   ✅ Telemetria ativada (profile={profile_enum.value})")
+            self.logger.debug(
+                f"   ✅ Telemetria ativada (profile={profile_enum.value})"
+            )
         else:
             self.telemetry = None
             self.logger.debug("   ⏭️ Telemetria desativada")
-        
+
         # Valida devices após inicialização
         self._validate_internal_devices()
-        
+
+        self._gradient_hook_handles = []
         self._install_gradient_health_monitor()
 
         self.logger.info(f"✅ Neurônio {name or id(self)} inicializado com sucesso")
 
     def _install_gradient_health_monitor(self) -> None:
-        """Instala gancho de saneamento para gradientes com NaN/Inf."""
-        self.register_full_backward_hook(self._gradient_health_monitor)
-
-    def _gradient_health_monitor(self, module, grad_input, grad_output):
-        """Gatekeeper contra gradientes corrompidos por falhas de hardware."""
-        safe_grad_input = []
-        for grad in grad_input:
-            if grad is None:
-                safe_grad_input.append(None)
+        """Instala saneamento de gradientes em nível de parâmetro."""
+        for param in self.parameters():
+            if not param.requires_grad:
                 continue
-            if torch.isfinite(grad).all():
-                safe_grad_input.append(grad)
-            else:
-                self.logger.error("Gradiente inválido detectado; substituindo por zeros.")
-                safe_grad_input.append(torch.zeros_like(grad))
-        return tuple(safe_grad_input)
+            handle = param.register_hook(self._sanitize_gradient)
+            self._gradient_hook_handles.append(handle)
+
+    def _sanitize_gradient(self, grad: torch.Tensor) -> torch.Tensor:
+        """Gatekeeper contra gradientes corrompidos por falhas de hardware."""
+        if torch.isfinite(grad).all():
+            return grad
+
+        self.logger.error("Gradiente inválido detectado; substituindo por zeros.")
+        return torch.zeros_like(grad)
 
     def _validate_internal_devices(self) -> None:
         """Valida consistência de devices internos."""
         devices = set()
-        
+
         # Device do theta
         devices.add(self.theta.device)
-        
+
         # Devices das dendrites e sinapses
         for dend in self.dendrites:
             for syn in dend.synapses:
                 devices.add(syn.N.device)
                 devices.add(syn.I.device)
-        
+
         if len(devices) > 1:
             self.logger.error(f"❌ Devices inconsistentes: {devices}")
             raise RuntimeError(
@@ -189,6 +207,7 @@ class MPJRDNeuron(BaseNeuron):
             f"✅ Homeostase estável! θ={controller.theta.item():.3f}, "
             f"erro={controller.homeostasis_error.item():.3f}"
         )
+
     def _on_homeostasis_unstable(self, controller: HomeostasisController) -> None:
         """Callback quando homeostase se torna instável."""
         self.logger.warning(
@@ -236,14 +255,18 @@ class MPJRDNeuron(BaseNeuron):
         try:
             self._runtime_injections.put_nowait((name, value))
         except Full:
-            self.logger.warning("Fila de injeções runtime cheia; descartando mutação %s", name)
+            self.logger.warning(
+                "Fila de injeções runtime cheia; descartando mutação %s", name
+            )
 
     @torch.no_grad()
     def _refresh_config_references(self) -> None:
         """Propaga nova configuração para submódulos que cacheiam ``cfg``."""
         self.homeostasis.cfg = self.cfg
         self.neuromodulator.cfg = self.cfg
-        self.stats_acc.cfg = self.cfg if hasattr(self.stats_acc, "cfg") else getattr(self, "cfg")
+        self.stats_acc.cfg = (
+            self.cfg if hasattr(self.stats_acc, "cfg") else getattr(self, "cfg")
+        )
         self.dendrite_integration.cfg = self.cfg
         for module in self.modules():
             if module is self:
@@ -268,7 +291,9 @@ class MPJRDNeuron(BaseNeuron):
 
             if name == "theta":
                 with torch.no_grad():
-                    tensor_value = torch.as_tensor(value, dtype=self.theta.dtype, device=self.theta.device)
+                    tensor_value = torch.as_tensor(
+                        value, dtype=self.theta.dtype, device=self.theta.device
+                    )
                     if tensor_value.numel() == 1:
                         tensor_value = tensor_value.reshape_as(self.theta)
                     self.theta.copy_(tensor_value)
@@ -277,7 +302,9 @@ class MPJRDNeuron(BaseNeuron):
 
             if name in {"r_hat", "target_spike_rate"}:
                 if name == "r_hat":
-                    tensor_value = torch.as_tensor(value, dtype=self.r_hat.dtype, device=self.r_hat.device)
+                    tensor_value = torch.as_tensor(
+                        value, dtype=self.r_hat.dtype, device=self.r_hat.device
+                    )
                     if tensor_value.numel() == 1:
                         tensor_value = tensor_value.reshape_as(self.r_hat)
                     self.r_hat.copy_(tensor_value)
@@ -293,7 +320,11 @@ class MPJRDNeuron(BaseNeuron):
 
             cfg_field = self.cfg.resolve_runtime_alias(name)
             if cfg_field in allowed_fields:
-                casted = float(value) if isinstance(value, (int, float, torch.Tensor)) else value
+                casted = (
+                    float(value)
+                    if isinstance(value, (int, float, torch.Tensor))
+                    else value
+                )
                 self.cfg = self.cfg.with_runtime_update(**{cfg_field: casted})
                 self._refresh_config_references()
                 applied += 1
@@ -309,7 +340,7 @@ class MPJRDNeuron(BaseNeuron):
             self.mode = mode
             self.mode_switches.add_(1)
             self.logger.info(f"🔄 Modo alterado: {old_mode} → {mode.value}")
-            
+
             # Ações específicas por modo
             if mode == LearningMode.SLEEP:
                 self.stats_acc.reset()  # Limpa pendências antes de dormir
@@ -317,7 +348,9 @@ class MPJRDNeuron(BaseNeuron):
     # ========== NEUROMODULAÇÃO ENDÓGENA ==========
 
     @torch.no_grad()
-    def _compute_R_endogenous(self, current_rate: float, saturation_ratio: float) -> float:
+    def _compute_R_endogenous(
+        self, current_rate: float, saturation_ratio: float
+    ) -> float:
         """Computa sinal neuromodulador interno."""
         cfg = self.cfg
 
@@ -360,7 +393,9 @@ class MPJRDNeuron(BaseNeuron):
     ) -> None:
         """Aplica regra local imediatamente (modo ONLINE sem defer)."""
         cfg = self.cfg
-        post_rate_t = torch.tensor([max(0.0, min(1.0, post_rate))], device=self.theta.device)
+        post_rate_t = torch.tensor(
+            [max(0.0, min(1.0, post_rate))], device=self.theta.device
+        )
 
         for d_idx, dend in enumerate(self.dendrites):
             # Filtra sinapses ativas
@@ -379,23 +414,30 @@ class MPJRDNeuron(BaseNeuron):
 
     @validate_input(
         expected_ndim=3,
-        expected_shape_fn=lambda self: (self.cfg.n_dendrites, self.cfg.n_synapses_per_dendrite),
+        expected_shape_fn=lambda self: (
+            self.cfg.n_dendrites,
+            self.cfg.n_synapses_per_dendrite,
+        ),
     )
-    def forward(self, x: torch.Tensor, reward: Optional[float] = None,
-                mode: Optional[Union[LearningMode, str]] = None,
-                collect_stats: bool = True,
-                dt: float = 1.0,
-                defer_homeostasis: bool = False) -> Dict[str, Any]:
+    def forward(
+        self,
+        x: torch.Tensor,
+        reward: Optional[float] = None,
+        mode: Optional[Union[LearningMode, str]] = None,
+        collect_stats: bool = True,
+        dt: float = 1.0,
+        defer_homeostasis: bool = False,
+    ) -> Dict[str, Any]:
         """
         Forward pass do neurônio.
-        
+
         Args:
             x: Tensor de entrada [batch, dendrites, synapses]
             reward: Sinal de recompensa externo
             mode: Modo de aprendizado (sobrescreve o atual)
             collect_stats: Se deve coletar estatísticas
             dt: Passo de tempo (ms)
-        
+
         Returns:
             Dict com spikes, potenciais e estatísticas
         """
@@ -406,7 +448,7 @@ class MPJRDNeuron(BaseNeuron):
 
         # Valida device
         self._validate_input_device(x)
-        
+
         device = self.theta.device
         B, D, _ = x.shape
         self._set_refractory_state(False)
@@ -422,11 +464,17 @@ class MPJRDNeuron(BaseNeuron):
         if not torch.isfinite(v_dend).all():
             self.logger.warning(
                 "event=non_finite_dendritic_sum action=nan_to_num_clamp mode=%s",
-                effective_mode.value if hasattr(effective_mode, "value") else str(effective_mode),
+                (
+                    effective_mode.value
+                    if hasattr(effective_mode, "value")
+                    else str(effective_mode)
+                ),
             )
             v_dend = torch.nan_to_num(v_dend, nan=0.0, posinf=1e6, neginf=-1e6)
 
-        if getattr(self.cfg, "backprop_enabled", True) and hasattr(self, "dendrite_amplification"):
+        if getattr(self.cfg, "backprop_enabled", True) and hasattr(
+            self, "dendrite_amplification"
+        ):
             max_gain = getattr(self.cfg, "backprop_max_gain", 2.0)
             amp = (1.0 + self.dendrite_amplification.to(device)).unsqueeze(0)
             amp = amp.clamp(1.0, max_gain)
@@ -444,12 +492,16 @@ class MPJRDNeuron(BaseNeuron):
                 self.cfg.shunting_eps + self.cfg.shunting_strength * d_float
             )
             theta_cap = u_cap - 1e-3
-            theta_cap_buf = self._theta_cap_buf.to(device=device, dtype=self.theta.dtype)
+            theta_cap_buf = self._theta_cap_buf.to(
+                device=device, dtype=self.theta.dtype
+            )
             theta_cap_buf.fill_(theta_cap)
             theta_eff = torch.minimum(theta_eff, theta_cap_buf)
             theta_max_eff = min(self.cfg.theta_max, theta_cap)
             if self.cfg.theta_min <= theta_max_eff:
-                theta_eff = torch.clamp(theta_eff, min=self.cfg.theta_min, max=theta_max_eff)
+                theta_eff = torch.clamp(
+                    theta_eff, min=self.cfg.theta_min, max=theta_max_eff
+                )
             else:
                 theta_eff = torch.clamp(theta_eff, max=theta_max_eff)
 
@@ -459,12 +511,16 @@ class MPJRDNeuron(BaseNeuron):
             dend_contribution = dend_out.contribution
         elif integration_mode == "wta_soft":
             theta_cap = float(self.cfg.n_dendrites) - 1e-3
-            theta_cap_buf = self._theta_cap_buf.to(device=device, dtype=self.theta.dtype)
+            theta_cap_buf = self._theta_cap_buf.to(
+                device=device, dtype=self.theta.dtype
+            )
             theta_cap_buf.fill_(theta_cap)
             theta_eff = torch.minimum(theta_eff, theta_cap_buf)
             theta_max_eff = min(self.cfg.theta_max, theta_cap)
             if self.cfg.theta_min <= theta_max_eff:
-                theta_eff = torch.clamp(theta_eff, min=self.cfg.theta_min, max=theta_max_eff)
+                theta_eff = torch.clamp(
+                    theta_eff, min=self.cfg.theta_min, max=theta_max_eff
+                )
             else:
                 theta_eff = torch.clamp(theta_eff, max=theta_max_eff)
 
@@ -493,13 +549,21 @@ class MPJRDNeuron(BaseNeuron):
                 "event=rate_out_of_range metric=spike_rate value=%.6f expected=[0,1] "
                 "mode=%s integration_mode=%s action=clamp_to_valid_range",
                 spike_rate,
-                effective_mode.value if hasattr(effective_mode, "value") else str(effective_mode),
+                (
+                    effective_mode.value
+                    if hasattr(effective_mode, "value")
+                    else str(effective_mode)
+                ),
                 integration_mode,
             )
             spike_rate = max(0.0, min(1.0, spike_rate))
 
         # ===== 7. HOMEOSTASE =====
-        if effective_mode != LearningMode.INFERENCE and collect_stats and not defer_homeostasis:
+        if (
+            effective_mode != LearningMode.INFERENCE
+            and collect_stats
+            and not defer_homeostasis
+        ):
             self.homeostasis.update(
                 spike_rate,
                 in_refractory_period=self.in_refractory_period,
@@ -514,7 +578,11 @@ class MPJRDNeuron(BaseNeuron):
         R_tensor = torch.tensor([R_val], device=device)
 
         # ===== 9. ACUMULAÇÃO (BATCH MODE) =====
-        if collect_stats and effective_mode == LearningMode.BATCH and self.cfg.defer_updates:
+        if (
+            collect_stats
+            and effective_mode == LearningMode.BATCH
+            and self.cfg.defer_updates
+        ):
             self.stats_acc.accumulate(x.detach(), gated.detach(), spikes.detach())
 
         # ===== 10. ATUALIZAÇÃO IMEDIATA (ONLINE) =====
@@ -546,19 +614,21 @@ class MPJRDNeuron(BaseNeuron):
 
             if emit_telemetry and self.telemetry.should_emit(sid):
                 try:
-                    self.telemetry.emit(forward_event(
-                        step_id=sid,
-                        mode=effective_mode.value,
-                        spike_rate=spike_rate,
-                        theta=float(self.theta.item()),
-                        r_hat=float(self.r_hat.item()),
-                        saturation_ratio=saturation_ratio,
-                        R=float(R_tensor.item()),
-                        N_mean=float(self.N.float().mean().item()),
-                        I_mean=float(self.I.float().mean().item()),
-                        W_mean=float(self.W.float().mean().item()),
-                        integration_mode=integration_mode,
-                    ))
+                    self.telemetry.emit(
+                        forward_event(
+                            step_id=sid,
+                            mode=effective_mode.value,
+                            spike_rate=spike_rate,
+                            theta=float(self.theta.item()),
+                            r_hat=float(self.r_hat.item()),
+                            saturation_ratio=saturation_ratio,
+                            R=float(R_tensor.item()),
+                            N_mean=float(self.N.float().mean().item()),
+                            I_mean=float(self.I.float().mean().item()),
+                            W_mean=float(self.W.float().mean().item()),
+                            integration_mode=integration_mode,
+                        )
+                    )
                 except Exception as exc:
                     self.logger.error(f"Falha ao emitir telemetria: {exc}")
 
@@ -567,16 +637,16 @@ class MPJRDNeuron(BaseNeuron):
             f"Forward [{integration_mode}]: batch={B}, spikes={spike_rate:.3f}, "
             f"θ={self.theta.item():.3f}, sat={saturation_ratio:.1%}"
         )
-        
+
         if spike_rate < self.cfg.dead_neuron_threshold:
             self.logger.warning(
                 f"⚠️ Neurônio hipoativo! rate={spike_rate:.3f} "
                 f"(threshold={self.cfg.dead_neuron_threshold})"
             )
-        
+
         if saturation_ratio > 0.5:
             self.logger.info(f"📊 Saturação alta: {saturation_ratio:.1%}")
-        
+
         if R_val > 0.8:
             self.logger.debug(f"🎯 Neuromodulação alta: R={R_val:.2f}")
 
@@ -629,7 +699,7 @@ class MPJRDNeuron(BaseNeuron):
     def apply_plasticity(self, dt: float = 1.0, reward: Optional[float] = None) -> None:
         """
         Aplica plasticidade acumulada (deferred updates).
-        
+
         ✅ CORRIGIDO: Passa mode para as sinapses
         """
         self._apply_runtime_injections()
@@ -653,7 +723,9 @@ class MPJRDNeuron(BaseNeuron):
         post_rate_float = float(stats.post_rate)
 
         if x_mean is None:
-            self.logger.warning("Sem x_mean acumulado; abortando aplicação de plasticidade")
+            self.logger.warning(
+                "Sem x_mean acumulado; abortando aplicação de plasticidade"
+            )
             return
 
         cfg = self.cfg
@@ -688,26 +760,30 @@ class MPJRDNeuron(BaseNeuron):
                     post_rate=post_rate_t,
                     R=R_t,
                     dt=dt,
-                    mode=self.mode
+                    mode=self.mode,
                 )
         except Exception as exc:
             self.logger.error(f"Falha ao aplicar plasticidade: {exc}")
             raise
 
         self.stats_acc.reset()
-        self.logger.debug(f"✅ Plasticidade aplicada, R={R:.3f}, post_rate={post_rate_float:.3f}")
+        self.logger.debug(
+            f"✅ Plasticidade aplicada, R={R:.3f}, post_rate={post_rate_float:.3f}"
+        )
 
         if self.telemetry is not None and self.telemetry.enabled():
             with self._telemetry_lock:
                 try:
                     sid = int(self.step_id.item())
-                    self.telemetry.emit(commit_event(
-                        step_id=sid,
-                        mode=self.mode.value,
-                        committed=True,
-                        post_rate=post_rate_float,
-                        R=R,
-                    ))
+                    self.telemetry.emit(
+                        commit_event(
+                            step_id=sid,
+                            mode=self.mode.value,
+                            committed=True,
+                            post_rate=post_rate_float,
+                            R=R,
+                        )
+                    )
                 except Exception as exc:
                     self.logger.error(f"Falha ao emitir evento de commit: {exc}")
 
@@ -718,28 +794,30 @@ class MPJRDNeuron(BaseNeuron):
         """Ciclo de sono: consolida sinapses."""
         self.logger.info(f"💤 Iniciando sono por {duration}ms")
         self.sleep_count.add_(1)
-        
+
         for i, dend in enumerate(self.dendrites):
             self.logger.debug(f"   Dendrito {i}: consolidando...")
             dend.consolidate(dt=duration)
-        
+
         self.logger.info("✅ Sono concluído")
 
         if self.telemetry is not None and self.telemetry.enabled():
             with self._telemetry_lock:
                 try:
                     sid = int(self.step_id.item())
-                    self.telemetry.emit(sleep_event(
-                        step_id=sid,
-                        mode=self.mode.value,
-                        duration=float(duration),
-                    ))
+                    self.telemetry.emit(
+                        sleep_event(
+                            step_id=sid,
+                            mode=self.mode.value,
+                            duration=float(duration),
+                        )
+                    )
                 except Exception as exc:
                     self.logger.error(f"Falha ao emitir evento de sleep: {exc}")
 
     # ========== UTILITÁRIOS ==========
 
-    def to(self, device: torch.device) -> 'MPJRDNeuron':
+    def to(self, device: torch.device) -> "MPJRDNeuron":
         """Move neurônio para device e valida consistência."""
         super().to(device)
         self.logger.debug(f"📦 Neurônio movido para {device}")
@@ -756,41 +834,47 @@ class MPJRDNeuron(BaseNeuron):
             percentiles = torch.quantile(N_flat, torch.tensor([0.25, 0.5, 0.75]))
         else:
             percentiles = torch.tensor([0.0, 0.0, 0.0])
-            
+
         metrics = {
-            'type': 'MPJRDNeuron',
-            'id': id(self),
-            'theta': self.theta.item(),
-            'r_hat': self.r_hat.item(),
-            'step_count': self.homeostasis.step_count.item(),
-            'N_mean': N_flat.mean().item(),
-            'N_std': N_flat.std().item(),
-            'N_min': N_flat.min().item(),
-            'N_max': N_flat.max().item(),
-            'N_25p': percentiles[0].item(),
-            'N_median': percentiles[1].item(),
-            'N_75p': percentiles[2].item(),
-            'I_mean': I_flat.mean().item(),
-            'I_std': I_flat.std().item(),
-            'I_min': I_flat.min().item(),
-            'I_max': I_flat.max().item(),
-            'saturation_ratio': (self.N == self.cfg.n_max).float().mean().item(),
-            'protection_ratio': self.protection.float().mean().item(),
-            'total_synapses': self.N.numel(),
-            'total_dendrites': len(self.dendrites),
-            'mode': self.mode.value,
-            'mode_switches': self.mode_switches.item(),
-            'sleep_count': self.sleep_count.item(),
-            'has_pending_updates': self.stats_acc.has_data,
-            'pending_count': self.stats_acc.acc_count.item() if self.stats_acc.has_data else 0,
-            'device': str(self.theta.device),
-            'homeostasis_stable': self.homeostasis.is_stable(),
+            "type": "MPJRDNeuron",
+            "id": id(self),
+            "theta": self.theta.item(),
+            "r_hat": self.r_hat.item(),
+            "step_count": self.homeostasis.step_count.item(),
+            "N_mean": N_flat.mean().item(),
+            "N_std": N_flat.std().item(),
+            "N_min": N_flat.min().item(),
+            "N_max": N_flat.max().item(),
+            "N_25p": percentiles[0].item(),
+            "N_median": percentiles[1].item(),
+            "N_75p": percentiles[2].item(),
+            "I_mean": I_flat.mean().item(),
+            "I_std": I_flat.std().item(),
+            "I_min": I_flat.min().item(),
+            "I_max": I_flat.max().item(),
+            "saturation_ratio": (self.N == self.cfg.n_max).float().mean().item(),
+            "protection_ratio": self.protection.float().mean().item(),
+            "total_synapses": self.N.numel(),
+            "total_dendrites": len(self.dendrites),
+            "mode": self.mode.value,
+            "mode_switches": self.mode_switches.item(),
+            "sleep_count": self.sleep_count.item(),
+            "has_pending_updates": self.stats_acc.has_data,
+            "pending_count": (
+                self.stats_acc.acc_count.item() if self.stats_acc.has_data else 0
+            ),
+            "device": str(self.theta.device),
+            "homeostasis_stable": self.homeostasis.is_stable(),
         }
-        
-        self.logger.debug(f"📊 Métricas coletadas: N_mean={metrics['N_mean']:.1f}, θ={metrics['theta']:.2f}")
+
+        self.logger.debug(
+            f"📊 Métricas coletadas: N_mean={metrics['N_mean']:.1f}, θ={metrics['theta']:.2f}"
+        )
         return metrics
 
     def extra_repr(self) -> str:
-        return (f"mode={self.mode.value}, D={self.cfg.n_dendrites}, "
-                f"S={self.cfg.n_synapses_per_dendrite}, θ={self.theta.item():.2f}, "
-                f"device={self.theta.device}")
+        return (
+            f"mode={self.mode.value}, D={self.cfg.n_dendrites}, "
+            f"S={self.cfg.n_synapses_per_dendrite}, θ={self.theta.item():.2f}, "
+            f"device={self.theta.device}"
+        )
