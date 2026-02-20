@@ -295,8 +295,15 @@ class "src.pyfolds.monitoring.health.NeuronHealthMonitor" {
 
 class "src.pyfolds.monitoring.mindcontrol.MindControl" {
   +__init__()
+  +_iter_neurons()
   +inject_parameter()
   +on_telemetry_event()
+  +register_neuron()
+}
+class "src.pyfolds.monitoring.mindcontrol.MindControlEngine" {
+  +__init__()
+  +_bounded()
+  +analyze_and_react()
   +register_neuron()
 }
 class "src.pyfolds.monitoring.mindcontrol.MindControlSink" {
@@ -306,6 +313,11 @@ class "src.pyfolds.monitoring.mindcontrol.MindControlSink" {
   +flush()
 }
 class "src.pyfolds.monitoring.mindcontrol.MutationCommand" {
+}
+class "src.pyfolds.monitoring.mindcontrol.MutationQueue" {
+  +__init__()
+  +fetch_all()
+  +inject()
 }
 
 
@@ -571,6 +583,12 @@ class "tests.checkpoint.CheckpointMixin" {
 
 
 
+class "tests.integration.test_mindcontrol_runtime.MockNeuron" {
+  +__init__()
+  +_apply_mutations_safe()
+  +attach_mindcontrol()
+  +forward()
+}
 
 
 class "tests.integration.test_neuron_advanced.TestAdvancedNeuron" {

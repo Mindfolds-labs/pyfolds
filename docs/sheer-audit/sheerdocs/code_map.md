@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `138`
-- Símbolos: `989`
+- Símbolos: `1005`
 
 ## Módulos
 
@@ -385,6 +385,7 @@
 - Imports:
   - `mod:__future__`
   - `mod:dataclasses`
+  - `mod:queue`
   - `mod:src.pyfolds.telemetry.events`
   - `mod:src.pyfolds.telemetry.sinks`
   - `mod:threading`
@@ -392,8 +393,10 @@
   - `mod:weakref`
 - Classes:
   - `MindControl` (bases: (sem base explícita))
+  - `MindControlEngine` (bases: (sem base explícita))
   - `MindControlSink` (bases: Sink)
   - `MutationCommand` (bases: (sem base explícita))
+  - `MutationQueue` (bases: (sem base explícita))
 
 ### `src.pyfolds.network`
 - Arquivo: `src/pyfolds/network/__init__.py`
@@ -819,11 +822,15 @@
 ### `tests.integration.test_mindcontrol_runtime`
 - Arquivo: `tests/integration/test_mindcontrol_runtime.py`
 - Imports:
-  - `mod:pyfolds`
+  - `mod:pyfolds.monitoring.mindcontrol`
   - `mod:pytest`
   - `mod:torch`
+  - `mod:torch.nn`
+- Classes:
+  - `MockNeuron` (bases: nn.Module)
 - Funções:
-  - `test_mindcontrol_runtime_injection_prevents_numerical_crash(extreme_threshold)`
+  - `test_mindcontrol_bounds_clamp_threshold_values()`
+  - `test_mindcontrol_graph_safety()`
 
 ### `tests.integration.test_mnist_file_logging`
 - Arquivo: `tests/integration/test_mnist_file_logging.py`

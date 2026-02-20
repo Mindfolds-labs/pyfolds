@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 138,
-    "symbols": 989,
-    "edges": 1484,
+    "symbols": 1005,
+    "edges": 1503,
     "findings": 0,
     "internal_import_edges": 104
   },
@@ -40,7 +40,7 @@
           "id": "fn:src.pyfolds.__getattr__",
           "name": "__getattr__",
           "qname": "src.pyfolds.__getattr__",
-          "line": 158,
+          "line": 162,
           "params": [
             "name"
           ]
@@ -1205,6 +1205,7 @@
       "imports": [
         "mod:__future__",
         "mod:dataclasses",
+        "mod:queue",
         "mod:src.pyfolds.telemetry.events",
         "mod:src.pyfolds.telemetry.sinks",
         "mod:threading",
@@ -1216,20 +1217,34 @@
           "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControl",
           "name": "MindControl",
           "qname": "src.pyfolds.monitoring.mindcontrol.MindControl",
-          "line": 22,
+          "line": 99,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.__init__",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControl._iter_neurons",
             "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.inject_parameter",
             "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.on_telemetry_event",
             "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.register_neuron"
           ]
         },
         {
+          "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControlEngine",
+          "name": "MindControlEngine",
+          "qname": "src.pyfolds.monitoring.mindcontrol.MindControlEngine",
+          "line": 42,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControlEngine.__init__",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControlEngine._bounded",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControlEngine.analyze_and_react",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControlEngine.register_neuron"
+          ]
+        },
+        {
           "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
           "name": "MindControlSink",
           "qname": "src.pyfolds.monitoring.mindcontrol.MindControlSink",
-          "line": 58,
+          "line": 137,
           "bases": [
             "Sink"
           ],
@@ -1244,9 +1259,21 @@
           "id": "cls:src.pyfolds.monitoring.mindcontrol.MutationCommand",
           "name": "MutationCommand",
           "qname": "src.pyfolds.monitoring.mindcontrol.MutationCommand",
-          "line": 15,
+          "line": 16,
           "bases": [],
           "methods": []
+        },
+        {
+          "id": "cls:src.pyfolds.monitoring.mindcontrol.MutationQueue",
+          "name": "MutationQueue",
+          "qname": "src.pyfolds.monitoring.mindcontrol.MutationQueue",
+          "line": 23,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.monitoring.mindcontrol.MutationQueue.__init__",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MutationQueue.fetch_all",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MutationQueue.inject"
+          ]
         }
       ],
       "functions": []
@@ -2949,20 +2976,42 @@
       "qname": "tests.integration.test_mindcontrol_runtime",
       "file": "tests/integration/test_mindcontrol_runtime.py",
       "imports": [
-        "mod:pyfolds",
+        "mod:pyfolds.monitoring.mindcontrol",
         "mod:pytest",
-        "mod:torch"
+        "mod:torch",
+        "mod:torch.nn"
       ],
-      "classes": [],
+      "classes": [
+        {
+          "id": "cls:tests.integration.test_mindcontrol_runtime.MockNeuron",
+          "name": "MockNeuron",
+          "qname": "tests.integration.test_mindcontrol_runtime.MockNeuron",
+          "line": 10,
+          "bases": [
+            "nn.Module"
+          ],
+          "methods": [
+            "mtd:tests.integration.test_mindcontrol_runtime.MockNeuron.__init__",
+            "mtd:tests.integration.test_mindcontrol_runtime.MockNeuron._apply_mutations_safe",
+            "mtd:tests.integration.test_mindcontrol_runtime.MockNeuron.attach_mindcontrol",
+            "mtd:tests.integration.test_mindcontrol_runtime.MockNeuron.forward"
+          ]
+        }
+      ],
       "functions": [
         {
-          "id": "fn:tests.integration.test_mindcontrol_runtime.test_mindcontrol_runtime_injection_prevents_numerical_crash",
-          "name": "test_mindcontrol_runtime_injection_prevents_numerical_crash",
-          "qname": "tests.integration.test_mindcontrol_runtime.test_mindcontrol_runtime_injection_prevents_numerical_crash",
-          "line": 11,
-          "params": [
-            "extreme_threshold"
-          ]
+          "id": "fn:tests.integration.test_mindcontrol_runtime.test_mindcontrol_bounds_clamp_threshold_values",
+          "name": "test_mindcontrol_bounds_clamp_threshold_values",
+          "qname": "tests.integration.test_mindcontrol_runtime.test_mindcontrol_bounds_clamp_threshold_values",
+          "line": 62,
+          "params": []
+        },
+        {
+          "id": "fn:tests.integration.test_mindcontrol_runtime.test_mindcontrol_graph_safety",
+          "name": "test_mindcontrol_graph_safety",
+          "qname": "tests.integration.test_mindcontrol_runtime.test_mindcontrol_graph_safety",
+          "line": 39,
+          "params": []
         }
       ]
     },
