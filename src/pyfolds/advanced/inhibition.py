@@ -103,7 +103,7 @@ class InhibitionLayer(nn.Module):
     
     def _init_E2I_weights(self) -> torch.Tensor:
         """Inicializa pesos E→I com conectividade esparsa determinística."""
-        generator = torch.Generator(device='cpu')
+        generator = torch.Generator()
         generator.manual_seed(self.seed)
 
         dense_weights = torch.nn.init.xavier_uniform_(

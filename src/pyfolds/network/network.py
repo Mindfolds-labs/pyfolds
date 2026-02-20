@@ -48,6 +48,7 @@ class MPJRDNetwork(nn.Module):
         self.connections = []  # Lista de tuplas (origem, destino)
         self.connection_weights = nn.ParameterDict()  # Pesos das conexões
         self.built = False
+        self._input_generators: Dict[str, torch.Generator] = {}
         self.input_layer = None
         self.output_layer = None
         self._layer_order = []  # Cache da ordenação topológica
@@ -232,7 +233,7 @@ class MPJRDNetwork(nn.Module):
         # Gerador controlado por seed global/configurável (reutilizado por camada)
         generator = self._input_generators.get(to_layer)
         if generator is None:
-            generator = torch.Generator(device='cpu')
+            generator = torch.Generator()
             cfg_seed = getattr(getattr(to_layer_obj, 'cfg', None), 'random_seed', None)
             seed = torch.initial_seed() if cfg_seed is None else int(cfg_seed)
             generator.manual_seed(seed)

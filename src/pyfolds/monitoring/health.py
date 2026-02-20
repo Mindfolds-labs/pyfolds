@@ -137,24 +137,17 @@ class WeightIntegrityMonitor:
         self.last_hash = current_hash
         return {"checked": True, "ok": is_ok, "hash": current_hash}
 
+    # Backward compatibility aliases
     def _compute_state_hash(self) -> str:
-        """Compatibilidade com versões antigas do monitor."""
         return self._compute_hash()
 
-    def check_integrity(self) -> Dict[str, str | bool | int]:
-        """Compatibilidade com versões antigas do monitor."""
-        self.step_count += 1
-        if self.step_count % self.check_every != 0:
-            return {"checked": False, "step": self.step_count}
-
-        current_hash = self._compute_hash()
-        ok = bool(current_hash == self.last_hash)
-        result: Dict[str, str | bool | int] = {
-            "checked": True,
-            "step": self.step_count,
-            "ok": ok,
-            "previous_hash": self.last_hash,
-            "current_hash": current_hash,
-        }
-        self.last_hash = current_hash
+    def check_integrity(self) -> Dict[str, bool | str | int]:
+        result = self.check()
+        if "step" not in result:
+            result["step"] = self.step_count
         return result
+
+
+class ModelIntegrityMonitor(WeightIntegrityMonitor):
+    """Alias de compatibilidade para monitor de integridade de modelo."""
+

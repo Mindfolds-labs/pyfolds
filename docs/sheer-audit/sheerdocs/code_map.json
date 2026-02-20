@@ -6,10 +6,10 @@
   },
   "metrics": {
     "python_files": 140,
-    "symbols": 1062,
-    "edges": 1575,
+    "symbols": 1060,
+    "edges": 1576,
     "findings": 0,
-    "internal_import_edges": 104
+    "internal_import_edges": 105
   },
   "modules": [
     {
@@ -208,7 +208,7 @@
           "id": "cls:src.pyfolds.advanced.inhibition.InhibitionLayer",
           "name": "InhibitionLayer",
           "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer",
-          "line": 22,
+          "line": 25,
           "bases": [
             "nn.Module"
           ],
@@ -227,7 +227,7 @@
           "id": "cls:src.pyfolds.advanced.inhibition.InhibitionMixin",
           "name": "InhibitionMixin",
           "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin",
-          "line": 337,
+          "line": 339,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.advanced.inhibition.InhibitionMixin._init_inhibition",
@@ -595,7 +595,7 @@
           "id": "fn:src.pyfolds.core.accumulator.create_accumulator_from_config",
           "name": "create_accumulator_from_config",
           "qname": "src.pyfolds.core.accumulator.create_accumulator_from_config",
-          "line": 316,
+          "line": 313,
           "params": [
             "config",
             "track_extra"
@@ -685,6 +685,7 @@
       "qname": "src.pyfolds.core.dendrite",
       "file": "src/pyfolds/core/dendrite.py",
       "imports": [
+        "mod:logging",
         "mod:src.pyfolds.core.config",
         "mod:src.pyfolds.core.synapse",
         "mod:threading",
@@ -697,7 +698,7 @@
           "id": "cls:src.pyfolds.core.dendrite.MPJRDDendrite",
           "name": "MPJRDDendrite",
           "qname": "src.pyfolds.core.dendrite.MPJRDDendrite",
-          "line": 11,
+          "line": 16,
           "bases": [
             "nn.Module"
           ],
@@ -1177,6 +1178,16 @@
           "methods": []
         },
         {
+          "id": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+          "name": "ModelIntegrityMonitor",
+          "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+          "line": 151,
+          "bases": [
+            "WeightIntegrityMonitor"
+          ],
+          "methods": []
+        },
+        {
           "id": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
           "name": "NeuronHealthCheck",
           "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck",
@@ -1203,25 +1214,9 @@
           "id": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
           "name": "WeightIntegrityMonitor",
           "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor",
-          "line": 144,
+          "line": 102,
           "bases": [],
           "methods": [
-            "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
-            "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
-            "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_hash",
-            "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
-            "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check",
-            "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check_integrity"
-          ]
-        },
-        {
-          "id": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
-          "name": "WeightIntegrityMonitor",
-          "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor",
-          "line": 144,
-          "bases": [],
-          "methods": [
-            "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
             "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
             "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_hash",
             "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
@@ -1879,6 +1874,7 @@
         "mod:pathlib",
         "mod:pickle",
         "mod:shutil",
+        "mod:src.pyfolds.serialization.ecc",
         "mod:subprocess",
         "mod:torch",
         "mod:typing",
@@ -1889,7 +1885,7 @@
           "id": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
           "name": "VersionedCheckpoint",
           "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
-          "line": 29,
+          "line": 31,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
@@ -2516,7 +2512,6 @@
           "methods": [
             "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.__init__",
             "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
-            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
             "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.close",
             "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.emit"
           ]
@@ -2565,7 +2560,7 @@
           "id": "fn:src.pyfolds.utils.logging.build_log_path",
           "name": "build_log_path",
           "qname": "src.pyfolds.utils.logging.build_log_path",
-          "line": 385,
+          "line": 378,
           "params": [
             "log_dir",
             "app",
@@ -2585,7 +2580,7 @@
           "id": "fn:src.pyfolds.utils.logging.next_log_path",
           "name": "next_log_path",
           "qname": "src.pyfolds.utils.logging.next_log_path",
-          "line": 368,
+          "line": 361,
           "params": [
             "log_dir",
             "app",

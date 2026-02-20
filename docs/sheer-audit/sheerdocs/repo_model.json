@@ -465,7 +465,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.forward",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 117,
+      "line": 123,
       "doc": "Forward pass com backpropagação.",
       "params": [
         "self",
@@ -481,7 +481,7 @@
       "name": "reset_backprop",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.reset_backprop",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 140,
+      "line": 146,
       "doc": "Reseta estado de backpropagação.",
       "params": [
         "self"
@@ -496,7 +496,7 @@
       "name": "get_backprop_metrics",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.get_backprop_metrics",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 147,
+      "line": 153,
       "doc": "Retorna métricas de backpropagação.",
       "params": [
         "self"
@@ -524,7 +524,7 @@
       "name": "InhibitionLayer",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 22,
+      "line": 25,
       "doc": "Camada de inibição GABA para redes MPJRD.\n\nCaracterísticas:\n- Inibição lateral (gaussiana): neurônios próximos se inibem\n- Inibição feedforward (E→I): excitatórios ativam inibitórios\n- Inibição feedback (I→E): inibitórios inibem excitatórios\n- Esparsidade controlada (5-15%)\n- Overhead: ~5%\n\nUso típico:\n    exc_layer = MPJRDLayer(100, cfg)  # Excitatórios\n    inh_layer = InhibitionLayer(\n        n_excitatory=100,\n        n_inhibitory=25,\n        lateral_strength=0.5,\n        feedback_strength=0.4\n    )\n    \n    # Forward\n    exc_out = exc_layer(x)\n    inh_out = inh_layer(exc_out['spikes'])\n    exc_out_final = inh_layer.apply_inhibition(exc_out, inh_out)",
       "params": [],
       "returns": null,
@@ -539,7 +539,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer.__init__",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 48,
+      "line": 51,
       "doc": "Args:\n    n_excitatory: Número de neurônios excitatórios\n    n_inhibitory: Número de neurônios inibitórios (padrão: n_exc//4)\n    lateral_strength: Força da inibição lateral (0.0-1.0)\n    feedforward_strength: Força da inibição feedforward (0.0-1.0)\n    feedback_strength: Força da inibição feedback (0.0-1.0)\n    lateral_sigma: Largura do kernel gaussiano para inibição lateral\n    trainable_i2e: Se True, pesos I→E viram nn.Parameter treinável\n    seed: Seed opcional para inicialização de conectividade",
       "params": [
         "self",
@@ -562,7 +562,7 @@
       "name": "_init_E2I_weights",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer._init_E2I_weights",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 101,
+      "line": 104,
       "doc": "Inicializa pesos E→I com conectividade esparsa determinística.",
       "params": [
         "self"
@@ -577,7 +577,7 @@
       "name": "_init_I2E_weights",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer._init_I2E_weights",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 119,
+      "line": 122,
       "doc": "Inicializa pesos I→E com decay espacial.\n\nCada inibitório inibe todos os excitatórios,\nmas com força decaindo com a distância.",
       "params": [
         "self"
@@ -592,7 +592,7 @@
       "name": "_create_lateral_kernel",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer._create_lateral_kernel",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 142,
+      "line": 145,
       "doc": "Cria kernel gaussiano para inibição lateral entre excitatórios.\n\nReturns:\n    Tensor [n_exc, n_exc] com pesos de inibição lateral",
       "params": [
         "self"
@@ -607,7 +607,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer.forward",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 161,
+      "line": 164,
       "doc": "Processa neurônios inibitórios baseado nos spikes excitatórios.\n\nArgs:\n    exc_spikes: [batch, n_exc] spikes dos neurônios excitatórios\n    \nReturns:\n    Dict com:\n        'inh_spikes': [n_inh] spikes inibitórios (média sobre batch)\n        'inh_potential': [n_inh] potencial dos inibitórios\n        'feedforward_input': [n_inh] input feedforward",
       "params": [
         "self",
@@ -623,7 +623,7 @@
       "name": "apply_inhibition",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer.apply_inhibition",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 200,
+      "line": 202,
       "doc": "Aplica inibição aos neurônios excitatórios.\n\nArgs:\n    exc_output: Output da camada excitatória (deve conter 'spikes' e 'u')\n    inh_output: Output desta camada (de 'forward')\n    \nReturns:\n    exc_output modificado com inibição aplicada",
       "params": [
         "self",
@@ -640,7 +640,7 @@
       "name": "get_inhibition_metrics",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer.get_inhibition_metrics",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 312,
+      "line": 314,
       "doc": "Retorna métricas da inibição.\n\nReturns:\n    dict: Dicionário com métricas",
       "params": [
         "self"
@@ -655,7 +655,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer.extra_repr",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 331,
+      "line": 333,
       "doc": null,
       "params": [
         "self"
@@ -670,7 +670,7 @@
       "name": "InhibitionMixin",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 337,
+      "line": 339,
       "doc": "Mixin para integrar inibição em layers.\n\nNOTA: Este mixin opera no nível de Layer, não de neurônio individual.\nDeve ser usado com MPJRDLayer ou classes derivadas.\n\nUso:\n    class InhibitedLayer(InhibitionMixin, MPJRDLayer):\n        def __init__(self, n_neurons, cfg):\n            super().__init__(n_neurons, cfg)\n            self._init_inhibition()",
       "params": [],
       "returns": null,
@@ -683,7 +683,7 @@
       "name": "_init_inhibition",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin._init_inhibition",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 351,
+      "line": 353,
       "doc": "Inicializa camada inibitória.\n\nArgs:\n    n_inhibitory: Número de neurônios inibitórios (padrão: n_neurons//4)\n    lateral_strength: Força da inibição lateral\n    feedforward_strength: Força da inibição feedforward\n    feedback_strength: Força da inibição feedback\n    lateral_sigma: Largura do kernel gaussiano\n    trainable_i2e: Define se I→E é treinável (default usa cfg)\n    seed: Seed opcional para conectividade",
       "params": [
         "self",
@@ -705,7 +705,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin.forward",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 390,
+      "line": 392,
       "doc": "Forward com inibição aplicada.\n\nArgs:\n    x: Tensor de entrada [batch, n_neurons, dendrites, synapses]\n    **kwargs: Argumentos adicionais para a camada base\n\nReturns:\n    Dict com spikes após inibição",
       "params": [
         "self",
@@ -721,7 +721,7 @@
       "name": "get_inhibition_metrics",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin.get_inhibition_metrics",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 417,
+      "line": 419,
       "doc": "Retorna métricas da inibição desta layer.",
       "params": [
         "self"
@@ -1073,7 +1073,7 @@
       "name": "_should_apply_stdp",
       "qname": "src.pyfolds.advanced.stdp.STDPMixin._should_apply_stdp",
       "file": "src/pyfolds/advanced/stdp.py",
-      "line": 143,
+      "line": 145,
       "doc": "Determina se STDP deve ser aplicado no passo atual.\n\n:param mode: Modo explícito de aprendizado. Se ``None``, usa\n    ``self.mode`` quando disponível.\n:returns: ``True`` quando STDP está habilitado e o modo é compatível.",
       "params": [
         "self",
@@ -1089,7 +1089,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.stdp.STDPMixin.forward",
       "file": "src/pyfolds/advanced/stdp.py",
-      "line": 159,
+      "line": 161,
       "doc": "Executa ``forward`` e acopla atualização de STDP quando habilitado.\n\n:param x: Entrada com shape ``[B, D, S]``.\n:param kwargs: Argumentos adicionais propagados ao ``forward`` base.\n    Chaves relevantes:\n\n    - ``mode``: modo de aprendizado.\n    - ``dt``: passo temporal para o decaimento dos traços.\n\n:returns: Dicionário de saída do neurônio acrescido de métricas STDP.\n\nExample\n-------\n>>> import torch\n>>> class _Base:\n...     def __init__(self):\n...         self.mode = LearningMode.ONLINE\n...     def forward(self, x, **kwargs):\n...         return {\"spikes\": torch.ones(x.shape[0])}\n>>> class _Cfg:\n...     n_dendrites = 1\n...     n_synapses_per_dendrite = 2\n...     i_min = 0.0\n...     i_max = 1.0\n...     spike_threshold = 0.0\n...     stdp_trace_threshold = 0.0\n>>> class _Neuron(STDPMixin, _Base):\n...     def __init__(self):\n...         _Base.__init__(self)\n...         self.cfg = _Cfg()\n...         self.I = torch.zeros(1, 2)\n...         self._init_stdp(plasticity_mode=\"stdp\")\n>>> n = _Neuron()\n>>> out = n.forward(torch.ones(1, 1, 2))\n>>> bool(out[\"stdp_applied\"].item())\nTrue\n>>> n.I.shape\ntorch.Size([1, 2])",
       "params": [
         "self",
@@ -1699,7 +1699,7 @@
       "name": "plot_history",
       "qname": "src.pyfolds.core.accumulator.StatisticsAccumulator.plot_history",
       "file": "src/pyfolds/core/accumulator.py",
-      "line": 263,
+      "line": 260,
       "doc": "Plota histórico (retorna figura para maior controle).",
       "params": [
         "self",
@@ -1716,7 +1716,7 @@
       "name": "has_data",
       "qname": "src.pyfolds.core.accumulator.StatisticsAccumulator.has_data",
       "file": "src/pyfolds/core/accumulator.py",
-      "line": 301,
+      "line": 298,
       "doc": null,
       "params": [
         "self"
@@ -1733,7 +1733,7 @@
       "name": "batch_count",
       "qname": "src.pyfolds.core.accumulator.StatisticsAccumulator.batch_count",
       "file": "src/pyfolds/core/accumulator.py",
-      "line": 305,
+      "line": 302,
       "doc": null,
       "params": [
         "self"
@@ -1750,7 +1750,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.accumulator.StatisticsAccumulator.extra_repr",
       "file": "src/pyfolds/core/accumulator.py",
-      "line": 308,
+      "line": 305,
       "doc": null,
       "params": [
         "self"
@@ -1765,7 +1765,7 @@
       "name": "create_accumulator_from_config",
       "qname": "src.pyfolds.core.accumulator.create_accumulator_from_config",
       "file": "src/pyfolds/core/accumulator.py",
-      "line": 316,
+      "line": 313,
       "doc": "Cria accumulator a partir de config.",
       "params": [
         "config",
@@ -2130,7 +2130,7 @@
       "name": "MPJRDDendrite",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 11,
+      "line": 16,
       "doc": "Dendrito MPJRD com processamento vetorizado e cache OTIMIZADO.\n\n✅ OTIMIZAÇÃO CRÍTICA:\n    - Cache único que coleta estados UMA ÚNICA VEZ\n    - Evita loops múltiplos sobre as sinapses\n    - Propriedades retornam do cache, não recalculam",
       "params": [],
       "returns": null,
@@ -2145,7 +2145,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.__init__",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 21,
+      "line": 26,
       "doc": null,
       "params": [
         "self",
@@ -2162,7 +2162,7 @@
       "name": "_ensure_cache_valid",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite._ensure_cache_valid",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 37,
+      "line": 43,
       "doc": "✅ OTIMIZADO: Coleta estados UMA ÚNICA VEZ e cacheia tudo.\nPropriedades individuais retornam do cache, não recalculam.",
       "params": [
         "self"
@@ -2177,7 +2177,7 @@
       "name": "_invalidate_cache",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite._invalidate_cache",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 78,
+      "line": 82,
       "doc": "Invalida o cache (chamar após modificar sinapses).",
       "params": [
         "self"
@@ -2192,7 +2192,7 @@
       "name": "N",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.N",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 86,
+      "line": 90,
       "doc": "Filamentos [S] - ✅ retorna do cache.",
       "params": [
         "self"
@@ -2209,7 +2209,7 @@
       "name": "I",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.I",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 92,
+      "line": 96,
       "doc": "Potencial interno [S] - ✅ retorna do cache.",
       "params": [
         "self"
@@ -2226,7 +2226,7 @@
       "name": "u",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.u",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 98,
+      "line": 102,
       "doc": "Facilitação [S] quando disponível no backend sináptico.",
       "params": [
         "self"
@@ -2243,7 +2243,7 @@
       "name": "R",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.R",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 104,
+      "line": 108,
       "doc": "Recuperação [S] quando disponível no backend sináptico.",
       "params": [
         "self"
@@ -2260,7 +2260,7 @@
       "name": "W",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.W",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 110,
+      "line": 114,
       "doc": "Pesos [S] derivados de N - ✅ cacheado.",
       "params": [
         "self"
@@ -2277,7 +2277,7 @@
       "name": "forward",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.forward",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 117,
+      "line": 121,
       "doc": "Forward pass vetorizado.",
       "params": [
         "self",
@@ -2293,7 +2293,7 @@
       "name": "_validate_finite",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite._validate_finite",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 144,
+      "line": 151,
       "doc": "Falha cedo quando entradas contêm NaN/Inf.",
       "params": [
         "name",
@@ -2311,7 +2311,7 @@
       "name": "update_synapses_rate_based",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.update_synapses_rate_based",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 150,
+      "line": 157,
       "doc": "Atualiza sinapses de forma indexada (pré-sináptico por sinapse).",
       "params": [
         "self",
@@ -2333,7 +2333,7 @@
       "name": "consolidate",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.consolidate",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 178,
+      "line": 185,
       "doc": "Consolida mudanças sinápticas.",
       "params": [
         "self",
@@ -2351,7 +2351,7 @@
       "name": "get_states",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.get_states",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 186,
+      "line": 193,
       "doc": "Retorna todos os estados.",
       "params": [
         "self"
@@ -2366,7 +2366,7 @@
       "name": "load_states",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.load_states",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 202,
+      "line": 209,
       "doc": "Carrega estados.",
       "params": [
         "self",
@@ -2382,7 +2382,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.dendrite.MPJRDDendrite.extra_repr",
       "file": "src/pyfolds/core/dendrite.py",
-      "line": 215,
+      "line": 222,
       "doc": "Representação string.",
       "params": [
         "self"
@@ -2972,7 +2972,7 @@
       "name": "_install_gradient_health_monitor",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._install_gradient_health_monitor",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 138,
+      "line": 139,
       "doc": "Instala gancho de saneamento para gradientes com NaN/Inf.",
       "params": [
         "self"
@@ -2987,7 +2987,7 @@
       "name": "_gradient_health_monitor",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._gradient_health_monitor",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 142,
+      "line": 143,
       "doc": "Gatekeeper contra gradientes corrompidos por falhas de hardware.",
       "params": [
         "self",
@@ -3005,7 +3005,7 @@
       "name": "_validate_internal_devices",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._validate_internal_devices",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 156,
+      "line": 157,
       "doc": "Valida consistência de devices internos.",
       "params": [
         "self"
@@ -3020,7 +3020,7 @@
       "name": "_on_homeostasis_stable",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_stable",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 184,
+      "line": 185,
       "doc": "Callback quando homeostase se torna estável.",
       "params": [
         "self",
@@ -3036,7 +3036,7 @@
       "name": "_on_homeostasis_unstable",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_unstable",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 190,
+      "line": 191,
       "doc": "Callback quando homeostase se torna instável.",
       "params": [
         "self",
@@ -3052,7 +3052,7 @@
       "name": "N",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.N",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 200,
+      "line": 201,
       "doc": "Filamentos [dendrites, synapses].",
       "params": [
         "self"
@@ -3069,7 +3069,7 @@
       "name": "I",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.I",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 205,
+      "line": 206,
       "doc": "Potenciais internos [dendrites, synapses].",
       "params": [
         "self"
@@ -3086,7 +3086,7 @@
       "name": "W",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.W",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 210,
+      "line": 211,
       "doc": "Pesos [dendrites, synapses].",
       "params": [
         "self"
@@ -3103,7 +3103,7 @@
       "name": "protection",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.protection",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 215,
+      "line": 216,
       "doc": "Flags de proteção [dendrites, synapses].",
       "params": [
         "self"
@@ -3120,7 +3120,7 @@
       "name": "theta",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.theta",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 224,
+      "line": 225,
       "doc": null,
       "params": [
         "self"
@@ -3137,7 +3137,7 @@
       "name": "r_hat",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.r_hat",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 228,
+      "line": 229,
       "doc": null,
       "params": [
         "self"
@@ -3154,7 +3154,7 @@
       "name": "queue_runtime_injection",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.queue_runtime_injection",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 232,
+      "line": 233,
       "doc": "Enfileira mutação de parâmetro para aplicação assíncrona no próximo step.",
       "params": [
         "self",
@@ -3173,7 +3173,7 @@
       "name": "_refresh_config_references",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._refresh_config_references",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 240,
+      "line": 241,
       "doc": "Propaga nova configuração para submódulos que cacheiam ``cfg``.",
       "params": [
         "self"
@@ -3190,7 +3190,7 @@
       "name": "_apply_runtime_injections",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._apply_runtime_injections",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 253,
+      "line": 254,
       "doc": "Aplica injeções pendentes sem bloquear o caminho crítico do forward.",
       "params": [
         "self"
@@ -3207,7 +3207,7 @@
       "name": "set_mode",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.set_mode",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 303,
+      "line": 304,
       "doc": "Define modo de aprendizado.",
       "params": [
         "self",
@@ -3223,7 +3223,7 @@
       "name": "_compute_R_endogenous",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._compute_R_endogenous",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 318,
+      "line": 319,
       "doc": "Computa sinal neuromodulador interno.",
       "params": [
         "self",
@@ -3242,7 +3242,7 @@
       "name": "_validate_input_device",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._validate_input_device",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 340,
+      "line": 341,
       "doc": "Valida se input está no device correto.",
       "params": [
         "self",
@@ -3258,7 +3258,7 @@
       "name": "_apply_online_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._apply_online_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 351,
+      "line": 352,
       "doc": "Aplica regra local imediatamente (modo ONLINE sem defer).",
       "params": [
         "self",
@@ -3280,7 +3280,7 @@
       "name": "forward",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.forward",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 382,
+      "line": 383,
       "doc": "Forward pass do neurônio.\n\nArgs:\n    x: Tensor de entrada [batch, dendrites, synapses]\n    reward: Sinal de recompensa externo\n    mode: Modo de aprendizado (sobrescreve o atual)\n    collect_stats: Se deve coletar estatísticas\n    dt: Passo de tempo (ms)\n\nReturns:\n    Dict com spikes, potenciais e estatísticas",
       "params": [
         "self",
@@ -3303,7 +3303,7 @@
       "name": "step",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.step",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 605,
+      "line": 608,
       "doc": "API explícita de passo temporal (compatível com README).",
       "params": [
         "self",
@@ -3323,7 +3323,7 @@
       "name": "apply_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 625,
+      "line": 628,
       "doc": "Aplica plasticidade acumulada (deferred updates).\n\n✅ CORRIGIDO: Passa mode para as sinapses",
       "params": [
         "self",
@@ -3342,7 +3342,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.sleep",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 713,
+      "line": 716,
       "doc": "Ciclo de sono: consolida sinapses.",
       "params": [
         "self",
@@ -3360,7 +3360,7 @@
       "name": "to",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.to",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 738,
+      "line": 741,
       "doc": "Move neurônio para device e valida consistência.",
       "params": [
         "self",
@@ -3376,7 +3376,7 @@
       "name": "get_metrics",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.get_metrics",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 747,
+      "line": 749,
       "doc": "Retorna métricas consolidadas do neurônio.",
       "params": [
         "self"
@@ -3391,7 +3391,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.extra_repr",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 790,
+      "line": 792,
       "doc": null,
       "params": [
         "self"
@@ -4223,66 +4223,6 @@
       "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor",
       "file": "src/pyfolds/monitoring/health.py",
       "line": 102,
-      "doc": "Monitora integridade de pesos por hash SHA-256 em janelas periódicas.\n\nÚtil para detectar corrupção silenciosa em execuções longas (ex.: bitflips em VRAM).",
-      "params": [],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
-      "kind": "method",
-      "name": "__init__",
-      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 108,
-      "doc": null,
-      "params": [
-        "self",
-        "model",
-        "check_every_n_steps"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
-      "kind": "method",
-      "name": "_compute_state_hash",
-      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 114,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check_integrity",
-      "kind": "method",
-      "name": "check_integrity",
-      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor.check_integrity",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 126,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
-      "kind": "class",
-      "name": "WeightIntegrityMonitor",
-      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 144,
       "doc": "Monitora corrupção silenciosa de pesos em runtime.\n\nEste monitor é focado em cenários de treino/inferência com aceleração em GPU,\ndetectando alterações inesperadas no ``state_dict`` a cada ``N`` passos.",
       "params": [],
       "returns": null,
@@ -4295,7 +4235,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
       "file": "src/pyfolds/monitoring/health.py",
-      "line": 151,
+      "line": 109,
       "doc": null,
       "params": [
         "self",
@@ -4312,7 +4252,7 @@
       "name": "_compute_hash",
       "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_hash",
       "file": "src/pyfolds/monitoring/health.py",
-      "line": 157,
+      "line": 115,
       "doc": null,
       "params": [
         "self"
@@ -4327,13 +4267,58 @@
       "name": "check",
       "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor.check",
       "file": "src/pyfolds/monitoring/health.py",
-      "line": 170,
+      "line": 128,
       "doc": null,
       "params": [
         "self"
       ],
       "returns": null,
       "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
+      "kind": "method",
+      "name": "_compute_state_hash",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 141,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check_integrity",
+      "kind": "method",
+      "name": "check_integrity",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor.check_integrity",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 144,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+      "kind": "class",
+      "name": "ModelIntegrityMonitor",
+      "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 151,
+      "doc": "Alias de compatibilidade para monitor de integridade de modelo.",
+      "params": [],
+      "returns": null,
+      "bases": [
+        "WeightIntegrityMonitor"
+      ],
       "decorators": []
     },
     {
@@ -4812,7 +4797,7 @@
       "name": "add_layer",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.add_layer",
       "file": "src/pyfolds/network/network.py",
-      "line": 55,
+      "line": 56,
       "doc": "Adiciona uma camada à rede.\n\nArgs:\n    name: Nome único da camada\n    layer: Camada MPJRDLayer\n\nReturns:\n    self (para encadeamento)",
       "params": [
         "self",
@@ -4829,7 +4814,7 @@
       "name": "connect",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.connect",
       "file": "src/pyfolds/network/network.py",
-      "line": 77,
+      "line": 78,
       "doc": "Conecta duas camadas com validação de ciclos.\n\nArgs:\n    from_layer: Nome da camada de origem\n    to_layer: Nome da camada de destino\n    weight_init: Inicialização dos pesos (padrão: 1.0)\n\nReturns:\n    self (para encadeamento)",
       "params": [
         "self",
@@ -4847,7 +4832,7 @@
       "name": "_has_cycle",
       "qname": "src.pyfolds.network.network.MPJRDNetwork._has_cycle",
       "file": "src/pyfolds/network/network.py",
-      "line": 122,
+      "line": 123,
       "doc": "Detecta ciclos no grafo de conexões usando DFS.\n\nArgs:\n    connections: Lista de tuplas (origem, destino)\n    \nReturns:\n    True se houver ciclo, False caso contrário",
       "params": [
         "self",
@@ -4863,7 +4848,7 @@
       "name": "_topological_sort",
       "qname": "src.pyfolds.network.network.MPJRDNetwork._topological_sort",
       "file": "src/pyfolds/network/network.py",
-      "line": 160,
+      "line": 161,
       "doc": "Ordenação topológica usando algoritmo de Kahn.\n\nReturns:\n    Lista de nomes de camadas em ordem topológica\n    \nRaises:\n    ValueError: Se houver ciclo no grafo",
       "params": [
         "self"
@@ -4878,7 +4863,7 @@
       "name": "_prepare_input_for_layer",
       "qname": "src.pyfolds.network.network.MPJRDNetwork._prepare_input_for_layer",
       "file": "src/pyfolds/network/network.py",
-      "line": 200,
+      "line": 201,
       "doc": "Prepara spikes de origem para entrada da camada destino.\n\n✅ OTIMIZADO: Distribui ativação entre dendritos de forma realista\n\nArgs:\n    spikes: Spikes da camada origem [B, from]\n    to_layer: Nome da camada destino\n    weights: Pesos da conexão [from, to]\n\nReturns:\n    Tensor [B, to, D, S] pronto para a camada destino",
       "params": [
         "self",
@@ -4896,7 +4881,7 @@
       "name": "build",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.build",
       "file": "src/pyfolds/network/network.py",
-      "line": 251,
+      "line": 255,
       "doc": "Constrói a rede (valida conexões, ordena topologicamente).\n\nReturns:\n    self (para encadeamento)",
       "params": [
         "self"
@@ -4911,7 +4896,7 @@
       "name": "forward",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.forward",
       "file": "src/pyfolds/network/network.py",
-      "line": 277,
+      "line": 281,
       "doc": "Forward pass da rede com ordenação topológica real.\n\nArgs:\n    x: Tensor de entrada (formato depende da primeira camada)\n    reward: Sinal de recompensa (opcional)\n    mode: Modo de aprendizado\n\nReturns:\n    Dict com:\n        - output: spikes da última camada [B, output_neurons]\n        - layers: saídas de todas as camadas\n        - final_layer: nome da última camada\n        - layer_order: ordem de processamento",
       "params": [
         "self",
@@ -4930,7 +4915,7 @@
       "name": "set_mode",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.set_mode",
       "file": "src/pyfolds/network/network.py",
-      "line": 373,
+      "line": 377,
       "doc": "Define modo de aprendizado para todas as camadas.",
       "params": [
         "self",
@@ -4946,7 +4931,7 @@
       "name": "apply_batch_update",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.apply_batch_update",
       "file": "src/pyfolds/network/network.py",
-      "line": 380,
+      "line": 384,
       "doc": "Aplica plasticidade acumulada em todas as camadas.\nÚtil no modo BATCH após processar múltiplos exemplos.",
       "params": [
         "self",
@@ -4962,7 +4947,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.sleep",
       "file": "src/pyfolds/network/network.py",
-      "line": 388,
+      "line": 392,
       "doc": "Ciclo de sono para consolidação two-factor em todas camadas.\n\nArgs:\n    duration: Duração do sono em unidades de tempo",
       "params": [
         "self",
@@ -4978,7 +4963,7 @@
       "name": "get_all_metrics",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.get_all_metrics",
       "file": "src/pyfolds/network/network.py",
-      "line": 398,
+      "line": 402,
       "doc": "Retorna métricas de todas as camadas.\n\nReturns:\n    Dict com métricas por camada",
       "params": [
         "self"
@@ -4993,7 +4978,7 @@
       "name": "get_network_metrics",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.get_network_metrics",
       "file": "src/pyfolds/network/network.py",
-      "line": 410,
+      "line": 414,
       "doc": "Retorna métricas agregadas da rede.\n\nReturns:\n    Dict com estatísticas da rede",
       "params": [
         "self"
@@ -5008,7 +4993,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.network.network.MPJRDNetwork.extra_repr",
       "file": "src/pyfolds/network/network.py",
-      "line": 436,
+      "line": 440,
       "doc": null,
       "params": [
         "self"
@@ -6155,7 +6140,7 @@
       "name": "VersionedCheckpoint",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 29,
+      "line": 31,
       "doc": "Salva/recupera estado do modelo com metadados e hash de integridade.\n\n✅ CORRIGIDO:\n    - Warnings para git hash ausente\n    - Validação de versão ao carregar\n    - Otimização de hash\n    - Suporte a compressão\n    - Suporte opcional a safetensors\n    - Validação de shape antes de ``load_state_dict``\n    - Sidecar ECC opcional para recuperação física de bitflips",
       "params": [],
       "returns": null,
@@ -6168,7 +6153,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 43,
+      "line": 45,
       "doc": "Args:\n    model: Modelo a ser salvo/restaurado\n    version: Versão semântica do modelo (ex: \"2.0.0\")",
       "params": [
         "self",
@@ -6185,7 +6170,7 @@
       "name": "_cfg_dict",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._cfg_dict",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 52,
+      "line": 54,
       "doc": "Extrai configuração do modelo em formato dict.",
       "params": [
         "self"
@@ -6200,7 +6185,7 @@
       "name": "_git_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 67,
+      "line": 69,
       "doc": "Obtém hash atual do git para reprodutibilidade.",
       "params": [
         "self"
@@ -6215,7 +6200,7 @@
       "name": "_metadata",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 92,
+      "line": 94,
       "doc": "Gera metadados para o checkpoint.",
       "params": [
         "self",
@@ -6231,7 +6216,7 @@
       "name": "_compute_plain_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_plain_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 105,
+      "line": 107,
       "doc": "Calcula hash SHA-256 puro do state_dict.",
       "params": [
         "self",
@@ -6247,7 +6232,7 @@
       "name": "_compute_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 118,
+      "line": 120,
       "doc": "Calcula digest de integridade do state dict (HMAC quando disponível).",
       "params": [
         "self",
@@ -6263,7 +6248,7 @@
       "name": "_verify_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 128,
+      "line": 130,
       "doc": null,
       "params": [
         "plain_digest",
@@ -6281,7 +6266,7 @@
       "name": "_resolve_safetensors_paths",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 144,
+      "line": 146,
       "doc": null,
       "params": [
         "path"
@@ -6298,7 +6283,7 @@
       "name": "_decode_with_ecc",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 153,
+      "line": 155,
       "doc": null,
       "params": [
         "raw_payload",
@@ -6317,7 +6302,7 @@
       "name": "_validate_shape_invariants",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 167,
+      "line": 169,
       "doc": "Valida shape dos tensores do checkpoint antes do load no modelo.",
       "params": [
         "model",
@@ -6335,7 +6320,7 @@
       "name": "save",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.save",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 179,
+      "line": 181,
       "doc": "Salva checkpoint e retorna payload persistido.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    extra_metadata: Metadados adicionais\n    compress: Usar compressão zip (recomendado para .pt)\n    use_safetensors: Usa formato seguro sem pickle para pesos\n    ecc_protection: Nível ECC de sidecar (off|low|med|high)\n\nReturns:\n    Dicionário com o checkpoint salvo",
       "params": [
         "self",
@@ -6354,7 +6339,7 @@
       "name": "_validate_model_shapes",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_model_shapes",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 240,
+      "line": 242,
       "doc": null,
       "params": [
         "model",
@@ -6372,7 +6357,7 @@
       "name": "load",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 261,
+      "line": 263,
       "doc": "Carrega checkpoint, valida hash e opcionalmente restaura modelo.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    model: Modelo para carregar o estado (opcional)\n    map_location: Device para carregar tensores\n    strict: Se True, valida hash e versão\n    expected_version: Versão esperada (opcional)\n\nReturns:\n    Dicionário com o checkpoint carregado\n\nRaises:\n    ValueError: Se hash/shape não coincidirem",
       "params": [
         "cls",
@@ -6394,7 +6379,7 @@
       "name": "load_secure",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load_secure",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 353,
+      "line": 355,
       "doc": "Carrega pesos via safetensors com validações rígidas de integridade.",
       "params": [
         "cls",
@@ -6413,7 +6398,7 @@
       "name": "__repr__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 381,
+      "line": 383,
       "doc": null,
       "params": [
         "self"
@@ -8461,27 +8446,12 @@
       "decorators": []
     },
     {
-      "id": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
-      "kind": "method",
-      "name": "_flush_to_disk",
-      "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
-      "file": "src/pyfolds/utils/logging.py",
-      "line": 327,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
       "id": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.emit",
       "kind": "method",
       "name": "emit",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.emit",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 335,
+      "line": 327,
       "doc": null,
       "params": [
         "self",
@@ -8497,7 +8467,7 @@
       "name": "_flush_to_disk",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 353,
+      "line": 345,
       "doc": null,
       "params": [
         "self"
@@ -8512,7 +8482,7 @@
       "name": "close",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.close",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 361,
+      "line": 354,
       "doc": null,
       "params": [
         "self"
@@ -8527,7 +8497,7 @@
       "name": "next_log_path",
       "qname": "src.pyfolds.utils.logging.next_log_path",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 368,
+      "line": 361,
       "doc": "Gera caminho de log incremental: NNN_app_version_YYYYMMDD_HHMMSS.log.",
       "params": [
         "log_dir",
@@ -8544,7 +8514,7 @@
       "name": "build_log_path",
       "qname": "src.pyfolds.utils.logging.build_log_path",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 385,
+      "line": 378,
       "doc": "Alias de compatibilidade para ``next_log_path``.",
       "params": [
         "log_dir",
@@ -9152,7 +9122,7 @@
       "name": "apply_plasticity",
       "qname": "src.pyfolds.wave.neuron.MPJRDWaveNeuron.apply_plasticity",
       "file": "src/pyfolds/wave/neuron.py",
-      "line": 195,
+      "line": 197,
       "doc": null,
       "params": [
         "self",
@@ -17623,6 +17593,12 @@
     {
       "type": "IMPORT",
       "src": "mod:src.pyfolds.core.dendrite",
+      "dst": "mod:logging",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.core.dendrite",
       "dst": "mod:torch",
       "meta": {}
     },
@@ -18895,6 +18871,18 @@
     {
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_hash",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
       "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
       "meta": {}
     },
@@ -18907,25 +18895,13 @@
     {
       "type": "CONTAINS",
       "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "dst": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
       "meta": {}
     },
     {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_hash",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check",
+      "type": "INHERITS",
+      "src": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+      "dst": "cls:*.WeightIntegrityMonitor",
       "meta": {}
     },
     {
@@ -20006,6 +19982,12 @@
       "type": "IMPORT",
       "src": "mod:src.pyfolds.serialization.versioned_checkpoint",
       "dst": "mod:torch",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.serialization.versioned_checkpoint",
+      "dst": "mod:src.pyfolds.serialization.ecc",
       "meta": {}
     },
     {
@@ -21278,12 +21260,6 @@
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
       "dst": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.__init__",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
-      "dst": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
       "meta": {}
     },
     {
@@ -25670,9 +25646,9 @@
   "findings": [],
   "metrics": {
     "python_files": 140,
-    "symbols": 1062,
-    "edges": 1575,
+    "symbols": 1060,
+    "edges": 1576,
     "findings": 0,
-    "internal_import_edges": 104
+    "internal_import_edges": 105
   }
 }

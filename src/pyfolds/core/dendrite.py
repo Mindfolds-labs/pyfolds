@@ -1,6 +1,7 @@
 """Dendrito MPJRD - Agregação vetorizada de sinapses - VERSÃO OTIMIZADA"""
 
 import logging
+
 import torch
 import torch.nn as nn
 from typing import Optional, Dict
@@ -35,6 +36,7 @@ class MPJRDDendrite(nn.Module):
         
         # Cache único (dicionário)
         self._cached_states = None
+        self._cached_W = None
         self._cache_invalid = True
         self._cache_lock = Lock()
 
@@ -50,13 +52,8 @@ class MPJRDDendrite(nn.Module):
         first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
         device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
 
-        # ✅ ÚNICO LOOP sobre sinapses (coleta tudo de uma vez)
         N_list = []
         I_list = []
-        # Nota técnica:
-        # O núcleo MPJRD mantém apenas estados estruturais (N) e voláteis (I)
-        # por sinapse. Estados de STP (u, R) pertencem ao módulo avançado
-        # (ShortTermDynamicsMixin) em nível de neurônio, não ao core de sinapse.
         has_short_term_state = all(hasattr(syn, "u") and hasattr(syn, "R") for syn in self.synapses)
         u_list = [] if has_short_term_state else None
         R_list = [] if has_short_term_state else None
@@ -76,10 +73,11 @@ class MPJRDDendrite(nn.Module):
         cached_w = torch.log2(1.0 + cached_states['N'].float()) / self.cfg.w_scale
 
         with self._cache_lock:
-            if self._cache_invalid or self._cached_states is None:
-                self._cached_states = cached_states
-                self._cached_W = cached_w
-                self._cache_invalid = False
+            if not self._cache_invalid and self._cached_states is not None:
+                return
+            self._cached_states = cached_states
+            self._cached_W = cached_w
+            self._cache_invalid = False
 
     def _invalidate_cache(self):
         """Invalida o cache (chamar após modificar sinapses)."""
@@ -144,7 +142,7 @@ class MPJRDDendrite(nn.Module):
         # Proteção numérica para cenários com taxa alta
         clamped = torch.clamp(v_dend, min=-10.0, max=10.0)
         if not torch.equal(clamped, v_dend):
-            _LOGGER.warning("v_dend clamped to [-10, 10] in dendrite forward")
+            _LOGGER.warning("event=dendrite_clamp applied=true min=-10 max=10")
         v_dend = clamped
 
         return v_dend
