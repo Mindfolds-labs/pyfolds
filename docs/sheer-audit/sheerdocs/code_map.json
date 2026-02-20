@@ -7,7 +7,7 @@
   "metrics": {
     "python_files": 138,
     "symbols": 1017,
-    "edges": 1520,
+    "edges": 1521,
     "findings": 0,
     "internal_import_edges": 104
   },
@@ -1833,6 +1833,7 @@
         "mod:hmac",
         "mod:os",
         "mod:pathlib",
+        "mod:pickle",
         "mod:shutil",
         "mod:subprocess",
         "mod:torch",
@@ -1844,7 +1845,7 @@
           "id": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
           "name": "VersionedCheckpoint",
           "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
-          "line": 19,
+          "line": 20,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
@@ -2497,7 +2498,7 @@
           "id": "fn:src.pyfolds.utils.logging.build_log_path",
           "name": "build_log_path",
           "qname": "src.pyfolds.utils.logging.build_log_path",
-          "line": 346,
+          "line": 341,
           "params": [
             "log_dir",
             "app",
@@ -2517,7 +2518,7 @@
           "id": "fn:src.pyfolds.utils.logging.next_log_path",
           "name": "next_log_path",
           "qname": "src.pyfolds.utils.logging.next_log_path",
-          "line": 329,
+          "line": 324,
           "params": [
             "log_dir",
             "app",

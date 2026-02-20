@@ -526,6 +526,7 @@
   - `mod:hmac`
   - `mod:os`
   - `mod:pathlib`
+  - `mod:pickle`
   - `mod:shutil`
   - `mod:subprocess`
   - `mod:torch`
