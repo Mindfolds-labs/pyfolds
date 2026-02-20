@@ -19,9 +19,7 @@ import torch
 
 from .ecc import ReedSolomonECC, ecc_from_protection
 
-from pyfolds.core.config import MPJRDConfig
-
-NeuronConfig = MPJRDConfig
+from pyfolds.core.config import MPJRDConfig, NeuronConfig
 
 try:
     from safetensors.torch import load_file as load_safetensors_file
@@ -132,12 +130,32 @@ class VersionedCheckpoint:
 
         try:
             torch.serialization.add_safe_globals(
-                [NeuronConfig, dict, list, str, float]
+                [MPJRDConfig, NeuronConfig, dict, list, str, float]
             )
             torch.serialization.add_safe_globals(safe_types)
         except AttributeError:
             return
         cls._safe_globals_registered = True
+
+
+    @staticmethod
+    def _load_checkpoint_with_filtered_warnings(
+        path: str,
+        map_location: str,
+        *,
+        weights_only: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """Carrega checkpoint silenciando apenas UserWarnings de dicionário do PyTorch."""
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                category=UserWarning,
+                message=r"(?i).*dict(?:ionary)?.*",
+                module=r"torch(?:\..*)?",
+            )
+            if weights_only is None:
+                return torch.load(path, map_location=map_location)
+            return torch.load(path, map_location=map_location, weights_only=weights_only)
 
     @classmethod
     def _to_weights_only_safe(cls, value: Any) -> Any:
@@ -387,10 +405,10 @@ class VersionedCheckpoint:
         else:
             try:
                 cls._register_safe_globals()
-                ckpt = torch.load(path, map_location=map_location, weights_only=True)
+                ckpt = cls._load_checkpoint_with_filtered_warnings(path, map_location, weights_only=True)
             except TypeError:
                 # Compatibilidade com versões do PyTorch sem argumento weights_only
-                ckpt = torch.load(path, map_location=map_location)
+                ckpt = cls._load_checkpoint_with_filtered_warnings(path, map_location, weights_only=None)
             except pickle.UnpicklingError as exc:
                 # Compatibilidade com checkpoints serializados com protocolo/objetos
                 # ainda não suportados pelo modo weights_only=True (PyTorch >=2.6).
@@ -399,7 +417,7 @@ class VersionedCheckpoint:
                     f"incompatibilidade do formato seguro: {exc}",
                     RuntimeWarning,
                 )
-                ckpt = torch.load(path, map_location=map_location, weights_only=False)
+                ckpt = cls._load_checkpoint_with_filtered_warnings(path, map_location, weights_only=False)
 
         model_state = ckpt["model_state"]
         metadata = ckpt.get("metadata", {})

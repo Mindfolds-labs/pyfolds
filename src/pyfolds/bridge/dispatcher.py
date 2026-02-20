@@ -19,7 +19,7 @@ class MindDispatcher:
         metrics: dict[str, Any] | Any,
     ) -> dict[str, Any]:
         """Prepara dados serializáveis para MindStream/MindAudis sem acoplamento."""
-        return {
+        event = {
             "origin": "pyfolds_v2.1.1",
             "layer": layer_id,
             "ts": datetime.now(UTC).isoformat(),
@@ -31,6 +31,10 @@ class MindDispatcher:
                 "health": metrics,
             },
         }
+        # Contrato legado (app atual/tests) mantido em paralelo ao payload canônico.
+        event["layer_id"] = layer_id
+        event["timestamp"] = event["ts"]
+        return event
 
     @staticmethod
     def prepare_payload(
@@ -47,8 +51,8 @@ class MindDispatcher:
             metrics=health_score,
         )
         return {
-            "layer_id": event["layer"],
-            "timestamp": event["ts"],
+            "layer_id": event["layer_id"],
+            "timestamp": event["timestamp"],
             "data": {
                 "spikes": event["payload"]["activity"],
                 "weights_mean": event["payload"]["weights_avg"],
