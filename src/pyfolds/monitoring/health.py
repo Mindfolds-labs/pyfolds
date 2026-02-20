@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from enum import Enum
 from typing import Dict, List, Tuple
 
@@ -96,3 +97,52 @@ class NeuronHealthMonitor:
         if not self.alerts:
             return 100.0
         return max(0.0, 100.0 - len(self.alerts) * 10.0)
+
+
+class ModelIntegrityMonitor:
+    """Monitor de integridade de parâmetros para detecção periódica de corrupção.
+
+    O monitor calcula um hash SHA-256 determinístico do estado atual de
+    parâmetros e buffers do modelo. O uso recomendado é em fases de validação
+    ou inferência estável, nas quais o estado esperado não deve mutar.
+    """
+
+    def __init__(self, model: torch.nn.Module, check_every_n_steps: int = 100):
+        self.model = model
+        self.check_every = max(1, int(check_every_n_steps))
+        self.step_count = 0
+        self.expected_hash: str | None = None
+
+    @staticmethod
+    def compute_state_hash(model: torch.nn.Module) -> str:
+        hasher = hashlib.sha256()
+        for name, tensor in model.state_dict().items():
+            if not torch.is_tensor(tensor):
+                continue
+            view = tensor.detach().contiguous().cpu()
+            hasher.update(name.encode("utf-8"))
+            hasher.update(str(view.dtype).encode("utf-8"))
+            hasher.update(str(tuple(view.shape)).encode("utf-8"))
+            hasher.update(view.numpy().tobytes())
+        return hasher.hexdigest()
+
+    def set_baseline(self) -> str:
+        self.expected_hash = self.compute_state_hash(self.model)
+        return self.expected_hash
+
+    def check_integrity(self) -> Dict[str, str | bool]:
+        self.step_count += 1
+        if self.step_count % self.check_every != 0:
+            return {}
+
+        current_hash = self.compute_state_hash(self.model)
+        if self.expected_hash is None:
+            self.expected_hash = current_hash
+            return {"hash_initialized": True, "current_hash": current_hash}
+
+        ok = current_hash == self.expected_hash
+        return {
+            "integrity_ok": ok,
+            "expected_hash": self.expected_hash,
+            "current_hash": current_hash,
+        }
