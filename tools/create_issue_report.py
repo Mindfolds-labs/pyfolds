@@ -11,6 +11,11 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    from tools.id_registry import next_issue_id, register_ids
+except ImportError:
+    from id_registry import next_issue_id, register_ids
+
 RELATORIOS_DIR = Path("docs/development/prompts/relatorios")
 LOGS_DIR = Path("docs/development/prompts/logs")
 
@@ -128,17 +133,29 @@ area: \"{area}\"
     (LOGS_DIR / f"{issue_id}-create.log.json").write_text(
         json.dumps(log_payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+    register_ids(issue_id=issue_id)
     return target
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--issue-id", required=True)
+    parser.add_argument("--issue-id")
+    parser.add_argument(
+        "--auto-id",
+        action="store_true",
+        help="Descobre automaticamente o próximo ISSUE-XXX a partir do histórico",
+    )
     parser.add_argument("--tema", required=True)
     parser.add_argument("--prioridade", required=True)
     parser.add_argument("--area", required=True)
     args = parser.parse_args()
-    path = create_issue_template(args.issue_id, args.tema, args.prioridade, args.area)
+    issue_id = args.issue_id
+    if args.auto_id or not issue_id:
+        issue_id = next_issue_id()
+    if not issue_id:
+        raise ValueError("issue_id não resolvido")
+
+    path = create_issue_template(issue_id, args.tema, args.prioridade, args.area)
     print(path)
     return 0
 
