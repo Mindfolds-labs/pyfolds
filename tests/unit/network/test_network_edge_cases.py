@@ -1,4 +1,4 @@
-"""Edge-case tests for MPJRDNetwork input preparation."""
+"""Edge-case tests for SpikingNetwork input preparation."""
 
 import torch
 
@@ -6,11 +6,11 @@ import pyfolds
 
 
 def test_prepare_input_with_single_dendrite_avoids_division_by_zero():
-    cfg = pyfolds.MPJRDConfig(n_dendrites=1, n_synapses_per_dendrite=4, device="cpu")
+    cfg = pyfolds.NeuronConfig(n_dendrites=1, n_synapses_per_dendrite=4, device="cpu")
 
-    net = pyfolds.MPJRDNetwork("single_dendrite")
-    net.add_layer("in", pyfolds.MPJRDLayer(2, cfg, device=torch.device("cpu")))
-    net.add_layer("out", pyfolds.MPJRDLayer(3, cfg, device=torch.device("cpu")))
+    net = pyfolds.SpikingNetwork("single_dendrite")
+    net.add_layer("in", pyfolds.AdaptiveNeuronLayer(2, cfg, device=torch.device("cpu")))
+    net.add_layer("out", pyfolds.AdaptiveNeuronLayer(3, cfg, device=torch.device("cpu")))
     net.connect("in", "out")
     net.build()
 

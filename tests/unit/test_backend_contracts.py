@@ -11,7 +11,7 @@ import pyfolds
 
 def test_import_and_object_construction_v1_v2():
     """Garante compatibilidade de import/construção para v1 e v2."""
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
 
     neuron_v1 = pyfolds.MPJRDNeuron(cfg)
     neuron_v2 = pyfolds.MPJRDNeuronV2(cfg)
@@ -22,7 +22,7 @@ def test_import_and_object_construction_v1_v2():
 
 def test_torch_backend_shape_and_state_contracts():
     """Contrato mínimo de shape/estado no backend torch."""
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
     neuron_v1 = pyfolds.MPJRDNeuron(cfg)
     neuron_v2 = pyfolds.MPJRDNeuronV2(cfg)
 
@@ -53,7 +53,7 @@ def test_torch_backend_shape_and_state_contracts():
 
 def test_torch_backend_v2_accepts_multidim_batch_contract():
     """V2 deve aceitar entradas com batch multidimensional [..., D, S]."""
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
     neuron_v2 = pyfolds.MPJRDNeuronV2(cfg)
 
     x = torch.ones(2, 5, cfg.n_dendrites, cfg.n_synapses_per_dendrite)

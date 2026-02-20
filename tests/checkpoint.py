@@ -103,8 +103,8 @@ class CheckpointMixin:
         if 'config' in checkpoint:
             instance = cls(checkpoint['config'], **kwargs)
         elif 'config_dict' in checkpoint:
-            from .config import MPJRDConfig
-            config = MPJRDConfig.from_dict(checkpoint['config_dict'])
+            from .config import NeuronConfig
+            config = NeuronConfig.from_dict(checkpoint['config_dict'])
             instance = cls(config, **kwargs)
         else:
             instance = cls(**kwargs)

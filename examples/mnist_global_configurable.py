@@ -1,4 +1,4 @@
-"""Treino MNIST com projeção global para MPJRDLayer usando configuração em arquivo.
+"""Treino MNIST com projeção global para AdaptiveNeuronLayer usando configuração em arquivo.
 
 Objetivo:
 - manter o layout do exemplo fornecido (projeção 784 -> [N,D,S])
@@ -20,7 +20,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from pyfolds import LearningMode, MPJRDConfig, MPJRDLayer
+from pyfolds import LearningMode, NeuronConfig, AdaptiveNeuronLayer
 
 try:
     import torchvision
@@ -42,7 +42,7 @@ def _mode_from_config(value: str, plastic: bool) -> LearningMode:
 
 
 class MNISTMPJRDGlobal(nn.Module):
-    def __init__(self, cfg: MPJRDConfig, n_neurons: int, device: torch.device):
+    def __init__(self, cfg: NeuronConfig, n_neurons: int, device: torch.device):
         super().__init__()
         self.cfg = cfg
         self.n_neurons = n_neurons
@@ -50,7 +50,7 @@ class MNISTMPJRDGlobal(nn.Module):
 
         total_synapses = n_neurons * cfg.n_dendrites * cfg.n_synapses_per_dendrite
         self.proj = nn.Linear(784, total_synapses)
-        self.mpjrd = MPJRDLayer(n_neurons=n_neurons, cfg=cfg, name="global_layer", device=device)
+        self.mpjrd = AdaptiveNeuronLayer(n_neurons=n_neurons, cfg=cfg, name="global_layer", device=device)
         self.fc = nn.Linear(n_neurons, 10)
 
     def forward(self, x: torch.Tensor, mode: LearningMode) -> torch.Tensor:
@@ -110,7 +110,7 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     os.makedirs(training["save_dir"], exist_ok=True)
 
-    mpjrd_cfg = MPJRDConfig(
+    mpjrd_cfg = NeuronConfig(
         n_dendrites=model_cfg["n_dendrites"],
         n_synapses_per_dendrite=model_cfg["n_synapses_per_dendrite"],
         dendrite_integration_mode=model_cfg["dendrite_integration_mode"],

@@ -21,7 +21,7 @@ def forward_sequence(neuron: pyfolds.MPJRDNeuron, x_seq: torch.Tensor, dt: float
 
 @pytest.mark.integration
 def test_forward_sequence_torch_stability_minimal_criteria():
-    cfg = pyfolds.MPJRDConfig(
+    cfg = pyfolds.NeuronConfig(
         n_dendrites=2,
         n_synapses_per_dendrite=4,
         theta_init=0.4,

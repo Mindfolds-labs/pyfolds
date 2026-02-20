@@ -34,7 +34,7 @@ class TestAdvancedNeuron:
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
 
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             n_dendrites=1,
             n_synapses_per_dendrite=1,
             backprop_enabled=False,

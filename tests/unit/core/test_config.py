@@ -1,22 +1,22 @@
-"""Tests for MPJRDConfig."""
+"""Tests for NeuronConfig."""
 
 import pytest
 import torch
 import pyfolds
 
 
-class TestMPJRDConfig:
+class TestNeuronConfig:
     """Test configuration class."""
     
     def test_default_values(self):
         """Test default values."""
-        cfg = pyfolds.MPJRDConfig()
+        cfg = pyfolds.NeuronConfig()
         assert cfg.n_dendrites == 4
         assert cfg.n_synapses_per_dendrite == 32
     
     def test_custom_values(self):
         """Test custom values."""
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             n_dendrites=8,
             n_synapses_per_dendrite=64,
             plastic=False,
@@ -30,29 +30,29 @@ class TestMPJRDConfig:
     def test_validation(self):
         """Test validation."""
         with pytest.raises(ValueError):
-            pyfolds.MPJRDConfig(n_min=10, n_max=5)
+            pyfolds.NeuronConfig(n_min=10, n_max=5)
 
 
     def test_get_decay_rate_validation(self):
         """Tau inválido deve gerar erro explícito."""
-        cfg = pyfolds.MPJRDConfig()
+        cfg = pyfolds.NeuronConfig()
         with pytest.raises(ValueError):
             cfg.get_decay_rate(-1.0)
 
 
     def test_get_decay_rate_negative_dt_validation(self):
         """dt negativo deve gerar erro explícito."""
-        cfg = pyfolds.MPJRDConfig()
+        cfg = pyfolds.NeuronConfig()
         with pytest.raises(ValueError):
             cfg.get_decay_rate(10.0, dt=-0.1)
 
     def test_numerical_safety_validation(self):
         """Config deve validar parâmetros numéricos críticos."""
         with pytest.raises(ValueError):
-            pyfolds.MPJRDConfig(w_scale=0)
+            pyfolds.NeuronConfig(w_scale=0)
 
         with pytest.raises(ValueError):
-            pyfolds.MPJRDConfig(float_precision="float16")
+            pyfolds.NeuronConfig(float_precision="float16")
 
     @pytest.mark.parametrize(
         "kwargs",
@@ -67,12 +67,12 @@ class TestMPJRDConfig:
     def test_dendritic_integration_validation(self, kwargs):
         """Valida limites dos novos parâmetros de integração dendrítica."""
         with pytest.raises(ValueError):
-            pyfolds.MPJRDConfig(**kwargs)
+            pyfolds.NeuronConfig(**kwargs)
 
 
 def test_hebbian_ltd_ratio_must_be_non_negative():
     """Config should reject negative explicit LTD ratio."""
-    from pyfolds.core import MPJRDConfig
+    from pyfolds import NeuronConfig
 
     with pytest.raises(ValueError, match="hebbian_ltd_ratio"):
-        MPJRDConfig(hebbian_ltd_ratio=-0.1)
+        NeuronConfig(hebbian_ltd_ratio=-0.1)

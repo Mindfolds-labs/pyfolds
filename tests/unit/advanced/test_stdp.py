@@ -103,13 +103,13 @@ class TestSTDPMixin:
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
 
-        cfg_raw = pyfolds.MPJRDConfig(
+        cfg_raw = pyfolds.NeuronConfig(
             n_dendrites=1,
             n_synapses_per_dendrite=1,
             stdp_input_source="raw",
             spike_threshold=0.5,
         )
-        cfg_stp = pyfolds.MPJRDConfig(
+        cfg_stp = pyfolds.NeuronConfig(
             n_dendrites=1,
             n_synapses_per_dendrite=1,
             stdp_input_source="stp",
@@ -135,13 +135,13 @@ class TestSTDPMixin:
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
 
-        cfg_classic = pyfolds.MPJRDConfig(
+        cfg_classic = pyfolds.NeuronConfig(
             n_dendrites=1,
             n_synapses_per_dendrite=1,
             ltd_rule="classic",
             plasticity_mode="stdp",
         )
-        cfg_current = pyfolds.MPJRDConfig(
+        cfg_current = pyfolds.NeuronConfig(
             n_dendrites=1,
             n_synapses_per_dendrite=1,
             ltd_rule="current",
@@ -174,7 +174,7 @@ class TestSTDPMixin:
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
 
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             n_dendrites=1,
             n_synapses_per_dendrite=1,
             plasticity_mode="stdp",

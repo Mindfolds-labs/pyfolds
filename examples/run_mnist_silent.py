@@ -22,8 +22,8 @@ def main(logger: logging.Logger, log_path: Path) -> int:
     logger.info("START run_mnist_silent log_path=%s", log_path)
 
     # Mini fluxo de demonstração (sem depender de download de dataset)
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
-    layer = pyfolds.MPJRDLayer(n_neurons=3, cfg=cfg)
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    layer = pyfolds.AdaptiveNeuronLayer(n_neurons=3, cfg=cfg)
 
     print("▶ Rodando inferência sintética...")
     x = torch.rand(8, 3, 2, 4)

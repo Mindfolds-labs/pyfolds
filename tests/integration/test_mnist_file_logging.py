@@ -9,8 +9,8 @@ from examples.mnist_file_logging import TrainConfig, run_training
 
 def test_pyfolds_imports_are_stable():
     """Validate direct/advanced imports to detect circular import regressions."""
-    assert hasattr(pyfolds, "MPJRDConfig")
-    assert hasattr(pyfolds, "MPJRDLayer")
+    assert hasattr(pyfolds, "NeuronConfig")
+    assert hasattr(pyfolds, "AdaptiveNeuronLayer")
     assert hasattr(pyfolds, "LearningMode")
     assert pyfolds.MPJRDNeuronAdvanced is not None
 

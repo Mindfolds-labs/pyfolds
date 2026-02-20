@@ -153,7 +153,7 @@ class ModelIntegrityMonitor(WeightIntegrityMonitor):
 
     def __init__(self, model: torch.nn.Module, check_every_n_steps: int = 100):
         super().__init__(model, check_every_n_steps=check_every_n_steps)
-        self.expected_hash = self.last_hash
+        self.expected_hash: str | None = None
         self._initialized_via_check = False
 
     def set_baseline(self) -> str:
@@ -174,9 +174,6 @@ class ModelIntegrityMonitor(WeightIntegrityMonitor):
 
         if self.expected_hash is None:
             self.expected_hash = current_hash
-            hash_initialized = True
-        elif not self._initialized_via_check and self.step_count == 1:
-            # Compatibilidade: primeira verificação sem baseline explícito.
             hash_initialized = True
             self._initialized_via_check = True
 

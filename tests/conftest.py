@@ -74,16 +74,16 @@ def torch_module():
 def _core_symbols():
     """Carrega símbolos de core apenas quando torch está disponível."""
     pytest.importorskip("torch", reason=TORCH_REASON)
-    from pyfolds.core import MPJRDConfig, MPJRDNeuron
+    from pyfolds import NeuronConfig, MPJRDNeuron
 
-    return MPJRDConfig, MPJRDNeuron
+    return NeuronConfig, MPJRDNeuron
 
 
 @pytest.fixture
 def small_config(_core_symbols):
     """Configuração pequena para testes rápidos."""
-    MPJRDConfig, _ = _core_symbols
-    return MPJRDConfig(
+    NeuronConfig, _ = _core_symbols
+    return NeuronConfig(
         n_dendrites=2,
         n_synapses_per_dendrite=4,
         plastic=True,
@@ -93,8 +93,8 @@ def small_config(_core_symbols):
 @pytest.fixture
 def full_config(_core_symbols):
     """Configuração completa para testes de mecanismos avançados."""
-    MPJRDConfig, _ = _core_symbols
-    return MPJRDConfig(
+    NeuronConfig, _ = _core_symbols
+    return NeuronConfig(
         n_dendrites=4,
         n_synapses_per_dendrite=8,
         plastic=True,
@@ -104,8 +104,8 @@ def full_config(_core_symbols):
 @pytest.fixture
 def tiny_config(_core_symbols):
     """Configuração mínima para testes de unidade."""
-    MPJRDConfig, _ = _core_symbols
-    return MPJRDConfig(
+    NeuronConfig, _ = _core_symbols
+    return NeuronConfig(
         n_dendrites=1,
         n_synapses_per_dendrite=2,
         plastic=True,

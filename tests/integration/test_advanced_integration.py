@@ -3,11 +3,11 @@
 import torch
 
 from pyfolds.advanced import MPJRDNeuronAdvanced
-from pyfolds.core.config import MPJRDConfig
+from pyfolds import NeuronConfig
 
 
 def test_all_mixins_together_smoke():
-    cfg = MPJRDConfig(
+    cfg = NeuronConfig(
         n_dendrites=2,
         n_synapses_per_dendrite=8,
         t_refrac_abs=2.0,

@@ -1,9 +1,9 @@
 import pytest
-from pyfolds.core import MPJRDConfig
+from pyfolds import NeuronConfig
 
 
 def test_accepts_stdp_source_and_ltd_rule_flags():
-    cfg = MPJRDConfig(stdp_input_source="raw", ltd_rule="classic")
+    cfg = NeuronConfig(stdp_input_source="raw", ltd_rule="classic")
     assert cfg.stdp_input_source == "raw"
     assert cfg.ltd_rule == "classic"
 
@@ -14,4 +14,4 @@ def test_accepts_stdp_source_and_ltd_rule_flags():
 ])
 def test_rejects_invalid_order_flags(kwargs):
     with pytest.raises(ValueError):
-        MPJRDConfig(**kwargs)
+        NeuronConfig(**kwargs)

@@ -3,7 +3,7 @@ import pyfolds
 
 
 def test_absolute_refractory_is_inviolable():
-    cfg = pyfolds.MPJRDConfig(t_refrac_abs=3.0, t_refrac_rel=5.0)
+    cfg = pyfolds.NeuronConfig(t_refrac_abs=3.0, t_refrac_rel=5.0)
     neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
 
     x = torch.ones(1, cfg.n_dendrites, cfg.n_synapses_per_dendrite)

@@ -5,13 +5,13 @@ Cobertura aprofundada vive em `tests/unit/serialization/test_foldio.py`.
 
 import pytest
 
-from pyfolds.core.config import MPJRDConfig
+from pyfolds import NeuronConfig
 from pyfolds.core.neuron import MPJRDNeuron
 from pyfolds.serialization import FoldReader, save_fold_or_mind
 
 
 def test_fold_corruption_is_detected(tmp_path):
-    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4, device="cpu")
+    cfg = NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4, device="cpu")
     neuron = MPJRDNeuron(cfg)
     target = tmp_path / "corrupted.fold"
 

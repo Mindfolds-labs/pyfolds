@@ -3,7 +3,7 @@ import pyfolds
 
 
 def test_time_counter_increments_at_end_of_forward_step():
-    cfg = pyfolds.MPJRDConfig(t_refrac_abs=2.0)
+    cfg = pyfolds.NeuronConfig(t_refrac_abs=2.0)
     neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
 
     x = torch.ones(1, cfg.n_dendrites, cfg.n_synapses_per_dendrite)

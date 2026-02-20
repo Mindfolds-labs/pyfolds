@@ -3,7 +3,7 @@ import pyfolds
 
 
 def test_sfa_applies_before_threshold_and_reduces_spiking_probability():
-    cfg = pyfolds.MPJRDConfig()
+    cfg = pyfolds.NeuronConfig()
     neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
     x = torch.ones(1, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
 

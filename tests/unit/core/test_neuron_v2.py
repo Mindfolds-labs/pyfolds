@@ -20,7 +20,7 @@ def test_forward_shapes_v2(small_config, batch_size):
 
 
 def test_cooperative_sum_uses_multiple_dendrites():
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=2, theta_init=1.1)
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=2, theta_init=1.1)
     neuron = pyfolds.MPJRDNeuronV2(cfg)
 
     with torch.no_grad():
@@ -52,7 +52,7 @@ def test_step_id_thread_safe_increment_v2(small_config):
 
 
 def test_theta_eff_caps_unreachable_threshold():
-    cfg = pyfolds.MPJRDConfig(n_dendrites=4, n_synapses_per_dendrite=2, theta_init=4.5)
+    cfg = pyfolds.NeuronConfig(n_dendrites=4, n_synapses_per_dendrite=2, theta_init=4.5)
     neuron = pyfolds.MPJRDNeuronV2(cfg)
 
     with torch.no_grad():
@@ -70,7 +70,7 @@ def test_theta_eff_caps_unreachable_threshold():
 
 def test_vectorization_and_forward_integrity_batch64():
     """Valida vetorização em lote e estabilidade numérica do forward."""
-    cfg = pyfolds.MPJRDConfig(n_dendrites=16, n_synapses_per_dendrite=8)
+    cfg = pyfolds.NeuronConfig(n_dendrites=16, n_synapses_per_dendrite=8)
     neuron = pyfolds.MPJRDNeuronV2(cfg)
 
     batch_size = 64

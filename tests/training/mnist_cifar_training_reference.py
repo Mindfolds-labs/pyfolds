@@ -15,7 +15,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
-from pyfolds import MPJRDConfig, MPJRDNeuron
+from pyfolds import NeuronConfig, MPJRDNeuron
 
 
 @dataclass
@@ -37,7 +37,7 @@ class PyFoldsMLP(nn.Module):
         self.fc2 = nn.Linear(hidden_dim, num_classes)
 
         # Exemplo de integração: objeto pyfolds para controle/inspeção do gate.
-        self.gate_neuron = MPJRDNeuron(MPJRDConfig(n_dendrites=4))
+        self.gate_neuron = MPJRDNeuron(NeuronConfig(n_dendrites=4))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = torch.flatten(x, start_dim=1)
