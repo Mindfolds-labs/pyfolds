@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `138`
-- Símbolos: `1017`
+- Símbolos: `1030`
 
 ## Módulos
 
@@ -452,6 +452,7 @@
   - `mod:typing`
 - Classes:
   - `ECCCodec` (bases: Protocol)
+  - `ECCProtector` (bases: (sem base explícita))
   - `ECCResult` (bases: (sem base explícita))
   - `NoECC` (bases: (sem base explícita))
   - `ReedSolomonECC` (bases: (sem base explícita))
@@ -524,10 +525,12 @@
   - `mod:datetime`
   - `mod:hashlib`
   - `mod:hmac`
+  - `mod:json`
   - `mod:os`
   - `mod:pathlib`
   - `mod:pickle`
   - `mod:shutil`
+  - `mod:src.pyfolds.serialization.ecc`
   - `mod:subprocess`
   - `mod:torch`
   - `mod:typing`
@@ -704,8 +707,8 @@
   - `build_log_path(log_dir, app, version)`
   - `get_logger(name)`
   - `next_log_path(log_dir, app, version)`
-  - `setup_logging(log_file, level, structured, circular_buffer_lines, console, fixed_layout)`
-  - `setup_run_logging(app, version, log_dir, level, structured, fixed_layout, console, circular_buffer_lines)`
+  - `setup_logging(log_file, level, structured, circular_buffer_lines, circular_flush_interval_sec, console, fixed_layout)`
+  - `setup_run_logging(app, version, log_dir, level, structured, fixed_layout, console, circular_buffer_lines, circular_flush_interval_sec)`
   - `trace(self, message)`
 
 ### `src.pyfolds.utils.math`
@@ -1187,13 +1190,16 @@
   - `mod:pyfolds`
   - `mod:pyfolds.monitoring`
   - `mod:pyfolds.serialization`
+  - `mod:pytest`
 - Classes:
   - `DummyNeuron` (bases: (sem base explícita))
 - Funções:
   - `test_health_check_critical_for_dead_neurons()`
   - `test_health_check_uses_fallback_metrics_from_get_metrics_contract()`
   - `test_versioned_checkpoint_metadata_created_at_is_utc(tmp_path)`
+  - `test_versioned_checkpoint_safetensors_roundtrip(tmp_path)`
   - `test_versioned_checkpoint_save_and_load(tmp_path)`
+  - `test_versioned_checkpoint_shape_validation_raises(tmp_path)`
 
 ### `tests.unit.core.test_neuromodulation`
 - Arquivo: `tests/unit/core/test_neuromodulation.py`
