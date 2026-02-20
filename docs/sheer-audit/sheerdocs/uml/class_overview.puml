@@ -87,6 +87,7 @@ class "src.pyfolds.advanced.time_mixin.TimedMixin" {
 
 
 class "src.pyfolds.bridge.dispatcher.MindDispatcher" {
+  +capture_event()
   +get_topology_map()
   +prepare_payload()
 }

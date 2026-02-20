@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 143,
-    "symbols": 1081,
-    "edges": 1610,
+    "symbols": 1082,
+    "edges": 1611,
     "findings": 0,
     "internal_import_edges": 106
   },
@@ -376,6 +376,7 @@
           "line": 11,
           "bases": [],
           "methods": [
+            "mtd:src.pyfolds.bridge.dispatcher.MindDispatcher.capture_event",
             "mtd:src.pyfolds.bridge.dispatcher.MindDispatcher.get_topology_map",
             "mtd:src.pyfolds.bridge.dispatcher.MindDispatcher.prepare_payload"
           ]

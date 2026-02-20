@@ -1204,11 +1204,31 @@
       "qname": "src.pyfolds.bridge.dispatcher.MindDispatcher",
       "file": "src/pyfolds/bridge/dispatcher.py",
       "line": 11,
-      "doc": "Interface agnóstica para exportação de dados do Core PyFolds.",
+      "doc": "Único ponto de saída de dados do PyFolds para o ecossistema Mind.",
       "params": [],
       "returns": null,
       "bases": [],
       "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.bridge.dispatcher.MindDispatcher.capture_event",
+      "kind": "method",
+      "name": "capture_event",
+      "qname": "src.pyfolds.bridge.dispatcher.MindDispatcher.capture_event",
+      "file": "src/pyfolds/bridge/dispatcher.py",
+      "line": 15,
+      "doc": "Prepara dados serializáveis para MindStream/MindAudis sem acoplamento.",
+      "params": [
+        "layer_id",
+        "spikes",
+        "weights",
+        "metrics"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "staticmethod"
+      ]
     },
     {
       "id": "mtd:src.pyfolds.bridge.dispatcher.MindDispatcher.prepare_payload",
@@ -1216,8 +1236,8 @@
       "name": "prepare_payload",
       "qname": "src.pyfolds.bridge.dispatcher.MindDispatcher.prepare_payload",
       "file": "src/pyfolds/bridge/dispatcher.py",
-      "line": 15,
-      "doc": "Prepara pacote serializável para consumo externo.",
+      "line": 36,
+      "doc": "Mantém contrato legado do dispatcher para consumidores atuais.",
       "params": [
         "layer_id",
         "spikes",
@@ -1236,7 +1256,7 @@
       "name": "get_topology_map",
       "qname": "src.pyfolds.bridge.dispatcher.MindDispatcher.get_topology_map",
       "file": "src/pyfolds/bridge/dispatcher.py",
-      "line": 37,
+      "line": 60,
       "doc": "Exporta estrutura em formato serializável sem dependências externas.",
       "params": [
         "network"
@@ -6388,7 +6408,7 @@
       "name": "_to_weights_only_safe",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._to_weights_only_safe",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 140,
+      "line": 143,
       "doc": "Converte metadados para estrutura composta por tipos primitivos seguros.",
       "params": [
         "cls",
@@ -6406,7 +6426,7 @@
       "name": "_compute_plain_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_plain_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 167,
+      "line": 170,
       "doc": "Calcula hash SHA-256 puro do state_dict.",
       "params": [
         "self",
@@ -6422,7 +6442,7 @@
       "name": "_compute_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 180,
+      "line": 183,
       "doc": "Calcula digest de integridade do state dict (HMAC quando disponível).",
       "params": [
         "self",
@@ -6438,7 +6458,7 @@
       "name": "_verify_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 192,
+      "line": 195,
       "doc": null,
       "params": [
         "plain_digest",
@@ -6456,7 +6476,7 @@
       "name": "_resolve_safetensors_paths",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 211,
+      "line": 214,
       "doc": null,
       "params": [
         "path"
@@ -6473,7 +6493,7 @@
       "name": "_decode_with_ecc",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 220,
+      "line": 223,
       "doc": null,
       "params": [
         "raw_payload",
@@ -6492,7 +6512,7 @@
       "name": "_validate_shape_invariants",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 234,
+      "line": 237,
       "doc": "Valida shape dos tensores do checkpoint antes do load no modelo.",
       "params": [
         "model",
@@ -6510,7 +6530,7 @@
       "name": "save",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.save",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 248,
+      "line": 251,
       "doc": "Salva checkpoint e retorna payload persistido.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    extra_metadata: Metadados adicionais\n    compress: Usar compressão zip (recomendado para .pt)\n    use_safetensors: Usa formato seguro sem pickle para pesos\n    ecc_protection: Nível ECC de sidecar (off|low|med|high)\n\nReturns:\n    Dicionário com o checkpoint salvo",
       "params": [
         "self",
@@ -6529,7 +6549,7 @@
       "name": "_validate_model_shapes",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_model_shapes",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 319,
+      "line": 322,
       "doc": null,
       "params": [
         "model",
@@ -6547,7 +6567,7 @@
       "name": "load",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 342,
+      "line": 345,
       "doc": "Carrega checkpoint, valida hash e opcionalmente restaura modelo.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    model: Modelo para carregar o estado (opcional)\n    map_location: Device para carregar tensores\n    strict: Se True, valida hash e versão\n    expected_version: Versão esperada (opcional)\n\nReturns:\n    Dicionário com o checkpoint carregado\n\nRaises:\n    ValueError: Se hash/shape não coincidirem",
       "params": [
         "cls",
@@ -6569,7 +6589,7 @@
       "name": "load_secure",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load_secure",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 434,
+      "line": 437,
       "doc": "Carrega pesos via safetensors com validações rígidas de integridade.",
       "params": [
         "cls",
@@ -6588,7 +6608,7 @@
       "name": "__repr__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 464,
+      "line": 467,
       "doc": null,
       "params": [
         "self"
@@ -17346,6 +17366,12 @@
     {
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.bridge.dispatcher.MindDispatcher",
+      "dst": "mtd:src.pyfolds.bridge.dispatcher.MindDispatcher.capture_event",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.bridge.dispatcher.MindDispatcher",
       "dst": "mtd:src.pyfolds.bridge.dispatcher.MindDispatcher.prepare_payload",
       "meta": {}
     },
@@ -26161,8 +26187,8 @@
   "findings": [],
   "metrics": {
     "python_files": 143,
-    "symbols": 1081,
-    "edges": 1610,
+    "symbols": 1082,
+    "edges": 1611,
     "findings": 0,
     "internal_import_edges": 106
   }
