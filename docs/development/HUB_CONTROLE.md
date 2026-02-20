@@ -46,7 +46,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-010 | Concluída | Falhas regressivas na suíte completa de testes | Codex | 2026-02-20 |
 | ISSUE-011 | Concluída | Micro-otimização do forward e análise dos testes pulados | Codex | 2026-02-20 |
 | ISSUE-012 | Concluída | Validar assinatura digital opcional e medir overhead de telemetria | Codex | 2026-02-20 |
-| ISSUE-005 | Concluída | Plano 3: Executar validações e registrar evidências no HUB | Codex | 2026-02-19 |
+| ISSUE-013 | Concluída | MindControl - Cérebro Externo e Mutação em Tempo Real | Codex | 2026-02-20 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 Cards (UI limpa)
@@ -137,14 +137,14 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > 📄 [Relatório](./prompts/relatorios/ISSUE-012-validacao-criptografia-e-telemetria.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-012-validacao-criptografia-e-telemetria.md)
 
 > [!TIP]
-> **ISSUE-005** · Plano 3: Executar validações e registrar evidências no HUB
+> **ISSUE-013** · MindControl - Cérebro Externo e Mutação em Tempo Real
 >
 > **Status:** ✅ Concluída  
 > **Responsável:** Codex  
-> **Data:** 2026-02-19  
-> **Prioridade:** `Média` · **Área:** `Governança/Validação`  
+> **Data:** 2026-02-20  
+> **Prioridade:** `Alta` · **Área:** `Core/Telemetria/Neuromodulação`  
 >
-> 📄 [Relatório](./prompts/relatorios/ISSUE-005-plano-3-validacoes-e-evidencias-hub.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-005-plano-3-validacoes-e-evidencias-hub.md)
+> 📄 [Relatório](./prompts/relatorios/ISSUE-013-mindcontrol.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-013-mindcontrol.md)
 
 <!-- HUB:CARDS:END -->
 

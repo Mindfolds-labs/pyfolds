@@ -9,6 +9,7 @@
    - `_refresh_config_references`
 4. `MPJRDConfig` recebeu utilitários de atualização runtime e aliases.
 5. Criado teste de integração `tests/integration/test_mindcontrol_runtime.py`.
+6. Registrada decisão arquitetural em `docs/governance/adr/ADR-044-mindcontrol-cerebro-externo-e-mutacao-runtime-segura.md`.
 
 ## Validação
 - Execução de teste dedicado de integração para garantir ausência de NaN e continuidade do treino após mutação abrupta.

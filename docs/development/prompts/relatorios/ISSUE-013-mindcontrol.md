@@ -23,3 +23,7 @@ Implementar um motor externo em malha fechada para mutar hiperparâmetros do neu
   - **Mitigação:** `with_runtime_update` reutiliza validações de `MPJRDConfig` e só aplica campos reconhecidos.
 - **Risco:** inconsistência de referência de config nos submódulos.
   - **Mitigação:** `_refresh_config_references` propaga a nova configuração para módulos com atributo `cfg`.
+
+
+## Governança (ADR)
+- ADR criada: `docs/governance/adr/ADR-044-mindcontrol-cerebro-externo-e-mutacao-runtime-segura.md`.
