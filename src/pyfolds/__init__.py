@@ -35,7 +35,13 @@ from .serialization import (
     ReedSolomonECC,
     ecc_from_protection,
 )
-from .monitoring import HealthStatus, NeuronHealthCheck
+from .monitoring import (
+    HealthStatus,
+    NeuronHealthCheck,
+    MindControl,
+    MindControlSink,
+    MutationCommand,
+)
 
 # High-level state contract returned by forward-like calls.
 NeuronState = Dict[str, Any]
@@ -110,6 +116,9 @@ __all__ = [
     "ecc_from_protection",
     "HealthStatus",
     "NeuronHealthCheck",
+    "MindControl",
+    "MindControlSink",
+    "MutationCommand",
     # Types/helpers
     "LearningMode",
     "ConnectionType",

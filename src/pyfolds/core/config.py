@@ -1,6 +1,6 @@
 """Configuração imutável do neurônio MPJRD - SUPORTE A 9 MECANISMOS"""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import warnings
 import math
 from typing import Literal, Dict, Optional
@@ -366,6 +366,20 @@ class MPJRDConfig:
         
         return presets[name]
     
+
+
+    def with_runtime_update(self, **updates: float) -> "MPJRDConfig":
+        """Retorna nova config validada com campos atualizados em runtime."""
+        return replace(self, **updates)
+
+    def resolve_runtime_alias(self, name: str) -> str:
+        """Normaliza aliases de parâmetros usados por controladores externos."""
+        aliases = {
+            "learning_rate": "i_eta",
+            "theta": "theta_init",
+        }
+        return aliases.get(name, name)
+
     def __repr__(self) -> str:
         """Representação string da configuração."""
         lines = ["MPJRDConfig:"]

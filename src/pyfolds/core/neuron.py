@@ -19,6 +19,8 @@ import torch
 import torch.nn as nn
 from typing import Optional, Dict, Any, Union
 from threading import Lock
+from queue import SimpleQueue, Empty
+from dataclasses import fields
 from .config import MPJRDConfig
 from .base import BaseNeuron
 from .dendrite import MPJRDDendrite
@@ -100,6 +102,9 @@ class MPJRDNeuron(BaseNeuron):
         
         # ===== THREAD SAFETY PARA TELEMETRIA =====
         self._telemetry_lock = Lock()
+
+        # ===== FILA LOCK-FREE DE INJEÇÕES RUNTIME (MindControl) =====
+        self._runtime_injections: SimpleQueue[tuple[str, Any]] = SimpleQueue()
 
         # ===== TELEMETRIA =====
         self.register_buffer("step_id", torch.tensor(0, dtype=torch.int64))
@@ -203,6 +208,73 @@ class MPJRDNeuron(BaseNeuron):
     def r_hat(self) -> torch.Tensor:
         return self.homeostasis.r_hat
 
+    @torch.no_grad()
+    def queue_runtime_injection(self, name: str, value: Any) -> None:
+        """Enfileira mutação de parâmetro para aplicação assíncrona no próximo step."""
+        self._runtime_injections.put((name, value))
+
+    @torch.no_grad()
+    def _refresh_config_references(self) -> None:
+        """Propaga nova configuração para submódulos que cacheiam ``cfg``."""
+        self.homeostasis.cfg = self.cfg
+        self.neuromodulator.cfg = self.cfg
+        self.stats_acc.cfg = self.cfg if hasattr(self.stats_acc, "cfg") else getattr(self, "cfg")
+        self.dendrite_integration.cfg = self.cfg
+        for module in self.modules():
+            if module is self:
+                continue
+            if hasattr(module, "cfg"):
+                module.cfg = self.cfg
+
+    @torch.no_grad()
+    def _apply_runtime_injections(self) -> int:
+        """Aplica injeções pendentes sem bloquear o caminho crítico do forward."""
+        applied = 0
+        allowed_fields = {f.name for f in fields(MPJRDConfig)}
+
+        while True:
+            try:
+                name, value = self._runtime_injections.get_nowait()
+            except Empty:
+                break
+
+            if isinstance(value, torch.Tensor):
+                value = value.to(self.theta.device)
+
+            if name == "theta":
+                with torch.no_grad():
+                    tensor_value = torch.as_tensor(value, dtype=self.theta.dtype, device=self.theta.device)
+                    if tensor_value.numel() == 1:
+                        tensor_value = tensor_value.reshape_as(self.theta)
+                    self.theta.copy_(tensor_value)
+                applied += 1
+                continue
+
+            if name in {"r_hat", "target_spike_rate"}:
+                if name == "r_hat":
+                    tensor_value = torch.as_tensor(value, dtype=self.r_hat.dtype, device=self.r_hat.device)
+                    if tensor_value.numel() == 1:
+                        tensor_value = tensor_value.reshape_as(self.r_hat)
+                    self.r_hat.copy_(tensor_value)
+                    applied += 1
+                    continue
+
+                cfg_field = self.cfg.resolve_runtime_alias(name)
+                if cfg_field in allowed_fields:
+                    self.cfg = self.cfg.with_runtime_update(**{cfg_field: float(value)})
+                    self._refresh_config_references()
+                    applied += 1
+                continue
+
+            cfg_field = self.cfg.resolve_runtime_alias(name)
+            if cfg_field in allowed_fields:
+                casted = float(value) if isinstance(value, (int, float, torch.Tensor)) else value
+                self.cfg = self.cfg.with_runtime_update(**{cfg_field: casted})
+                self._refresh_config_references()
+                applied += 1
+
+        return applied
+
     # ========== CONTROLE DE MODO ==========
 
     def set_mode(self, mode: LearningMode) -> None:
@@ -304,7 +376,9 @@ class MPJRDNeuron(BaseNeuron):
         """
         normalized_mode = normalize_learning_mode(mode)
         effective_mode = normalized_mode if normalized_mode is not None else self.mode
-        
+
+        self._apply_runtime_injections()
+
         # Valida device
         self._validate_input_device(x)
         
@@ -531,6 +605,8 @@ class MPJRDNeuron(BaseNeuron):
         
         ✅ CORRIGIDO: Passa mode para as sinapses
         """
+        self._apply_runtime_injections()
+
         if not self.cfg.plastic:
             self.logger.debug("⏭️ Plasticidade desabilitada (cfg.plastic=False)")
             return
