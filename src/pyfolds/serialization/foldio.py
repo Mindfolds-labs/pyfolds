@@ -50,6 +50,7 @@ zstd = _optional_import("zstandard")
 google_crc32c = _optional_import("google_crc32c")
 serialization = _optional_import("cryptography.hazmat.primitives.serialization")
 ed25519 = _optional_import("cryptography.hazmat.primitives.asymmetric.ed25519")
+safetensors_torch = _optional_import("safetensors.torch")
 
 
 MAGIC = b"FOLDv1\0\0"
@@ -96,6 +97,34 @@ class FoldSecurityError(RuntimeError):
     """Erro de segurança ao desserializar payload torch."""
 
 
+
+
+def _serialize_state_dict_safetensors(state_dict: Dict[str, Any]) -> bytes:
+    if safetensors_torch is None:
+        raise FoldSecurityError(
+            "Serialização segura requer pacote 'safetensors'. Instale a dependência para salvar .fold/.mind."
+        )
+
+    tensors: Dict[str, torch.Tensor] = {}
+    for key, value in state_dict.items():
+        if not isinstance(value, torch.Tensor):
+            raise FoldSecurityError(f"state_dict contém valor não tensor em '{key}'")
+        tensors[key] = value.detach().cpu().contiguous()
+
+    return safetensors_torch.save(tensors)
+
+
+def _deserialize_state_dict_safetensors(payload: bytes, map_location: str = "cpu") -> Dict[str, torch.Tensor]:
+    if safetensors_torch is None:
+        raise FoldSecurityError(
+            "Desserialização segura requer pacote 'safetensors'. Instale a dependência para carregar .fold/.mind."
+        )
+
+    tensors = safetensors_torch.load(payload)
+    if map_location and str(map_location) != "cpu":
+        device = torch.device(map_location)
+        tensors = {k: v.to(device) for k, v in tensors.items()}
+    return tensors
 def crc32c_u32(data: bytes) -> int:
     """Retorna CRC32C (Castagnoli) como inteiro unsigned de 32 bits."""
     if google_crc32c is not None:
@@ -598,37 +627,24 @@ class FoldReader:
     def read_json(self, name: str, verify: bool = True) -> Dict[str, Any]:
         return json.loads(self.read_chunk_bytes(name, verify=verify).decode("utf-8"))
 
-    def read_torch(
+    def read_state_dict(
         self,
         name: str,
         map_location: str = "cpu",
         verify: bool = True,
-        trusted: bool = False,
-    ) -> Any:
+    ) -> Dict[str, torch.Tensor]:
         payload = self.read_chunk_bytes(name, verify=verify)
-
-        if trusted:
-            return torch.load(io.BytesIO(payload), map_location=map_location)
-
-        try:
-            return torch.load(io.BytesIO(payload), map_location=map_location, weights_only=True)
-        except Exception as exc:
-            raise FoldSecurityError(
-                "Falha ao carregar chunk torch em modo seguro (weights_only=True). "
-                "Se o arquivo for confiável, use read_torch(..., trusted=True) "
-                "ou load_fold_or_mind(..., trusted_torch_payload=True)."
-            ) from exc
+        return _deserialize_state_dict_safetensors(payload, map_location=map_location)
 
 
 class _TrustedFoldReader(FoldReader):
-    """Reader dedicado para ambientes de confiança explícita."""
+    """Reader dedicado para ambientes de confiança explícita (legado torch.save)."""
 
-    def read_torch(
+    def read_torch_legacy(
         self,
         name: str,
         map_location: str = "cpu",
         verify: bool = True,
-        trusted: bool = False,
     ) -> Any:
         payload = self.read_chunk_bytes(name, verify=verify)
         return torch.load(io.BytesIO(payload), map_location=map_location)
@@ -741,14 +757,7 @@ def save_fold_or_mind(
     mode = getattr(getattr(neuron, "mode", None), "value", None)
     step = int(getattr(getattr(neuron, "step_id", None), "item", lambda: 0)())
 
-    torch_payload = {
-        "state_dict": neuron.state_dict(),
-        "config": cfg,
-        "mode": mode,
-        "step_id": step,
-    }
-    torch_buffer = io.BytesIO()
-    torch.save(torch_payload, torch_buffer)
+    safe_state_bytes = _serialize_state_dict_safetensors(neuron.state_dict())
 
     expression = _expression_summary(neuron)
     metrics = None
@@ -824,7 +833,7 @@ def save_fold_or_mind(
 
     tmp_path = f"{path}.tmp"
     with FoldWriter(tmp_path, compress=compress, ecc=selected_ecc) as writer:
-        writer.add_chunk("torch_state", "TSAV", torch_buffer.getvalue())
+        writer.add_chunk("torch_state", "STEN", safe_state_bytes)
         writer.add_chunk("llm_manifest", "JSON", _json_bytes(manifest))
         if metrics is not None:
             writer.add_chunk("metrics", "JSON", _json_bytes(metrics))
@@ -905,16 +914,30 @@ def load_fold_or_mind(
             if not is_valid:
                 raise FoldSecurityError("Assinatura digital inválida para o arquivo fold/mind.")
 
-        payload = reader.read_torch("torch_state", map_location=map_location)
+        cfg_chunk = reader.read_json("llm_manifest")
+        state_chunk = next((c for c in reader.index.get("chunks", []) if c.get("name") == "torch_state"), None)
+        ctype = state_chunk.get("ctype") if state_chunk else None
 
-    cfg = payload.get("config")
+        if ctype == "STEN":
+            state_dict = reader.read_state_dict("torch_state", map_location=map_location)
+        elif trusted_torch_payload:
+            legacy_payload = reader.read_torch_legacy("torch_state", map_location=map_location)
+            state_dict = legacy_payload.get("state_dict", {})
+            if not cfg_chunk.get("hyperparameters"):
+                cfg_chunk["hyperparameters"] = legacy_payload.get("config") or {}
+        else:
+            raise FoldSecurityError(
+                "Formato de estado legado detectado. Requer trusted_torch_payload=True em ambiente confiável."
+            )
+
+    cfg = cfg_chunk.get("hyperparameters")
     if isinstance(cfg, dict):
         from ..core.config import MPJRDConfig
 
         cfg = MPJRDConfig.from_dict(cfg)
 
     neuron = neuron_class(cfg)
-    neuron.load_state_dict(payload["state_dict"])
+    neuron.load_state_dict(state_dict)
     return neuron
 
 
