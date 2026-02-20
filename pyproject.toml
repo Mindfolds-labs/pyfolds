@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyfolds"
-version = "2.0.3"
+version = "2.1.0"
 description = "MPJRD Neural Computation Framework"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -22,6 +22,7 @@ dependencies = [
 
 [project.optional-dependencies]
 full = [
+  "tensorflow-cpu>=2.20.0",
   "zstandard>=0.21.0",
   "google-crc32c>=1.5.0",
   "h5py>=3.8.0",
@@ -43,12 +44,16 @@ serialization = [
 telemetry = ["matplotlib>=3.7.0"]
 dev = [
   "pytest>=7.0.0",
+  "tensorflow-cpu>=2.20.0",
   "black>=23.0.0",
   "isort>=5.0.0",
   "mypy>=1.0.0",
 ]
 examples = [
   "torchvision>=0.15.0",
+]
+tensorflow = [
+  "tensorflow-cpu>=2.20.0",
 ]
 
 

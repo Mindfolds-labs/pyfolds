@@ -6,3 +6,5 @@ zstandard>=0.21.0
 google-crc32c>=1.5.0
 reedsolo>=1.7.0
 safetensors>=0.4.3
+
+tensorflow-cpu>=2.20.0

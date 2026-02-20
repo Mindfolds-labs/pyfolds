@@ -41,7 +41,7 @@ from .controller import TelemetryController, TelemetryConfig, Profile, Telemetry
 from .decorator import telemetry
 from .types import ForwardPayload, CommitPayload, SleepPayload
 
-__version__ = "2.0.3"
+__version__ = "2.1.0"
 
 __all__ = [
     # Events
