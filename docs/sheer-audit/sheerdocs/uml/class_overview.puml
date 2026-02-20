@@ -86,6 +86,12 @@ class "src.pyfolds.advanced.time_mixin.TimedMixin" {
 }
 
 
+class "src.pyfolds.bridge.dispatcher.MindDispatcher" {
+  +get_topology_map()
+  +prepare_payload()
+}
+
+
 class "src.pyfolds.contracts.backends.TensorFlowNeuronContractBackend" {
   +run_step()
 }
@@ -724,6 +730,14 @@ class "tests.unit.advanced.test_stdp.TestSTDPMixin" {
   +test_stdp_update_is_batch_size_invariant_for_identical_samples()
   +test_stdp_updates_underlying_synapses_online()
   +test_trace_decay()
+}
+
+class "tests.unit.bridge.test_dispatcher._Cfg" {
+  +to_dict()
+}
+class "tests.unit.bridge.test_dispatcher._Layer" {
+}
+class "tests.unit.bridge.test_dispatcher._Network" {
 }
 
 

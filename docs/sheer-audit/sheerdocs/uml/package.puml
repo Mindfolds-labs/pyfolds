@@ -10,6 +10,8 @@ package "src.pyfolds.advanced.refractory" {}
 package "src.pyfolds.advanced.short_term" {}
 package "src.pyfolds.advanced.stdp" {}
 package "src.pyfolds.advanced.time_mixin" {}
+package "src.pyfolds.bridge" {}
+package "src.pyfolds.bridge.dispatcher" {}
 package "src.pyfolds.contracts" {}
 package "src.pyfolds.contracts.backends" {}
 package "src.pyfolds.contracts.neuron_contract" {}
@@ -94,6 +96,7 @@ package "tests.unit.advanced.test_inhibition" {}
 package "tests.unit.advanced.test_refractory" {}
 package "tests.unit.advanced.test_short_term" {}
 package "tests.unit.advanced.test_stdp" {}
+package "tests.unit.bridge.test_dispatcher" {}
 package "tests.unit.core" {}
 package "tests.unit.core.test_accumulator" {}
 package "tests.unit.core.test_config" {}
@@ -152,6 +155,7 @@ package "tests.unit.wave.test_wave_neuron" {}
 "src.pyfolds.advanced.backprop" --> "src.pyfolds.advanced.time_mixin"
 "src.pyfolds.advanced.refractory" --> "src.pyfolds.advanced.time_mixin"
 "src.pyfolds.advanced.stdp" --> "src.pyfolds.utils.types"
+"src.pyfolds.bridge" --> "src.pyfolds.dispatcher"
 "src.pyfolds.contracts" --> "src.pyfolds.backends"
 "src.pyfolds.contracts" --> "src.pyfolds.neuron_contract"
 "src.pyfolds.contracts.backends" --> "src.pyfolds.contracts.neuron_contract"

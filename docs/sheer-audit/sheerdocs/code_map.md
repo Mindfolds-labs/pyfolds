@@ -1,8 +1,8 @@
 # Code Map (Sheer Audit)
 
 - Repositório: `pyfolds`
-- Arquivos Python: `140`
-- Símbolos: `1069`
+- Arquivos Python: `143`
+- Símbolos: `1081`
 
 ## Módulos
 
@@ -10,6 +10,7 @@
 - Arquivo: `src/pyfolds/__init__.py`
 - Imports:
   - `mod:src.advanced`
+  - `mod:src.bridge`
   - `mod:src.core.base`
   - `mod:src.core.config`
   - `mod:src.core.factory`
@@ -116,6 +117,21 @@
   - `mod:torch`
 - Classes:
   - `TimedMixin` (bases: (sem base explícita))
+
+### `src.pyfolds.bridge`
+- Arquivo: `src/pyfolds/bridge/__init__.py`
+- Imports:
+  - `mod:src.pyfolds.dispatcher`
+
+### `src.pyfolds.bridge.dispatcher`
+- Arquivo: `src/pyfolds/bridge/dispatcher.py`
+- Imports:
+  - `mod:__future__`
+  - `mod:datetime`
+  - `mod:torch`
+  - `mod:typing`
+- Classes:
+  - `MindDispatcher` (bases: (sem base explícita))
 
 ### `src.pyfolds.contracts`
 - Arquivo: `src/pyfolds/contracts/__init__.py`
@@ -1115,6 +1131,19 @@
   - `mod:torch`
 - Classes:
   - `TestSTDPMixin` (bases: (sem base explícita))
+
+### `tests.unit.bridge.test_dispatcher`
+- Arquivo: `tests/unit/bridge/test_dispatcher.py`
+- Imports:
+  - `mod:pyfolds.bridge`
+  - `mod:torch`
+- Classes:
+  - `_Cfg` (bases: (sem base explícita))
+  - `_Layer` (bases: (sem base explícita))
+  - `_Network` (bases: (sem base explícita))
+- Funções:
+  - `test_get_topology_map_uses_cfg_to_dict_when_available()`
+  - `test_prepare_payload_tensor_fields_are_serializable()`
 
 ### `tests.unit.core`
 - Arquivo: `tests/unit/core/__init__.py`

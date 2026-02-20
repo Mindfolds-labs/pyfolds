@@ -44,13 +44,14 @@ Atualizado automaticamente pelo Sheer Audit no merge para `main`.
 
 <!-- SHEER-CODEMAP:START -->
 - Repositório: `pyfolds`
-- Arquivos Python: `140`
-- Símbolos: `1069`
+- Arquivos Python: `143`
+- Símbolos: `1081`
 
 
 - Arquivo: `src/pyfolds/__init__.py`
 - Imports:
   - `mod:src.advanced`
+  - `mod:src.bridge`
   - `mod:src.core.base`
   - `mod:src.core.config`
   - `mod:src.core.factory`
@@ -81,7 +82,6 @@ Atualizado automaticamente pelo Sheer Audit no merge para `main`.
   - `mod:src.pyfolds.short_term`
   - `mod:src.pyfolds.stdp`
   - `mod:src.utils.logging`
-  - `mod:src.wave`
 <!-- SHEER-CODEMAP:END -->
 
 Consulte também: `docs/sheer-audit/sheerdocs/code_map.md`.

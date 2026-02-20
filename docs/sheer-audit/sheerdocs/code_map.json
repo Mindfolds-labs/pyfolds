@@ -5,11 +5,11 @@
     "commit": null
   },
   "metrics": {
-    "python_files": 140,
-    "symbols": 1069,
-    "edges": 1593,
+    "python_files": 143,
+    "symbols": 1081,
+    "edges": 1610,
     "findings": 0,
-    "internal_import_edges": 105
+    "internal_import_edges": 106
   },
   "modules": [
     {
@@ -18,6 +18,7 @@
       "file": "src/pyfolds/__init__.py",
       "imports": [
         "mod:src.advanced",
+        "mod:src.bridge",
         "mod:src.core.base",
         "mod:src.core.config",
         "mod:src.core.factory",
@@ -40,7 +41,7 @@
           "id": "fn:src.pyfolds.__getattr__",
           "name": "__getattr__",
           "qname": "src.pyfolds.__getattr__",
-          "line": 170,
+          "line": 172,
           "params": [
             "name"
           ]
@@ -342,6 +343,41 @@
             "mtd:src.pyfolds.advanced.time_mixin.TimedMixin._ensure_time_counter",
             "mtd:src.pyfolds.advanced.time_mixin.TimedMixin._get_time",
             "mtd:src.pyfolds.advanced.time_mixin.TimedMixin._increment_time"
+          ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.bridge",
+      "qname": "src.pyfolds.bridge",
+      "file": "src/pyfolds/bridge/__init__.py",
+      "imports": [
+        "mod:src.pyfolds.dispatcher"
+      ],
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.bridge.dispatcher",
+      "qname": "src.pyfolds.bridge.dispatcher",
+      "file": "src/pyfolds/bridge/dispatcher.py",
+      "imports": [
+        "mod:__future__",
+        "mod:datetime",
+        "mod:torch",
+        "mod:typing"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.bridge.dispatcher.MindDispatcher",
+          "name": "MindDispatcher",
+          "qname": "src.pyfolds.bridge.dispatcher.MindDispatcher",
+          "line": 11,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.bridge.dispatcher.MindDispatcher.get_topology_map",
+            "mtd:src.pyfolds.bridge.dispatcher.MindDispatcher.prepare_payload"
           ]
         }
       ],
@@ -3923,6 +3959,59 @@
         }
       ],
       "functions": []
+    },
+    {
+      "id": "mod:tests.unit.bridge.test_dispatcher",
+      "qname": "tests.unit.bridge.test_dispatcher",
+      "file": "tests/unit/bridge/test_dispatcher.py",
+      "imports": [
+        "mod:pyfolds.bridge",
+        "mod:torch"
+      ],
+      "classes": [
+        {
+          "id": "cls:tests.unit.bridge.test_dispatcher._Cfg",
+          "name": "_Cfg",
+          "qname": "tests.unit.bridge.test_dispatcher._Cfg",
+          "line": 5,
+          "bases": [],
+          "methods": [
+            "mtd:tests.unit.bridge.test_dispatcher._Cfg.to_dict"
+          ]
+        },
+        {
+          "id": "cls:tests.unit.bridge.test_dispatcher._Layer",
+          "name": "_Layer",
+          "qname": "tests.unit.bridge.test_dispatcher._Layer",
+          "line": 10,
+          "bases": [],
+          "methods": []
+        },
+        {
+          "id": "cls:tests.unit.bridge.test_dispatcher._Network",
+          "name": "_Network",
+          "qname": "tests.unit.bridge.test_dispatcher._Network",
+          "line": 14,
+          "bases": [],
+          "methods": []
+        }
+      ],
+      "functions": [
+        {
+          "id": "fn:tests.unit.bridge.test_dispatcher.test_get_topology_map_uses_cfg_to_dict_when_available",
+          "name": "test_get_topology_map_uses_cfg_to_dict_when_available",
+          "qname": "tests.unit.bridge.test_dispatcher.test_get_topology_map_uses_cfg_to_dict_when_available",
+          "line": 33,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.bridge.test_dispatcher.test_prepare_payload_tensor_fields_are_serializable",
+          "name": "test_prepare_payload_tensor_fields_are_serializable",
+          "qname": "tests.unit.bridge.test_dispatcher.test_prepare_payload_tensor_fields_are_serializable",
+          "line": 18,
+          "params": []
+        }
+      ]
     },
     {
       "id": "mod:tests.unit.core",
