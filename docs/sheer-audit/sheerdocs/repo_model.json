@@ -3186,7 +3186,7 @@
       "name": "step",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.step",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 505,
+      "line": 508,
       "doc": "API explícita de passo temporal (compatível com README).",
       "params": [
         "self",
@@ -3206,7 +3206,7 @@
       "name": "apply_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 525,
+      "line": 528,
       "doc": "Aplica plasticidade acumulada (deferred updates).\n\n✅ CORRIGIDO: Passa mode para as sinapses",
       "params": [
         "self",
@@ -3225,7 +3225,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.sleep",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 611,
+      "line": 614,
       "doc": "Ciclo de sono: consolida sinapses.",
       "params": [
         "self",
@@ -3243,7 +3243,7 @@
       "name": "to",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.to",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 636,
+      "line": 639,
       "doc": "Move neurônio para device e valida consistência.",
       "params": [
         "self",
@@ -3259,7 +3259,7 @@
       "name": "get_metrics",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.get_metrics",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 645,
+      "line": 648,
       "doc": "Retorna métricas consolidadas do neurônio.",
       "params": [
         "self"
@@ -3274,7 +3274,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.extra_repr",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 688,
+      "line": 691,
       "doc": null,
       "params": [
         "self"
