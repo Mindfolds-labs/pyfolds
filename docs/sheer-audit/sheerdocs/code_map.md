@@ -1,8 +1,8 @@
 # Code Map (Sheer Audit)
 
 - Repositório: `pyfolds`
-- Arquivos Python: `138`
-- Símbolos: `1030`
+- Arquivos Python: `139`
+- Símbolos: `1035`
 
 ## Módulos
 
@@ -530,7 +530,6 @@
   - `mod:pathlib`
   - `mod:pickle`
   - `mod:shutil`
-  - `mod:src.pyfolds.serialization.ecc`
   - `mod:subprocess`
   - `mod:torch`
   - `mod:typing`
@@ -707,8 +706,8 @@
   - `build_log_path(log_dir, app, version)`
   - `get_logger(name)`
   - `next_log_path(log_dir, app, version)`
-  - `setup_logging(log_file, level, structured, circular_buffer_lines, circular_flush_interval_sec, console, fixed_layout)`
-  - `setup_run_logging(app, version, log_dir, level, structured, fixed_layout, console, circular_buffer_lines, circular_flush_interval_sec)`
+  - `setup_logging(log_file, level, structured, circular_buffer_lines, circular_buffer_flush_interval_sec, console, fixed_layout)`
+  - `setup_run_logging(app, version, log_dir, level, structured, fixed_layout, console, circular_buffer_lines, circular_buffer_flush_interval_sec)`
   - `trace(self, message)`
 
 ### `src.pyfolds.utils.math`
@@ -1199,7 +1198,7 @@
   - `test_versioned_checkpoint_metadata_created_at_is_utc(tmp_path)`
   - `test_versioned_checkpoint_safetensors_roundtrip(tmp_path)`
   - `test_versioned_checkpoint_save_and_load(tmp_path)`
-  - `test_versioned_checkpoint_shape_validation_raises(tmp_path)`
+  - `test_versioned_checkpoint_shape_validation_raises_on_mismatch(tmp_path)`
 
 ### `tests.unit.core.test_neuromodulation`
 - Arquivo: `tests/unit/core/test_neuromodulation.py`
@@ -1529,6 +1528,18 @@
   - `mod:torch`
 - Classes:
   - `TestDevice` (bases: (sem base explícita))
+
+### `tests.unit.utils.test_logging`
+- Arquivo: `tests/unit/utils/test_logging.py`
+- Imports:
+  - `mod:logging`
+  - `mod:pathlib`
+  - `mod:pyfolds.utils.logging`
+  - `mod:time`
+- Funções:
+  - `_build_record(level, message)`
+  - `test_circular_buffer_flushes_immediately_on_error(tmp_path)`
+  - `test_circular_buffer_lazy_flush_by_interval(tmp_path)`
 
 ### `tests.unit.utils.test_math`
 - Arquivo: `tests/unit/utils/test_math.py`
