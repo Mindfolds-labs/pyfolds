@@ -59,6 +59,23 @@ class TestInhibitionLayer:
         assert 'inh_spikes' in out
         assert out['inh_potential'].shape == (2,)
 
+    def test_apply_inhibition_accepts_u_values(self):
+        """apply_inhibition deve suportar saída de layer com `u_values`."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        from pyfolds.advanced import InhibitionLayer
+
+        layer = InhibitionLayer(n_excitatory=5, n_inhibitory=2)
+        exc_output = {
+            "spikes": torch.randint(0, 2, (3, 5)).float(),
+            "u_values": torch.rand(3, 5),
+            "thetas": torch.full((5,), 0.5),
+        }
+        inh_out = layer(exc_output["spikes"])
+        out = layer.apply_inhibition(exc_output, inh_out)
+        assert out["spikes"].shape == (3, 5)
+
     def test_e2i_initialization_is_deterministic(self):
         """E→I should be reproducible across instances."""
         if not pyfolds.ADVANCED_AVAILABLE:

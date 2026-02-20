@@ -128,7 +128,8 @@ class STDPMixin:
         # Aplica atualização diretamente nas sinapses reais.
         # self.I é uma visão consolidada/cached e não deve receber add_ in-place.
         if hasattr(self, "dendrites"):
-            delta_total = (delta_ltd + delta_ltp).sum(dim=0)  # [D, S]
+            # Invariante ao batch-size: normaliza atualização por amostra.
+            delta_total = (delta_ltd + delta_ltp).mean(dim=0)  # [D, S]
             with torch.no_grad():
                 for d_idx, dend in enumerate(self.dendrites):
                     for s_idx, syn in enumerate(dend.synapses):
@@ -202,7 +203,12 @@ class STDPMixin:
         stdp_applied = self._should_apply_stdp(mode)
 
         if stdp_applied:
-            self._update_stdp_traces(x_pre_stp, output["spikes"], dt=kwargs.get("dt", 1.0))
+            self._update_stdp_traces(
+                x,
+                output["spikes"],
+                dt=kwargs.get("dt", 1.0),
+                x_pre_stp=x_pre_stp,
+            )
 
         # Métricas
         if self.trace_pre is not None:

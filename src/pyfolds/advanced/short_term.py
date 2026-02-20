@@ -76,7 +76,9 @@ class ShortTermDynamicsMixin:
         # Garante buffers no mesmo device da entrada
         if self.u_stp.device != x.device:
             self.u_stp = self.u_stp.to(x.device)
+            self._buffers["u_stp"] = self.u_stp
             self.R_stp = self.R_stp.to(x.device)
+            self._buffers["R_stp"] = self.R_stp
 
         # Detecta spikes pré com threshold configurável
         spike_threshold = getattr(self.cfg, 'spike_threshold', 0.5)

@@ -7,7 +7,7 @@ v1 names as compatibility aliases with deprecation warnings.
 from typing import Any, Dict
 import warnings
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 # ===== CORE V2 SURFACE =====
 from .core.config import MPJRDConfig as NeuronConfig

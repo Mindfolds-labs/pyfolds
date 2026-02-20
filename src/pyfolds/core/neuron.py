@@ -287,7 +287,8 @@ class MPJRDNeuron(BaseNeuron):
     def forward(self, x: torch.Tensor, reward: Optional[float] = None,
                 mode: Optional[LearningMode] = None,
                 collect_stats: bool = True,
-                dt: float = 1.0) -> Dict[str, Any]:
+                dt: float = 1.0,
+                defer_homeostasis: bool = False) -> Dict[str, Any]:
         """
         Forward pass do neurônio.
         
@@ -385,7 +386,7 @@ class MPJRDNeuron(BaseNeuron):
             spike_rate = max(0.0, min(1.0, spike_rate))
 
         # ===== 7. HOMEOSTASE =====
-        if effective_mode != LearningMode.INFERENCE and collect_stats:
+        if effective_mode != LearningMode.INFERENCE and collect_stats and not defer_homeostasis:
             self.homeostasis.update(spike_rate)
 
         # ===== 8. NEUROMODULAÇÃO =====
@@ -472,6 +473,7 @@ class MPJRDNeuron(BaseNeuron):
             "v_dend": v_dend,
             "gated": gated,
             "theta": self.theta.clone(),
+            "theta_eff": theta_eff.clone(),
             "r_hat": self.r_hat.clone(),
             "spike_rate": spike_rate,
             "saturation_ratio": saturation_ratio,
