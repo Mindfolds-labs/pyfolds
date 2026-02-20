@@ -19,7 +19,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - v1 public aliases remain supported during `1.x` with `DeprecationWarning` and are scheduled for removal in `2.0.0`: `MPJRDConfig` (use `NeuronConfig`), `MPJRDLayer` (use `AdaptiveNeuronLayer`), and `MPJRDNetwork` (use `SpikingNetwork`).
 
 ### Changed
-- Canonical release version unified to `2.0.1` across package metadata, public modules and docs examples.
+- Canonical release version unified to `2.0.2` across package metadata, public modules and docs examples.
 - `docs/ARCHITECTURE.md` diagram reference updated to `docs/architecture/blueprints/`.
 - `docs/development/execution_queue.csv` ISSUE-005 marked as partial in progress.
 
@@ -31,18 +31,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Fixed refractory threshold consistency by prioritizing `theta_eff` in refractory masking.
 - Fixed health monitoring fallback to `spike_rate=0.0` (instead of `1.0`) when only `r_hat` is absent.
 
+
 ## [2.0.2] - 2026-02-20
 
 ### Added
-- ADR 0042 formalizando blindagem de checkpoint com safetensors, validação de shape e ECC sidecar.
-- Novo utilitário `ECCProtector` para proteção/recuperação Reed-Solomon de chunk único.
+- Added ADR-045 documenting hardening decisions for checkpoint serialization, shape validation and lazy log flush.
 
 ### Changed
-- `VersionedCheckpoint` agora suporta fluxo opcional `use_safetensors=True` com sidecar `.json` e ECC configurável (`off|low|med|high`).
-- `CircularBufferFileHandler` passou a usar flush temporizado (`circular_flush_interval_sec`) com flush imediato em nível `ERROR` ou superior.
+- `VersionedCheckpoint` now supports safe weight serialization via `.safetensors` with JSON sidecar metadata.
+- `CircularBufferFileHandler` now uses interval-based lazy flush with immediate flush on `ERROR+`.
+- Release version updated to `2.0.2` across package metadata, module surfaces and docs examples.
 
 ### Fixed
-- Carregamento de checkpoint agora valida invariantes de shape antes de `load_state_dict`, evitando falhas silenciosas de incompatibilidade estrutural.
+- Added explicit tensor shape validation before `load_state_dict` to prevent silent incompatibility loads.
 
 ## [2.0.1] - 2026-02-20
 

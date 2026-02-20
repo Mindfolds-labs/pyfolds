@@ -17,12 +17,13 @@ from typing import Any, Dict, Optional
 
 import torch
 
-from .ecc import ReedSolomonECC, ecc_from_protection
-
 try:
-    from safetensors import torch as safetensors_torch
-except ImportError:  # pragma: no cover - dependência opcional em runtime
-    safetensors_torch = None
+    from safetensors.torch import load_file as load_safetensors_file
+    from safetensors.torch import save_file as save_safetensors_file
+
+    HAS_SAFETENSORS = True
+except ImportError:
+    HAS_SAFETENSORS = False
 
 
 class VersionedCheckpoint:
@@ -181,7 +182,6 @@ class VersionedCheckpoint:
         extra_metadata: Optional[Dict[str, Any]] = None,
         compress: bool = True,
         use_safetensors: bool = False,
-        ecc_protection: str = "off",
     ) -> Dict[str, Any]:
         """
         Salva checkpoint e retorna payload persistido.
@@ -205,45 +205,57 @@ class VersionedCheckpoint:
             "metadata": metadata,
             "integrity_hash": integrity_hash,
         }
-
-        target_path = Path(path)
-        target_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Cria diretório se necessário
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        
+        file_path = Path(path)
 
         if use_safetensors:
-            if safetensors_torch is None:
-                raise RuntimeError("use_safetensors=True requer dependência 'safetensors'.")
+            if not HAS_SAFETENSORS:
+                raise RuntimeError(
+                    "use_safetensors=True, mas o pacote 'safetensors' não está instalado"
+                )
 
-            tensor_path, meta_path = self._resolve_safetensors_paths(path)
-            tensor_path.parent.mkdir(parents=True, exist_ok=True)
+            safetensor_path = file_path if file_path.suffix == ".safetensors" else file_path.with_suffix(".safetensors")
+            save_safetensors_file(state, str(safetensor_path))
 
-            payload_bytes = safetensors_torch.save(state)
-            tensor_path.write_bytes(payload_bytes)
-
-            ecc_codec = ecc_from_protection(ecc_protection)
-            ecc_result = ecc_codec.encode(payload_bytes)
-            ecc_path = tensor_path.with_suffix(f"{tensor_path.suffix}.ecc")
-            if ecc_result.ecc_bytes:
-                ecc_path.write_bytes(ecc_result.ecc_bytes)
-            elif ecc_path.exists():
-                ecc_path.unlink()
-
-            sidecar = {
-                "format": "safetensors",
-                "tensor_file": tensor_path.name,
+            ckpt = {
                 "metadata": metadata,
                 "integrity_hash": integrity_hash,
-                "ecc_algo": ecc_result.ecc_algo,
-                "ecc_len": len(ecc_result.ecc_bytes),
+                "format": "safetensors",
             }
-            meta_path.write_text(json.dumps(sidecar, ensure_ascii=False, indent=2), encoding="utf-8")
-            return ckpt
-
-        if compress:
-            torch.save(ckpt, path, pickle_protocol=5, _use_new_zipfile_serialization=True)
+            meta_path = safetensor_path.with_suffix(safetensor_path.suffix + ".meta.json")
+            meta_path.write_text(json.dumps(ckpt, ensure_ascii=False, indent=2), encoding="utf-8")
         else:
-            torch.save(ckpt, path)
+            # Salva com ou sem compressão
+            if compress:
+                torch.save(ckpt, path, pickle_protocol=5, _use_new_zipfile_serialization=True)
+            else:
+                torch.save(ckpt, path)
 
         return ckpt
+
+    @staticmethod
+    def _validate_model_shapes(model: torch.nn.Module, model_state: Dict[str, torch.Tensor]) -> None:
+        current_state = model.state_dict()
+
+        missing_keys = sorted(set(current_state.keys()) - set(model_state.keys()))
+        unexpected_keys = sorted(set(model_state.keys()) - set(current_state.keys()))
+        if missing_keys or unexpected_keys:
+            raise ValueError(
+                "State dict incompatível entre modelo e checkpoint. "
+                f"missing_keys={missing_keys[:5]} unexpected_keys={unexpected_keys[:5]}"
+            )
+
+        for name, tensor in current_state.items():
+            loaded = model_state[name]
+            if torch.is_tensor(tensor) and torch.is_tensor(loaded):
+                if tuple(tensor.shape) != tuple(loaded.shape):
+                    raise ValueError(
+                        f"Shape mismatch para {name}: "
+                        f"Modelo {tuple(tensor.shape)} vs Checkpoint {tuple(loaded.shape)}"
+                    )
 
     @classmethod
     def load(
@@ -270,52 +282,40 @@ class VersionedCheckpoint:
         Raises:
             ValueError: Se hash/shape não coincidirem
         """
-        ckpt = None
-        target_path = Path(path)
-        tensor_path, meta_path = cls._resolve_safetensors_paths(path)
-
-        if safetensors_torch is not None and (
-            target_path.suffix in {".safetensors", ".json"} or tensor_path.exists()
-        ):
-            if not tensor_path.exists():
-                raise FileNotFoundError(f"Arquivo de pesos safetensors não encontrado: {tensor_path}")
-
-            sidecar = {}
+        input_path = Path(path)
+        if input_path.suffix == ".safetensors":
+            if not HAS_SAFETENSORS:
+                raise RuntimeError(
+                    "Não foi possível carregar .safetensors: pacote 'safetensors' não está instalado"
+                )
+            model_state = load_safetensors_file(str(input_path), device=map_location)
+            meta_path = input_path.with_suffix(input_path.suffix + ".meta.json")
             if meta_path.exists():
-                sidecar = json.loads(meta_path.read_text(encoding="utf-8"))
+                ckpt = json.loads(meta_path.read_text(encoding="utf-8"))
+            else:
+                warnings.warn(
+                    "Arquivo de metadados .meta.json ausente para checkpoint safetensors",
+                    RuntimeWarning,
+                )
+                ckpt = {}
 
-            raw_payload = tensor_path.read_bytes()
-            ecc_algo = sidecar.get("ecc_algo", "none")
-            if sidecar.get("ecc_len", 0) > 0 and ecc_algo != "none":
-                ecc_path = tensor_path.with_suffix(f"{tensor_path.suffix}.ecc")
-                try:
-                    raw_payload = cls._decode_with_ecc(raw_payload, ecc_algo, ecc_path)
-                except Exception:
-                    if strict:
-                        raise
-                    warnings.warn("Falha de recuperação ECC em safetensors; seguindo sem correção.", RuntimeWarning)
-
-            model_state = safetensors_torch.load(raw_payload)
-            model_state = {k: v.to(map_location) for k, v in model_state.items()}
-            ckpt = {
-                "model_state": model_state,
-                "metadata": sidecar.get("metadata", {}),
-                "integrity_hash": sidecar.get("integrity_hash"),
-            }
-
-        if ckpt is None:
+            ckpt["model_state"] = model_state
+        else:
             try:
                 ckpt = torch.load(path, map_location=map_location, weights_only=True)
             except TypeError:
+                # Compatibilidade com versões do PyTorch sem argumento weights_only
                 ckpt = torch.load(path, map_location=map_location)
             except pickle.UnpicklingError as exc:
+                # Compatibilidade com checkpoints serializados com protocolo/objetos
+                # ainda não suportados pelo modo weights_only=True (PyTorch >=2.6).
                 warnings.warn(
                     "Fallback para torch.load(weights_only=False) devido a "
                     f"incompatibilidade do formato seguro: {exc}",
                     RuntimeWarning,
                 )
                 ckpt = torch.load(path, map_location=map_location, weights_only=False)
-
+        
         model_state = ckpt["model_state"]
         metadata = ckpt.get("metadata", {})
         saved_hash = ckpt.get("integrity_hash")
@@ -343,7 +343,7 @@ class VersionedCheckpoint:
                 )
 
         if model is not None:
-            cls._validate_shape_invariants(model, model_state)
+            cls._validate_model_shapes(model, model_state)
             model.load_state_dict(model_state)
 
         return ckpt

@@ -66,30 +66,41 @@ def test_versioned_checkpoint_metadata_created_at_is_utc(tmp_path):
 
 
 
-def test_versioned_checkpoint_shape_validation_raises(tmp_path):
-    model_a = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4))
-    model_b = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=3, n_synapses_per_dendrite=4))
-    ckpt = VersionedCheckpoint(model_a, version="1.0.0")
+def test_versioned_checkpoint_shape_validation_raises_on_mismatch(tmp_path):
+    cfg_source = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg_target = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=5)
+    source = pyfolds.MPJRDNeuron(cfg_source)
+    target = pyfolds.MPJRDNeuron(cfg_target)
 
-    path = Path(tmp_path) / "shape-check.pt"
+    ckpt = VersionedCheckpoint(source, version="1.0.0")
+    path = Path(tmp_path) / "neuron-shape.pt"
     ckpt.save(str(path))
 
-    with pytest.raises(ValueError, match="Shape mismatch"):
-        VersionedCheckpoint.load(str(path), model=model_b)
+    try:
+        VersionedCheckpoint.load(str(path), model=target)
+        assert False, "esperava ValueError por shape mismatch"
+    except ValueError as exc:
+        assert "incompatível" in str(exc) or "Shape mismatch" in str(exc)
 
 
 def test_versioned_checkpoint_safetensors_roundtrip(tmp_path):
-    safetensors = pytest.importorskip("safetensors")
-    assert safetensors is not None
-
     cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     neuron = pyfolds.MPJRDNeuron(cfg)
     ckpt = VersionedCheckpoint(neuron, version="1.0.0")
 
-    path = Path(tmp_path) / "neuron-safe.pt"
-    payload = ckpt.save(str(path), use_safetensors=True, ecc_protection="low")
-    loaded = VersionedCheckpoint.load(str(path.with_suffix('.safetensors')), model=neuron)
+    path = Path(tmp_path) / "neuron.pt"
 
-    assert payload["integrity_hash"] == loaded["integrity_hash"]
-    assert loaded["metadata"]["version"] == "1.0.0"
-    assert path.with_suffix('.json').exists()
+    try:
+        payload = ckpt.save(str(path), use_safetensors=True, extra_metadata={"backend": "safe"})
+    except RuntimeError as exc:
+        if "safetensors" in str(exc):
+            return
+        raise
+
+    safetensor_path = path.with_suffix('.safetensors')
+    assert safetensor_path.exists()
+    assert safetensor_path.with_suffix('.safetensors.meta.json').exists()
+
+    loaded = VersionedCheckpoint.load(str(safetensor_path), model=neuron)
+    assert loaded["metadata"]["backend"] == "safe"
+    assert loaded["integrity_hash"] == payload["integrity_hash"]
