@@ -1,8 +1,8 @@
 # Code Map (Sheer Audit)
 
 - Repositório: `pyfolds`
-- Arquivos Python: `134`
-- Símbolos: `958`
+- Arquivos Python: `135`
+- Símbolos: `963`
 
 ## Módulos
 
@@ -1216,6 +1216,14 @@
 - Funções:
   - `test_torch_and_tf_contract_conformance_with_same_artificial_input_and_tolerance()`
   - `test_torch_contract_invariants_order_and_time_step_end_of_step()`
+
+### `tests.unit.neuron.test_integration_stability`
+- Arquivo: `tests/unit/neuron/test_integration_stability.py`
+- Imports:
+  - `mod:pyfolds`
+  - `mod:torch`
+- Funções:
+  - `test_forward_clamps_non_finite_dendritic_sum(monkeypatch)`
 
 ### `tests.unit.neuron.test_refractory`
 - Arquivo: `tests/unit/neuron/test_refractory.py`

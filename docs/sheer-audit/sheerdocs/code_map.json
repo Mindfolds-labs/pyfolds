@@ -5,9 +5,9 @@
     "commit": null
   },
   "metrics": {
-    "python_files": 134,
-    "symbols": 958,
-    "edges": 1437,
+    "python_files": 135,
+    "symbols": 963,
+    "edges": 1443,
     "findings": 0,
     "internal_import_edges": 101
   },
@@ -625,9 +625,11 @@
             "ABC"
           ],
           "methods": [
+            "mtd:src.pyfolds.core.base.BaseNeuron._set_refractory_state",
             "mtd:src.pyfolds.core.base.BaseNeuron.apply_plasticity",
             "mtd:src.pyfolds.core.base.BaseNeuron.forward",
-            "mtd:src.pyfolds.core.base.BaseNeuron.get_metrics"
+            "mtd:src.pyfolds.core.base.BaseNeuron.get_metrics",
+            "mtd:src.pyfolds.core.base.BaseNeuron.in_refractory_period"
           ]
         },
         {
@@ -3525,6 +3527,7 @@
           "methods": [
             "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_check_refractory_periods",
             "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_forward_increments_time_once",
+            "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_homeostasis_does_not_update_theta_in_refractory",
             "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_initialization",
             "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_refractory_blocks_spikes",
             "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_update_refractory"
@@ -4128,6 +4131,27 @@
           "qname": "tests.unit.neuron.test_contract_conformance.test_torch_contract_invariants_order_and_time_step_end_of_step",
           "line": 13,
           "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.unit.neuron.test_integration_stability",
+      "qname": "tests.unit.neuron.test_integration_stability",
+      "file": "tests/unit/neuron/test_integration_stability.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.unit.neuron.test_integration_stability.test_forward_clamps_non_finite_dendritic_sum",
+          "name": "test_forward_clamps_non_finite_dendritic_sum",
+          "qname": "tests.unit.neuron.test_integration_stability.test_forward_clamps_non_finite_dendritic_sum",
+          "line": 5,
+          "params": [
+            "monkeypatch"
+          ]
         }
       ]
     },

@@ -849,7 +849,7 @@
       "name": "reset_refractory",
       "qname": "src.pyfolds.advanced.refractory.RefractoryMixin.reset_refractory",
       "file": "src/pyfolds/advanced/refractory.py",
-      "line": 176,
+      "line": 182,
       "doc": "Reseta o estado refratário.",
       "params": [
         "self"
@@ -864,7 +864,7 @@
       "name": "get_refractory_metrics",
       "qname": "src.pyfolds.advanced.refractory.RefractoryMixin.get_refractory_metrics",
       "file": "src/pyfolds/advanced/refractory.py",
-      "line": 181,
+      "line": 188,
       "doc": "Retorna métricas do período refratário.\n\nReturns:\n    dict: Dicionário com métricas",
       "params": [
         "self"
@@ -1840,12 +1840,45 @@
       "decorators": []
     },
     {
+      "id": "mtd:src.pyfolds.core.base.BaseNeuron.in_refractory_period",
+      "kind": "method",
+      "name": "in_refractory_period",
+      "qname": "src.pyfolds.core.base.BaseNeuron.in_refractory_period",
+      "file": "src/pyfolds/core/base.py",
+      "line": 29,
+      "doc": "Indica se o neurônio está em estado refratário no passo atual.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "property"
+      ]
+    },
+    {
+      "id": "mtd:src.pyfolds.core.base.BaseNeuron._set_refractory_state",
+      "kind": "method",
+      "name": "_set_refractory_state",
+      "qname": "src.pyfolds.core.base.BaseNeuron._set_refractory_state",
+      "file": "src/pyfolds/core/base.py",
+      "line": 33,
+      "doc": "Atualiza o estado refratário observado no passo atual.",
+      "params": [
+        "self",
+        "in_refractory"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mtd:src.pyfolds.core.base.BaseNeuron.forward",
       "kind": "method",
       "name": "forward",
       "qname": "src.pyfolds.core.base.BaseNeuron.forward",
       "file": "src/pyfolds/core/base.py",
-      "line": 29,
+      "line": 38,
       "doc": "Executa o passo forward do neurônio.",
       "params": [
         "self",
@@ -1863,7 +1896,7 @@
       "name": "apply_plasticity",
       "qname": "src.pyfolds.core.base.BaseNeuron.apply_plasticity",
       "file": "src/pyfolds/core/base.py",
-      "line": 33,
+      "line": 42,
       "doc": "Aplica atualizações plásticas acumuladas.",
       "params": [
         "self",
@@ -1881,7 +1914,7 @@
       "name": "get_metrics",
       "qname": "src.pyfolds.core.base.BaseNeuron.get_metrics",
       "file": "src/pyfolds/core/base.py",
-      "line": 37,
+      "line": 46,
       "doc": "Retorna métricas agregadas do estado interno.",
       "params": [
         "self"
@@ -2638,11 +2671,12 @@
       "qname": "src.pyfolds.core.homeostasis.HomeostasisController.update",
       "file": "src/pyfolds/core/homeostasis.py",
       "line": 52,
-      "doc": "Atualiza parâmetros homeostáticos (PID-like).\n\nArgs:\n    current_rate: Taxa atual no intervalo [0, 1].\n        Aceita float ou tensor escalar.\n    clamp_theta: Se deve limitar `theta` entre [theta_min, theta_max].\n\nReturns:\n    torch.Tensor: theta atualizado (tensor escalar shape [1]).",
+      "doc": "Atualiza parâmetros homeostáticos (PID-like).\n\nArgs:\n    current_rate: Taxa atual no intervalo [0, 1].\n        Aceita float ou tensor escalar.\n    clamp_theta: Se deve limitar `theta` entre [theta_min, theta_max].\n    in_refractory_period: Se True, congela atualização de limiar neste passo.\n\nReturns:\n    torch.Tensor: theta atualizado (tensor escalar shape [1]).",
       "params": [
         "self",
         "current_rate",
-        "clamp_theta"
+        "clamp_theta",
+        "in_refractory_period"
       ],
       "returns": null,
       "bases": [],
@@ -2654,7 +2688,7 @@
       "name": "_check_stability_change",
       "qname": "src.pyfolds.core.homeostasis.HomeostasisController._check_stability_change",
       "file": "src/pyfolds/core/homeostasis.py",
-      "line": 128,
+      "line": 133,
       "doc": "Verifica se houve mudança no estado de estabilidade.",
       "params": [
         "self",
@@ -2670,7 +2704,7 @@
       "name": "on_stable",
       "qname": "src.pyfolds.core.homeostasis.HomeostasisController.on_stable",
       "file": "src/pyfolds/core/homeostasis.py",
-      "line": 148,
+      "line": 153,
       "doc": "Registra callback para quando a homeostase se tornar estável.",
       "params": [
         "self",
@@ -2686,7 +2720,7 @@
       "name": "on_unstable",
       "qname": "src.pyfolds.core.homeostasis.HomeostasisController.on_unstable",
       "file": "src/pyfolds/core/homeostasis.py",
-      "line": 158,
+      "line": 163,
       "doc": "Registra callback para quando a homeostase se tornar instável.",
       "params": [
         "self",
@@ -2702,7 +2736,7 @@
       "name": "reset",
       "qname": "src.pyfolds.core.homeostasis.HomeostasisController.reset",
       "file": "src/pyfolds/core/homeostasis.py",
-      "line": 168,
+      "line": 173,
       "doc": "Reseta buffers.",
       "params": [
         "self"
@@ -2717,7 +2751,7 @@
       "name": "homeostasis_error",
       "qname": "src.pyfolds.core.homeostasis.HomeostasisController.homeostasis_error",
       "file": "src/pyfolds/core/homeostasis.py",
-      "line": 178,
+      "line": 183,
       "doc": "Erro homeostático atual (r_hat - target).",
       "params": [
         "self"
@@ -2734,7 +2768,7 @@
       "name": "is_stable",
       "qname": "src.pyfolds.core.homeostasis.HomeostasisController.is_stable",
       "file": "src/pyfolds/core/homeostasis.py",
-      "line": 182,
+      "line": 187,
       "doc": "Verifica se homeostase está estável com tolerância configurável.",
       "params": [
         "self",
@@ -2750,7 +2784,7 @@
       "name": "stability_ratio",
       "qname": "src.pyfolds.core.homeostasis.HomeostasisController.stability_ratio",
       "file": "src/pyfolds/core/homeostasis.py",
-      "line": 186,
+      "line": 191,
       "doc": "Calcula proporção de passos estáveis na janela recente.\n\nArgs:\n    window: Número de passos para considerar\n    \nReturns:\n    Float entre 0 e 1 indicando proporção de estabilidade",
       "params": [
         "self",
@@ -2766,7 +2800,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.homeostasis.HomeostasisController.extra_repr",
       "file": "src/pyfolds/core/homeostasis.py",
-      "line": 202,
+      "line": 207,
       "doc": "Representação string detalhada do módulo.",
       "params": [
         "self"
@@ -3152,7 +3186,7 @@
       "name": "step",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.step",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 493,
+      "line": 504,
       "doc": "API explícita de passo temporal (compatível com README).",
       "params": [
         "self",
@@ -3172,7 +3206,7 @@
       "name": "apply_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 513,
+      "line": 524,
       "doc": "Aplica plasticidade acumulada (deferred updates).\n\n✅ CORRIGIDO: Passa mode para as sinapses",
       "params": [
         "self",
@@ -3191,7 +3225,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.sleep",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 599,
+      "line": 610,
       "doc": "Ciclo de sono: consolida sinapses.",
       "params": [
         "self",
@@ -3209,7 +3243,7 @@
       "name": "to",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.to",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 624,
+      "line": 635,
       "doc": "Move neurônio para device e valida consistência.",
       "params": [
         "self",
@@ -3225,7 +3259,7 @@
       "name": "get_metrics",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.get_metrics",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 633,
+      "line": 644,
       "doc": "Retorna métricas consolidadas do neurônio.",
       "params": [
         "self"
@@ -3240,7 +3274,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.extra_repr",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 676,
+      "line": 687,
       "doc": null,
       "params": [
         "self"
@@ -9818,6 +9852,22 @@
       "decorators": []
     },
     {
+      "id": "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_homeostasis_does_not_update_theta_in_refractory",
+      "kind": "method",
+      "name": "test_homeostasis_does_not_update_theta_in_refractory",
+      "qname": "tests.unit.advanced.test_refractory.TestRefractoryMixin.test_homeostasis_does_not_update_theta_in_refractory",
+      "file": "tests/unit/advanced/test_refractory.py",
+      "line": 111,
+      "doc": "Theta must remain frozen while any sample is in refractory period.",
+      "params": [
+        "self",
+        "full_config"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mod:tests.unit.advanced.test_short_term",
       "kind": "module",
       "name": "test_short_term",
@@ -11487,6 +11537,34 @@
       "line": 29,
       "doc": null,
       "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mod:tests.unit.neuron.test_integration_stability",
+      "kind": "module",
+      "name": "test_integration_stability",
+      "qname": "tests.unit.neuron.test_integration_stability",
+      "file": "tests/unit/neuron/test_integration_stability.py",
+      "line": 1,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.neuron.test_integration_stability.test_forward_clamps_non_finite_dendritic_sum",
+      "kind": "function",
+      "name": "test_forward_clamps_non_finite_dendritic_sum",
+      "qname": "tests.unit.neuron.test_integration_stability.test_forward_clamps_non_finite_dendritic_sum",
+      "file": "tests/unit/neuron/test_integration_stability.py",
+      "line": 5,
+      "doc": null,
+      "params": [
+        "monkeypatch"
+      ],
       "returns": null,
       "bases": [],
       "decorators": []
@@ -15904,6 +15982,18 @@
       "type": "INHERITS",
       "src": "cls:src.pyfolds.core.base.BaseNeuron",
       "dst": "cls:*.ABC",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.base.BaseNeuron",
+      "dst": "mtd:src.pyfolds.core.base.BaseNeuron.in_refractory_period",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.base.BaseNeuron",
+      "dst": "mtd:src.pyfolds.core.base.BaseNeuron._set_refractory_state",
       "meta": {}
     },
     {
@@ -20617,6 +20707,12 @@
       "meta": {}
     },
     {
+      "type": "CONTAINS",
+      "src": "cls:tests.unit.advanced.test_refractory.TestRefractoryMixin",
+      "dst": "mtd:tests.unit.advanced.test_refractory.TestRefractoryMixin.test_homeostasis_does_not_update_theta_in_refractory",
+      "meta": {}
+    },
+    {
       "type": "IMPORT",
       "src": "mod:tests.unit.advanced.test_short_term",
       "dst": "mod:pytest",
@@ -21556,6 +21652,24 @@
       "type": "CONTAINS",
       "src": "mod:tests.unit.neuron.test_contract_conformance",
       "dst": "fn:tests.unit.neuron.test_contract_conformance.test_torch_and_tf_contract_conformance_with_same_artificial_input_and_tolerance",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.unit.neuron.test_integration_stability",
+      "dst": "mod:torch",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.unit.neuron.test_integration_stability",
+      "dst": "mod:pyfolds",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.neuron.test_integration_stability",
+      "dst": "fn:tests.unit.neuron.test_integration_stability.test_forward_clamps_non_finite_dendritic_sum",
       "meta": {}
     },
     {
@@ -23247,9 +23361,9 @@
   ],
   "findings": [],
   "metrics": {
-    "python_files": 134,
-    "symbols": 958,
-    "edges": 1437,
+    "python_files": 135,
+    "symbols": 963,
+    "edges": 1443,
     "findings": 0,
     "internal_import_edges": 101
   }

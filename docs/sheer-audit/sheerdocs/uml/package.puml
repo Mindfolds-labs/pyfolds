@@ -108,6 +108,7 @@ package "tests.unit.network.test_network_edge_cases" {}
 package "tests.unit.neuron.test_adaptation_sfa" {}
 package "tests.unit.neuron.test_backprop_bap" {}
 package "tests.unit.neuron.test_contract_conformance" {}
+package "tests.unit.neuron.test_integration_stability" {}
 package "tests.unit.neuron.test_refractory" {}
 package "tests.unit.neuron.test_stp_stdp_contracts" {}
 package "tests.unit.neuron.test_time_counter" {}

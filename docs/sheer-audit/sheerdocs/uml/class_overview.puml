@@ -130,9 +130,11 @@ class "src.pyfolds.core.accumulator.StatisticsAccumulator" {
 }
 
 class "src.pyfolds.core.base.BaseNeuron" {
+  +_set_refractory_state()
   +apply_plasticity()
   +forward()
   +get_metrics()
+  +in_refractory_period()
 }
 class "src.pyfolds.core.base.BasePlasticityRule" {
   +update()
@@ -617,6 +619,7 @@ class "tests.unit.advanced.test_inhibition.TestInhibitionMixin" {
 class "tests.unit.advanced.test_refractory.TestRefractoryMixin" {
   +test_check_refractory_periods()
   +test_forward_increments_time_once()
+  +test_homeostasis_does_not_update_theta_in_refractory()
   +test_initialization()
   +test_refractory_blocks_spikes()
   +test_update_refractory()
@@ -717,6 +720,7 @@ class "tests.unit.core.test_synapse.TestMPJRDSynapse" {
   +test_update_supports_explicit_hebbian_ltd_component()
   +test_update_uses_absolute_dt_and_mode_multiplier()
 }
+
 
 
 
