@@ -255,6 +255,11 @@ class MPJRDLayer(nn.Module):
                 category=UserWarning,
                 message=r".*does not return a single Tensor or a tuple of Tensors.*",
             )
+            warnings.filterwarnings(
+                "ignore",
+                category=UserWarning,
+                message=r".*received <class 'dict'>.*",
+            )
             yield
 
     def _prepare_input(self, x: torch.Tensor) -> torch.Tensor:
