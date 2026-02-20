@@ -119,7 +119,7 @@ class MPJRDConfig:
     A_plus: float = 0.01
     A_minus: float = 0.012
     stdp_trace_threshold: float = 0.01
-    stdp_input_source: STDPInputSource = "stp"
+    stdp_input_source: STDPInputSource = "raw"
     ltd_rule: LTDRule = "current"
 
     # ===== THRESHOLDS E REPRODUTIBILIDADE =====
