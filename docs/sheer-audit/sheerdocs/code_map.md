@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `140`
-- Símbolos: `1063`
+- Símbolos: `1068`
 
 ## Módulos
 
@@ -533,6 +533,7 @@
   - `mod:os`
   - `mod:pathlib`
   - `mod:pickle`
+  - `mod:pyfolds.core.config`
   - `mod:shutil`
   - `mod:src.pyfolds.serialization.ecc`
   - `mod:subprocess`
@@ -941,16 +942,20 @@
 - Imports:
   - `mod:pyfolds`
   - `mod:pyfolds.core.neuron`
+  - `mod:pyfolds.core.synapse`
   - `mod:pyfolds.serialization`
   - `mod:pyfolds.serialization.foldio`
   - `mod:pytest`
   - `mod:struct`
+  - `mod:torch`
 - Funções:
   - `_build_neuron()`
   - `_write_base_fold(path)`
   - `test_bit_flip_is_detected(tmp_path)`
+  - `test_ecc_like_burst_corruption_is_detected(tmp_path)`
   - `test_huge_index_len_dos_guard(tmp_path)`
   - `test_invalid_magic_is_rejected(tmp_path)`
+  - `test_mpjrd_synapse_recovers_from_ecc_like_state_corruption()`
   - `test_partial_read_raises_eoferror(tmp_path)`
   - `test_truncation_is_detected(tmp_path)`
 

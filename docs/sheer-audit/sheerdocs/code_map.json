@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 140,
-    "symbols": 1063,
-    "edges": 1582,
+    "symbols": 1068,
+    "edges": 1590,
     "findings": 0,
     "internal_import_edges": 105
   },
@@ -927,7 +927,7 @@
           "id": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
           "name": "MPJRDNeuron",
           "qname": "src.pyfolds.core.neuron.MPJRDNeuron",
-          "line": 45,
+          "line": 46,
           "bases": [
             "BaseNeuron"
           ],
@@ -939,11 +939,11 @@
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._apply_online_plasticity",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._apply_runtime_injections",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._compute_R_endogenous",
-            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._gradient_health_monitor",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._install_gradient_health_monitor",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_stable",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_unstable",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._refresh_config_references",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._sanitize_gradient",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._validate_input_device",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._validate_internal_devices",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
@@ -1016,6 +1016,7 @@
           "methods": [
             "mtd:src.pyfolds.core.synapse.MPJRDSynapse.W",
             "mtd:src.pyfolds.core.synapse.MPJRDSynapse.__init__",
+            "mtd:src.pyfolds.core.synapse.MPJRDSynapse._sanitize_state_buffers",
             "mtd:src.pyfolds.core.synapse.MPJRDSynapse._sync_distributed_plasticity_state",
             "mtd:src.pyfolds.core.synapse.MPJRDSynapse._update_with_soft_saturation",
             "mtd:src.pyfolds.core.synapse.MPJRDSynapse.consolidate",
@@ -1877,6 +1878,7 @@
         "mod:os",
         "mod:pathlib",
         "mod:pickle",
+        "mod:pyfolds.core.config",
         "mod:shutil",
         "mod:src.pyfolds.serialization.ecc",
         "mod:subprocess",
@@ -1889,7 +1891,7 @@
           "id": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
           "name": "VersionedCheckpoint",
           "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
-          "line": 31,
+          "line": 33,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
@@ -1900,7 +1902,9 @@
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._register_safe_globals",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._to_weights_only_safe",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_model_shapes",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
@@ -2509,7 +2513,7 @@
           "id": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
           "name": "CircularBufferFileHandler",
           "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler",
-          "line": 288,
+          "line": 296,
           "bases": [
             "logging.Handler"
           ],
@@ -2536,7 +2540,7 @@
           "id": "cls:src.pyfolds.utils.logging.PyFoldsLogger",
           "name": "PyFoldsLogger",
           "qname": "src.pyfolds.utils.logging.PyFoldsLogger",
-          "line": 79,
+          "line": 80,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.utils.logging.PyFoldsLogger.__init__",
@@ -2564,7 +2568,7 @@
           "id": "fn:src.pyfolds.utils.logging.build_log_path",
           "name": "build_log_path",
           "qname": "src.pyfolds.utils.logging.build_log_path",
-          "line": 378,
+          "line": 386,
           "params": [
             "log_dir",
             "app",
@@ -2575,7 +2579,7 @@
           "id": "fn:src.pyfolds.utils.logging.get_logger",
           "name": "get_logger",
           "qname": "src.pyfolds.utils.logging.get_logger",
-          "line": 219,
+          "line": 220,
           "params": [
             "name"
           ]
@@ -2584,7 +2588,7 @@
           "id": "fn:src.pyfolds.utils.logging.next_log_path",
           "name": "next_log_path",
           "qname": "src.pyfolds.utils.logging.next_log_path",
-          "line": 361,
+          "line": 369,
           "params": [
             "log_dir",
             "app",
@@ -2595,7 +2599,7 @@
           "id": "fn:src.pyfolds.utils.logging.setup_logging",
           "name": "setup_logging",
           "qname": "src.pyfolds.utils.logging.setup_logging",
-          "line": 266,
+          "line": 274,
           "params": [
             "log_file",
             "level",
@@ -2610,7 +2614,7 @@
           "id": "fn:src.pyfolds.utils.logging.setup_run_logging",
           "name": "setup_run_logging",
           "qname": "src.pyfolds.utils.logging.setup_run_logging",
-          "line": 226,
+          "line": 225,
           "params": [
             "app",
             "version",
@@ -3377,10 +3381,12 @@
       "imports": [
         "mod:pyfolds",
         "mod:pyfolds.core.neuron",
+        "mod:pyfolds.core.synapse",
         "mod:pyfolds.serialization",
         "mod:pyfolds.serialization.foldio",
         "mod:pytest",
-        "mod:struct"
+        "mod:struct",
+        "mod:torch"
       ],
       "classes": [],
       "functions": [
@@ -3388,14 +3394,14 @@
           "id": "fn:tests.test_corruption_detection._build_neuron",
           "name": "_build_neuron",
           "qname": "tests.test_corruption_detection._build_neuron",
-          "line": 11,
+          "line": 13,
           "params": []
         },
         {
           "id": "fn:tests.test_corruption_detection._write_base_fold",
           "name": "_write_base_fold",
           "qname": "tests.test_corruption_detection._write_base_fold",
-          "line": 22,
+          "line": 24,
           "params": [
             "path"
           ]
@@ -3404,7 +3410,16 @@
           "id": "fn:tests.test_corruption_detection.test_bit_flip_is_detected",
           "name": "test_bit_flip_is_detected",
           "qname": "tests.test_corruption_detection.test_bit_flip_is_detected",
-          "line": 34,
+          "line": 36,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.test_corruption_detection.test_ecc_like_burst_corruption_is_detected",
+          "name": "test_ecc_like_burst_corruption_is_detected",
+          "qname": "tests.test_corruption_detection.test_ecc_like_burst_corruption_is_detected",
+          "line": 105,
           "params": [
             "tmp_path"
           ]
@@ -3413,7 +3428,7 @@
           "id": "fn:tests.test_corruption_detection.test_huge_index_len_dos_guard",
           "name": "test_huge_index_len_dos_guard",
           "qname": "tests.test_corruption_detection.test_huge_index_len_dos_guard",
-          "line": 78,
+          "line": 80,
           "params": [
             "tmp_path"
           ]
@@ -3422,16 +3437,23 @@
           "id": "fn:tests.test_corruption_detection.test_invalid_magic_is_rejected",
           "name": "test_invalid_magic_is_rejected",
           "qname": "tests.test_corruption_detection.test_invalid_magic_is_rejected",
-          "line": 65,
+          "line": 67,
           "params": [
             "tmp_path"
           ]
         },
         {
+          "id": "fn:tests.test_corruption_detection.test_mpjrd_synapse_recovers_from_ecc_like_state_corruption",
+          "name": "test_mpjrd_synapse_recovers_from_ecc_like_state_corruption",
+          "qname": "tests.test_corruption_detection.test_mpjrd_synapse_recovers_from_ecc_like_state_corruption",
+          "line": 124,
+          "params": []
+        },
+        {
           "id": "fn:tests.test_corruption_detection.test_partial_read_raises_eoferror",
           "name": "test_partial_read_raises_eoferror",
           "qname": "tests.test_corruption_detection.test_partial_read_raises_eoferror",
-          "line": 88,
+          "line": 92,
           "params": [
             "tmp_path"
           ]
@@ -3440,7 +3462,7 @@
           "id": "fn:tests.test_corruption_detection.test_truncation_is_detected",
           "name": "test_truncation_is_detected",
           "qname": "tests.test_corruption_detection.test_truncation_is_detected",
-          "line": 53,
+          "line": 55,
           "params": [
             "tmp_path"
           ]
