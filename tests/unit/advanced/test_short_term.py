@@ -101,3 +101,16 @@ class TestShortTermDynamicsMixin:
 
         assert neuron.u_stp.device.type == 'cuda'
         assert neuron.R_stp.device.type == 'cuda'
+
+
+    def test_stp_buffers_remain_registered_after_device_alignment(self, full_config):
+        """Realinhamento de device não deve remover buffers do state_dict."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
+        neuron._align_short_term_buffers_device(torch.device('cpu'))
+
+        state = neuron.state_dict()
+        assert 'u_stp' in state
+        assert 'R_stp' in state
