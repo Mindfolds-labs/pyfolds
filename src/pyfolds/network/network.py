@@ -52,6 +52,7 @@ class MPJRDNetwork(nn.Module):
         self.input_layer = None
         self.output_layer = None
         self._layer_order = []  # Cache da ordenação topológica
+        self._input_generators: Dict[str, torch.Generator] = {}
 
     def add_layer(self, name: str, layer: MPJRDLayer) -> 'MPJRDNetwork':
         """

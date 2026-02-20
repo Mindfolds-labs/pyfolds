@@ -109,6 +109,7 @@ class MPJRDNeuron(BaseNeuron):
 
         # ===== TELEMETRIA =====
         self.register_buffer("step_id", torch.tensor(0, dtype=torch.int64))
+        self.register_buffer("_theta_cap_buf", torch.zeros(1, dtype=self.theta.dtype, device=self.theta.device))
         if TELEMETRY_AVAILABLE and enable_telemetry:
             from ..telemetry import TelemetryConfig, TelemetryController, TelemetryProfile
 
