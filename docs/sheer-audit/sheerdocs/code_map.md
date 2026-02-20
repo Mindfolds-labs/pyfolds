@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `140`
-- Símbolos: `1060`
+- Símbolos: `1063`
 
 ## Módulos
 

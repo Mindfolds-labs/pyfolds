@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 140,
-    "symbols": 1060,
-    "edges": 1576,
+    "symbols": 1063,
+    "edges": 1579,
     "findings": 0,
     "internal_import_edges": 105
   },
@@ -1185,7 +1185,11 @@
           "bases": [
             "WeightIntegrityMonitor"
           ],
-          "methods": []
+          "methods": [
+            "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.__init__",
+            "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.check_integrity",
+            "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.set_baseline"
+          ]
         },
         {
           "id": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",

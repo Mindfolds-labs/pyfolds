@@ -4322,6 +4322,53 @@
       "decorators": []
     },
     {
+      "id": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.__init__",
+      "kind": "method",
+      "name": "__init__",
+      "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor.__init__",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 154,
+      "doc": null,
+      "params": [
+        "self",
+        "model",
+        "check_every_n_steps"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.set_baseline",
+      "kind": "method",
+      "name": "set_baseline",
+      "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor.set_baseline",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 159,
+      "doc": "Define (ou redefine) o hash de baseline esperado.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.check_integrity",
+      "kind": "method",
+      "name": "check_integrity",
+      "qname": "src.pyfolds.monitoring.health.ModelIntegrityMonitor.check_integrity",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 166,
+      "doc": "Contrato legado com payload semântico de integridade do modelo.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mod:src.pyfolds.monitoring.mindcontrol",
       "kind": "module",
       "name": "mindcontrol",
@@ -18905,6 +18952,24 @@
       "meta": {}
     },
     {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.__init__",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.set_baseline",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.ModelIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.ModelIntegrityMonitor.check_integrity",
+      "meta": {}
+    },
+    {
       "type": "IMPORT",
       "src": "mod:src.pyfolds.monitoring.mindcontrol",
       "dst": "mod:__future__",
@@ -25646,8 +25711,8 @@
   "findings": [],
   "metrics": {
     "python_files": 140,
-    "symbols": 1060,
-    "edges": 1576,
+    "symbols": 1063,
+    "edges": 1579,
     "findings": 0,
     "internal_import_edges": 105
   }

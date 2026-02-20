@@ -287,6 +287,9 @@ class "src.pyfolds.layers.wave_layer.MPJRDWaveLayer" {
 class "src.pyfolds.monitoring.health.HealthStatus" {
 }
 class "src.pyfolds.monitoring.health.ModelIntegrityMonitor" {
+  +__init__()
+  +check_integrity()
+  +set_baseline()
 }
 class "src.pyfolds.monitoring.health.NeuronHealthCheck" {
   +__init__()
