@@ -49,6 +49,22 @@ def test_torch_backend_shape_and_state_contracts():
     assert neuron_v1.I.shape == (cfg.n_dendrites, cfg.n_synapses_per_dendrite)
 
 
+
+
+def test_torch_backend_v2_accepts_multidim_batch_contract():
+    """V2 deve aceitar entradas com batch multidimensional [..., D, S]."""
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
+    neuron_v2 = pyfolds.MPJRDNeuronV2(cfg)
+
+    x = torch.ones(2, 5, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
+    out_v2 = neuron_v2.forward(x, collect_stats=True)
+
+    assert out_v2["spikes"].shape == (2, 5)
+    assert out_v2["u"].shape == (2, 5)
+    assert out_v2["somatic"].shape == (2, 5)
+    assert out_v2["v_dend"].shape == (2, 5, cfg.n_dendrites)
+    assert out_v2["dendritic_gain"].shape == (2, 5, cfg.n_dendrites)
+
 def _tf_forward_sequence_equivalent(x_seq: "object") -> "object":
     """Equivalente simples de forward_sequence para validar shape/estabilidade em tf.
 
