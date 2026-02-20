@@ -1,8 +1,8 @@
 # Code Map (Sheer Audit)
 
 - Repositório: `pyfolds`
-- Arquivos Python: `135`
-- Símbolos: `966`
+- Arquivos Python: `136`
+- Símbolos: `970`
 
 ## Módulos
 
@@ -859,6 +859,18 @@
   - `mod:tracemalloc`
 - Classes:
   - `TestMemoryUsage` (bases: (sem base explícita))
+
+### `tests.performance.test_telemetry_overhead`
+- Arquivo: `tests/performance/test_telemetry_overhead.py`
+- Imports:
+  - `mod:pyfolds`
+  - `mod:pytest`
+  - `mod:time`
+  - `mod:torch`
+- Funções:
+  - `_measure_forward_loop(neuron, x)`
+  - `_sync_if_cuda()`
+  - `test_forward_telemetry_ringbuffer_overhead(small_config)`
 
 ### `tests.test_concurrent_reads`
 - Arquivo: `tests/test_concurrent_reads.py`

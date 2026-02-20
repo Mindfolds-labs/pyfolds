@@ -5,9 +5,9 @@
     "commit": null
   },
   "metrics": {
-    "python_files": 135,
-    "symbols": 966,
-    "edges": 1446,
+    "python_files": 136,
+    "symbols": 970,
+    "edges": 1453,
     "findings": 0,
     "internal_import_edges": 101
   },
@@ -3050,6 +3050,46 @@
         }
       ],
       "functions": []
+    },
+    {
+      "id": "mod:tests.performance.test_telemetry_overhead",
+      "qname": "tests.performance.test_telemetry_overhead",
+      "file": "tests/performance/test_telemetry_overhead.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:time",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.performance.test_telemetry_overhead._measure_forward_loop",
+          "name": "_measure_forward_loop",
+          "qname": "tests.performance.test_telemetry_overhead._measure_forward_loop",
+          "line": 15,
+          "params": [
+            "neuron",
+            "x"
+          ]
+        },
+        {
+          "id": "fn:tests.performance.test_telemetry_overhead._sync_if_cuda",
+          "name": "_sync_if_cuda",
+          "qname": "tests.performance.test_telemetry_overhead._sync_if_cuda",
+          "line": 10,
+          "params": []
+        },
+        {
+          "id": "fn:tests.performance.test_telemetry_overhead.test_forward_telemetry_ringbuffer_overhead",
+          "name": "test_forward_telemetry_ringbuffer_overhead",
+          "qname": "tests.performance.test_telemetry_overhead.test_forward_telemetry_ringbuffer_overhead",
+          "line": 42,
+          "params": [
+            "small_config"
+          ]
+        }
+      ]
     },
     {
       "id": "mod:tests.test_concurrent_reads",
