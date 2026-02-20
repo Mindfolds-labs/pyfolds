@@ -4,13 +4,13 @@ cachedir: .pytest_cache
 preflight: torch detectado
 rootdir: /workspace/pyfolds
 configfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)
-collecting ... collected 294 items / 3 deselected / 291 selected
+collecting ... collected 295 items / 4 deselected / 291 selected
 
 tests/integration/test_advanced_integration.py::test_all_mixins_together_smoke PASSED [  0%]
 tests/integration/test_mnist_file_logging.py::test_pyfolds_imports_are_stable PASSED [  0%]
 tests/integration/test_mnist_file_logging.py::test_training_script_runs_end_to_end PASSED [  1%]
 tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_full_pipeline PASSED [  1%]
-tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain FAILED [  1%]
+tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain PASSED [  1%]
 tests/integration/test_temporal_sequence_stability.py::test_forward_sequence_torch_stability_minimal_criteria PASSED [  2%]
 tests/integration/test_temporal_sequence_stability.py::test_tf_sequence_equivalent_stability_minimal_criteria SKIPPED [  2%]
 tests/integration/test_training_loop.py::TestTrainingLoop::test_batch_training PASSED [  2%]
@@ -30,8 +30,8 @@ tests/tools/test_validate_issue_format.py::test_validate_structure_filename PASS
 tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_initialization PASSED [  7%]
 tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_decay PASSED [  7%]
 tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_increment PASSED [  8%]
-tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_respects_string_inference_mode FAILED [  8%]
-tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_forward_updates_u_for_downstream_mixins FAILED [  8%]
+tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_respects_string_inference_mode PASSED [  8%]
+tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_forward_updates_u_for_downstream_mixins PASSED [  8%]
 tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_initialization PASSED [  9%]
 tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_backprop_queue PASSED [  9%]
 tests/unit/advanced/test_backprop.py::TestBackpropMixin::test_dendrite_amplification_decay PASSED [  9%]
@@ -136,7 +136,7 @@ tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_consolidate_transfers_el
 tests/unit/core/test_synapse.py::TestMPJRDSynapse::test_update_supports_explicit_hebbian_ltd_component PASSED [ 43%]
 tests/unit/network/test_network_edge_cases.py::test_prepare_input_with_single_dendrite_avoids_division_by_zero PASSED [ 44%]
 tests/unit/neuron/test_adaptation_sfa.py::test_sfa_applies_before_threshold_and_reduces_spiking_probability PASSED [ 44%]
-tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain FAILED [ 45%]
+tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain PASSED [ 45%]
 tests/unit/neuron/test_contract_conformance.py::test_torch_contract_invariants_order_and_time_step_end_of_step PASSED [ 45%]
 tests/unit/neuron/test_contract_conformance.py::test_torch_and_tf_contract_conformance_with_same_artificial_input_and_tolerance SKIPPED [ 45%]
 tests/unit/neuron/test_integration_stability.py::test_forward_clamps_non_finite_dendritic_sum PASSED [ 46%]
@@ -223,7 +223,7 @@ tests/unit/test_learning_mode_consistency.py::test_network_accepts_mode_string P
 tests/unit/test_learning_mode_consistency.py::test_network_rejects_invalid_mode PASSED [ 73%]
 tests/unit/test_public_import_surface.py::test_public_all_exports_are_importable PASSED [ 73%]
 tests/unit/test_public_import_surface.py::test_v2_surface_is_canonical_and_instantiable PASSED [ 74%]
-tests/unit/test_public_import_surface.py::test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0 FAILED [ 74%]
+tests/unit/test_public_import_surface.py::test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0 PASSED [ 74%]
 tests/unit/test_public_import_surface.py::test_telemetry_controller_basic_flow PASSED [ 74%]
 tests/unit/test_run_pyfolds_runner.py::test_runner_logs_syntax_error PASSED [ 75%]
 tests/unit/test_run_pyfolds_runner.py::test_runner_logs_runtime_error_and_propagates_exit_code PASSED [ 75%]
@@ -299,72 +299,6 @@ tests/unit/wave/test_wave_neuron.py::test_wave_outputs_quadrature_and_phase_rang
 tests/unit/wave/test_wave_neuron.py::test_cooperative_integration_uses_multiple_dendrites PASSED [ 99%]
 tests/unit/wave/test_wave_neuron.py::test_wave_step_id_thread_safe_increment PASSED [100%]
 
-=================================== FAILURES ===================================
-___ TestAdvancedNeuron.test_backprop_disabled_does_not_apply_dendritic_gain ____
-tests/integration/test_neuron_advanced.py:61: in test_backprop_disabled_does_not_apply_dendritic_gain
-    assert torch.allclose(out_disabled["v_dend"], out_base["v_dend"])
-E   assert False
-E    +  where False = <built-in method allclose of type object at 0x7f54a32e5920>(tensor([[0.0172]]), tensor([[0.0086]]))
-E    +    where <built-in method allclose of type object at 0x7f54a32e5920> = torch.allclose
-______ TestAdaptationMixin.test_adaptation_respects_string_inference_mode ______
-tests/unit/advanced/test_adaptation.py:78: in test_adaptation_respects_string_inference_mode
-    out = neuron.forward(x, mode='inference')
-src/pyfolds/advanced/backprop.py:123: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/advanced/short_term.py:135: in forward
-    output = super().forward(x_modulated, _x_pre_stp=x, **kwargs)  # type: ignore
-src/pyfolds/advanced/stdp.py:200: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/advanced/adaptation.py:81: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/advanced/refractory.py:124: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/utils/validation.py:77: in wrapper
-    return func(self, x, *args, **kwargs)
-src/pyfolds/core/neuron.py:495: in forward
-    "mode": effective_mode.value,
-E   AttributeError: 'str' object has no attribute 'value'
-_______ TestAdaptationMixin.test_forward_updates_u_for_downstream_mixins _______
-tests/unit/advanced/test_adaptation.py:92: in test_forward_updates_u_for_downstream_mixins
-    out = neuron.forward(x, mode='online')
-src/pyfolds/advanced/backprop.py:123: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/advanced/short_term.py:135: in forward
-    output = super().forward(x_modulated, _x_pre_stp=x, **kwargs)  # type: ignore
-src/pyfolds/advanced/stdp.py:200: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/advanced/adaptation.py:81: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/advanced/refractory.py:124: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/utils/validation.py:77: in wrapper
-    return func(self, x, *args, **kwargs)
-src/pyfolds/core/neuron.py:495: in forward
-    "mode": effective_mode.value,
-E   AttributeError: 'str' object has no attribute 'value'
-_____ test_bap_amplification_changes_dendritic_computation_and_clamps_gain _____
-tests/unit/neuron/test_backprop_bap.py:14: in test_bap_amplification_changes_dendritic_computation_and_clamps_gain
-    baseline = base_neuron.forward(x, mode="inference")
-src/pyfolds/advanced/backprop.py:123: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/advanced/short_term.py:135: in forward
-    output = super().forward(x_modulated, _x_pre_stp=x, **kwargs)  # type: ignore
-src/pyfolds/advanced/stdp.py:200: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/advanced/adaptation.py:81: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/advanced/refractory.py:124: in forward
-    output = super().forward(x, **kwargs)
-src/pyfolds/utils/validation.py:77: in wrapper
-    return func(self, x, *args, **kwargs)
-src/pyfolds/core/neuron.py:495: in forward
-    "mode": effective_mode.value,
-E   AttributeError: 'str' object has no attribute 'value'
-___ test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0 ____
-tests/unit/test_public_import_surface.py:36: in test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0
-    assert not hasattr(pyfolds, "MPJRDConfig")
-E   AssertionError: assert not True
-E    +  where True = hasattr(pyfolds, 'MPJRDConfig')
 =============================== warnings summary ===============================
 examples/mnist_file_logging.py:23
 examples/mnist_file_logging.py:23
@@ -568,7 +502,7 @@ tests/unit/neuron/test_time_counter.py::test_time_counter_increments_at_end_of_f
     cfg = pyfolds.MPJRDConfig(t_refrac_abs=2.0)
 
 tests/unit/serialization/test_foldio.py::test_fold_reader_exit_closes_file_even_if_mmap_close_fails
-  /workspace/pyfolds/tests/unit/serialization/test_foldio.py:340: RuntimeWarning: Erro ao fechar mmap de '/tmp/pytest-of-root/pytest-0/test_fold_reader_exit_closes_f0/cleanup.fold': forced close error
+  /workspace/pyfolds/tests/unit/serialization/test_foldio.py:340: RuntimeWarning: Erro ao fechar mmap de '/tmp/pytest-of-root/pytest-1/test_fold_reader_exit_closes_f0/cleanup.fold': forced close error
     reader.__exit__(None, None, None)
 
 tests/unit/test_backend_contracts.py::test_import_and_object_construction_v1_v2
@@ -595,45 +529,40 @@ tests/unit/test_public_import_surface.py::test_public_all_exports_are_importable
   /workspace/pyfolds/tests/unit/test_public_import_surface.py:15: DeprecationWarning: 'pyfolds.MPJRDNetwork' está depreciado e será removido em versão futura; use 'pyfolds.SpikingNetwork'
     missing = [name for name in pyfolds.__all__ if not hasattr(pyfolds, name)]
 
-tests/unit/test_public_import_surface.py::test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0
-  /workspace/pyfolds/tests/unit/test_public_import_surface.py:36: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
-    assert not hasattr(pyfolds, "MPJRDConfig")
-
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 -- generated xml file: /workspace/pyfolds/outputs/test_logs/pytest-junit.xml ---
 ============================= slowest 25 durations =============================
-2.65s call     tests/unit/utils/test_utils.py::TestLogging::test_import_pyfolds_does_not_add_stream_handler
-0.85s call     tests/integration/test_mnist_file_logging.py::test_training_script_runs_end_to_end
-0.61s call     tests/unit/test_run_pyfolds_runner.py::test_runner_timeout_watchdog
-0.38s call     tests/unit/test_run_pyfolds_runner.py::test_runner_retry_and_metrics_csv
-0.23s call     tests/unit/test_run_pyfolds_runner.py::test_runner_logs_syntax_error
-0.22s call     tests/unit/test_run_pyfolds_runner.py::test_runner_logs_runtime_error_and_propagates_exit_code
-0.22s call     tests/unit/test_run_pyfolds_runner.py::test_runner_tee_prints_progress
-0.12s call     tests/performance/test_memory_usage.py::TestMemoryUsage::test_memory_leak
-0.11s call     tests/unit/advanced/test_short_term.py::TestShortTermDynamicsMixin::test_tsodyks_markram_recovery
-0.09s call     tests/unit/serialization/test_foldio.py::test_ecc_roundtrip_if_available
-0.08s call     tests/integration/test_training_loop.py::TestTrainingLoop::test_batch_training
-0.05s call     tests/unit/core/test_neuron_v2.py::test_step_id_thread_safe_increment_v2
+3.76s call     tests/unit/utils/test_utils.py::TestLogging::test_import_pyfolds_does_not_add_stream_handler
+1.01s call     tests/integration/test_mnist_file_logging.py::test_training_script_runs_end_to_end
+0.67s call     tests/unit/test_run_pyfolds_runner.py::test_runner_timeout_watchdog
+0.46s call     tests/unit/test_run_pyfolds_runner.py::test_runner_retry_and_metrics_csv
+0.29s call     tests/unit/test_run_pyfolds_runner.py::test_runner_logs_syntax_error
+0.28s call     tests/unit/test_run_pyfolds_runner.py::test_runner_tee_prints_progress
+0.27s call     tests/unit/test_run_pyfolds_runner.py::test_runner_logs_runtime_error_and_propagates_exit_code
+0.16s call     tests/unit/advanced/test_short_term.py::TestShortTermDynamicsMixin::test_tsodyks_markram_recovery
+0.16s call     tests/performance/test_memory_usage.py::TestMemoryUsage::test_memory_leak
+0.14s call     tests/test_corruption_detection.py::test_invalid_magic_is_rejected
+0.12s call     tests/unit/serialization/test_foldio.py::test_ecc_roundtrip_if_available
+0.11s call     tests/integration/test_training_loop.py::TestTrainingLoop::test_batch_training
+0.08s call     tests/unit/core/test_neuron_v2.py::test_step_id_thread_safe_increment_v2
+0.06s call     tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_full_pipeline
+0.06s call     tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain
 0.05s call     tests/unit/serialization/test_foldio.py::test_fold_roundtrip_preserves_state_dict_after_forward_steps
-0.04s call     tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain
+0.05s call     tests/unit/wave/test_wave_neuron.py::test_wave_step_id_thread_safe_increment
 0.04s call     tests/unit/utils/test_utils.py::TestMath::test_xavier_init_gain
-0.04s call     tests/unit/wave/test_wave_neuron.py::test_wave_step_id_thread_safe_increment
-0.03s call     tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_full_pipeline
-0.03s call     tests/unit/serialization/test_foldio.py::test_fold_roundtrip_and_peek
-0.03s call     tests/test_fold_corruption.py::test_fold_corruption_is_detected
-0.02s call     tests/test_corruption_detection.py::test_bit_flip_is_detected
-0.02s call     tests/unit/neuron/test_time_counter.py::test_time_counter_increments_at_end_of_forward_step
-0.02s call     tests/unit/neuron/test_adaptation_sfa.py::test_sfa_applies_before_threshold_and_reduces_spiking_probability
-0.02s call     tests/unit/serialization/test_foldio.py::test_training_then_save_with_telemetry_and_history_and_nuclear_arrays
-0.02s call     tests/unit/neuron/test_refractory.py::test_absolute_refractory_is_inviolable
-0.02s call     tests/unit/serialization/test_foldio.py::test_fold_manifest_includes_governance_sections
+0.04s call     tests/unit/serialization/test_foldio.py::test_fold_roundtrip_and_peek
+0.03s call     tests/unit/neuron/test_refractory.py::test_absolute_refractory_is_inviolable
+0.03s call     tests/test_corruption_detection.py::test_bit_flip_is_detected
+0.03s call     tests/unit/neuron/test_time_counter.py::test_time_counter_increments_at_end_of_forward_step
+0.03s call     tests/unit/neuron/test_adaptation_sfa.py::test_sfa_applies_before_threshold_and_reduces_spiking_probability
+0.03s call     tests/unit/serialization/test_foldio.py::test_training_then_save_with_telemetry_and_history_and_nuclear_arrays
+0.03s call     tests/unit/core/test_monitoring_and_checkpoint.py::test_versioned_checkpoint_save_and_load
 =========================== short test summary info ============================
-FAILED tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain - assert False
- +  where False = <built-in method allclose of type object at 0x7f54a32e5920>(tensor([[0.0172]]), tensor([[0.0086]]))
- +    where <built-in method allclose of type object at 0x7f54a32e5920> = torch.allclose
-FAILED tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_respects_string_inference_mode - AttributeError: 'str' object has no attribute 'value'
-FAILED tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_forward_updates_u_for_downstream_mixins - AttributeError: 'str' object has no attribute 'value'
-FAILED tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain - AttributeError: 'str' object has no attribute 'value'
-FAILED tests/unit/test_public_import_surface.py::test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0 - AssertionError: assert not True
- +  where True = hasattr(pyfolds, 'MPJRDConfig')
-===== 5 failed, 279 passed, 7 skipped, 3 deselected, 65 warnings in 11.49s =====
+SKIPPED [1] tests/integration/test_temporal_sequence_stability.py:57: TensorFlow não instalado neste ambiente.
+SKIPPED [1] tests/unit/advanced/test_short_term.py:95: CUDA not available
+SKIPPED [1] tests/unit/neuron/test_contract_conformance.py:30: could not import 'tensorflow': No module named 'tensorflow'
+SKIPPED [1] tests/unit/serialization/test_foldio.py:451: could not import 'cryptography.hazmat.primitives.serialization': No module named 'cryptography'
+SKIPPED [1] tests/unit/test_backend_contracts.py:81: TensorFlow não instalado neste ambiente.
+SKIPPED [1] tests/unit/test_tf_backend.py:25: could not import 'tensorflow': No module named 'tensorflow'
+SKIPPED [1] tests/unit/test_tf_backend.py:40: could not import 'tensorflow': No module named 'tensorflow'
+========== 284 passed, 7 skipped, 4 deselected, 64 warnings in 14.60s ==========

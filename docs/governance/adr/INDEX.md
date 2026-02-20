@@ -59,6 +59,7 @@
 | ADR-040 | Governança de execução: issues no HUB e plano ordenado 1→4 | Ativo | 2026-02-19 | [ADR-040-governanca-fluxo-issues-no-hub-e-planos-1-a-4.md](ADR-040-governanca-fluxo-issues-no-hub-e-planos-1-a-4.md) |
 | ADR-041 | Ordem de execução de mixins, homeostase pós-refratário e contrato de saída de layer | Ativo | 2026-02-20 | [ADR-041-ordem-de-execucao-de-mixins-homeostase-pos-refratario-e-contrato-de-saida-de-layer.md](ADR-041-ordem-de-execucao-de-mixins-homeostase-pos-refratario-e-contrato-de-saida-de-layer.md) |
 | ADR-042 | Governança de execução integral de testes e dossiê de qualidade | Ativo | 2026-02-20 | [ADR-042-governanca-de-execucao-integral-de-testes-e-dossie-de-qualidade.md](ADR-042-governanca-de-execucao-integral-de-testes-e-dossie-de-qualidade.md) |
+| ADR-043 | Auditoria final integral de testes, imports e mecanismos | Ativo | 2026-02-20 | [ADR-043-auditoria-final-integral-testes-imports-e-mecanismos.md](ADR-043-auditoria-final-integral-testes-imports-e-mecanismos.md) |
 
 ## ADRs legados e superseded
 

@@ -13,20 +13,17 @@ adr_vinculada: "ADR-042"
 # ISSUE-010: Falhas regressivas na suíte completa de testes
 
 ## Objetivo
-Executar a suíte integral de testes com rastreabilidade completa, identificar falhas regressivas atuais e consolidar plano de remediação orientado a risco.
+Executar a suíte integral de testes com rastreabilidade completa, eliminar falhas regressivas e consolidar o fechamento da ISSUE-010.
 
 ## Contexto Técnico
-A suíte completa (`pytest tests -v`) foi executada após instalação de dependências e pacote local. Resultado consolidado:
+A suíte completa (`pytest tests -v`) foi executada após instalação de dependências e pacote local. Resultado consolidado (execução final):
 - 291 testes selecionados
-- 279 aprovados
-- 5 falhos
+- 284 aprovados
+- 0 falhos
 - 7 pulados
-- 11.49s de execução
+- 16.39s de execução
 
-Falhas concentram-se em:
-1. integração/neuron advanced (ganho dendrítico com backprop desligado),
-2. adaptation mixin com `inference_mode` string,
-3. contrato de alias de import público legado.
+Não houve falhas regressivas abertas na rodada final de validação.
 
 ## Análise Técnica
 ### Evidências produzidas
@@ -38,11 +35,7 @@ Falhas concentram-se em:
 - `outputs/test_logs/check_links.log`
 
 ### Falhas capturadas
-- `tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain`
-- `tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_respects_string_inference_mode`
-- `tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_forward_updates_u_for_downstream_mixins`
-- `tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain`
-- `tests/unit/test_public_import_surface.py::test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0`
+- Nenhuma falha capturada na execução final integral (`0 failed`).
 
 ## Requisitos Funcionais
 - [x] RF-01: Executar suíte completa com log integral.
@@ -105,3 +98,9 @@ evidencias:
 ## Atualização pós-correção
 - [x] Regressões corrigidas e validadas em `outputs/test_logs/pytest_full_fixed.log` (284 passed, 7 skipped).
 - [x] Treino MNIST de 50 épocas executado para modelos `py` e `wave` com logs em `outputs/test_logs/mnist_train_*_50ep_console.log`.
+
+
+## Status final
+- [x] ISSUE-010 concluída com sucesso.
+- [x] Evidências finais atualizadas em `outputs/test_logs/pytest_full.log` e `outputs/test_logs/pytest-junit.xml`.
+- [x] Relatório final atualizado em `docs/RELATORIO_FINAL_EXECUCAO_TESTES_ISSUE-010.md`.
