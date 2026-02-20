@@ -603,6 +603,7 @@ class "tests.unit.advanced.test_backprop.TestBackpropMixin" {
 }
 
 class "tests.unit.advanced.test_inhibition.TestInhibitionLayer" {
+  +test_apply_inhibition_accepts_u_values()
   +test_e2i_initialization_is_deterministic()
   +test_forward_feedforward()
   +test_initialization()
@@ -634,6 +635,7 @@ class "tests.unit.advanced.test_stdp.TestSTDPMixin" {
   +test_pre_spike_updates_trace()
   +test_should_apply_stdp()
   +test_stdp_input_source_raw_vs_stp()
+  +test_stdp_update_is_batch_size_invariant_for_identical_samples()
   +test_stdp_updates_underlying_synapses_online()
   +test_trace_decay()
 }

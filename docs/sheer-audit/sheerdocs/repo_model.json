@@ -481,7 +481,7 @@
       "name": "reset_backprop",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.reset_backprop",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 142,
+      "line": 140,
       "doc": "Reseta estado de backpropagação.",
       "params": [
         "self"
@@ -496,7 +496,7 @@
       "name": "get_backprop_metrics",
       "qname": "src.pyfolds.advanced.backprop.BackpropMixin.get_backprop_metrics",
       "file": "src/pyfolds/advanced/backprop.py",
-      "line": 149,
+      "line": 147,
       "doc": "Retorna métricas de backpropagação.",
       "params": [
         "self"
@@ -640,7 +640,7 @@
       "name": "get_inhibition_metrics",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer.get_inhibition_metrics",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 300,
+      "line": 312,
       "doc": "Retorna métricas da inibição.\n\nReturns:\n    dict: Dicionário com métricas",
       "params": [
         "self"
@@ -655,7 +655,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionLayer.extra_repr",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 319,
+      "line": 331,
       "doc": null,
       "params": [
         "self"
@@ -670,7 +670,7 @@
       "name": "InhibitionMixin",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 325,
+      "line": 337,
       "doc": "Mixin para integrar inibição em layers.\n\nNOTA: Este mixin opera no nível de Layer, não de neurônio individual.\nDeve ser usado com MPJRDLayer ou classes derivadas.\n\nUso:\n    class InhibitedLayer(InhibitionMixin, MPJRDLayer):\n        def __init__(self, n_neurons, cfg):\n            super().__init__(n_neurons, cfg)\n            self._init_inhibition()",
       "params": [],
       "returns": null,
@@ -683,7 +683,7 @@
       "name": "_init_inhibition",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin._init_inhibition",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 339,
+      "line": 351,
       "doc": "Inicializa camada inibitória.\n\nArgs:\n    n_inhibitory: Número de neurônios inibitórios (padrão: n_neurons//4)\n    lateral_strength: Força da inibição lateral\n    feedforward_strength: Força da inibição feedforward\n    feedback_strength: Força da inibição feedback\n    lateral_sigma: Largura do kernel gaussiano\n    trainable_i2e: Define se I→E é treinável (default usa cfg)\n    seed: Seed opcional para conectividade",
       "params": [
         "self",
@@ -705,7 +705,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin.forward",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 378,
+      "line": 390,
       "doc": "Forward com inibição aplicada.\n\nArgs:\n    x: Tensor de entrada [batch, n_neurons, dendrites, synapses]\n    **kwargs: Argumentos adicionais para a camada base\n\nReturns:\n    Dict com spikes após inibição",
       "params": [
         "self",
@@ -721,7 +721,7 @@
       "name": "get_inhibition_metrics",
       "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin.get_inhibition_metrics",
       "file": "src/pyfolds/advanced/inhibition.py",
-      "line": 405,
+      "line": 417,
       "doc": "Retorna métricas da inibição desta layer.",
       "params": [
         "self"
@@ -849,7 +849,7 @@
       "name": "reset_refractory",
       "qname": "src.pyfolds.advanced.refractory.RefractoryMixin.reset_refractory",
       "file": "src/pyfolds/advanced/refractory.py",
-      "line": 163,
+      "line": 176,
       "doc": "Reseta o estado refratário.",
       "params": [
         "self"
@@ -864,7 +864,7 @@
       "name": "get_refractory_metrics",
       "qname": "src.pyfolds.advanced.refractory.RefractoryMixin.get_refractory_metrics",
       "file": "src/pyfolds/advanced/refractory.py",
-      "line": 168,
+      "line": 181,
       "doc": "Retorna métricas do período refratário.\n\nReturns:\n    dict: Dicionário com métricas",
       "params": [
         "self"
@@ -942,7 +942,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.short_term.ShortTermDynamicsMixin.forward",
       "file": "src/pyfolds/advanced/short_term.py",
-      "line": 105,
+      "line": 107,
       "doc": "Forward pass com dinâmica de curto prazo.\n\n✅ SEMÂNTICA GLOBAL (agregado sobre batch)\n✅ CORRIGIDO: sem criação de tensores desnecessários\n\nArgs:\n    x: Tensor de entrada [B, D, S]\n    **kwargs: Argumentos adicionais (dt, etc.)\n\nReturns:\n    Dict com spikes, potenciais e métricas de STP",
       "params": [
         "self",
@@ -1057,7 +1057,7 @@
       "name": "_should_apply_stdp",
       "qname": "src.pyfolds.advanced.stdp.STDPMixin._should_apply_stdp",
       "file": "src/pyfolds/advanced/stdp.py",
-      "line": 142,
+      "line": 143,
       "doc": "Determina se STDP deve ser aplicado no passo atual.\n\n:param mode: Modo explícito de aprendizado. Se ``None``, usa\n    ``self.mode`` quando disponível.\n:returns: ``True`` quando STDP está habilitado e o modo é compatível.",
       "params": [
         "self",
@@ -1073,7 +1073,7 @@
       "name": "forward",
       "qname": "src.pyfolds.advanced.stdp.STDPMixin.forward",
       "file": "src/pyfolds/advanced/stdp.py",
-      "line": 158,
+      "line": 159,
       "doc": "Executa ``forward`` e acopla atualização de STDP quando habilitado.\n\n:param x: Entrada com shape ``[B, D, S]``.\n:param kwargs: Argumentos adicionais propagados ao ``forward`` base.\n    Chaves relevantes:\n\n    - ``mode``: modo de aprendizado.\n    - ``dt``: passo temporal para o decaimento dos traços.\n\n:returns: Dicionário de saída do neurônio acrescido de métricas STDP.\n\nExample\n-------\n>>> import torch\n>>> class _Base:\n...     def __init__(self):\n...         self.mode = LearningMode.ONLINE\n...     def forward(self, x, **kwargs):\n...         return {\"spikes\": torch.ones(x.shape[0])}\n>>> class _Cfg:\n...     n_dendrites = 1\n...     n_synapses_per_dendrite = 2\n...     i_min = 0.0\n...     i_max = 1.0\n...     spike_threshold = 0.0\n...     stdp_trace_threshold = 0.0\n>>> class _Neuron(STDPMixin, _Base):\n...     def __init__(self):\n...         _Base.__init__(self)\n...         self.cfg = _Cfg()\n...         self.I = torch.zeros(1, 2)\n...         self._init_stdp(plasticity_mode=\"stdp\")\n>>> n = _Neuron()\n>>> out = n.forward(torch.ones(1, 1, 2))\n>>> bool(out[\"stdp_applied\"].item())\nTrue\n>>> n.I.shape\ntorch.Size([1, 2])",
       "params": [
         "self",
@@ -3121,7 +3121,8 @@
         "reward",
         "mode",
         "collect_stats",
-        "dt"
+        "dt",
+        "defer_homeostasis"
       ],
       "returns": null,
       "bases": [],
@@ -3135,7 +3136,7 @@
       "name": "step",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.step",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 491,
+      "line": 493,
       "doc": "API explícita de passo temporal (compatível com README).",
       "params": [
         "self",
@@ -3155,7 +3156,7 @@
       "name": "apply_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 511,
+      "line": 513,
       "doc": "Aplica plasticidade acumulada (deferred updates).\n\n✅ CORRIGIDO: Passa mode para as sinapses",
       "params": [
         "self",
@@ -3174,7 +3175,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.sleep",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 597,
+      "line": 599,
       "doc": "Ciclo de sono: consolida sinapses.",
       "params": [
         "self",
@@ -3192,7 +3193,7 @@
       "name": "to",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.to",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 622,
+      "line": 624,
       "doc": "Move neurônio para device e valida consistência.",
       "params": [
         "self",
@@ -3208,7 +3209,7 @@
       "name": "get_metrics",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.get_metrics",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 631,
+      "line": 633,
       "doc": "Retorna métricas consolidadas do neurônio.",
       "params": [
         "self"
@@ -3223,7 +3224,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.extra_repr",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 674,
+      "line": 676,
       "doc": null,
       "params": [
         "self"
@@ -3717,7 +3718,7 @@
       "name": "_prepare_input",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer._prepare_input",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 239,
+      "line": 244,
       "doc": "Prepara entrada para o formato [batch, neurons, dendrites, synapses].\n\nArgs:\n    x: Tensor em vários formatos possíveis\n\nReturns:\n    Tensor no formato [batch, neurons, dendrites, synapses]\n\nRaises:\n    ValueError: Se formato for inválido",
       "params": [
         "self",
@@ -3733,7 +3734,7 @@
       "name": "set_mode",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.set_mode",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 303,
+      "line": 308,
       "doc": "Define modo de aprendizado para todos os neurônios.",
       "params": [
         "self",
@@ -3749,7 +3750,7 @@
       "name": "apply_batch_update",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.apply_batch_update",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 310,
+      "line": 315,
       "doc": "Aplica plasticidade acumulada em todos os neurônios.\nÚtil no modo BATCH após processar múltiplos exemplos.",
       "params": [
         "self",
@@ -3765,7 +3766,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.sleep",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 318,
+      "line": 323,
       "doc": "Ciclo de sono para consolidação two-factor em todos neurônios.\n\nArgs:\n    duration: Duração do sono em unidades de tempo",
       "params": [
         "self",
@@ -3781,7 +3782,7 @@
       "name": "get_all_metrics",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.get_all_metrics",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 328,
+      "line": 333,
       "doc": "Retorna métricas de todos os neurônios na camada.\n\nReturns:\n    Lista de dicionários com métricas de cada neurônio",
       "params": [
         "self"
@@ -3796,7 +3797,7 @@
       "name": "get_layer_metrics",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.get_layer_metrics",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 337,
+      "line": 342,
       "doc": "Retorna métricas agregadas da camada.\n\nReturns:\n    Dicionário com estatísticas da camada",
       "params": [
         "self"
@@ -3811,7 +3812,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.layers.layer.MPJRDLayer.extra_repr",
       "file": "src/pyfolds/layers/layer.py",
-      "line": 369,
+      "line": 374,
       "doc": "Representação string da camada.",
       "params": [
         "self"
@@ -9637,12 +9638,27 @@
       "decorators": []
     },
     {
+      "id": "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_apply_inhibition_accepts_u_values",
+      "kind": "method",
+      "name": "test_apply_inhibition_accepts_u_values",
+      "qname": "tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_apply_inhibition_accepts_u_values",
+      "file": "tests/unit/advanced/test_inhibition.py",
+      "line": 62,
+      "doc": "apply_inhibition deve suportar saída de layer com `u_values`.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_e2i_initialization_is_deterministic",
       "kind": "method",
       "name": "test_e2i_initialization_is_deterministic",
       "qname": "tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_e2i_initialization_is_deterministic",
       "file": "tests/unit/advanced/test_inhibition.py",
-      "line": 62,
+      "line": 79,
       "doc": "E→I should be reproducible across instances.",
       "params": [
         "self"
@@ -9657,7 +9673,7 @@
       "name": "TestInhibitionMixin",
       "qname": "tests.unit.advanced.test_inhibition.TestInhibitionMixin",
       "file": "tests/unit/advanced/test_inhibition.py",
-      "line": 75,
+      "line": 92,
       "doc": "Tests for InhibitionMixin guard clauses.",
       "params": [],
       "returns": null,
@@ -9670,7 +9686,7 @@
       "name": "test_forward_requires_initialized_inhibition",
       "qname": "tests.unit.advanced.test_inhibition.TestInhibitionMixin.test_forward_requires_initialized_inhibition",
       "file": "tests/unit/advanced/test_inhibition.py",
-      "line": 78,
+      "line": 95,
       "doc": "Forward should fail fast when inhibition layer is missing.",
       "params": [
         "self"
@@ -10020,6 +10036,21 @@
       "file": "tests/unit/advanced/test_stdp.py",
       "line": 133,
       "doc": "classic usa pre_spike; current preserva regra legada dependente de post.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_stdp_update_is_batch_size_invariant_for_identical_samples",
+      "kind": "method",
+      "name": "test_stdp_update_is_batch_size_invariant_for_identical_samples",
+      "qname": "tests.unit.advanced.test_stdp.TestSTDPMixin.test_stdp_update_is_batch_size_invariant_for_identical_samples",
+      "file": "tests/unit/advanced/test_stdp.py",
+      "line": 172,
+      "doc": "Delta sináptico médio não deve escalar linearmente com batch.",
       "params": [
         "self"
       ],
@@ -20472,6 +20503,12 @@
     {
       "type": "CONTAINS",
       "src": "cls:tests.unit.advanced.test_inhibition.TestInhibitionLayer",
+      "dst": "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_apply_inhibition_accepts_u_values",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:tests.unit.advanced.test_inhibition.TestInhibitionLayer",
       "dst": "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_e2i_initialization_is_deterministic",
       "meta": {}
     },
@@ -20665,6 +20702,12 @@
       "type": "CONTAINS",
       "src": "cls:tests.unit.advanced.test_stdp.TestSTDPMixin",
       "dst": "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_ltd_rule_classic_vs_current",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:tests.unit.advanced.test_stdp.TestSTDPMixin",
+      "dst": "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_stdp_update_is_batch_size_invariant_for_identical_samples",
       "meta": {}
     },
     {
@@ -23161,8 +23204,8 @@
   "findings": [],
   "metrics": {
     "python_files": 134,
-    "symbols": 954,
-    "edges": 1433,
+    "symbols": 956,
+    "edges": 1435,
     "findings": 0,
     "internal_import_edges": 101
   }

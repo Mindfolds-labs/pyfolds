@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 134,
-    "symbols": 954,
-    "edges": 1433,
+    "symbols": 956,
+    "edges": 1435,
     "findings": 0,
     "internal_import_edges": 101
   },
@@ -227,7 +227,7 @@
           "id": "cls:src.pyfolds.advanced.inhibition.InhibitionMixin",
           "name": "InhibitionMixin",
           "qname": "src.pyfolds.advanced.inhibition.InhibitionMixin",
-          "line": 325,
+          "line": 337,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.advanced.inhibition.InhibitionMixin._init_inhibition",
@@ -3485,6 +3485,7 @@
           "line": 8,
           "bases": [],
           "methods": [
+            "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_apply_inhibition_accepts_u_values",
             "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_e2i_initialization_is_deterministic",
             "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_forward_feedforward",
             "mtd:tests.unit.advanced.test_inhibition.TestInhibitionLayer.test_initialization",
@@ -3495,7 +3496,7 @@
           "id": "cls:tests.unit.advanced.test_inhibition.TestInhibitionMixin",
           "name": "TestInhibitionMixin",
           "qname": "tests.unit.advanced.test_inhibition.TestInhibitionMixin",
-          "line": 75,
+          "line": 92,
           "bases": [],
           "methods": [
             "mtd:tests.unit.advanced.test_inhibition.TestInhibitionMixin.test_forward_requires_initialized_inhibition"
@@ -3581,6 +3582,7 @@
             "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_pre_spike_updates_trace",
             "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_should_apply_stdp",
             "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_stdp_input_source_raw_vs_stp",
+            "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_stdp_update_is_batch_size_invariant_for_identical_samples",
             "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_stdp_updates_underlying_synapses_online",
             "mtd:tests.unit.advanced.test_stdp.TestSTDPMixin.test_trace_decay"
           ]
