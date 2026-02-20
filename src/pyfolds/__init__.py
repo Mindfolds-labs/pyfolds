@@ -7,7 +7,7 @@ v1 names as compatibility aliases with deprecation warnings.
 from typing import Any, Dict
 import warnings
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 # ===== CORE V2 SURFACE =====
 from .core.config import MPJRDConfig as NeuronConfig
@@ -36,6 +36,7 @@ from .serialization import (
     ECCProtector,
     ecc_from_protection,
 )
+from .bridge import MindDispatcher
 from .monitoring import (
     HealthStatus,
     ModelIntegrityMonitor,
@@ -130,6 +131,7 @@ __all__ = [
     "MindControlSink",
     "MutationCommand",
     "MutationQueue",
+    "MindDispatcher",
     # Types/helpers
     "LearningMode",
     "ConnectionType",
