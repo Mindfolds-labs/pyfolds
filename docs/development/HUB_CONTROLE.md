@@ -43,6 +43,8 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-003 | Concluída | Plano 1: Reposicionar issues no fluxo oficial do HUB | Codex | 2026-02-19 |
 | ISSUE-004 | Concluída | Plano 2: Sanear links e navegação documental | Codex | 2026-02-19 |
 | ISSUE-006 | Concluída | Plano 4: Consolidar correções de código e testes mínimos | Codex | 2026-02-19 |
+| ISSUE-010 | Concluída | Falhas regressivas na suíte completa de testes | Codex | 2026-02-20 |
+| ISSUE-011 | Concluída | Micro-otimização do forward e análise dos testes pulados | Codex | 2026-02-20 |
 | ISSUE-005 | Concluída | Plano 3: Executar validações e registrar evidências no HUB | Codex | 2026-02-19 |
 <!-- HUB:QUEUE:END -->
 
@@ -102,6 +104,26 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > **Prioridade:** `Alta` · **Área:** `Core/Testes/Docs`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-006-plano-4-consolidar-correcoes-codigo-testes.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-006-plano-4-consolidar-correcoes-codigo-testes.md)
+
+> [!TIP]
+> **ISSUE-010** · Falhas regressivas na suíte completa de testes
+>
+> **Status:** ✅ Concluída  
+> **Responsável:** Codex  
+> **Data:** 2026-02-20  
+> **Prioridade:** `Alta` · **Área:** `Qualidade/Testes`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-010-falhas-regressivas-na-su-te-completa-de-testes.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-010-falhas-regressivas-na-suite-completa-de-testes.md)
+
+> [!TIP]
+> **ISSUE-011** · Micro-otimização do forward e análise dos testes pulados
+>
+> **Status:** ✅ Concluída  
+> **Responsável:** Codex  
+> **Data:** 2026-02-20  
+> **Prioridade:** `Alta` · **Área:** `Qualidade/Performance`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-011-otimizacao-forward-e-analise-de-skips.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-011-otimizacao-forward-e-analise-de-skips.md)
 
 > [!TIP]
 > **ISSUE-005** · Plano 3: Executar validações e registrar evidências no HUB

@@ -313,9 +313,12 @@ class MPJRDNeuron(BaseNeuron):
         self._set_refractory_state(False)
 
         # ===== 1. INTEGRAÇÃO DENDRÍTICA =====
-        v_dend = torch.zeros(B, D, device=device)
-        for d_idx, dend in enumerate(self.dendrites):
-            v_dend[:, d_idx] = dend(x[:, d_idx, :])
+        # Micro-otimização: evita alocação + escrita indexada em loop,
+        # preservando semântica e shape [B, D].
+        dendrite_outputs = [
+            dend(x[:, d_idx, :]) for d_idx, dend in enumerate(self.dendrites)
+        ]
+        v_dend = torch.stack(dendrite_outputs, dim=1)
 
         if not torch.isfinite(v_dend).all():
             self.logger.warning(
