@@ -154,7 +154,6 @@ class PyFoldsLogger:
                     capacity_lines=circular_buffer_lines,
                     flush_interval_sec=circular_buffer_flush_interval_sec,
                     encoding="utf-8",
-                    flush_interval_sec=circular_flush_interval_sec,
                 )
             else:
                 file_handler = logging.handlers.RotatingFileHandler(

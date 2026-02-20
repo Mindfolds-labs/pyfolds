@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from enum import Enum
 from typing import Dict, List, Tuple
 
@@ -96,3 +97,45 @@ class NeuronHealthMonitor:
         if not self.alerts:
             return 100.0
         return max(0.0, 100.0 - len(self.alerts) * 10.0)
+
+
+class WeightIntegrityMonitor:
+    """Monitora integridade de pesos por hash SHA-256 em janelas periódicas.
+
+    Útil para detectar corrupção silenciosa em execuções longas (ex.: bitflips em VRAM).
+    """
+
+    def __init__(self, model: torch.nn.Module, check_every_n_steps: int = 100):
+        self.model = model
+        self.check_every = max(1, int(check_every_n_steps))
+        self.step_count = 0
+        self.last_hash = self._compute_state_hash()
+
+    def _compute_state_hash(self) -> str:
+        hasher = hashlib.sha256()
+        for key, tensor in sorted(self.model.state_dict().items()):
+            if not torch.is_tensor(tensor):
+                continue
+            t = tensor.detach().contiguous()
+            hasher.update(key.encode("utf-8"))
+            hasher.update(str(t.dtype).encode("utf-8"))
+            hasher.update(str(tuple(t.shape)).encode("utf-8"))
+            hasher.update(t.cpu().numpy().tobytes())
+        return hasher.hexdigest()
+
+    def check_integrity(self) -> Dict[str, str | bool | int]:
+        self.step_count += 1
+        if self.step_count % self.check_every != 0:
+            return {"checked": False, "step": self.step_count}
+
+        current_hash = self._compute_state_hash()
+        ok = bool(current_hash == self.last_hash)
+        result = {
+            "checked": True,
+            "step": self.step_count,
+            "ok": ok,
+            "previous_hash": self.last_hash,
+            "current_hash": current_hash,
+        }
+        self.last_hash = current_hash
+        return result

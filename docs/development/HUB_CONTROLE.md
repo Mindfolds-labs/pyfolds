@@ -47,6 +47,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-011 | Concluída | Micro-otimização do forward e análise dos testes pulados | Codex | 2026-02-20 |
 | ISSUE-012 | Concluída | Validar assinatura digital opcional e medir overhead de telemetria | Codex | 2026-02-20 |
 | ISSUE-013 | Concluída | MindControl - Cérebro Externo e Mutação em Tempo Real | Codex | 2026-02-20 |
+| ISSUE-014 | Concluída | Hardening de integridade de pesos (sanity check VRAM) | Codex | 2026-02-20 |
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 Cards (UI limpa)
@@ -145,6 +146,16 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > **Prioridade:** `Alta` · **Área:** `Core/Telemetria/Neuromodulação`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-013-mindcontrol.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-013-mindcontrol.md)
+
+> [!TIP]
+> **ISSUE-014** · Hardening de integridade de pesos (sanity check VRAM)
+>
+> **Status:** ✅ Concluída  
+> **Responsável:** Codex  
+> **Data:** 2026-02-20  
+> **Prioridade:** `Alta` · **Área:** `Segurança/Runtime`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-014-hardening-integridade-pesos-vram.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-014-hardening-integridade-pesos-vram.md)
 
 <!-- HUB:CARDS:END -->
 
