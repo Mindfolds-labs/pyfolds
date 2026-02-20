@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 135,
-    "symbols": 963,
-    "edges": 1443,
+    "symbols": 965,
+    "edges": 1445,
     "findings": 0,
     "internal_import_edges": 101
   },
@@ -973,6 +973,7 @@
             "MPJRDNeuron"
           ],
           "methods": [
+            "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2._reshape_input_for_forward",
             "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2._telemetry_forward_event",
             "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2.extra_repr",
             "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2.forward"
@@ -4718,7 +4719,7 @@
           "id": "fn:tests.unit.test_backend_contracts._tf_forward_sequence_equivalent",
           "name": "_tf_forward_sequence_equivalent",
           "qname": "tests.unit.test_backend_contracts._tf_forward_sequence_equivalent",
-          "line": 52,
+          "line": 68,
           "params": [
             "x_seq"
           ]
@@ -4734,7 +4735,7 @@
           "id": "fn:tests.unit.test_backend_contracts.test_tf_backend_conditional_shape_state_contracts",
           "name": "test_tf_backend_conditional_shape_state_contracts",
           "qname": "tests.unit.test_backend_contracts.test_tf_backend_conditional_shape_state_contracts",
-          "line": 70,
+          "line": 86,
           "params": []
         },
         {
@@ -4742,6 +4743,13 @@
           "name": "test_torch_backend_shape_and_state_contracts",
           "qname": "tests.unit.test_backend_contracts.test_torch_backend_shape_and_state_contracts",
           "line": 23,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.test_backend_contracts.test_torch_backend_v2_accepts_multidim_batch_contract",
+          "name": "test_torch_backend_v2_accepts_multidim_batch_contract",
+          "qname": "tests.unit.test_backend_contracts.test_torch_backend_v2_accepts_multidim_batch_contract",
+          "line": 54,
           "params": []
         }
       ]

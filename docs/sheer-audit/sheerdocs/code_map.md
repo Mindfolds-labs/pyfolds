@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `135`
-- Símbolos: `963`
+- Símbolos: `965`
 
 ## Módulos
 
@@ -1362,6 +1362,7 @@
   - `test_import_and_object_construction_v1_v2()`
   - `test_tf_backend_conditional_shape_state_contracts()`
   - `test_torch_backend_shape_and_state_contracts()`
+  - `test_torch_backend_v2_accepts_multidim_batch_contract()`
 
 ### `tests.unit.test_design_improvements`
 - Arquivo: `tests/unit/test_design_improvements.py`

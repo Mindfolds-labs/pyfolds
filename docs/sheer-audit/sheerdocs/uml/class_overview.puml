@@ -230,6 +230,7 @@ class "src.pyfolds.core.neuron.MPJRDNeuron" {
 }
 
 class "src.pyfolds.core.neuron_v2.MPJRDNeuronV2" {
+  +_reshape_input_for_forward()
   +_telemetry_forward_event()
   +extra_repr()
   +forward()

@@ -3332,12 +3332,28 @@
       "decorators": []
     },
     {
+      "id": "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2._reshape_input_for_forward",
+      "kind": "method",
+      "name": "_reshape_input_for_forward",
+      "qname": "src.pyfolds.core.neuron_v2.MPJRDNeuronV2._reshape_input_for_forward",
+      "file": "src/pyfolds/core/neuron_v2.py",
+      "line": 178,
+      "doc": "Normaliza input para [B, D, S], preservando batch de dimensão arbitrária.",
+      "params": [
+        "self",
+        "x"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2._telemetry_forward_event",
       "kind": "method",
       "name": "_telemetry_forward_event",
       "qname": "src.pyfolds.core.neuron_v2.MPJRDNeuronV2._telemetry_forward_event",
       "file": "src/pyfolds/core/neuron_v2.py",
-      "line": 186,
+      "line": 204,
       "doc": "Gera evento de telemetria para forward (compatível com versão base).",
       "params": [
         "self",
@@ -3356,7 +3372,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.neuron_v2.MPJRDNeuronV2.extra_repr",
       "file": "src/pyfolds/core/neuron_v2.py",
-      "line": 209,
+      "line": 227,
       "doc": "Representação string.",
       "params": [
         "self"
@@ -12914,12 +12930,25 @@
       "decorators": []
     },
     {
+      "id": "fn:tests.unit.test_backend_contracts.test_torch_backend_v2_accepts_multidim_batch_contract",
+      "kind": "function",
+      "name": "test_torch_backend_v2_accepts_multidim_batch_contract",
+      "qname": "tests.unit.test_backend_contracts.test_torch_backend_v2_accepts_multidim_batch_contract",
+      "file": "tests/unit/test_backend_contracts.py",
+      "line": 54,
+      "doc": "V2 deve aceitar entradas com batch multidimensional [..., D, S].",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "fn:tests.unit.test_backend_contracts._tf_forward_sequence_equivalent",
       "kind": "function",
       "name": "_tf_forward_sequence_equivalent",
       "qname": "tests.unit.test_backend_contracts._tf_forward_sequence_equivalent",
       "file": "tests/unit/test_backend_contracts.py",
-      "line": 52,
+      "line": 68,
       "doc": "Equivalente simples de forward_sequence para validar shape/estabilidade em tf.\n\nx_seq: [T, B, D, S]\nretorna: [T, B]",
       "params": [
         "x_seq"
@@ -12934,7 +12963,7 @@
       "name": "test_tf_backend_conditional_shape_state_contracts",
       "qname": "tests.unit.test_backend_contracts.test_tf_backend_conditional_shape_state_contracts",
       "file": "tests/unit/test_backend_contracts.py",
-      "line": 70,
+      "line": 86,
       "doc": "Teste condicional de backend tf (shape, faixa e estabilidade numérica).",
       "params": [],
       "returns": null,
@@ -16834,6 +16863,12 @@
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.core.neuron_v2.MPJRDNeuronV2",
       "dst": "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2.forward",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.neuron_v2.MPJRDNeuronV2",
+      "dst": "mtd:src.pyfolds.core.neuron_v2.MPJRDNeuronV2._reshape_input_for_forward",
       "meta": {}
     },
     {
@@ -22359,6 +22394,12 @@
     {
       "type": "CONTAINS",
       "src": "mod:tests.unit.test_backend_contracts",
+      "dst": "fn:tests.unit.test_backend_contracts.test_torch_backend_v2_accepts_multidim_batch_contract",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.test_backend_contracts",
       "dst": "fn:tests.unit.test_backend_contracts._tf_forward_sequence_equivalent",
       "meta": {}
     },
@@ -23362,8 +23403,8 @@
   "findings": [],
   "metrics": {
     "python_files": 135,
-    "symbols": 963,
-    "edges": 1443,
+    "symbols": 965,
+    "edges": 1445,
     "findings": 0,
     "internal_import_edges": 101
   }
