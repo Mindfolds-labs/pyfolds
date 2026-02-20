@@ -1,4 +1,6 @@
+import importlib
 import importlib.util
+import sys
 
 import pytest
 
@@ -10,15 +12,16 @@ def test_importing_pyfolds_still_works_without_tensorflow():
 
 
 def test_tf_backend_guard_when_tensorflow_is_missing(monkeypatch):
-    if importlib.util.find_spec("tensorflow") is not None:
-        pytest.skip("TensorFlow instalado; guard test não aplicável")
-
     monkeypatch.setattr(importlib.util, "find_spec", lambda name: None)
+    sys.modules.pop("pyfolds.tf", None)
 
     import pyfolds.tf as tf_backend
+    importlib.reload(tf_backend)
 
     with pytest.raises(ImportError, match="TensorFlow backend requested"):
         _ = tf_backend.MPJRDTFNeuronCell
+
+    sys.modules.pop("pyfolds.tf", None)
 
 
 def test_tf_cell_state_and_step_contract():
