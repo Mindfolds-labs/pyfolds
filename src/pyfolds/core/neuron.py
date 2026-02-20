@@ -131,7 +131,27 @@ class MPJRDNeuron(BaseNeuron):
         # Valida devices após inicialização
         self._validate_internal_devices()
         
+        self._install_gradient_health_monitor()
+
         self.logger.info(f"✅ Neurônio {name or id(self)} inicializado com sucesso")
+
+    def _install_gradient_health_monitor(self) -> None:
+        """Instala gancho de saneamento para gradientes com NaN/Inf."""
+        self.register_full_backward_hook(self._gradient_health_monitor)
+
+    def _gradient_health_monitor(self, module, grad_input, grad_output):
+        """Gatekeeper contra gradientes corrompidos por falhas de hardware."""
+        safe_grad_input = []
+        for grad in grad_input:
+            if grad is None:
+                safe_grad_input.append(None)
+                continue
+            if torch.isfinite(grad).all():
+                safe_grad_input.append(grad)
+            else:
+                self.logger.error("Gradiente inválido detectado; substituindo por zeros.")
+                safe_grad_input.append(torch.zeros_like(grad))
+        return tuple(safe_grad_input)
 
     def _validate_internal_devices(self) -> None:
         """Valida consistência de devices internos."""

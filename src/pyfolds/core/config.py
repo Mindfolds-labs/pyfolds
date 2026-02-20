@@ -147,6 +147,7 @@ class MPJRDConfig:
     plastic: bool = True
     defer_updates: bool = True
     consolidation_rate: float = 0.1
+    distributed_sync_on_consolidate: bool = True
     eps: float = 1e-8
     dt: float = 1.0
     device: str = "auto"

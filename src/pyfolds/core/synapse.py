@@ -223,6 +223,37 @@ class MPJRDSynapse(nn.Module):
             self.sat_time.masked_fill_(recovery_mask, 0.0)
 
     @torch.no_grad()
+    def _sync_distributed_plasticity_state(self) -> None:
+        """Sincroniza buffers plásticos após consolidação em execução distribuída."""
+        if not self.cfg.distributed_sync_on_consolidate:
+            return
+
+        if not torch.distributed.is_available() or not torch.distributed.is_initialized():
+            return
+
+        world_size = torch.distributed.get_world_size()
+        if world_size <= 1:
+            return
+
+        n_float = self.N.to(dtype=torch.float32)
+        torch.distributed.all_reduce(n_float, op=torch.distributed.ReduceOp.SUM)
+        n_float.div_(float(world_size))
+        self.N.copy_(torch.round(n_float).to(dtype=self.N.dtype))
+
+        torch.distributed.all_reduce(self.I, op=torch.distributed.ReduceOp.SUM)
+        self.I.div_(float(world_size))
+
+        torch.distributed.all_reduce(self.eligibility, op=torch.distributed.ReduceOp.SUM)
+        self.eligibility.div_(float(world_size))
+
+        protection_float = self.protection.to(dtype=torch.float32)
+        torch.distributed.all_reduce(protection_float, op=torch.distributed.ReduceOp.SUM)
+        self.protection.copy_(protection_float >= (world_size * 0.5))
+
+        torch.distributed.all_reduce(self.sat_time, op=torch.distributed.ReduceOp.SUM)
+        self.sat_time.div_(float(world_size))
+
+    @torch.no_grad()
     def consolidate(self, dt: float = 1.0) -> None:
         """
         Consolida o fator volátil em estável (two-factor consolidation).
@@ -250,6 +281,8 @@ class MPJRDSynapse(nn.Module):
         # 4. Decaimento natural de I
         if self.I.numel() > 0:
             self.I.mul_(self.cfg.i_decay_sleep)
+
+        self._sync_distributed_plasticity_state()
 
     def get_state(self) -> dict:
         """Retorna estado completo da sinapse (sem .item() para tensores)."""

@@ -1,5 +1,7 @@
 """Tests for MPJRDSynapse."""
 
+from unittest import mock
+
 import pytest
 import torch
 import pyfolds
@@ -164,3 +166,40 @@ class TestMPJRDSynapse:
 
         assert syn.I.item() < 0.0
         assert syn.eligibility.item() < 0.0
+
+
+    def test_consolidate_performs_distributed_sync_when_enabled(self, tiny_config):
+        """Consolidation should all-reduce plasticity buffers in distributed mode."""
+        from pyfolds.core import MPJRDSynapse, MPJRDConfig
+
+        cfg = MPJRDConfig(**{**tiny_config.to_dict(), "distributed_sync_on_consolidate": True})
+        syn = MPJRDSynapse(cfg, init_n=4)
+        syn.eligibility.fill_(2.0)
+
+        fake_dist = mock.Mock()
+        fake_dist.is_available.return_value = True
+        fake_dist.is_initialized.return_value = True
+        fake_dist.get_world_size.return_value = 2
+        fake_dist.ReduceOp.SUM = object()
+
+        with mock.patch.object(torch, "distributed", fake_dist):
+            syn.consolidate(dt=1.0)
+
+        assert fake_dist.all_reduce.call_count == 5
+
+    def test_consolidate_skips_distributed_sync_when_disabled(self, tiny_config):
+        """Distributed all-reduce should be skipped when config disables it."""
+        from pyfolds.core import MPJRDSynapse, MPJRDConfig
+
+        cfg = MPJRDConfig(**{**tiny_config.to_dict(), "distributed_sync_on_consolidate": False})
+        syn = MPJRDSynapse(cfg, init_n=4)
+
+        fake_dist = mock.Mock()
+        fake_dist.is_available.return_value = True
+        fake_dist.is_initialized.return_value = True
+        fake_dist.get_world_size.return_value = 2
+
+        with mock.patch.object(torch, "distributed", fake_dist):
+            syn.consolidate(dt=1.0)
+
+        fake_dist.all_reduce.assert_not_called()

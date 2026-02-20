@@ -61,6 +61,8 @@ FLAG_COMP_NONE = 0
 FLAG_COMP_ZSTD = 1
 MAX_INDEX_SIZE = 100 * 1024 * 1024
 MAX_CHUNK_SIZE = 2 * 1024 * 1024 * 1024
+MAX_SAFETENSORS_HEADER_SIZE = 64 * 1024 * 1024
+MAX_SAFETENSORS_TENSOR_COUNT = 1_000_000
 SUPPORTED_FOLD_FORMAT = "fold"
 SUPPORTED_FOLD_VERSIONS = {"1.0.0", "1.1.0", "1.2.0"}
 
@@ -114,12 +116,42 @@ def _serialize_state_dict_safetensors(state_dict: Dict[str, Any]) -> bytes:
     return safetensors_torch.save(tensors)
 
 
+def _validate_safetensors_payload(payload: bytes) -> None:
+    """Valida limites do header safetensors antes de invocar parser externo."""
+    if len(payload) < 8:
+        raise FoldSecurityError("Payload safetensors truncado (menos de 8 bytes)")
+
+    header_len = int.from_bytes(payload[:8], byteorder="little", signed=False)
+    if header_len > MAX_SAFETENSORS_HEADER_SIZE:
+        raise FoldSecurityError(
+            f"Header safetensors acima do limite defensivo: {header_len} > {MAX_SAFETENSORS_HEADER_SIZE}"
+        )
+
+    if 8 + header_len > len(payload):
+        raise FoldSecurityError("Payload safetensors inconsistente: header excede tamanho do chunk")
+
+    try:
+        header = json.loads(payload[8:8 + header_len].decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise FoldSecurityError(f"Header safetensors inválido: {exc}") from exc
+
+    if not isinstance(header, dict):
+        raise FoldSecurityError("Header safetensors inválido: estrutura JSON deve ser objeto")
+
+    if len(header) > MAX_SAFETENSORS_TENSOR_COUNT:
+        raise FoldSecurityError(
+            "Header safetensors contém entradas demais "
+            f"({len(header)} > {MAX_SAFETENSORS_TENSOR_COUNT})"
+        )
+
+
 def _deserialize_state_dict_safetensors(payload: bytes, map_location: str = "cpu") -> Dict[str, torch.Tensor]:
     if safetensors_torch is None:
         raise FoldSecurityError(
             "Desserialização segura requer pacote 'safetensors'. Instale a dependência para carregar .fold/.mind."
         )
 
+    _validate_safetensors_payload(payload)
     tensors = safetensors_torch.load(payload)
     if map_location and str(map_location) != "cpu":
         device = torch.device(map_location)
