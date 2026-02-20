@@ -151,6 +151,7 @@ class MPJRDConfig:
     eps: float = 1e-8
     dt: float = 1.0
     device: str = "auto"
+    runtime_queue_maxsize: int = 2048
 
     # ===== ESTABILIDADE NUMÉRICA =====
     max_log_weight: float = 10.0

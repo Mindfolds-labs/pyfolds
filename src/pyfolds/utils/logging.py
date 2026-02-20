@@ -300,20 +300,28 @@ class CircularBufferFileHandler(logging.Handler):
         self.capacity_lines = capacity_lines
         self._lock = Lock()
         self._buffer: Deque[str] = deque(maxlen=capacity_lines)
+        self._line_count = 0
 
         if self.path.exists():
             previous_lines = self.path.read_text(encoding=self.encoding).splitlines()
             self._buffer.extend(previous_lines[-capacity_lines:])
+            self._line_count = len(self._buffer)
 
     def emit(self, record: logging.LogRecord) -> None:
         try:
             message = self.format(record)
             with self._lock:
                 self._buffer.append(message)
-                content = "\n".join(self._buffer)
-                if content:
-                    content += "\n"
-                self.path.write_text(content, encoding=self.encoding)
+                with self.path.open("a", encoding=self.encoding) as handle:
+                    handle.write(message + "\n")
+                self._line_count += 1
+
+                if self._line_count > self.capacity_lines * 2:
+                    content = "\n".join(self._buffer)
+                    if content:
+                        content += "\n"
+                    self.path.write_text(content, encoding=self.encoding)
+                    self._line_count = len(self._buffer)
         except Exception:
             self.handleError(record)
 

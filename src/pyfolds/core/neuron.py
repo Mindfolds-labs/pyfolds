@@ -19,7 +19,7 @@ import torch
 import torch.nn as nn
 from typing import Optional, Dict, Any, Union
 from threading import Lock
-from queue import SimpleQueue, Empty
+from queue import Queue, Empty, Full
 from dataclasses import fields
 from .config import MPJRDConfig
 from .base import BaseNeuron
@@ -104,7 +104,7 @@ class MPJRDNeuron(BaseNeuron):
         self._telemetry_lock = Lock()
 
         # ===== FILA LOCK-FREE DE INJEÇÕES RUNTIME (MindControl) =====
-        self._runtime_injections: SimpleQueue[tuple[str, Any]] = SimpleQueue()
+        self._runtime_injections: Queue[tuple[str, Any]] = Queue(maxsize=max(1, int(getattr(cfg, "runtime_queue_maxsize", 2048))))
 
         # ===== TELEMETRIA =====
         self.register_buffer("step_id", torch.tensor(0, dtype=torch.int64))
@@ -231,7 +231,10 @@ class MPJRDNeuron(BaseNeuron):
     @torch.no_grad()
     def queue_runtime_injection(self, name: str, value: Any) -> None:
         """Enfileira mutação de parâmetro para aplicação assíncrona no próximo step."""
-        self._runtime_injections.put((name, value))
+        try:
+            self._runtime_injections.put_nowait((name, value))
+        except Full:
+            self.logger.warning("Fila de injeções runtime cheia; descartando mutação %s", name)
 
     @torch.no_grad()
     def _refresh_config_references(self) -> None:

@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
+import os
+import shutil
 import subprocess
 import warnings
 from dataclasses import asdict, is_dataclass
@@ -50,9 +53,12 @@ class VersionedCheckpoint:
 
     def _git_hash(self) -> str:
         """Obtém hash atual do git para reprodutibilidade."""
+        git_bin = shutil.which("git")
+        if not git_bin:
+            return "unknown"
         try:
             result = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
+                [git_bin, "rev-parse", "HEAD"],
                 capture_output=True,
                 text=True,
                 check=False
@@ -83,18 +89,43 @@ class VersionedCheckpoint:
             metadata.update(extra)
         return metadata
 
-    def _compute_hash(self, state_dict: Dict[str, torch.Tensor]) -> str:
-        """Calcula hash SHA-256 do state dict."""
+    def _compute_plain_hash(self, state_dict: Dict[str, torch.Tensor]) -> str:
+        """Calcula hash SHA-256 puro do state_dict."""
         hasher = hashlib.sha256()
-        
+
         for key in sorted(state_dict.keys()):
             tensor = state_dict[key].detach().cpu().contiguous()
             hasher.update(key.encode('utf-8'))
             hasher.update(str(tensor.dtype).encode('utf-8'))
             hasher.update(str(tuple(tensor.shape)).encode('utf-8'))
             hasher.update(tensor.numpy().tobytes())
-        
+
         return hasher.hexdigest()
+
+    def _compute_hash(self, state_dict: Dict[str, torch.Tensor]) -> str:
+        """Calcula digest de integridade do state dict (HMAC quando disponível)."""
+        digest = self._compute_plain_hash(state_dict)
+        hmac_key = os.getenv("PYFOLDS_CHECKPOINT_HMAC_KEY")
+        if not hmac_key:
+            return f"sha256:{digest}"
+        signed = hmac.new(hmac_key.encode("utf-8"), digest.encode("utf-8"), hashlib.sha256).hexdigest()
+        return f"hmac-sha256:{signed}"
+
+    @staticmethod
+    def _verify_hash(plain_digest: str, saved: str) -> bool:
+        if saved.startswith("hmac-sha256:"):
+            hmac_key = os.getenv("PYFOLDS_CHECKPOINT_HMAC_KEY")
+            if not hmac_key:
+                return False
+            expected = "hmac-sha256:" + hmac.new(
+                hmac_key.encode("utf-8"),
+                plain_digest.encode("utf-8"),
+                hashlib.sha256,
+            ).hexdigest()
+            return hmac.compare_digest(expected, saved)
+        if saved.startswith("sha256:"):
+            return hmac.compare_digest(f"sha256:{plain_digest}", saved)
+        return hmac.compare_digest(plain_digest, saved)
 
     def save(
         self, 
@@ -160,7 +191,7 @@ class VersionedCheckpoint:
             ValueError: Se hash ou versão não coincidirem
         """
         try:
-            ckpt = torch.load(path, map_location=map_location, weights_only=False)
+            ckpt = torch.load(path, map_location=map_location, weights_only=True)
         except TypeError:
             # Compatibilidade com versões do PyTorch sem argumento weights_only
             ckpt = torch.load(path, map_location=map_location)
@@ -175,8 +206,9 @@ class VersionedCheckpoint:
                 warnings.warn("Checkpoint sem hash de integridade", RuntimeWarning)
             else:
                 verifier = cls(model=model or torch.nn.Identity(), version="verify")
-                current_hash = verifier._compute_hash(model_state)
-                if current_hash != saved_hash:
+                plain_hash = verifier._compute_plain_hash(model_state)
+                if not cls._verify_hash(plain_hash, saved_hash):
+                    current_hash = verifier._compute_hash(model_state)
                     raise ValueError(
                         f"Falha na verificação de integridade do checkpoint.\n"
                         f"Esperado: {saved_hash}\n"
