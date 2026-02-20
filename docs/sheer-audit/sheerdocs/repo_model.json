@@ -25,7 +25,7 @@
       "name": "__getattr__",
       "qname": "src.pyfolds.__getattr__",
       "file": "src/pyfolds/__init__.py",
-      "line": 149,
+      "line": 158,
       "doc": "Provide deprecated v1 aliases while keeping v2 names canonical.",
       "params": [
         "name"
@@ -2066,12 +2066,43 @@
       "decorators": []
     },
     {
+      "id": "mtd:src.pyfolds.core.config.MPJRDConfig.with_runtime_update",
+      "kind": "method",
+      "name": "with_runtime_update",
+      "qname": "src.pyfolds.core.config.MPJRDConfig.with_runtime_update",
+      "file": "src/pyfolds/core/config.py",
+      "line": 371,
+      "doc": "Retorna nova config validada com campos atualizados em runtime.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.core.config.MPJRDConfig.resolve_runtime_alias",
+      "kind": "method",
+      "name": "resolve_runtime_alias",
+      "qname": "src.pyfolds.core.config.MPJRDConfig.resolve_runtime_alias",
+      "file": "src/pyfolds/core/config.py",
+      "line": 375,
+      "doc": "Normaliza aliases de parâmetros usados por controladores externos.",
+      "params": [
+        "self",
+        "name"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mtd:src.pyfolds.core.config.MPJRDConfig.__repr__",
       "kind": "method",
       "name": "__repr__",
       "qname": "src.pyfolds.core.config.MPJRDConfig.__repr__",
       "file": "src/pyfolds/core/config.py",
-      "line": 369,
+      "line": 383,
       "doc": "Representação string da configuração.",
       "params": [
         "self"
@@ -2907,7 +2938,7 @@
       "name": "MPJRDNeuron",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 43,
+      "line": 45,
       "doc": "Neurônio MPJRD completo.\n\n✅ OTIMIZADO:\n    - Forward pass eficiente\n    - Suporte a learning_rate_multiplier\n    - Usa activity_threshold da config\n    - ✅ LOGGING integrado\n    - ✅ Validação de devices\n    - ✅ Thread-safe telemetry",
       "params": [],
       "returns": null,
@@ -2922,7 +2953,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.__init__",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 56,
+      "line": 58,
       "doc": null,
       "params": [
         "self",
@@ -2941,7 +2972,7 @@
       "name": "_validate_internal_devices",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._validate_internal_devices",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 131,
+      "line": 136,
       "doc": "Valida consistência de devices internos.",
       "params": [
         "self"
@@ -2956,7 +2987,7 @@
       "name": "_on_homeostasis_stable",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_stable",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 159,
+      "line": 164,
       "doc": "Callback quando homeostase se torna estável.",
       "params": [
         "self",
@@ -2972,7 +3003,7 @@
       "name": "_on_homeostasis_unstable",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_unstable",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 165,
+      "line": 170,
       "doc": "Callback quando homeostase se torna instável.",
       "params": [
         "self",
@@ -2988,7 +3019,7 @@
       "name": "N",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.N",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 175,
+      "line": 180,
       "doc": "Filamentos [dendrites, synapses].",
       "params": [
         "self"
@@ -3005,7 +3036,7 @@
       "name": "I",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.I",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 180,
+      "line": 185,
       "doc": "Potenciais internos [dendrites, synapses].",
       "params": [
         "self"
@@ -3022,7 +3053,7 @@
       "name": "W",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.W",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 185,
+      "line": 190,
       "doc": "Pesos [dendrites, synapses].",
       "params": [
         "self"
@@ -3039,7 +3070,7 @@
       "name": "protection",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.protection",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 190,
+      "line": 195,
       "doc": "Flags de proteção [dendrites, synapses].",
       "params": [
         "self"
@@ -3056,7 +3087,7 @@
       "name": "theta",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.theta",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 199,
+      "line": 204,
       "doc": null,
       "params": [
         "self"
@@ -3073,7 +3104,7 @@
       "name": "r_hat",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.r_hat",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 203,
+      "line": 208,
       "doc": null,
       "params": [
         "self"
@@ -3085,12 +3116,65 @@
       ]
     },
     {
+      "id": "mtd:src.pyfolds.core.neuron.MPJRDNeuron.queue_runtime_injection",
+      "kind": "method",
+      "name": "queue_runtime_injection",
+      "qname": "src.pyfolds.core.neuron.MPJRDNeuron.queue_runtime_injection",
+      "file": "src/pyfolds/core/neuron.py",
+      "line": 212,
+      "doc": "Enfileira mutação de parâmetro para aplicação assíncrona no próximo step.",
+      "params": [
+        "self",
+        "name",
+        "value"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "torch.no_grad()"
+      ]
+    },
+    {
+      "id": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._refresh_config_references",
+      "kind": "method",
+      "name": "_refresh_config_references",
+      "qname": "src.pyfolds.core.neuron.MPJRDNeuron._refresh_config_references",
+      "file": "src/pyfolds/core/neuron.py",
+      "line": 217,
+      "doc": "Propaga nova configuração para submódulos que cacheiam ``cfg``.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "torch.no_grad()"
+      ]
+    },
+    {
+      "id": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._apply_runtime_injections",
+      "kind": "method",
+      "name": "_apply_runtime_injections",
+      "qname": "src.pyfolds.core.neuron.MPJRDNeuron._apply_runtime_injections",
+      "file": "src/pyfolds/core/neuron.py",
+      "line": 230,
+      "doc": "Aplica injeções pendentes sem bloquear o caminho crítico do forward.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "torch.no_grad()"
+      ]
+    },
+    {
       "id": "mtd:src.pyfolds.core.neuron.MPJRDNeuron.set_mode",
       "kind": "method",
       "name": "set_mode",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.set_mode",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 208,
+      "line": 280,
       "doc": "Define modo de aprendizado.",
       "params": [
         "self",
@@ -3106,7 +3190,7 @@
       "name": "_compute_R_endogenous",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._compute_R_endogenous",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 223,
+      "line": 295,
       "doc": "Computa sinal neuromodulador interno.",
       "params": [
         "self",
@@ -3125,7 +3209,7 @@
       "name": "_validate_input_device",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._validate_input_device",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 245,
+      "line": 317,
       "doc": "Valida se input está no device correto.",
       "params": [
         "self",
@@ -3141,7 +3225,7 @@
       "name": "_apply_online_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._apply_online_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 256,
+      "line": 328,
       "doc": "Aplica regra local imediatamente (modo ONLINE sem defer).",
       "params": [
         "self",
@@ -3163,7 +3247,7 @@
       "name": "forward",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.forward",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 287,
+      "line": 359,
       "doc": "Forward pass do neurônio.\n\nArgs:\n    x: Tensor de entrada [batch, dendrites, synapses]\n    reward: Sinal de recompensa externo\n    mode: Modo de aprendizado (sobrescreve o atual)\n    collect_stats: Se deve coletar estatísticas\n    dt: Passo de tempo (ms)\n\nReturns:\n    Dict com spikes, potenciais e estatísticas",
       "params": [
         "self",
@@ -3186,7 +3270,7 @@
       "name": "step",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.step",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 508,
+      "line": 582,
       "doc": "API explícita de passo temporal (compatível com README).",
       "params": [
         "self",
@@ -3206,7 +3290,7 @@
       "name": "apply_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 528,
+      "line": 602,
       "doc": "Aplica plasticidade acumulada (deferred updates).\n\n✅ CORRIGIDO: Passa mode para as sinapses",
       "params": [
         "self",
@@ -3225,7 +3309,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.sleep",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 614,
+      "line": 690,
       "doc": "Ciclo de sono: consolida sinapses.",
       "params": [
         "self",
@@ -3243,7 +3327,7 @@
       "name": "to",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.to",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 639,
+      "line": 715,
       "doc": "Move neurônio para device e valida consistência.",
       "params": [
         "self",
@@ -3259,7 +3343,7 @@
       "name": "get_metrics",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.get_metrics",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 648,
+      "line": 724,
       "doc": "Retorna métricas consolidadas do neurônio.",
       "params": [
         "self"
@@ -3274,7 +3358,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.extra_repr",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 691,
+      "line": 767,
       "doc": null,
       "params": [
         "self"
@@ -4074,6 +4158,189 @@
       "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
       "file": "src/pyfolds/monitoring/health.py",
       "line": 95,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mod:src.pyfolds.monitoring.mindcontrol",
+      "kind": "module",
+      "name": "mindcontrol",
+      "qname": "src.pyfolds.monitoring.mindcontrol",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 1,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "cls:src.pyfolds.monitoring.mindcontrol.MutationCommand",
+      "kind": "class",
+      "name": "MutationCommand",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MutationCommand",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 15,
+      "doc": "Single runtime mutation request.",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "dataclass(frozen=True)"
+      ]
+    },
+    {
+      "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControl",
+      "kind": "class",
+      "name": "MindControl",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControl",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 22,
+      "doc": "Closed-loop controller that injects runtime mutations into neurons.",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.__init__",
+      "kind": "method",
+      "name": "__init__",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControl.__init__",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 25,
+      "doc": null,
+      "params": [
+        "self",
+        "decision_fn"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.register_neuron",
+      "kind": "method",
+      "name": "register_neuron",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControl.register_neuron",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 30,
+      "doc": "Register a neuron that accepts ``queue_runtime_injection`` calls.",
+      "params": [
+        "self",
+        "neuron"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.inject_parameter",
+      "kind": "method",
+      "name": "inject_parameter",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControl.inject_parameter",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 37,
+      "doc": "Queue mutation for all registered neurons without blocking forward path.",
+      "params": [
+        "self",
+        "name",
+        "value"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.on_telemetry_event",
+      "kind": "method",
+      "name": "on_telemetry_event",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControl.on_telemetry_event",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 46,
+      "doc": "Process telemetry events and optionally emit a mutation command.",
+      "params": [
+        "self",
+        "event"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
+      "kind": "class",
+      "name": "MindControlSink",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControlSink",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 58,
+      "doc": "Telemetry sink that forwards COMMIT events to a MindControl instance.",
+      "params": [],
+      "returns": null,
+      "bases": [
+        "Sink"
+      ],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.__init__",
+      "kind": "method",
+      "name": "__init__",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControlSink.__init__",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 61,
+      "doc": null,
+      "params": [
+        "self",
+        "controller"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.emit",
+      "kind": "method",
+      "name": "emit",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControlSink.emit",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 64,
+      "doc": null,
+      "params": [
+        "self",
+        "event"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.flush",
+      "kind": "method",
+      "name": "flush",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControlSink.flush",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 67,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.close",
+      "kind": "method",
+      "name": "close",
+      "qname": "src.pyfolds.monitoring.mindcontrol.MindControlSink.close",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "line": 70,
       "doc": null,
       "params": [
         "self"
@@ -8569,6 +8836,37 @@
       "returns": null,
       "bases": [],
       "decorators": []
+    },
+    {
+      "id": "mod:tests.integration.test_mindcontrol_runtime",
+      "kind": "module",
+      "name": "test_mindcontrol_runtime",
+      "qname": "tests.integration.test_mindcontrol_runtime",
+      "file": "tests/integration/test_mindcontrol_runtime.py",
+      "line": 1,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.integration.test_mindcontrol_runtime.test_mindcontrol_runtime_injection_prevents_numerical_crash",
+      "kind": "function",
+      "name": "test_mindcontrol_runtime_injection_prevents_numerical_crash",
+      "qname": "tests.integration.test_mindcontrol_runtime.test_mindcontrol_runtime_injection_prevents_numerical_crash",
+      "file": "tests/integration/test_mindcontrol_runtime.py",
+      "line": 11,
+      "doc": "MindControl deve mutar parâmetros em runtime sem causar NaN/crash.",
+      "params": [
+        "extreme_threshold"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "pytest.mark.integration",
+        "pytest.mark.parametrize('extreme_threshold', [10.0, 100.0])"
+      ]
     },
     {
       "id": "mod:tests.integration.test_mnist_file_logging",
@@ -16191,6 +16489,18 @@
     {
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.core.config.MPJRDConfig",
+      "dst": "mtd:src.pyfolds.core.config.MPJRDConfig.with_runtime_update",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.config.MPJRDConfig",
+      "dst": "mtd:src.pyfolds.core.config.MPJRDConfig.resolve_runtime_alias",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.config.MPJRDConfig",
       "dst": "mtd:src.pyfolds.core.config.MPJRDConfig.__repr__",
       "meta": {}
     },
@@ -16701,6 +17011,18 @@
     {
       "type": "IMPORT",
       "src": "mod:src.pyfolds.core.neuron",
+      "dst": "mod:queue",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.core.neuron",
+      "dst": "mod:dataclasses",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.core.neuron",
       "dst": "mod:src.pyfolds.core.config",
       "meta": {}
     },
@@ -16828,6 +17150,24 @@
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
       "dst": "mtd:src.pyfolds.core.neuron.MPJRDNeuron.r_hat",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
+      "dst": "mtd:src.pyfolds.core.neuron.MPJRDNeuron.queue_runtime_injection",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
+      "dst": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._refresh_config_references",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
+      "dst": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._apply_runtime_injections",
       "meta": {}
     },
     {
@@ -17318,6 +17658,12 @@
     },
     {
       "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring",
+      "dst": "mod:src.pyfolds.mindcontrol",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
       "src": "mod:src.pyfolds.monitoring.health",
       "dst": "mod:__future__",
       "meta": {}
@@ -17392,6 +17738,120 @@
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
       "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "mod:__future__",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "mod:dataclasses",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "mod:threading",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "mod:typing",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "mod:weakref",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "mod:src.pyfolds.telemetry.events",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "mod:src.pyfolds.telemetry.sinks",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "cls:src.pyfolds.monitoring.mindcontrol.MutationCommand",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "cls:src.pyfolds.monitoring.mindcontrol.MindControl",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.mindcontrol.MindControl",
+      "dst": "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.__init__",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.mindcontrol.MindControl",
+      "dst": "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.register_neuron",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.mindcontrol.MindControl",
+      "dst": "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.inject_parameter",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.mindcontrol.MindControl",
+      "dst": "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.on_telemetry_event",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.monitoring.mindcontrol",
+      "dst": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
+      "meta": {}
+    },
+    {
+      "type": "INHERITS",
+      "src": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
+      "dst": "cls:*.Sink",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
+      "dst": "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.__init__",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
+      "dst": "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.emit",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
+      "dst": "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.flush",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
+      "dst": "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.close",
       "meta": {}
     },
     {
@@ -19996,6 +20456,30 @@
       "type": "CONTAINS",
       "src": "mod:tests.integration.test_advanced_integration",
       "dst": "fn:tests.integration.test_advanced_integration.test_all_mixins_together_smoke",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.integration.test_mindcontrol_runtime",
+      "dst": "mod:pytest",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.integration.test_mindcontrol_runtime",
+      "dst": "mod:torch",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.integration.test_mindcontrol_runtime",
+      "dst": "mod:pyfolds",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.integration.test_mindcontrol_runtime",
+      "dst": "fn:tests.integration.test_mindcontrol_runtime.test_mindcontrol_runtime_injection_prevents_numerical_crash",
       "meta": {}
     },
     {
@@ -23523,10 +24007,10 @@
   ],
   "findings": [],
   "metrics": {
-    "python_files": 136,
-    "symbols": 970,
-    "edges": 1453,
+    "python_files": 138,
+    "symbols": 989,
+    "edges": 1484,
     "findings": 0,
-    "internal_import_edges": 101
+    "internal_import_edges": 104
   }
 }

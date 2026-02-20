@@ -1,8 +1,8 @@
 # Code Map (Sheer Audit)
 
 - Repositório: `pyfolds`
-- Arquivos Python: `136`
-- Símbolos: `970`
+- Arquivos Python: `138`
+- Símbolos: `989`
 
 ## Módulos
 
@@ -279,6 +279,8 @@
 ### `src.pyfolds.core.neuron`
 - Arquivo: `src/pyfolds/core/neuron.py`
 - Imports:
+  - `mod:dataclasses`
+  - `mod:queue`
   - `mod:src.pyfolds.core.accumulator`
   - `mod:src.pyfolds.core.base`
   - `mod:src.pyfolds.core.config`
@@ -364,6 +366,7 @@
 - Arquivo: `src/pyfolds/monitoring/__init__.py`
 - Imports:
   - `mod:src.pyfolds.health`
+  - `mod:src.pyfolds.mindcontrol`
 
 ### `src.pyfolds.monitoring.health`
 - Arquivo: `src/pyfolds/monitoring/health.py`
@@ -376,6 +379,21 @@
   - `HealthStatus` (bases: Enum)
   - `NeuronHealthCheck` (bases: (sem base explícita))
   - `NeuronHealthMonitor` (bases: (sem base explícita))
+
+### `src.pyfolds.monitoring.mindcontrol`
+- Arquivo: `src/pyfolds/monitoring/mindcontrol.py`
+- Imports:
+  - `mod:__future__`
+  - `mod:dataclasses`
+  - `mod:src.pyfolds.telemetry.events`
+  - `mod:src.pyfolds.telemetry.sinks`
+  - `mod:threading`
+  - `mod:typing`
+  - `mod:weakref`
+- Classes:
+  - `MindControl` (bases: (sem base explícita))
+  - `MindControlSink` (bases: Sink)
+  - `MutationCommand` (bases: (sem base explícita))
 
 ### `src.pyfolds.network`
 - Arquivo: `src/pyfolds/network/__init__.py`
@@ -797,6 +815,15 @@
   - `mod:torch`
 - Funções:
   - `test_all_mixins_together_smoke()`
+
+### `tests.integration.test_mindcontrol_runtime`
+- Arquivo: `tests/integration/test_mindcontrol_runtime.py`
+- Imports:
+  - `mod:pyfolds`
+  - `mod:pytest`
+  - `mod:torch`
+- Funções:
+  - `test_mindcontrol_runtime_injection_prevents_numerical_crash(extreme_threshold)`
 
 ### `tests.integration.test_mnist_file_logging`
 - Arquivo: `tests/integration/test_mnist_file_logging.py`

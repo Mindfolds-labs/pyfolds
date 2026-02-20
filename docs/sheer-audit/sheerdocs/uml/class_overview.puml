@@ -147,8 +147,10 @@ class "src.pyfolds.core.config.MPJRDConfig" {
   +get_decay_rate()
   +get_preset()
   +get_ts()
+  +resolve_runtime_alias()
   +to_dict()
   +validate_numerical_safety()
+  +with_runtime_update()
 }
 
 class "src.pyfolds.core.dendrite.MPJRDDendrite" {
@@ -211,9 +213,11 @@ class "src.pyfolds.core.neuron.MPJRDNeuron" {
   +W()
   +__init__()
   +_apply_online_plasticity()
+  +_apply_runtime_injections()
   +_compute_R_endogenous()
   +_on_homeostasis_stable()
   +_on_homeostasis_unstable()
+  +_refresh_config_references()
   +_validate_input_device()
   +_validate_internal_devices()
   +apply_plasticity()
@@ -221,6 +225,7 @@ class "src.pyfolds.core.neuron.MPJRDNeuron" {
   +forward()
   +get_metrics()
   +protection()
+  +queue_runtime_injection()
   +r_hat()
   +set_mode()
   +sleep()
@@ -286,6 +291,21 @@ class "src.pyfolds.monitoring.health.NeuronHealthMonitor" {
   +__init__()
   +check_health()
   +get_health_score()
+}
+
+class "src.pyfolds.monitoring.mindcontrol.MindControl" {
+  +__init__()
+  +inject_parameter()
+  +on_telemetry_event()
+  +register_neuron()
+}
+class "src.pyfolds.monitoring.mindcontrol.MindControlSink" {
+  +__init__()
+  +close()
+  +emit()
+  +flush()
+}
+class "src.pyfolds.monitoring.mindcontrol.MutationCommand" {
 }
 
 
@@ -547,6 +567,7 @@ class "tests.checkpoint.CheckpointMixin" {
   +save()
   +save_weights_only()
 }
+
 
 
 

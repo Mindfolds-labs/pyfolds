@@ -5,11 +5,11 @@
     "commit": null
   },
   "metrics": {
-    "python_files": 136,
-    "symbols": 970,
-    "edges": 1453,
+    "python_files": 138,
+    "symbols": 989,
+    "edges": 1484,
     "findings": 0,
-    "internal_import_edges": 101
+    "internal_import_edges": 104
   },
   "modules": [
     {
@@ -40,7 +40,7 @@
           "id": "fn:src.pyfolds.__getattr__",
           "name": "__getattr__",
           "qname": "src.pyfolds.__getattr__",
-          "line": 149,
+          "line": 158,
           "params": [
             "name"
           ]
@@ -671,8 +671,10 @@
             "mtd:src.pyfolds.core.config.MPJRDConfig.get_decay_rate",
             "mtd:src.pyfolds.core.config.MPJRDConfig.get_preset",
             "mtd:src.pyfolds.core.config.MPJRDConfig.get_ts",
+            "mtd:src.pyfolds.core.config.MPJRDConfig.resolve_runtime_alias",
             "mtd:src.pyfolds.core.config.MPJRDConfig.to_dict",
-            "mtd:src.pyfolds.core.config.MPJRDConfig.validate_numerical_safety"
+            "mtd:src.pyfolds.core.config.MPJRDConfig.validate_numerical_safety",
+            "mtd:src.pyfolds.core.config.MPJRDConfig.with_runtime_update"
           ]
         }
       ],
@@ -902,6 +904,8 @@
       "qname": "src.pyfolds.core.neuron",
       "file": "src/pyfolds/core/neuron.py",
       "imports": [
+        "mod:dataclasses",
+        "mod:queue",
         "mod:src.pyfolds.core.accumulator",
         "mod:src.pyfolds.core.base",
         "mod:src.pyfolds.core.config",
@@ -922,7 +926,7 @@
           "id": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
           "name": "MPJRDNeuron",
           "qname": "src.pyfolds.core.neuron.MPJRDNeuron",
-          "line": 43,
+          "line": 45,
           "bases": [
             "BaseNeuron"
           ],
@@ -932,9 +936,11 @@
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.W",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.__init__",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._apply_online_plasticity",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._apply_runtime_injections",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._compute_R_endogenous",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_stable",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_unstable",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron._refresh_config_references",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._validate_input_device",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron._validate_internal_devices",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
@@ -942,6 +948,7 @@
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.forward",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.get_metrics",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.protection",
+            "mtd:src.pyfolds.core.neuron.MPJRDNeuron.queue_runtime_injection",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.r_hat",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.set_mode",
             "mtd:src.pyfolds.core.neuron.MPJRDNeuron.sleep",
@@ -1138,7 +1145,8 @@
       "qname": "src.pyfolds.monitoring",
       "file": "src/pyfolds/monitoring/__init__.py",
       "imports": [
-        "mod:src.pyfolds.health"
+        "mod:src.pyfolds.health",
+        "mod:src.pyfolds.mindcontrol"
       ],
       "classes": [],
       "functions": []
@@ -1186,6 +1194,59 @@
             "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
             "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score"
           ]
+        }
+      ],
+      "functions": []
+    },
+    {
+      "id": "mod:src.pyfolds.monitoring.mindcontrol",
+      "qname": "src.pyfolds.monitoring.mindcontrol",
+      "file": "src/pyfolds/monitoring/mindcontrol.py",
+      "imports": [
+        "mod:__future__",
+        "mod:dataclasses",
+        "mod:src.pyfolds.telemetry.events",
+        "mod:src.pyfolds.telemetry.sinks",
+        "mod:threading",
+        "mod:typing",
+        "mod:weakref"
+      ],
+      "classes": [
+        {
+          "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControl",
+          "name": "MindControl",
+          "qname": "src.pyfolds.monitoring.mindcontrol.MindControl",
+          "line": 22,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.__init__",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.inject_parameter",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.on_telemetry_event",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.register_neuron"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
+          "name": "MindControlSink",
+          "qname": "src.pyfolds.monitoring.mindcontrol.MindControlSink",
+          "line": 58,
+          "bases": [
+            "Sink"
+          ],
+          "methods": [
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.__init__",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.close",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.emit",
+            "mtd:src.pyfolds.monitoring.mindcontrol.MindControlSink.flush"
+          ]
+        },
+        {
+          "id": "cls:src.pyfolds.monitoring.mindcontrol.MutationCommand",
+          "name": "MutationCommand",
+          "qname": "src.pyfolds.monitoring.mindcontrol.MutationCommand",
+          "line": 15,
+          "bases": [],
+          "methods": []
         }
       ],
       "functions": []
@@ -2880,6 +2941,28 @@
           "qname": "tests.integration.test_advanced_integration.test_all_mixins_together_smoke",
           "line": 9,
           "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.integration.test_mindcontrol_runtime",
+      "qname": "tests.integration.test_mindcontrol_runtime",
+      "file": "tests/integration/test_mindcontrol_runtime.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.integration.test_mindcontrol_runtime.test_mindcontrol_runtime_injection_prevents_numerical_crash",
+          "name": "test_mindcontrol_runtime_injection_prevents_numerical_crash",
+          "qname": "tests.integration.test_mindcontrol_runtime.test_mindcontrol_runtime_injection_prevents_numerical_crash",
+          "line": 11,
+          "params": [
+            "extreme_threshold"
+          ]
         }
       ]
     },

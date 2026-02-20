@@ -31,6 +31,7 @@ package "src.pyfolds.layers.layer" {}
 package "src.pyfolds.layers.wave_layer" {}
 package "src.pyfolds.monitoring" {}
 package "src.pyfolds.monitoring.health" {}
+package "src.pyfolds.monitoring.mindcontrol" {}
 package "src.pyfolds.network" {}
 package "src.pyfolds.network.builder" {}
 package "src.pyfolds.network.network" {}
@@ -64,6 +65,7 @@ package "tests.checkpoint" {}
 package "tests.conftest" {}
 package "tests.integration" {}
 package "tests.integration.test_advanced_integration" {}
+package "tests.integration.test_mindcontrol_runtime" {}
 package "tests.integration.test_mnist_file_logging" {}
 package "tests.integration.test_neuron_advanced" {}
 package "tests.integration.test_temporal_sequence_stability" {}
@@ -195,6 +197,9 @@ package "tests.unit.wave.test_wave_neuron" {}
 "src.pyfolds.layers.wave_layer" --> "src.pyfolds.layers.layer"
 "src.pyfolds.layers.wave_layer" --> "src.pyfolds.wave"
 "src.pyfolds.monitoring" --> "src.pyfolds.health"
+"src.pyfolds.monitoring" --> "src.pyfolds.mindcontrol"
+"src.pyfolds.monitoring.mindcontrol" --> "src.pyfolds.telemetry.events"
+"src.pyfolds.monitoring.mindcontrol" --> "src.pyfolds.telemetry.sinks"
 "src.pyfolds.network" --> "src.pyfolds.builder"
 "src.pyfolds.network" --> "src.pyfolds.network"
 "src.pyfolds.network" --> "src.pyfolds.wave_network"
