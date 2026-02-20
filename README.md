@@ -50,6 +50,7 @@ pip install pyfolds
 - `pip install pyfolds[telemetry]` para visualização de métricas.
 - `pip install pyfolds[dev]` para lint/testes.
 - `pip install pyfolds[examples]` para dependências de exemplos.
+- `pip install pyfolds[tensorflow]` para backend TensorFlow (`tensorflow-cpu>=2.20.0`).
 
 
 ## Brand oficial

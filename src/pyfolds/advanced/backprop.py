@@ -29,7 +29,7 @@ class BackpropMixin(TimedMixin):
         self.register_buffer("dendrite_amplification", torch.zeros(D))
 
         self.backprop_trace = None
-        self._last_backprop_time = None
+        self._last_backprop_time = 0.0
 
         max_queue_size = max(100, int(self.backprop_delay * 50))
         self.backprop_queue = deque(maxlen=max_queue_size)
@@ -144,7 +144,7 @@ class BackpropMixin(TimedMixin):
         self.dendrite_amplification.zero_()
         self.backprop_trace = None
         self.backprop_queue.clear()
-        self._last_backprop_time = None
+        self._last_backprop_time = 0.0
 
     def get_backprop_metrics(self) -> dict:
         """Retorna métricas de backpropagação."""

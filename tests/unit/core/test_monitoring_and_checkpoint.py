@@ -160,7 +160,7 @@ def test_versioned_checkpoint_load_secure_validates_hash_and_shapes(tmp_path):
 
     cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     model = pyfolds.MPJRDNeuron(cfg)
-    ckpt = VersionedCheckpoint(model, version="2.0.3")
+    ckpt = VersionedCheckpoint(model, version="2.1.0")
 
     state = model.state_dict()
     weights_path = tmp_path / "secure.safetensors"
@@ -169,13 +169,13 @@ def test_versioned_checkpoint_load_secure_validates_hash_and_shapes(tmp_path):
     manifest_path = tmp_path / "manifest.json"
     manifest = {
         "weight_file": weights_path.name,
-        "metadata": {"version": "2.0.3"},
+        "metadata": {"version": "2.1.0"},
         "integrity_hash": ckpt._compute_hash(state),
     }
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
     metadata = VersionedCheckpoint.load_secure(str(manifest_path), model)
-    assert metadata["version"] == "2.0.3"
+    assert metadata["version"] == "2.1.0"
 
 
 def test_versioned_checkpoint_load_secure_fails_on_hash_mismatch(tmp_path):
@@ -191,7 +191,7 @@ def test_versioned_checkpoint_load_secure_fails_on_hash_mismatch(tmp_path):
     manifest_path = tmp_path / "manifest-bad.json"
     manifest = {
         "weight_file": weights_path.name,
-        "metadata": {"version": "2.0.3"},
+        "metadata": {"version": "2.1.0"},
         "integrity_hash": "sha256:" + "0" * 64,
     }
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")

@@ -151,3 +151,43 @@ class WeightIntegrityMonitor:
 class ModelIntegrityMonitor(WeightIntegrityMonitor):
     """Alias de compatibilidade para monitor de integridade de modelo."""
 
+    def __init__(self, model: torch.nn.Module, check_every_n_steps: int = 100):
+        super().__init__(model, check_every_n_steps=check_every_n_steps)
+        self.expected_hash = self.last_hash
+        self._initialized_via_check = False
+
+    def set_baseline(self) -> str:
+        """Define (ou redefine) o hash de baseline esperado."""
+        self.expected_hash = self._compute_hash()
+        self.last_hash = self.expected_hash
+        self._initialized_via_check = False
+        return self.expected_hash
+
+    def check_integrity(self) -> Dict[str, bool | str | int]:
+        """Contrato legado com payload semântico de integridade do modelo."""
+        self.step_count += 1
+        if self.step_count % self.check_every != 0:
+            return {"checked": False, "step": self.step_count}
+
+        current_hash = self._compute_hash()
+        hash_initialized = False
+
+        if self.expected_hash is None:
+            self.expected_hash = current_hash
+            hash_initialized = True
+        elif not self._initialized_via_check and self.step_count == 1:
+            # Compatibilidade: primeira verificação sem baseline explícito.
+            hash_initialized = True
+            self._initialized_via_check = True
+
+        integrity_ok = current_hash == self.expected_hash
+        self.last_hash = current_hash
+
+        return {
+            "checked": True,
+            "step": self.step_count,
+            "integrity_ok": integrity_ok,
+            "current_hash": current_hash,
+            "expected_hash": self.expected_hash,
+            "hash_initialized": hash_initialized,
+        }
