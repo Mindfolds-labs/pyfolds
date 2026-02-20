@@ -102,6 +102,39 @@ class ReedSolomonECC:
         return bytes(decoded)
 
 
+class ECCProtector:
+    """Proteção simples de um chunk único via Reed-Solomon.
+
+    Esta API é útil para casos fora do container ``.fold/.mind`` em que o
+    payload completo precisa de proteção ECC direta (ex.: sidecar de checkpoint).
+    """
+
+    def __init__(self, error_bytes: int = 10):
+        if error_bytes <= 0:
+            raise ValueError("error_bytes deve ser > 0")
+        self.error_bytes = error_bytes
+
+        import reedsolo
+
+        self._reedsolo = reedsolo
+        self._codec = reedsolo.RSCodec(error_bytes)
+
+    def protect_chunk(self, data: bytes) -> bytes:
+        """Adiciona bytes de paridade ao chunk."""
+        return bytes(self._codec.encode(data))
+
+    def recover_chunk(self, protected_data: bytes) -> bytes:
+        """Tenta corrigir erros e retorna o payload original."""
+        try:
+            recovered = self._codec.decode(protected_data)
+        except self._reedsolo.ReedSolomonError as exc:
+            raise RuntimeError(f"Falha na recuperação ECC: {exc}") from exc
+
+        if isinstance(recovered, tuple):
+            recovered = recovered[0]
+        return bytes(recovered)
+
+
 def ecc_from_protection(level: str) -> ECCCodec:
     """Mapeia nível de proteção em codec ECC.
 
