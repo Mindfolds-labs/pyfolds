@@ -39,8 +39,10 @@ from .monitoring import (
     HealthStatus,
     NeuronHealthCheck,
     MindControl,
+    MindControlEngine,
     MindControlSink,
     MutationCommand,
+    MutationQueue,
 )
 
 # High-level state contract returned by forward-like calls.
@@ -117,8 +119,10 @@ __all__ = [
     "HealthStatus",
     "NeuronHealthCheck",
     "MindControl",
+    "MindControlEngine",
     "MindControlSink",
     "MutationCommand",
+    "MutationQueue",
     # Types/helpers
     "LearningMode",
     "ConnectionType",

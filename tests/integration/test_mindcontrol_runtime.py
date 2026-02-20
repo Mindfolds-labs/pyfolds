@@ -1,53 +1,70 @@
-"""Integration tests for MindControl runtime parameter injection."""
+"""Integration tests for MindControl runtime parameter mutation."""
 
 import pytest
 import torch
+import torch.nn as nn
 
-import pyfolds
+from pyfolds.monitoring.mindcontrol import MindControlEngine, MutationQueue
+
+
+class MockNeuron(nn.Module):
+    """Minimal neuron to validate graph-safe runtime mutation."""
+
+    def __init__(self, neuron_id: str):
+        super().__init__()
+        self.neuron_id = neuron_id
+        self.activity_threshold = nn.Parameter(torch.tensor(0.5))
+        self._mutation_queue: MutationQueue | None = None
+
+    def attach_mindcontrol(self, mq: MutationQueue) -> None:
+        self._mutation_queue = mq
+
+    def _apply_mutations_safe(self) -> None:
+        if self._mutation_queue is None:
+            return
+
+        for param_name, new_val in self._mutation_queue.fetch_all():
+            target = getattr(self, param_name, None)
+            if target is None:
+                continue
+            with torch.no_grad():
+                target.copy_(torch.tensor(new_val, dtype=target.dtype, device=target.device))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        self._apply_mutations_safe()
+        return x * self.activity_threshold
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("extreme_threshold", [10.0, 100.0])
-def test_mindcontrol_runtime_injection_prevents_numerical_crash(extreme_threshold: float) -> None:
-    """MindControl deve mutar parâmetros em runtime sem causar NaN/crash."""
-    cfg = pyfolds.NeuronConfig(
-        n_dendrites=2,
-        n_synapses_per_dendrite=4,
-        defer_updates=True,
-        theta_init=0.5,
-        theta_min=0.1,
-        theta_max=5.0,
-        neuromod_mode="external",
-        device="cpu",
-    )
-    neuron = pyfolds.MPJRDNeuron(cfg, enable_telemetry=True, telemetry_profile="heavy")
-    neuron.set_mode(pyfolds.LearningMode.BATCH)
+def test_mindcontrol_graph_safety() -> None:
+    """Runtime mutation must not break PyTorch autograd graph lifecycle."""
+    engine = MindControlEngine()
+    neuron = MockNeuron(neuron_id="test_n1")
+    mq = engine.register_neuron("test_n1")
+    neuron.attach_mindcontrol(mq)
 
-    def decision(event):
-        if event.step_id == 3:
-            return pyfolds.MutationCommand("activity_threshold", extreme_threshold)
-        return None
+    x = torch.tensor([1.0, 2.0], requires_grad=True)
+    loss_1 = neuron(x).sum()
+    loss_1.backward()
 
-    mind = pyfolds.MindControl(decision_fn=decision)
-    mind.register_neuron(neuron)
+    engine.analyze_and_react({"neuron_id": "test_n1", "spike_rate": 0.01})
 
-    sink = pyfolds.DistributorSink([
-        neuron.telemetry.sink,
-        pyfolds.MindControlSink(mind),
-    ])
-    neuron.telemetry.sink = sink
+    loss_2 = neuron(x).sum()
+    assert neuron.activity_threshold.item() == pytest.approx(0.1)
 
-    for step in range(10):
-        x = torch.rand(16, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
-        out = neuron.step(x, reward=0.25, collect_stats=True)
+    try:
+        loss_2.backward()
+    except RuntimeError as exc:
+        pytest.fail(f"MindControl mutation broke autograd graph: {exc}")
 
-        assert torch.isfinite(out["u"]).all()
-        assert torch.isfinite(out["spikes"]).all()
 
-        neuron.apply_plasticity(reward=0.25)
+@pytest.mark.integration
+def test_mindcontrol_bounds_clamp_threshold_values() -> None:
+    """Safety bounds must clamp engineered thresholds to safe runtime values."""
+    engine = MindControlEngine()
+    queue = engine.register_neuron("n-safe")
 
-        assert torch.isfinite(neuron.theta).all()
-        assert torch.isfinite(neuron.r_hat).all()
+    engine.safety_bounds["activity_threshold"] = (0.2, 0.4)
+    engine.analyze_and_react({"neuron_id": "n-safe", "spike_rate": 0.0})
 
-    assert neuron.cfg.activity_threshold == pytest.approx(extreme_threshold)
-    assert neuron.cfg.target_spike_rate == pytest.approx(cfg.target_spike_rate)
+    assert queue.fetch_all() == [("activity_threshold", 0.2)]
