@@ -82,6 +82,8 @@ class MPJRDWaveNeuron(MPJRDNeuron):
 
         dendritic_activations = torch.sigmoid(v_dend - self.cfg.dendritic_threshold)
         u = dendritic_activations.sum(dim=1)
+        if hasattr(self, "_apply_sfa_before_threshold"):
+            u = self._apply_sfa_before_threshold(u, dt=dt)
         spikes = (u >= self.theta).float()
 
         spike_rate = spikes.mean().item()
