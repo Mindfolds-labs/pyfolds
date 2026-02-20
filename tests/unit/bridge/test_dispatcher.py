@@ -33,3 +33,18 @@ def test_prepare_payload_tensor_fields_are_serializable():
 def test_get_topology_map_uses_cfg_to_dict_when_available():
     topology = MindDispatcher.get_topology_map(_Network())
     assert topology == [{"layer_index": 0, "config": {"a": 1}}]
+
+
+def test_capture_event_preserves_new_and_legacy_contract_keys():
+    event = MindDispatcher.capture_event(
+        layer_id="L1",
+        spikes=torch.tensor([0.0, 1.0]),
+        weights=torch.tensor([2.0, 6.0]),
+        metrics={"health": 1.0},
+    )
+
+    assert event["layer"] == "L1"
+    assert isinstance(event["ts"], str)
+    assert event["layer_id"] == "L1"
+    assert event["timestamp"] == event["ts"]
+

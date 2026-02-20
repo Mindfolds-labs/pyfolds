@@ -391,3 +391,7 @@ class MPJRDConfig:
         lines.append(f"  Homeostase: θ∈[{self.theta_min},{self.theta_max}], target={self.target_spike_rate}")
         lines.append(f"  Constantes: activity_th={self.activity_threshold}, eps_homeo={self.homeostasis_eps}")
         return "\n".join(lines)
+
+
+# Alias operacional v2 sem quebrar identidade científica/serialização legada.
+NeuronConfig = MPJRDConfig
