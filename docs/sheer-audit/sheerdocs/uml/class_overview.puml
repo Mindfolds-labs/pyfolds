@@ -284,6 +284,33 @@ class "src.pyfolds.layers.wave_layer.MPJRDWaveLayer" {
 }
 
 
+class "src.pyfolds.monitoring.health.HealthStatus" {
+}
+class "src.pyfolds.monitoring.health.NeuronHealthCheck" {
+  +__init__()
+  +check()
+}
+class "src.pyfolds.monitoring.health.NeuronHealthMonitor" {
+  +__init__()
+  +check_health()
+  +get_health_score()
+}
+class "src.pyfolds.monitoring.health.WeightIntegrityMonitor" {
+  +__init__()
+  +__init__()
+  +_compute_hash()
+  +_compute_state_hash()
+  +check()
+  +check_integrity()
+}
+class "src.pyfolds.monitoring.health.WeightIntegrityMonitor" {
+  +__init__()
+  +__init__()
+  +_compute_hash()
+  +_compute_state_hash()
+  +check()
+  +check_integrity()
+}
 
 class "src.pyfolds.monitoring.mindcontrol.MindControl" {
   +__init__()
@@ -403,6 +430,7 @@ class "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint" {
   +_validate_shape_invariants()
   +_verify_hash()
   +load()
+  +load_secure()
   +save()
 }
 
@@ -445,6 +473,12 @@ class "src.pyfolds.telemetry.ringbuffer.RingBuffer" {
   +snapshot()
 }
 
+class "src.pyfolds.telemetry.sinks.BufferedJSONLinesSink" {
+  +__init__()
+  +close()
+  +emit()
+  +flush()
+}
 class "src.pyfolds.telemetry.sinks.ConsoleSink" {
   +__init__()
   +close()
@@ -813,6 +847,10 @@ class "tests.unit.telemetry.test_ringbuffer.TestRingBuffer" {
   +test_thread_safety()
 }
 
+class "tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink" {
+  +test_close_flushes_remaining_buffer()
+  +test_flushes_when_buffer_reaches_limit()
+}
 class "tests.unit.telemetry.test_sinks.TestConsoleSink" {
   +test_non_verbose()
   +test_verbose()

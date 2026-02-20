@@ -25,7 +25,7 @@
       "name": "__getattr__",
       "qname": "src.pyfolds.__getattr__",
       "file": "src/pyfolds/__init__.py",
-      "line": 166,
+      "line": 170,
       "doc": "Provide deprecated v1 aliases while keeping v2 names canonical.",
       "params": [
         "name"
@@ -4097,6 +4097,246 @@
       "decorators": []
     },
     {
+      "id": "cls:src.pyfolds.monitoring.health.HealthStatus",
+      "kind": "class",
+      "name": "HealthStatus",
+      "qname": "src.pyfolds.monitoring.health.HealthStatus",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 12,
+      "doc": "Estados de saúde operacional calculados pelo monitoramento.",
+      "params": [],
+      "returns": null,
+      "bases": [
+        "Enum"
+      ],
+      "decorators": []
+    },
+    {
+      "id": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
+      "kind": "class",
+      "name": "NeuronHealthCheck",
+      "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 20,
+      "doc": "Monitora métricas de saúde e gera alertas de operação.",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
+      "kind": "method",
+      "name": "__init__",
+      "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 23,
+      "doc": null,
+      "params": [
+        "self",
+        "neuron",
+        "thresholds"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.check",
+      "kind": "method",
+      "name": "check",
+      "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck.check",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 31,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
+      "kind": "class",
+      "name": "NeuronHealthMonitor",
+      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 54,
+      "doc": "Monitor de saúde contínuo para execução longa.",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
+      "kind": "method",
+      "name": "__init__",
+      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 57,
+      "doc": null,
+      "params": [
+        "self",
+        "neuron",
+        "check_every_n_steps"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
+      "kind": "method",
+      "name": "check_health",
+      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 63,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
+      "kind": "method",
+      "name": "get_health_score",
+      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 96,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "kind": "class",
+      "name": "WeightIntegrityMonitor",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 102,
+      "doc": "Monitora integridade de pesos por hash SHA-256 em janelas periódicas.\n\nÚtil para detectar corrupção silenciosa em execuções longas (ex.: bitflips em VRAM).",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
+      "kind": "method",
+      "name": "__init__",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 108,
+      "doc": null,
+      "params": [
+        "self",
+        "model",
+        "check_every_n_steps"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
+      "kind": "method",
+      "name": "_compute_state_hash",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 114,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check_integrity",
+      "kind": "method",
+      "name": "check_integrity",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor.check_integrity",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 126,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "kind": "class",
+      "name": "WeightIntegrityMonitor",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 144,
+      "doc": "Monitora corrupção silenciosa de pesos em runtime.\n\nEste monitor é focado em cenários de treino/inferência com aceleração em GPU,\ndetectando alterações inesperadas no ``state_dict`` a cada ``N`` passos.",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
+      "kind": "method",
+      "name": "__init__",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 151,
+      "doc": null,
+      "params": [
+        "self",
+        "model",
+        "check_every_n_steps"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_hash",
+      "kind": "method",
+      "name": "_compute_hash",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_hash",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 157,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check",
+      "kind": "method",
+      "name": "check",
+      "qname": "src.pyfolds.monitoring.health.WeightIntegrityMonitor.check",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 170,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mod:src.pyfolds.monitoring.mindcontrol",
       "kind": "module",
       "name": "mindcontrol",
@@ -6149,12 +6389,31 @@
       ]
     },
     {
+      "id": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load_secure",
+      "kind": "method",
+      "name": "load_secure",
+      "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load_secure",
+      "file": "src/pyfolds/serialization/versioned_checkpoint.py",
+      "line": 353,
+      "doc": "Carrega pesos via safetensors com validações rígidas de integridade.",
+      "params": [
+        "cls",
+        "manifest_path",
+        "model"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "classmethod"
+      ]
+    },
+    {
       "id": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
       "kind": "method",
       "name": "__repr__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 351,
+      "line": 381,
       "doc": null,
       "params": [
         "self"
@@ -7286,12 +7545,91 @@
       "decorators": []
     },
     {
+      "id": "cls:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink",
+      "kind": "class",
+      "name": "BufferedJSONLinesSink",
+      "qname": "src.pyfolds.telemetry.sinks.BufferedJSONLinesSink",
+      "file": "src/pyfolds/telemetry/sinks.py",
+      "line": 230,
+      "doc": "JSON Lines sink com buffer em memória para alto throughput.",
+      "params": [],
+      "returns": null,
+      "bases": [
+        "JSONLinesSink"
+      ],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.__init__",
+      "kind": "method",
+      "name": "__init__",
+      "qname": "src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.__init__",
+      "file": "src/pyfolds/telemetry/sinks.py",
+      "line": 233,
+      "doc": null,
+      "params": [
+        "self",
+        "path",
+        "buffer_size",
+        "truncate"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.emit",
+      "kind": "method",
+      "name": "emit",
+      "qname": "src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.emit",
+      "file": "src/pyfolds/telemetry/sinks.py",
+      "line": 243,
+      "doc": null,
+      "params": [
+        "self",
+        "event"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.flush",
+      "kind": "method",
+      "name": "flush",
+      "qname": "src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.flush",
+      "file": "src/pyfolds/telemetry/sinks.py",
+      "line": 273,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.close",
+      "kind": "method",
+      "name": "close",
+      "qname": "src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.close",
+      "file": "src/pyfolds/telemetry/sinks.py",
+      "line": 281,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "cls:src.pyfolds.telemetry.sinks.DistributorSink",
       "kind": "class",
       "name": "DistributorSink",
       "qname": "src.pyfolds.telemetry.sinks.DistributorSink",
       "file": "src/pyfolds/telemetry/sinks.py",
-      "line": 230,
+      "line": 286,
       "doc": "Sink that distributes events to multiple sinks.\n\nUseful for sending events to multiple destinations simultaneously:\n- MemorySink for MindBoard (real-time)\n- JSONLinesSink for MindAudit (persistence)\n- ConsoleSink for debug\n\nArgs:\n    sinks: List of sinks to distribute events to\n\nExample:\n    >>> sink = DistributorSink([\n    ...     MemorySink(1000),           # For MindBoard\n    ...     JSONLinesSink(\"audit.jsonl\") # For MindAudit\n    ... ])\n    >>> telem = TelemetryController(sink=sink)",
       "params": [],
       "returns": null,
@@ -7306,7 +7644,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.telemetry.sinks.DistributorSink.__init__",
       "file": "src/pyfolds/telemetry/sinks.py",
-      "line": 250,
+      "line": 306,
       "doc": null,
       "params": [
         "self",
@@ -7322,7 +7660,7 @@
       "name": "emit",
       "qname": "src.pyfolds.telemetry.sinks.DistributorSink.emit",
       "file": "src/pyfolds/telemetry/sinks.py",
-      "line": 253,
+      "line": 309,
       "doc": "Distribute event to all sinks.",
       "params": [
         "self",
@@ -7338,7 +7676,7 @@
       "name": "flush",
       "qname": "src.pyfolds.telemetry.sinks.DistributorSink.flush",
       "file": "src/pyfolds/telemetry/sinks.py",
-      "line": 261,
+      "line": 317,
       "doc": "Flush all sinks that support it.",
       "params": [
         "self"
@@ -7353,7 +7691,7 @@
       "name": "close",
       "qname": "src.pyfolds.telemetry.sinks.DistributorSink.close",
       "file": "src/pyfolds/telemetry/sinks.py",
-      "line": 270,
+      "line": 326,
       "doc": "Close all sinks.",
       "params": [
         "self"
@@ -7985,6 +8323,7 @@
         "structured",
         "circular_buffer_lines",
         "circular_buffer_flush_interval_sec",
+        "circular_flush_interval_sec",
         "console",
         "fixed_layout"
       ],
@@ -7998,7 +8337,7 @@
       "name": "get_logger",
       "qname": "src.pyfolds.utils.logging.PyFoldsLogger.get_logger",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 177,
+      "line": 181,
       "doc": "Retorna logger configurado.",
       "params": [
         "self",
@@ -8015,7 +8354,7 @@
       "name": "add_file_handler",
       "qname": "src.pyfolds.utils.logging.PyFoldsLogger.add_file_handler",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 189,
+      "line": 193,
       "doc": "Adiciona handler de arquivo adicional com rotação.",
       "params": [
         "self",
@@ -8034,7 +8373,7 @@
       "name": "get_logger",
       "qname": "src.pyfolds.utils.logging.get_logger",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 215,
+      "line": 219,
       "doc": "Função conveniência para obter logger.",
       "params": [
         "name"
@@ -8049,7 +8388,7 @@
       "name": "setup_run_logging",
       "qname": "src.pyfolds.utils.logging.setup_run_logging",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 222,
+      "line": 226,
       "doc": "Configuração recomendada para execução (treino/debug em produção).\n\nCria automaticamente um arquivo incremental e configura logging para arquivo\ncom terminal silencioso por padrão.\n\nReturns:\n    Tupla ``(logger, log_path)``.",
       "params": [
         "app",
@@ -8072,7 +8411,7 @@
       "name": "setup_logging",
       "qname": "src.pyfolds.utils.logging.setup_logging",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 262,
+      "line": 266,
       "doc": "Setup rápido de logging.",
       "params": [
         "log_file",
@@ -8093,7 +8432,7 @@
       "name": "CircularBufferFileHandler",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 284,
+      "line": 288,
       "doc": "Handler TXT com buffer circular em número de linhas.\n\nMantém somente as últimas ``capacity_lines`` mensagens no arquivo.\nPara reduzir custo de I/O, as gravações são feitas sob demanda via\n``flush_interval_sec`` ou imediatamente para eventos de erro.",
       "params": [],
       "returns": null,
@@ -8108,7 +8447,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.__init__",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 292,
+      "line": 296,
       "doc": null,
       "params": [
         "self",
@@ -8127,7 +8466,7 @@
       "name": "_flush_to_disk",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 323,
+      "line": 327,
       "doc": null,
       "params": [
         "self"
@@ -8142,7 +8481,7 @@
       "name": "emit",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.emit",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 331,
+      "line": 335,
       "doc": null,
       "params": [
         "self",
@@ -8158,7 +8497,7 @@
       "name": "_flush_to_disk",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 349,
+      "line": 353,
       "doc": null,
       "params": [
         "self"
@@ -8173,7 +8512,7 @@
       "name": "close",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.close",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 357,
+      "line": 361,
       "doc": null,
       "params": [
         "self"
@@ -8188,7 +8527,7 @@
       "name": "next_log_path",
       "qname": "src.pyfolds.utils.logging.next_log_path",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 364,
+      "line": 368,
       "doc": "Gera caminho de log incremental: NNN_app_version_YYYYMMDD_HHMMSS.log.",
       "params": [
         "log_dir",
@@ -8205,7 +8544,7 @@
       "name": "build_log_path",
       "qname": "src.pyfolds.utils.logging.build_log_path",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 381,
+      "line": 385,
       "doc": "Alias de compatibilidade para ``next_log_path``.",
       "params": [
         "log_dir",
@@ -11666,7 +12005,7 @@
       "name": "DummyNeuron",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 12,
+      "line": 13,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11679,7 +12018,7 @@
       "name": "__init__",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.__init__",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 13,
+      "line": 14,
       "doc": null,
       "params": [
         "self",
@@ -11695,7 +12034,7 @@
       "name": "get_metrics",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.get_metrics",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 16,
+      "line": 17,
       "doc": null,
       "params": [
         "self"
@@ -11710,7 +12049,7 @@
       "name": "test_health_check_critical_for_dead_neurons",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_critical_for_dead_neurons",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 20,
+      "line": 21,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11723,7 +12062,7 @@
       "name": "test_health_check_uses_fallback_metrics_from_get_metrics_contract",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_uses_fallback_metrics_from_get_metrics_contract",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 29,
+      "line": 30,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11736,7 +12075,7 @@
       "name": "test_versioned_checkpoint_save_and_load",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_save_and_load",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 43,
+      "line": 44,
       "doc": null,
       "params": [
         "tmp_path"
@@ -11751,7 +12090,7 @@
       "name": "test_versioned_checkpoint_metadata_created_at_is_utc",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 56,
+      "line": 57,
       "doc": null,
       "params": [
         "tmp_path"
@@ -11766,7 +12105,7 @@
       "name": "test_versioned_checkpoint_shape_validation_raises_on_mismatch",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises_on_mismatch",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 70,
+      "line": 71,
       "doc": null,
       "params": [
         "tmp_path"
@@ -11781,7 +12120,7 @@
       "name": "test_versioned_checkpoint_safetensors_roundtrip",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 87,
+      "line": 88,
       "doc": null,
       "params": [
         "tmp_path"
@@ -11796,7 +12135,7 @@
       "name": "test_model_integrity_monitor_detects_unexpected_mutation",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_detects_unexpected_mutation",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 110,
+      "line": 111,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11809,9 +12148,52 @@
       "name": "test_model_integrity_monitor_initializes_hash_on_first_check",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_initializes_hash_on_first_check",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 129,
+      "line": 130,
       "doc": null,
       "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_weight_integrity_monitor_detects_mutation_between_checks",
+      "kind": "function",
+      "name": "test_weight_integrity_monitor_detects_mutation_between_checks",
+      "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_weight_integrity_monitor_detects_mutation_between_checks",
+      "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
+      "line": 141,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_load_secure_validates_hash_and_shapes",
+      "kind": "function",
+      "name": "test_versioned_checkpoint_load_secure_validates_hash_and_shapes",
+      "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_load_secure_validates_hash_and_shapes",
+      "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
+      "line": 158,
+      "doc": null,
+      "params": [
+        "tmp_path"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_load_secure_fails_on_hash_mismatch",
+      "kind": "function",
+      "name": "test_versioned_checkpoint_load_secure_fails_on_hash_mismatch",
+      "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_load_secure_fails_on_hash_mismatch",
+      "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
+      "line": 181,
+      "doc": null,
+      "params": [
+        "tmp_path"
+      ],
       "returns": null,
       "bases": [],
       "decorators": []
@@ -13760,6 +14142,51 @@
       "doc": "Test that one sink failing doesn't stop others.",
       "params": [
         "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "cls:tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink",
+      "kind": "class",
+      "name": "TestBufferedJSONLinesSink",
+      "qname": "tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink",
+      "file": "tests/unit/telemetry/test_sinks.py",
+      "line": 247,
+      "doc": "Test buffered JSON lines sink.",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink.test_flushes_when_buffer_reaches_limit",
+      "kind": "method",
+      "name": "test_flushes_when_buffer_reaches_limit",
+      "qname": "tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink.test_flushes_when_buffer_reaches_limit",
+      "file": "tests/unit/telemetry/test_sinks.py",
+      "line": 250,
+      "doc": null,
+      "params": [
+        "self",
+        "tmp_path"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink.test_close_flushes_remaining_buffer",
+      "kind": "method",
+      "name": "test_close_flushes_remaining_buffer",
+      "qname": "tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink.test_close_flushes_remaining_buffer",
+      "file": "tests/unit/telemetry/test_sinks.py",
+      "line": 264,
+      "doc": null,
+      "params": [
+        "self",
+        "tmp_path"
       ],
       "returns": null,
       "bases": [],
@@ -18332,6 +18759,138 @@
     },
     {
       "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "mod:__future__",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "mod:hashlib",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "mod:enum",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "mod:typing",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "mod:torch",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "cls:src.pyfolds.monitoring.health.HealthStatus",
+      "meta": {}
+    },
+    {
+      "type": "INHERITS",
+      "src": "cls:src.pyfolds.monitoring.health.HealthStatus",
+      "dst": "cls:*.Enum",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
+      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
+      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.check",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_state_hash",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check_integrity",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.monitoring.health",
+      "dst": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.__init__",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor._compute_hash",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.monitoring.health.WeightIntegrityMonitor",
+      "dst": "mtd:src.pyfolds.monitoring.health.WeightIntegrityMonitor.check",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
       "src": "mod:src.pyfolds.monitoring.mindcontrol",
       "dst": "mod:__future__",
       "meta": {}
@@ -19497,6 +20056,12 @@
     {
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
+      "dst": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load_secure",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
       "dst": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
       "meta": {}
     },
@@ -20140,6 +20705,42 @@
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.telemetry.sinks.JSONLinesSink",
       "dst": "mtd:src.pyfolds.telemetry.sinks.JSONLinesSink.close",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.telemetry.sinks",
+      "dst": "cls:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink",
+      "meta": {}
+    },
+    {
+      "type": "INHERITS",
+      "src": "cls:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink",
+      "dst": "cls:*.JSONLinesSink",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink",
+      "dst": "mtd:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.__init__",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink",
+      "dst": "mtd:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.emit",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink",
+      "dst": "mtd:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.flush",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink",
+      "dst": "mtd:src.pyfolds.telemetry.sinks.BufferedJSONLinesSink.close",
       "meta": {}
     },
     {
@@ -22725,6 +23326,12 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "mod:json",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
       "dst": "mod:pathlib",
       "meta": {}
     },
@@ -22822,6 +23429,24 @@
       "type": "CONTAINS",
       "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
       "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_initializes_hash_on_first_check",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_weight_integrity_monitor_detects_mutation_between_checks",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_load_secure_validates_hash_and_shapes",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_load_secure_fails_on_hash_mismatch",
       "meta": {}
     },
     {
@@ -23836,6 +24461,24 @@
       "type": "CONTAINS",
       "src": "cls:tests.unit.telemetry.test_sinks.TestDistributorSink",
       "dst": "mtd:tests.unit.telemetry.test_sinks.TestDistributorSink.test_sink_failure_doesnt_affect_others",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.telemetry.test_sinks",
+      "dst": "cls:tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink",
+      "dst": "mtd:tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink.test_flushes_when_buffer_reaches_limit",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink",
+      "dst": "mtd:tests.unit.telemetry.test_sinks.TestBufferedJSONLinesSink.test_close_flushes_remaining_buffer",
       "meta": {}
     },
     {
@@ -24967,23 +25610,12 @@
       "meta": {}
     }
   ],
-  "findings": [
-    {
-      "code": "PARSE_ERROR",
-      "severity": "ERROR",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 102,
-      "column": 62,
-      "message": "invalid decimal literal (<unknown>, line 102)",
-      "hint": null,
-      "excerpt": null
-    }
-  ],
+  "findings": [],
   "metrics": {
     "python_files": 139,
-    "symbols": 1031,
-    "edges": 1536,
-    "findings": 1,
+    "symbols": 1059,
+    "edges": 1572,
+    "findings": 0,
     "internal_import_edges": 104
   }
 }

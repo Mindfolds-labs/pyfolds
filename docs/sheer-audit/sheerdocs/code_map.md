@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `139`
-- Símbolos: `1031`
+- Símbolos: `1059`
 
 ## Módulos
 
@@ -370,6 +370,18 @@
 
 ### `src.pyfolds.monitoring.health`
 - Arquivo: `src/pyfolds/monitoring/health.py`
+- Imports:
+  - `mod:__future__`
+  - `mod:enum`
+  - `mod:hashlib`
+  - `mod:torch`
+  - `mod:typing`
+- Classes:
+  - `HealthStatus` (bases: Enum)
+  - `NeuronHealthCheck` (bases: (sem base explícita))
+  - `NeuronHealthMonitor` (bases: (sem base explícita))
+  - `WeightIntegrityMonitor` (bases: (sem base explícita))
+  - `WeightIntegrityMonitor` (bases: (sem base explícita))
 
 ### `src.pyfolds.monitoring.mindcontrol`
 - Arquivo: `src/pyfolds/monitoring/mindcontrol.py`
@@ -603,6 +615,7 @@
   - `mod:src.pyfolds.telemetry.ringbuffer`
   - `mod:typing`
 - Classes:
+  - `BufferedJSONLinesSink` (bases: JSONLinesSink)
   - `ConsoleSink` (bases: Sink)
   - `DistributorSink` (bases: Sink)
   - `JSONLinesSink` (bases: Sink)
@@ -1178,6 +1191,7 @@
 - Arquivo: `tests/unit/core/test_monitoring_and_checkpoint.py`
 - Imports:
   - `mod:datetime`
+  - `mod:json`
   - `mod:pathlib`
   - `mod:pyfolds`
   - `mod:pyfolds.monitoring`
@@ -1191,10 +1205,13 @@
   - `test_health_check_uses_fallback_metrics_from_get_metrics_contract()`
   - `test_model_integrity_monitor_detects_unexpected_mutation()`
   - `test_model_integrity_monitor_initializes_hash_on_first_check()`
+  - `test_versioned_checkpoint_load_secure_fails_on_hash_mismatch(tmp_path)`
+  - `test_versioned_checkpoint_load_secure_validates_hash_and_shapes(tmp_path)`
   - `test_versioned_checkpoint_metadata_created_at_is_utc(tmp_path)`
   - `test_versioned_checkpoint_safetensors_roundtrip(tmp_path)`
   - `test_versioned_checkpoint_save_and_load(tmp_path)`
   - `test_versioned_checkpoint_shape_validation_raises_on_mismatch(tmp_path)`
+  - `test_weight_integrity_monitor_detects_mutation_between_checks()`
 
 ### `tests.unit.core.test_neuromodulation`
 - Arquivo: `tests/unit/core/test_neuromodulation.py`
@@ -1396,6 +1413,7 @@
   - `mod:pyfolds`
   - `mod:pytest`
 - Classes:
+  - `TestBufferedJSONLinesSink` (bases: (sem base explícita))
   - `TestConsoleSink` (bases: (sem base explícita))
   - `TestDistributorSink` (bases: (sem base explícita))
   - `TestJSONLinesSink` (bases: (sem base explícita))
