@@ -7,7 +7,7 @@ v1 names as compatibility aliases with deprecation warnings.
 from typing import Any, Dict
 import warnings
 
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 
 # ===== CORE V2 SURFACE =====
 from .core.config import MPJRDConfig as NeuronConfig
@@ -39,6 +39,7 @@ from .serialization import (
 from .monitoring import (
     HealthStatus,
     ModelIntegrityMonitor,
+    WeightIntegrityMonitor,
     NeuronHealthCheck,
     MindControl,
     MindControlEngine,
@@ -59,6 +60,7 @@ from .telemetry import (
     MemorySink,
     ConsoleSink,
     JSONLinesSink,
+    BufferedJSONLinesSink,
     DistributorSink,
     forward_event,
     commit_event,
@@ -121,6 +123,7 @@ __all__ = [
     "ecc_from_protection",
     "HealthStatus",
     "ModelIntegrityMonitor",
+    "WeightIntegrityMonitor",
     "NeuronHealthCheck",
     "MindControl",
     "MindControlEngine",
@@ -139,6 +142,7 @@ __all__ = [
     "MemorySink",
     "ConsoleSink",
     "JSONLinesSink",
+    "BufferedJSONLinesSink",
     "DistributorSink",
     "forward_event",
     "commit_event",

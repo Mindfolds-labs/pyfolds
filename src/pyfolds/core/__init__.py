@@ -35,7 +35,7 @@ from .accumulator import StatisticsAccumulator, create_accumulator_from_config  
 from .dendrite_integration import DendriticIntegration, DendriticOutput
 from .factory import NeuronFactory, NeuronType, register_neuron, register_default_neurons, infer_neuron_type
 
-__version__ = "2.0.2"  # ✅ Versão canônica de release
+__version__ = "2.0.3"  # ✅ Versão canônica de release
 
 __all__ = [
     # Classes principais

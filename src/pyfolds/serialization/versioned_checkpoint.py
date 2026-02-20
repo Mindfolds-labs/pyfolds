@@ -348,5 +348,35 @@ class VersionedCheckpoint:
 
         return ckpt
 
+
+    @classmethod
+    def load_secure(cls, manifest_path: str, model: torch.nn.Module) -> Dict[str, Any]:
+        """Carrega pesos via safetensors com validações rígidas de integridade."""
+        if not HAS_SAFETENSORS:
+            raise RuntimeError("load_secure requer o pacote 'safetensors' instalado")
+
+        manifest_file = Path(manifest_path)
+        manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
+
+        weight_file = manifest.get("weight_file")
+        if not weight_file:
+            raise ValueError("Manifesto inválido: campo 'weight_file' ausente")
+
+        weight_path = manifest_file.parent / weight_file
+        tensors = load_safetensors_file(str(weight_path))
+
+        cls._validate_model_shapes(model, tensors)
+
+        saved_hash = manifest.get("integrity_hash")
+        if saved_hash:
+            verifier = cls(model=model, version="verify")
+            plain_hash = verifier._compute_plain_hash(tensors)
+            if not cls._verify_hash(plain_hash, saved_hash):
+                raise ValueError("Falha de integridade: hash do manifesto não confere com pesos")
+
+        # Injeção somente após validações completas.
+        model.load_state_dict(tensors, strict=True)
+        return manifest.get("metadata", {})
+
     def __repr__(self) -> str:
         return f"VersionedCheckpoint(version={self.version})"

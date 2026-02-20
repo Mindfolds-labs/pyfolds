@@ -108,12 +108,16 @@ class PyFoldsLogger:
         structured: bool = False,
         circular_buffer_lines: Optional[int] = None,
         circular_buffer_flush_interval_sec: float = 5.0,
+        circular_flush_interval_sec: Optional[float] = None,
         console: bool = False,
         fixed_layout: bool = False,
     ):
         """Configura logging global e permite reconfiguração segura."""
         if isinstance(level, str):
             level = getattr(logging, level.upper(), logging.INFO)
+
+        if circular_flush_interval_sec is not None:
+            circular_buffer_flush_interval_sec = circular_flush_interval_sec
 
         self._default_level = level
         root_logger = logging.getLogger()

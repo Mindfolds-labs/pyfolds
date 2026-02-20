@@ -8,4 +8,4 @@ __all__ = [
     "MPJRDWaveLayer",
 ]
 
-__version__ = "2.0.2"  # ✅ Alinhado com versão canônica
+__version__ = "2.0.3"  # ✅ Alinhado com versão canônica

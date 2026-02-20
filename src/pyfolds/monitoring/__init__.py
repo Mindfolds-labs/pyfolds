@@ -1,6 +1,12 @@
 """Ferramentas de monitoramento de saúde do modelo."""
 
-from .health import HealthStatus, NeuronHealthCheck, NeuronHealthMonitor, WeightIntegrityMonitor
+from .health import (
+    HealthStatus,
+    ModelIntegrityMonitor,
+    NeuronHealthCheck,
+    NeuronHealthMonitor,
+    WeightIntegrityMonitor,
+)
 from .mindcontrol import (
     MindControl,
     MindControlEngine,

@@ -227,6 +227,62 @@ class JSONLinesSink(Sink):
             self._file = None
 
 
+class BufferedJSONLinesSink(JSONLinesSink):
+    """JSON Lines sink com buffer em memória para alto throughput."""
+
+    def __init__(
+        self,
+        path: Union[str, Path],
+        buffer_size: int = 50,
+        truncate: bool = False,
+    ):
+        super().__init__(path=path, flush_every=0, truncate=truncate)
+        self.buffer_size = max(1, int(buffer_size))
+        self.buffer: List[str] = []
+
+    def emit(self, event: TelemetryEvent) -> None:
+        self._ensure_open()
+
+        try:
+            data = {
+                'step_id': event.step_id,
+                'phase': event.phase,
+                'mode': event.mode,
+                'neuron_id': event.neuron_id,
+                'timestamp': event.timestamp,
+                'wall_time': event.wall_time,
+                'payload': event.payload
+            }
+            line = json.dumps(data)
+        except (TypeError, ValueError):
+            serializable_data = {
+                'step_id': event.step_id,
+                'phase': event.phase,
+                'mode': event.mode,
+                'neuron_id': event.neuron_id,
+                'timestamp': event.timestamp,
+                'wall_time': event.wall_time,
+                'payload': self._make_serializable(event.payload)
+            }
+            line = json.dumps(serializable_data)
+
+        self.buffer.append(line)
+        if len(self.buffer) >= self.buffer_size:
+            self.flush()
+
+    def flush(self) -> None:
+        if self._file is None or not self.buffer:
+            return
+
+        self._file.write('\n'.join(self.buffer) + '\n')
+        self._file.flush()
+        self.buffer.clear()
+
+    def close(self) -> None:
+        self.flush()
+        super().close()
+
+
 class DistributorSink(Sink):
     """
     Sink that distributes events to multiple sinks.

@@ -28,12 +28,20 @@ from .events import (
     sleep_event_lazy,
 )
 from .ringbuffer import RingBuffer
-from .sinks import Sink, NoOpSink, MemorySink, ConsoleSink, JSONLinesSink, DistributorSink
+from .sinks import (
+    Sink,
+    NoOpSink,
+    MemorySink,
+    ConsoleSink,
+    JSONLinesSink,
+    BufferedJSONLinesSink,
+    DistributorSink,
+)
 from .controller import TelemetryController, TelemetryConfig, Profile, TelemetryProfile
 from .decorator import telemetry
 from .types import ForwardPayload, CommitPayload, SleepPayload
 
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 
 __all__ = [
     # Events
@@ -54,6 +62,7 @@ __all__ = [
     "MemorySink",
     "ConsoleSink",
     "JSONLinesSink",
+    "BufferedJSONLinesSink",
     "DistributorSink",
     
     # Controller

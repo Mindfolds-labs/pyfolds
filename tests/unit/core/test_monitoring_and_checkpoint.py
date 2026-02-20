@@ -1,11 +1,12 @@
 from datetime import datetime
+import json
 from pathlib import Path
 
 import pytest
 import pyfolds
 import torch
 
-from pyfolds.monitoring import HealthStatus, ModelIntegrityMonitor, NeuronHealthCheck
+from pyfolds.monitoring import HealthStatus, ModelIntegrityMonitor, NeuronHealthCheck, WeightIntegrityMonitor
 from pyfolds.serialization import VersionedCheckpoint
 
 
@@ -135,3 +136,65 @@ def test_model_integrity_monitor_initializes_hash_on_first_check():
     assert payload["hash_initialized"] is True
     assert isinstance(payload["current_hash"], str)
     assert len(payload["current_hash"]) == 64
+
+
+def test_weight_integrity_monitor_detects_mutation_between_checks():
+    model = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4))
+    monitor = WeightIntegrityMonitor(model, check_every_n_steps=1)
+
+    first = monitor.check()
+    assert first["checked"] is True
+    assert first["ok"] is True
+
+    with torch.no_grad():
+        buf = next(model.buffers())
+        buf.add_(1)
+
+    second = monitor.check()
+    assert second["checked"] is True
+    assert second["ok"] is False
+
+
+def test_versioned_checkpoint_load_secure_validates_hash_and_shapes(tmp_path):
+    safetensors = pytest.importorskip("safetensors")
+
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    model = pyfolds.MPJRDNeuron(cfg)
+    ckpt = VersionedCheckpoint(model, version="2.0.3")
+
+    state = model.state_dict()
+    weights_path = tmp_path / "secure.safetensors"
+    safetensors.torch.save_file(state, str(weights_path))
+
+    manifest_path = tmp_path / "manifest.json"
+    manifest = {
+        "weight_file": weights_path.name,
+        "metadata": {"version": "2.0.3"},
+        "integrity_hash": ckpt._compute_hash(state),
+    }
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    metadata = VersionedCheckpoint.load_secure(str(manifest_path), model)
+    assert metadata["version"] == "2.0.3"
+
+
+def test_versioned_checkpoint_load_secure_fails_on_hash_mismatch(tmp_path):
+    safetensors = pytest.importorskip("safetensors")
+
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    model = pyfolds.MPJRDNeuron(cfg)
+    state = model.state_dict()
+
+    weights_path = tmp_path / "corrupted.safetensors"
+    safetensors.torch.save_file(state, str(weights_path))
+
+    manifest_path = tmp_path / "manifest-bad.json"
+    manifest = {
+        "weight_file": weights_path.name,
+        "metadata": {"version": "2.0.3"},
+        "integrity_hash": "sha256:" + "0" * 64,
+    }
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="integridade"):
+        VersionedCheckpoint.load_secure(str(manifest_path), model)

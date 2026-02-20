@@ -47,11 +47,10 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-011 | Concluída | Micro-otimização do forward e análise dos testes pulados | Codex | 2026-02-20 |
 | ISSUE-012 | Concluída | Validar assinatura digital opcional e medir overhead de telemetria | Codex | 2026-02-20 |
 | ISSUE-013 | Concluída | MindControl - Cérebro Externo e Mutação em Tempo Real | Codex | 2026-02-20 |
-<<<<<<< codex/create-adr-and-update-documentation-for-v2.0.2-8wj5z6
 | ISSUE-014 | Concluída | Hardening de integridade de pesos (sanity check VRAM) | Codex | 2026-02-20 |
-=======
 | ISSUE-014 | Concluída | Sanity check periódico de integridade de pesos e atualização docs v2.0.2 | Codex | 2026-02-20 |
->>>>>>> main
+| ISSUE-015 | Concluída | Hardening final do Core v2.0.3: integridade runtime, telemetria bufferizada e carga segura | Codex | 2026-02-20 |
+
 <!-- HUB:QUEUE:END -->
 
 ### 4.1 Cards (UI limpa)
@@ -152,24 +151,28 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > 📄 [Relatório](./prompts/relatorios/ISSUE-013-mindcontrol.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-013-mindcontrol.md)
 
 > [!TIP]
-<<<<<<< codex/create-adr-and-update-documentation-for-v2.0.2-8wj5z6
 > **ISSUE-014** · Hardening de integridade de pesos (sanity check VRAM)
-=======
 > **ISSUE-014** · Sanity check periódico de integridade de pesos e atualização docs v2.0.2
->>>>>>> main
 >
 > **Status:** ✅ Concluída  
 > **Responsável:** Codex  
 > **Data:** 2026-02-20  
-<<<<<<< codex/create-adr-and-update-documentation-for-v2.0.2-8wj5z6
 > **Prioridade:** `Alta` · **Área:** `Segurança/Runtime`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-014-hardening-integridade-pesos-vram.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-014-hardening-integridade-pesos-vram.md)
-=======
 > **Prioridade:** `Alta` · **Área:** `Segurança/Runtime/Docs`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-014-sanity-check-integridade-pesos-e-atualizacao-docs-v2-0-2.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-014-sanity-check-integridade-pesos-e-atualizacao-docs-v2-0-2.md)
->>>>>>> main
+
+> [!TIP]
+> **ISSUE-015** · Hardening final do Core v2.0.3: integridade runtime, telemetria bufferizada e carga segura
+>
+> **Status:** ✅ Concluída  
+> **Responsável:** Codex  
+> **Data:** 2026-02-20  
+> **Prioridade:** `Alta` · **Área:** `Segurança/Runtime/Telemetria`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-015-hardening-core-runtime-v2-0-3.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-015-hardening-core-runtime-v2-0-3.md)
 
 <!-- HUB:CARDS:END -->
 

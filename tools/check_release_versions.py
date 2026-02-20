@@ -12,7 +12,7 @@ try:
 except ModuleNotFoundError:  # pragma: no cover
     import tomli as tomllib  # type: ignore
 
-CANONICAL_VERSION = "2.0.2"
+CANONICAL_VERSION = "2.0.3"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 VERSION_PATTERNS = {
