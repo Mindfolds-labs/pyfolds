@@ -312,16 +312,11 @@ class CircularBufferFileHandler(logging.Handler):
             message = self.format(record)
             with self._lock:
                 self._buffer.append(message)
-                with self.path.open("a", encoding=self.encoding) as handle:
-                    handle.write(message + "\n")
-                self._line_count += 1
-
-                if self._line_count > self.capacity_lines * 2:
-                    content = "\n".join(self._buffer)
-                    if content:
-                        content += "\n"
-                    self.path.write_text(content, encoding=self.encoding)
-                    self._line_count = len(self._buffer)
+                content = "\n".join(self._buffer)
+                if content:
+                    content += "\n"
+                self.path.write_text(content, encoding=self.encoding)
+                self._line_count = len(self._buffer)
         except Exception:
             self.handleError(record)
 
