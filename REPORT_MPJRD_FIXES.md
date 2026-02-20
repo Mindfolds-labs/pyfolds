@@ -37,3 +37,14 @@ Foram corrigidos os bugs de ordem de execução e fidelidade computacional no `M
 1. Opcional: padronizar lint CI para `ruff check .` (ou alinhar comando requerido).
 2. Adicionar teste de regressão temporal multi-step para delay bAP em 2–5 ms com valores controlados.
 3. Expandir testes STDP para janelas Δt positivas/negativas explícitas (LTP/LTD com sequência temporal controlada).
+
+
+## Correções adicionais da auditoria C-01/C-02/A-01/A-02/A-03
+
+| Item | Correção aplicada | Evidência no código |
+|---|---|---|
+| C-01 (KeyError na inibição) | `MPJRDLayer.forward` expõe potencial somático agregado em `u_values` e alias `u`. | `src/pyfolds/layers/layer.py` (`output['u_values']` e `output['u']`). |
+| C-02 (STDP escalando com batch) | Redução do delta STDP normalizada por batch com `.mean(dim=0)`. | `src/pyfolds/advanced/stdp.py` (`delta_total = (delta_ltd + delta_ltp).mean(dim=0)`). |
+| A-01 (homeostase pré-refratária) | `RefractoryMixin` adia homeostase do base (`defer_homeostasis=True`) e atualiza após `final_spikes`. | `src/pyfolds/advanced/refractory.py` (bloco pós-aplicação do refratário). |
+| A-02 (buffers STP) | Alinhamento de device dos buffers STP sem reatribuição de atributo, preservando registro via `self._buffers[...]`. | `src/pyfolds/advanced/short_term.py` (`_align_short_term_buffers_device`). |
+| A-03 (theta mismatch) | Refratário passa a usar `theta_eff` quando disponível como referência para suppressão relativa. | `src/pyfolds/advanced/refractory.py` (`theta_raw = output.get('theta_eff', output['theta'])`). |

@@ -16,6 +16,8 @@ def test_layer_accepts_neuron_v2():
     out = layer(x)
 
     assert out["spikes"].shape == (5, 3)
+    assert out["u"].shape == (5, 3)
+    assert out["u_values"].shape == (5, 3)
     assert layer.neuron_cls is MPJRDNeuronV2
 
 
