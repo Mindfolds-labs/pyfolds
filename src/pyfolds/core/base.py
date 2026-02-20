@@ -25,6 +25,15 @@ class BasePlasticityRule(ABC):
 class BaseNeuron(nn.Module, ABC):
     """Contrato comum para neurônios MPJRD e variantes."""
 
+    @property
+    def in_refractory_period(self) -> bool:
+        """Indica se o neurônio está em estado refratário no passo atual."""
+        return bool(getattr(self, "_in_refractory_period", False))
+
+    def _set_refractory_state(self, in_refractory: bool) -> None:
+        """Atualiza o estado refratário observado no passo atual."""
+        self._in_refractory_period = bool(in_refractory)
+
     @abstractmethod
     def forward(self, x: torch.Tensor, *args: Any, **kwargs: Any) -> Dict[str, torch.Tensor]:
         """Executa o passo forward do neurônio."""
