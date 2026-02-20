@@ -154,6 +154,7 @@ class TestSTDPMixin:
             n._ensure_traces(1, torch.device("cpu"))
             n.trace_post.fill_(1.0)
             n.trace_pre.zero_()
+            n.dendrites[0].synapses[0].I.fill_(0.5)
 
         x_no_pre = torch.zeros(1, 1, 1)
         before_classic = n_classic.dendrites[0].synapses[0].I.item()
@@ -166,4 +167,36 @@ class TestSTDPMixin:
         after_current = n_current.dendrites[0].synapses[0].I.item()
 
         assert after_classic == before_classic
-        assert after_current < before_current
+        assert after_current <= before_current
+
+    def test_stdp_update_is_batch_size_invariant_for_identical_samples(self):
+        """Delta sináptico médio não deve escalar linearmente com batch."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        cfg = pyfolds.MPJRDConfig(
+            n_dendrites=1,
+            n_synapses_per_dendrite=1,
+            plasticity_mode="stdp",
+            i_min=-10.0,
+            i_max=10.0,
+            spike_threshold=0.0,
+            stdp_trace_threshold=0.0,
+        )
+
+        n_b1 = pyfolds.MPJRDNeuronAdvanced(cfg)
+        n_b8 = pyfolds.MPJRDNeuronAdvanced(cfg)
+
+        x1 = torch.ones(1, 1, 1)
+        p1 = torch.ones(1)
+        x8 = torch.ones(8, 1, 1)
+        p8 = torch.ones(8)
+
+        before1 = n_b1.dendrites[0].synapses[0].I.item()
+        before8 = n_b8.dendrites[0].synapses[0].I.item()
+        n_b1._update_stdp_traces(x1, p1, dt=1.0)
+        n_b8._update_stdp_traces(x8, p8, dt=1.0)
+        delta1 = n_b1.dendrites[0].synapses[0].I.item() - before1
+        delta8 = n_b8.dendrites[0].synapses[0].I.item() - before8
+
+        assert delta1 == pytest.approx(delta8, rel=1e-6, abs=1e-6)

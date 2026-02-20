@@ -155,6 +155,7 @@ class MPJRDLayer(nn.Module):
         spike_rates = torch.zeros(self.n_neurons, device=self.device)
         theta_values = torch.zeros(self.n_neurons, device=self.device)
         r_hat_values = torch.zeros(self.n_neurons, device=self.device)
+        u_values = torch.zeros(batch_size, self.n_neurons, device=self.device)
 
         wave_real = None
         wave_imag = None
@@ -177,6 +178,7 @@ class MPJRDLayer(nn.Module):
                 spike_rates[i] = out['spike_rate']
                 theta_values[i] = out['theta']
                 r_hat_values[i] = out['r_hat']
+                u_values[:, i] = out['u']
 
                 if 'wave_real' in out:
                     if wave_real is None:
@@ -204,6 +206,7 @@ class MPJRDLayer(nn.Module):
                     spike_rates[i] = out['spike_rate']
                     theta_values[i] = out['theta']
                     r_hat_values[i] = out['r_hat']
+                    u_values[:, i] = out['u']
 
                     if 'wave_real' in out:
                         if wave_real is None:
@@ -224,6 +227,8 @@ class MPJRDLayer(nn.Module):
             'rates': spike_rates,
             'thetas': theta_values,
             'r_hats': r_hat_values,
+            'u_values': u_values,
+            'u': u_values,
         }
 
         if wave_real is not None and wave_imag is not None and phase is not None and frequency is not None:

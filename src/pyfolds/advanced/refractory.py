@@ -118,7 +118,9 @@ class RefractoryMixin(TimedMixin):
         # Garante que last_spike_time existe
         self._ensure_last_spike_time(batch_size, device)
         
-        # Forward da classe base
+        # Forward da classe base (homeostase adiada para pós-refratário)
+        kwargs = dict(kwargs)
+        kwargs["defer_homeostasis"] = True
         output = super().forward(x, **kwargs)
         
         # Verifica estado refratário
@@ -128,7 +130,7 @@ class RefractoryMixin(TimedMixin):
         # Aplica refratário
         # theta_eff deve permanecer 1-D ([B]) para preservar a semântica
         # ponto-a-ponto do refratário por amostra.
-        theta_raw = output['theta']
+        theta_raw = output.get('theta_eff', output['theta'])
         if theta_raw.dim() == 0:
             theta = torch.full_like(theta_boost, theta_raw.item())
         elif theta_raw.dim() == 1 and theta_raw.shape[0] == 1:
@@ -149,8 +151,19 @@ class RefractoryMixin(TimedMixin):
         
         # Atualiza output
         output['spikes'] = final_spikes
+        output['spike_rate'] = float(final_spikes.mean().item())
         output['refrac_blocked'] = blocked
         output['theta_boost'] = theta_boost
+
+        effective_mode = kwargs.get("mode", getattr(self, "mode", None))
+        collect_stats = kwargs.get("collect_stats", True)
+        if (
+            collect_stats
+            and hasattr(self, "homeostasis")
+            and effective_mode is not None
+            and str(getattr(effective_mode, "value", effective_mode)) != "inference"
+        ):
+            self.homeostasis.update(output['spike_rate'])
         
         # Atualiza estado refratário
         self._update_refractory_batch(final_spikes, dt=kwargs.get('dt', 1.0))

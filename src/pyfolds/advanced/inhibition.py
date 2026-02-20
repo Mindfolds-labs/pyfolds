@@ -249,7 +249,19 @@ class InhibitionLayer(nn.Module):
         
         # ===== RECOMPUTA SPIKES =====
         # Subtrai inibição do potencial
-        u = exc_output['u']  # [B, n_neurons]
+        u = exc_output.get('u_values', exc_output.get('u'))
+        if u is None:
+            raise ValueError(
+                "Campo 'u_values' (ou compatível 'u') não encontrado em exc_output. "
+                f"Campos disponíveis: {list(exc_output.keys())}"
+            )
+        if u.dim() == 3:
+            # Compatível com representações [B, N, D]: agrega dimensão dendrítica.
+            u = u.mean(dim=2)
+        if u.dim() != 2 or u.shape[1] != self.n_exc:
+            raise ValueError(
+                f"Shape de potencial incompatível: {tuple(u.shape)}; esperado [B, {self.n_exc}]"
+            )
         u_inhibited = u - total_inh
         
         # Recomputa spikes com threshold

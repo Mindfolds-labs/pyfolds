@@ -19,12 +19,25 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - v1 public aliases remain supported during `1.x` with `DeprecationWarning` and are scheduled for removal in `2.0.0`: `MPJRDConfig` (use `NeuronConfig`), `MPJRDLayer` (use `AdaptiveNeuronLayer`), and `MPJRDNetwork` (use `SpikingNetwork`).
 
 ### Changed
-- Canonical release version unified to `2.0.0` across package metadata, public modules and docs examples.
+- Canonical release version unified to `2.0.1` across package metadata, public modules and docs examples.
 - `docs/ARCHITECTURE.md` diagram reference updated to `docs/architecture/blueprints/`.
 - `docs/development/execution_queue.csv` ISSUE-005 marked as partial in progress.
 
 ### Fixed
 - Fixed: refractory absolute respected; bAP applied; STDP LTD rule corrected; time counter updated; STDP uses pre-STP x.
+- Fixed critical STDP batch scaling by normalizing deltas with `mean(dim=0)` instead of `sum(dim=0)`.
+- Fixed inhibition/layer contract by exposing membrane potentials in layer output (`u_values`) and consuming them safely in `InhibitionLayer`.
+- Fixed STP buffer device migration to keep `register_buffer` registry consistent after device changes.
+- Fixed refractory threshold consistency by prioritizing `theta_eff` in refractory masking.
+- Fixed health monitoring fallback to `spike_rate=0.0` (instead of `1.0`) when only `r_hat` is absent.
+
+## [2.0.1] - 2026-02-20
+
+### Changed
+- MNIST training scripts now default to file-only logging (`train.log`) with optional console output.
+- Added explicit CLI logging parameters (`--log-level`, `--log-file`) and `--batch-size` alias support.
+- Improved failure handling with guaranteed `summary.json` on errors and automatic ADR/issue evidence generation.
+- Updated PowerShell and bash runner guidance for resume flows and crash bundle collection.
 
 ## [2.0.0] - 2026-02-16
 
