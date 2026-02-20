@@ -356,6 +356,11 @@ class "src.pyfolds.serialization.ecc.ECCCodec" {
   +decode()
   +encode()
 }
+class "src.pyfolds.serialization.ecc.ECCProtector" {
+  +__init__()
+  +protect_chunk()
+  +recover_chunk()
+}
 class "src.pyfolds.serialization.ecc.ECCResult" {
 }
 class "src.pyfolds.serialization.ecc.NoECC" {
@@ -401,8 +406,11 @@ class "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint" {
   +_cfg_dict()
   +_compute_hash()
   +_compute_plain_hash()
+  +_decode_with_ecc()
   +_git_hash()
   +_metadata()
+  +_resolve_safetensors_paths()
+  +_validate_shape_invariants()
   +_verify_hash()
   +load()
   +save()
@@ -524,7 +532,10 @@ class "src.pyfolds.utils.device.DeviceManager" {
 
 class "src.pyfolds.utils.logging.CircularBufferFileHandler" {
   +__init__()
+  +_flush_to_disk()
+  +close()
   +emit()
+  +flush()
 }
 class "src.pyfolds.utils.logging.FixedLayoutFormatter" {
   +format()
@@ -893,6 +904,7 @@ class "tests.unit.utils.test_utils.TestLogging" {
   +test_get_logger()
   +test_import_pyfolds_does_not_add_stream_handler()
   +test_logger_circular_buffer_file_handler()
+  +test_logger_circular_buffer_flushes_on_error()
   +test_logger_console_false_keeps_terminal_clean()
   +test_logger_file_handler()
   +test_logger_fixed_layout()

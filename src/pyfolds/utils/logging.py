@@ -154,6 +154,7 @@ class PyFoldsLogger:
                     capacity_lines=circular_buffer_lines,
                     flush_interval_sec=circular_buffer_flush_interval_sec,
                     encoding="utf-8",
+                    flush_interval_sec=circular_flush_interval_sec,
                 )
             else:
                 file_handler = logging.handlers.RotatingFileHandler(
@@ -284,13 +285,9 @@ def setup_logging(
 class CircularBufferFileHandler(logging.Handler):
     """Handler TXT com buffer circular em número de linhas.
 
-    Mantém somente as últimas ``capacity_lines`` mensagens no arquivo,
-    sobrescrevendo-o a cada emissão para preservar ordem cronológica.
-
-    Nota:
-        Recomendado para debug e inspeção dos últimos eventos.
-        Não é recomendado para treinos longos, pois cada ``emit``
-        reescreve o arquivo inteiro (custo O(n) no tamanho do buffer).
+    Mantém somente as últimas ``capacity_lines`` mensagens no arquivo.
+    Para reduzir custo de I/O, as gravações são feitas sob demanda via
+    ``flush_interval_sec`` ou imediatamente para eventos de erro.
     """
 
     def __init__(
@@ -305,6 +302,8 @@ class CircularBufferFileHandler(logging.Handler):
             raise ValueError(
                 f"circular_buffer_lines must be a positive integer, got {capacity_lines}"
             )
+        if flush_interval_sec < 0:
+            raise ValueError("flush_interval_sec must be >= 0")
 
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -321,6 +320,14 @@ class CircularBufferFileHandler(logging.Handler):
             previous_lines = self.path.read_text(encoding=self.encoding).splitlines()
             self._buffer.extend(previous_lines[-capacity_lines:])
             self._line_count = len(self._buffer)
+
+    def _flush_to_disk(self) -> None:
+        content = "\n".join(self._buffer)
+        if content:
+            content += "\n"
+        self.path.write_text(content, encoding=self.encoding)
+        self._line_count = len(self._buffer)
+        self._last_flush = datetime.now()
 
     def emit(self, record: logging.LogRecord) -> None:
         try:

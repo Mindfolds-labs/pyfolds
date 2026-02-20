@@ -33,6 +33,7 @@ from .serialization import (
     is_mind,
     NoECC,
     ReedSolomonECC,
+    ECCProtector,
     ecc_from_protection,
 )
 from .monitoring import (
@@ -115,6 +116,7 @@ __all__ = [
     "is_mind",
     "NoECC",
     "ReedSolomonECC",
+    "ECCProtector",
     "ecc_from_protection",
     "HealthStatus",
     "NeuronHealthCheck",

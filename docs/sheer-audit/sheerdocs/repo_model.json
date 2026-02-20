@@ -25,7 +25,7 @@
       "name": "__getattr__",
       "qname": "src.pyfolds.__getattr__",
       "file": "src/pyfolds/__init__.py",
-      "line": 162,
+      "line": 164,
       "doc": "Provide deprecated v1 aliases while keeping v2 names canonical.",
       "params": [
         "name"
@@ -5141,12 +5141,73 @@
       "decorators": []
     },
     {
+      "id": "cls:src.pyfolds.serialization.ecc.ECCProtector",
+      "kind": "class",
+      "name": "ECCProtector",
+      "qname": "src.pyfolds.serialization.ecc.ECCProtector",
+      "file": "src/pyfolds/serialization/ecc.py",
+      "line": 105,
+      "doc": "Proteção simples de um chunk único via Reed-Solomon.\n\nEsta API é útil para casos fora do container ``.fold/.mind`` em que o\npayload completo precisa de proteção ECC direta (ex.: sidecar de checkpoint).",
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.serialization.ecc.ECCProtector.__init__",
+      "kind": "method",
+      "name": "__init__",
+      "qname": "src.pyfolds.serialization.ecc.ECCProtector.__init__",
+      "file": "src/pyfolds/serialization/ecc.py",
+      "line": 112,
+      "doc": null,
+      "params": [
+        "self",
+        "error_bytes"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.serialization.ecc.ECCProtector.protect_chunk",
+      "kind": "method",
+      "name": "protect_chunk",
+      "qname": "src.pyfolds.serialization.ecc.ECCProtector.protect_chunk",
+      "file": "src/pyfolds/serialization/ecc.py",
+      "line": 122,
+      "doc": "Adiciona bytes de paridade ao chunk.",
+      "params": [
+        "self",
+        "data"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.serialization.ecc.ECCProtector.recover_chunk",
+      "kind": "method",
+      "name": "recover_chunk",
+      "qname": "src.pyfolds.serialization.ecc.ECCProtector.recover_chunk",
+      "file": "src/pyfolds/serialization/ecc.py",
+      "line": 126,
+      "doc": "Tenta corrigir erros e retorna o payload original.",
+      "params": [
+        "self",
+        "protected_data"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "fn:src.pyfolds.serialization.ecc.ecc_from_protection",
       "kind": "function",
       "name": "ecc_from_protection",
       "qname": "src.pyfolds.serialization.ecc.ecc_from_protection",
       "file": "src/pyfolds/serialization/ecc.py",
-      "line": 105,
+      "line": 138,
       "doc": "Mapeia nível de proteção em codec ECC.\n\nNíveis:\n    - off/none/0 -> NoECC\n    - low -> ReedSolomonECC(16)\n    - med -> ReedSolomonECC(32)\n    - high -> ReedSolomonECC(64)",
       "params": [
         "level"
@@ -5974,8 +6035,8 @@
       "name": "VersionedCheckpoint",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 20,
-      "doc": "Salva/recupera estado do modelo com metadados e hash de integridade.\n\n✅ CORRIGIDO:\n    - Warnings para git hash ausente\n    - Validação de versão ao carregar\n    - Otimização de hash\n    - Suporte a compressão",
+      "line": 28,
+      "doc": "Salva/recupera estado do modelo com metadados e hash de integridade.\n\n✅ CORRIGIDO:\n    - Warnings para git hash ausente\n    - Validação de versão ao carregar\n    - Otimização de hash\n    - Suporte a compressão\n    - Suporte opcional a safetensors\n    - Validação de shape antes de ``load_state_dict``\n    - Sidecar ECC opcional para recuperação física de bitflips",
       "params": [],
       "returns": null,
       "bases": [],
@@ -5987,7 +6048,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 31,
+      "line": 42,
       "doc": "Args:\n    model: Modelo a ser salvo/restaurado\n    version: Versão semântica do modelo (ex: \"2.0.0\")",
       "params": [
         "self",
@@ -6004,7 +6065,7 @@
       "name": "_cfg_dict",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._cfg_dict",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 40,
+      "line": 51,
       "doc": "Extrai configuração do modelo em formato dict.",
       "params": [
         "self"
@@ -6019,7 +6080,7 @@
       "name": "_git_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 55,
+      "line": 66,
       "doc": "Obtém hash atual do git para reprodutibilidade.",
       "params": [
         "self"
@@ -6034,7 +6095,7 @@
       "name": "_metadata",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 80,
+      "line": 91,
       "doc": "Gera metadados para o checkpoint.",
       "params": [
         "self",
@@ -6050,7 +6111,7 @@
       "name": "_compute_plain_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_plain_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 93,
+      "line": 104,
       "doc": "Calcula hash SHA-256 puro do state_dict.",
       "params": [
         "self",
@@ -6066,7 +6127,7 @@
       "name": "_compute_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 106,
+      "line": 117,
       "doc": "Calcula digest de integridade do state dict (HMAC quando disponível).",
       "params": [
         "self",
@@ -6082,11 +6143,65 @@
       "name": "_verify_hash",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 116,
+      "line": 127,
       "doc": null,
       "params": [
         "plain_digest",
         "saved"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "staticmethod"
+      ]
+    },
+    {
+      "id": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
+      "kind": "method",
+      "name": "_resolve_safetensors_paths",
+      "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
+      "file": "src/pyfolds/serialization/versioned_checkpoint.py",
+      "line": 143,
+      "doc": null,
+      "params": [
+        "path"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "staticmethod"
+      ]
+    },
+    {
+      "id": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
+      "kind": "method",
+      "name": "_decode_with_ecc",
+      "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
+      "file": "src/pyfolds/serialization/versioned_checkpoint.py",
+      "line": 152,
+      "doc": null,
+      "params": [
+        "raw_payload",
+        "ecc_algo",
+        "ecc_path"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "staticmethod"
+      ]
+    },
+    {
+      "id": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
+      "kind": "method",
+      "name": "_validate_shape_invariants",
+      "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
+      "file": "src/pyfolds/serialization/versioned_checkpoint.py",
+      "line": 166,
+      "doc": "Valida shape dos tensores do checkpoint antes do load no modelo.",
+      "params": [
+        "model",
+        "state_dict"
       ],
       "returns": null,
       "bases": [],
@@ -6100,13 +6215,15 @@
       "name": "save",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.save",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 131,
-      "doc": "Salva checkpoint e retorna payload persistido.\n\nArgs:\n    path: Caminho do arquivo .pt\n    extra_metadata: Metadados adicionais\n    compress: Usar compressão zip (recomendado)\n\nReturns:\n    Dicionário com o checkpoint salvo",
+      "line": 178,
+      "doc": "Salva checkpoint e retorna payload persistido.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    extra_metadata: Metadados adicionais\n    compress: Usar compressão zip (recomendado para .pt)\n    use_safetensors: Usa formato seguro sem pickle para pesos\n    ecc_protection: Nível ECC de sidecar (off|low|med|high)\n\nReturns:\n    Dicionário com o checkpoint salvo",
       "params": [
         "self",
         "path",
         "extra_metadata",
-        "compress"
+        "compress",
+        "use_safetensors",
+        "ecc_protection"
       ],
       "returns": null,
       "bases": [],
@@ -6118,8 +6235,8 @@
       "name": "load",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 170,
-      "doc": "Carrega checkpoint, valida hash e opcionalmente restaura modelo.\n\nArgs:\n    path: Caminho do arquivo .pt\n    model: Modelo para carregar o estado (opcional)\n    map_location: Device para carregar tensores\n    strict: Se True, valida hash e versão\n    expected_version: Versão esperada (opcional)\n\nReturns:\n    Dicionário com o checkpoint carregado\n\nRaises:\n    ValueError: Se hash ou versão não coincidirem",
+      "line": 249,
+      "doc": "Carrega checkpoint, valida hash e opcionalmente restaura modelo.\n\nArgs:\n    path: Caminho do arquivo .pt/.safetensors\n    model: Modelo para carregar o estado (opcional)\n    map_location: Device para carregar tensores\n    strict: Se True, valida hash e versão\n    expected_version: Versão esperada (opcional)\n\nReturns:\n    Dicionário com o checkpoint carregado\n\nRaises:\n    ValueError: Se hash/shape não coincidirem",
       "params": [
         "cls",
         "path",
@@ -6140,7 +6257,7 @@
       "name": "__repr__",
       "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
       "file": "src/pyfolds/serialization/versioned_checkpoint.py",
-      "line": 243,
+      "line": 351,
       "doc": null,
       "params": [
         "self"
@@ -7970,6 +8087,7 @@
         "module_levels",
         "structured",
         "circular_buffer_lines",
+        "circular_flush_interval_sec",
         "console",
         "fixed_layout"
       ],
@@ -7983,7 +8101,7 @@
       "name": "get_logger",
       "qname": "src.pyfolds.utils.logging.PyFoldsLogger.get_logger",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 175,
+      "line": 177,
       "doc": "Retorna logger configurado.",
       "params": [
         "self",
@@ -8000,7 +8118,7 @@
       "name": "add_file_handler",
       "qname": "src.pyfolds.utils.logging.PyFoldsLogger.add_file_handler",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 187,
+      "line": 189,
       "doc": "Adiciona handler de arquivo adicional com rotação.",
       "params": [
         "self",
@@ -8019,7 +8137,7 @@
       "name": "get_logger",
       "qname": "src.pyfolds.utils.logging.get_logger",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 213,
+      "line": 215,
       "doc": "Função conveniência para obter logger.",
       "params": [
         "name"
@@ -8034,7 +8152,7 @@
       "name": "setup_run_logging",
       "qname": "src.pyfolds.utils.logging.setup_run_logging",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 220,
+      "line": 222,
       "doc": "Configuração recomendada para execução (treino/debug em produção).\n\nCria automaticamente um arquivo incremental e configura logging para arquivo\ncom terminal silencioso por padrão.\n\nReturns:\n    Tupla ``(logger, log_path)``.",
       "params": [
         "app",
@@ -8044,7 +8162,8 @@
         "structured",
         "fixed_layout",
         "console",
-        "circular_buffer_lines"
+        "circular_buffer_lines",
+        "circular_flush_interval_sec"
       ],
       "returns": null,
       "bases": [],
@@ -8056,13 +8175,14 @@
       "name": "setup_logging",
       "qname": "src.pyfolds.utils.logging.setup_logging",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 258,
+      "line": 262,
       "doc": "Setup rápido de logging.",
       "params": [
         "log_file",
         "level",
         "structured",
         "circular_buffer_lines",
+        "circular_flush_interval_sec",
         "console",
         "fixed_layout"
       ],
@@ -8076,8 +8196,8 @@
       "name": "CircularBufferFileHandler",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 278,
-      "doc": "Handler TXT com buffer circular em número de linhas.\n\nMantém somente as últimas ``capacity_lines`` mensagens no arquivo,\nsobrescrevendo-o a cada emissão para preservar ordem cronológica.\n\nNota:\n    Recomendado para debug e inspeção dos últimos eventos.\n    Não é recomendado para treinos longos, pois cada ``emit``\n    reescreve o arquivo inteiro (custo O(n) no tamanho do buffer).",
+      "line": 284,
+      "doc": "Handler TXT com buffer circular em número de linhas.\n\nMantém somente as últimas ``capacity_lines`` mensagens no arquivo.\nPara reduzir custo de I/O, as gravações são feitas sob demanda via\n``flush_interval_sec`` ou imediatamente para eventos de erro.",
       "params": [],
       "returns": null,
       "bases": [
@@ -8091,13 +8211,29 @@
       "name": "__init__",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.__init__",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 290,
+      "line": 292,
       "doc": null,
       "params": [
         "self",
         "path",
         "capacity_lines",
-        "encoding"
+        "encoding",
+        "flush_interval_sec"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
+      "kind": "method",
+      "name": "_flush_to_disk",
+      "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
+      "file": "src/pyfolds/utils/logging.py",
+      "line": 322,
+      "doc": null,
+      "params": [
+        "self"
       ],
       "returns": null,
       "bases": [],
@@ -8109,11 +8245,41 @@
       "name": "emit",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.emit",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 310,
+      "line": 330,
       "doc": null,
       "params": [
         "self",
         "record"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.flush",
+      "kind": "method",
+      "name": "flush",
+      "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.flush",
+      "file": "src/pyfolds/utils/logging.py",
+      "line": 346,
+      "doc": null,
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.close",
+      "kind": "method",
+      "name": "close",
+      "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.close",
+      "file": "src/pyfolds/utils/logging.py",
+      "line": 350,
+      "doc": null,
+      "params": [
+        "self"
       ],
       "returns": null,
       "bases": [],
@@ -8125,7 +8291,7 @@
       "name": "next_log_path",
       "qname": "src.pyfolds.utils.logging.next_log_path",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 324,
+      "line": 356,
       "doc": "Gera caminho de log incremental: NNN_app_version_YYYYMMDD_HHMMSS.log.",
       "params": [
         "log_dir",
@@ -8142,7 +8308,7 @@
       "name": "build_log_path",
       "qname": "src.pyfolds.utils.logging.build_log_path",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 341,
+      "line": 373,
       "doc": "Alias de compatibilidade para ``next_log_path``.",
       "params": [
         "log_dir",
@@ -11577,7 +11743,7 @@
       "name": "DummyNeuron",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 10,
+      "line": 11,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11590,7 +11756,7 @@
       "name": "__init__",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.__init__",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 11,
+      "line": 12,
       "doc": null,
       "params": [
         "self",
@@ -11606,7 +11772,7 @@
       "name": "get_metrics",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.get_metrics",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 14,
+      "line": 15,
       "doc": null,
       "params": [
         "self"
@@ -11621,7 +11787,7 @@
       "name": "test_health_check_critical_for_dead_neurons",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_critical_for_dead_neurons",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 18,
+      "line": 19,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11634,7 +11800,7 @@
       "name": "test_health_check_uses_fallback_metrics_from_get_metrics_contract",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_uses_fallback_metrics_from_get_metrics_contract",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 27,
+      "line": 28,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11647,7 +11813,7 @@
       "name": "test_versioned_checkpoint_save_and_load",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_save_and_load",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 41,
+      "line": 42,
       "doc": null,
       "params": [
         "tmp_path"
@@ -11662,7 +11828,37 @@
       "name": "test_versioned_checkpoint_metadata_created_at_is_utc",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 54,
+      "line": 55,
+      "doc": null,
+      "params": [
+        "tmp_path"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises",
+      "kind": "function",
+      "name": "test_versioned_checkpoint_shape_validation_raises",
+      "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises",
+      "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
+      "line": 69,
+      "doc": null,
+      "params": [
+        "tmp_path"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
+      "kind": "function",
+      "name": "test_versioned_checkpoint_safetensors_roundtrip",
+      "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
+      "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
+      "line": 81,
       "doc": null,
       "params": [
         "tmp_path"
@@ -15268,12 +15464,28 @@
       "decorators": []
     },
     {
+      "id": "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_circular_buffer_flushes_on_error",
+      "kind": "method",
+      "name": "test_logger_circular_buffer_flushes_on_error",
+      "qname": "tests.unit.utils.test_utils.TestLogging.test_logger_circular_buffer_flushes_on_error",
+      "file": "tests/unit/utils/test_utils.py",
+      "line": 479,
+      "doc": null,
+      "params": [
+        "self",
+        "tmp_path"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mtd:tests.unit.utils.test_utils.TestLogging.test_multiple_loggers_same_name",
       "kind": "method",
       "name": "test_multiple_loggers_same_name",
       "qname": "tests.unit.utils.test_utils.TestLogging.test_multiple_loggers_same_name",
       "file": "tests/unit/utils/test_utils.py",
-      "line": 474,
+      "line": 499,
       "doc": "Testa se get_logger com mesmo nome retorna mesmo logger.",
       "params": [
         "self"
@@ -15288,7 +15500,7 @@
       "name": "test_module_levels",
       "qname": "tests.unit.utils.test_utils.TestLogging.test_module_levels",
       "file": "tests/unit/utils/test_utils.py",
-      "line": 480,
+      "line": 505,
       "doc": "Testa configuração de níveis por módulo.",
       "params": [
         "self"
@@ -15303,7 +15515,7 @@
       "name": "TestIntegration",
       "qname": "tests.unit.utils.test_utils.TestIntegration",
       "file": "tests/unit/utils/test_utils.py",
-      "line": 502,
+      "line": 527,
       "doc": "Testes que integram múltiplos módulos.",
       "params": [],
       "returns": null,
@@ -15316,7 +15528,7 @@
       "name": "test_logging_with_device",
       "qname": "tests.unit.utils.test_utils.TestIntegration.test_logging_with_device",
       "file": "tests/unit/utils/test_utils.py",
-      "line": 505,
+      "line": 530,
       "doc": "Testa logging + device juntos.",
       "params": [
         "self"
@@ -15331,7 +15543,7 @@
       "name": "test_learning_mode_with_math",
       "qname": "tests.unit.utils.test_utils.TestIntegration.test_learning_mode_with_math",
       "file": "tests/unit/utils/test_utils.py",
-      "line": 513,
+      "line": 538,
       "doc": "Testa LearningMode + funções matemáticas.",
       "params": [
         "self"
@@ -15346,7 +15558,7 @@
       "name": "test_device_with_tensor_ops",
       "qname": "tests.unit.utils.test_utils.TestIntegration.test_device_with_tensor_ops",
       "file": "tests/unit/utils/test_utils.py",
-      "line": 523,
+      "line": 548,
       "doc": "Testa device com operações de tensor.",
       "params": [
         "self"
@@ -18725,6 +18937,30 @@
     {
       "type": "CONTAINS",
       "src": "mod:src.pyfolds.serialization.ecc",
+      "dst": "cls:src.pyfolds.serialization.ecc.ECCProtector",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.serialization.ecc.ECCProtector",
+      "dst": "mtd:src.pyfolds.serialization.ecc.ECCProtector.__init__",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.serialization.ecc.ECCProtector",
+      "dst": "mtd:src.pyfolds.serialization.ecc.ECCProtector.protect_chunk",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.serialization.ecc.ECCProtector",
+      "dst": "mtd:src.pyfolds.serialization.ecc.ECCProtector.recover_chunk",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.serialization.ecc",
       "dst": "fn:src.pyfolds.serialization.ecc.ecc_from_protection",
       "meta": {}
     },
@@ -19181,6 +19417,12 @@
     {
       "type": "IMPORT",
       "src": "mod:src.pyfolds.serialization.versioned_checkpoint",
+      "dst": "mod:json",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.serialization.versioned_checkpoint",
       "dst": "mod:os",
       "meta": {}
     },
@@ -19239,6 +19481,12 @@
       "meta": {}
     },
     {
+      "type": "IMPORT",
+      "src": "mod:src.pyfolds.serialization.versioned_checkpoint",
+      "dst": "mod:src.pyfolds.serialization.ecc",
+      "meta": {}
+    },
+    {
       "type": "CONTAINS",
       "src": "mod:src.pyfolds.serialization.versioned_checkpoint",
       "dst": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
@@ -19284,6 +19532,24 @@
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
       "dst": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
+      "dst": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
+      "dst": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
+      "dst": "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
       "meta": {}
     },
     {
@@ -20447,7 +20713,25 @@
     {
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
+      "dst": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
       "dst": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.emit",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
+      "dst": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.flush",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
+      "dst": "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.close",
       "meta": {}
     },
     {
@@ -22505,6 +22789,12 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "mod:pytest",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
       "dst": "mod:pyfolds",
       "meta": {}
     },
@@ -22560,6 +22850,18 @@
       "type": "CONTAINS",
       "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
       "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
       "meta": {}
     },
     {
@@ -24515,6 +24817,12 @@
     {
       "type": "CONTAINS",
       "src": "cls:tests.unit.utils.test_utils.TestLogging",
+      "dst": "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_circular_buffer_flushes_on_error",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:tests.unit.utils.test_utils.TestLogging",
       "dst": "mtd:tests.unit.utils.test_utils.TestLogging.test_multiple_loggers_same_name",
       "meta": {}
     },
@@ -24660,9 +24968,9 @@
   "findings": [],
   "metrics": {
     "python_files": 138,
-    "symbols": 1017,
-    "edges": 1521,
+    "symbols": 1030,
+    "edges": 1537,
     "findings": 0,
-    "internal_import_edges": 104
+    "internal_import_edges": 105
   }
 }

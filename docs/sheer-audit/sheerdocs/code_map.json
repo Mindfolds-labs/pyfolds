@@ -6,10 +6,10 @@
   },
   "metrics": {
     "python_files": 138,
-    "symbols": 1017,
-    "edges": 1521,
+    "symbols": 1030,
+    "edges": 1537,
     "findings": 0,
-    "internal_import_edges": 104
+    "internal_import_edges": 105
   },
   "modules": [
     {
@@ -40,7 +40,7 @@
           "id": "fn:src.pyfolds.__getattr__",
           "name": "__getattr__",
           "qname": "src.pyfolds.__getattr__",
-          "line": 162,
+          "line": 164,
           "params": [
             "name"
           ]
@@ -1422,6 +1422,18 @@
           ]
         },
         {
+          "id": "cls:src.pyfolds.serialization.ecc.ECCProtector",
+          "name": "ECCProtector",
+          "qname": "src.pyfolds.serialization.ecc.ECCProtector",
+          "line": 105,
+          "bases": [],
+          "methods": [
+            "mtd:src.pyfolds.serialization.ecc.ECCProtector.__init__",
+            "mtd:src.pyfolds.serialization.ecc.ECCProtector.protect_chunk",
+            "mtd:src.pyfolds.serialization.ecc.ECCProtector.recover_chunk"
+          ]
+        },
+        {
           "id": "cls:src.pyfolds.serialization.ecc.ECCResult",
           "name": "ECCResult",
           "qname": "src.pyfolds.serialization.ecc.ECCResult",
@@ -1458,7 +1470,7 @@
           "id": "fn:src.pyfolds.serialization.ecc.ecc_from_protection",
           "name": "ecc_from_protection",
           "qname": "src.pyfolds.serialization.ecc.ecc_from_protection",
-          "line": 105,
+          "line": 138,
           "params": [
             "level"
           ]
@@ -1831,10 +1843,12 @@
         "mod:datetime",
         "mod:hashlib",
         "mod:hmac",
+        "mod:json",
         "mod:os",
         "mod:pathlib",
         "mod:pickle",
         "mod:shutil",
+        "mod:src.pyfolds.serialization.ecc",
         "mod:subprocess",
         "mod:torch",
         "mod:typing",
@@ -1845,7 +1859,7 @@
           "id": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
           "name": "VersionedCheckpoint",
           "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
-          "line": 20,
+          "line": 28,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
@@ -1853,8 +1867,11 @@
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._cfg_dict",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_plain_hash",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._decode_with_ecc",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._resolve_safetensors_paths",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._validate_shape_invariants",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.save"
@@ -2445,13 +2462,16 @@
           "id": "cls:src.pyfolds.utils.logging.CircularBufferFileHandler",
           "name": "CircularBufferFileHandler",
           "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler",
-          "line": 278,
+          "line": 284,
           "bases": [
             "logging.Handler"
           ],
           "methods": [
             "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.__init__",
-            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.emit"
+            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
+            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.close",
+            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.emit",
+            "mtd:src.pyfolds.utils.logging.CircularBufferFileHandler.flush"
           ]
         },
         {
@@ -2498,7 +2518,7 @@
           "id": "fn:src.pyfolds.utils.logging.build_log_path",
           "name": "build_log_path",
           "qname": "src.pyfolds.utils.logging.build_log_path",
-          "line": 341,
+          "line": 373,
           "params": [
             "log_dir",
             "app",
@@ -2509,7 +2529,7 @@
           "id": "fn:src.pyfolds.utils.logging.get_logger",
           "name": "get_logger",
           "qname": "src.pyfolds.utils.logging.get_logger",
-          "line": 213,
+          "line": 215,
           "params": [
             "name"
           ]
@@ -2518,7 +2538,7 @@
           "id": "fn:src.pyfolds.utils.logging.next_log_path",
           "name": "next_log_path",
           "qname": "src.pyfolds.utils.logging.next_log_path",
-          "line": 324,
+          "line": 356,
           "params": [
             "log_dir",
             "app",
@@ -2529,12 +2549,13 @@
           "id": "fn:src.pyfolds.utils.logging.setup_logging",
           "name": "setup_logging",
           "qname": "src.pyfolds.utils.logging.setup_logging",
-          "line": 258,
+          "line": 262,
           "params": [
             "log_file",
             "level",
             "structured",
             "circular_buffer_lines",
+            "circular_flush_interval_sec",
             "console",
             "fixed_layout"
           ]
@@ -2543,7 +2564,7 @@
           "id": "fn:src.pyfolds.utils.logging.setup_run_logging",
           "name": "setup_run_logging",
           "qname": "src.pyfolds.utils.logging.setup_run_logging",
-          "line": 220,
+          "line": 222,
           "params": [
             "app",
             "version",
@@ -2552,7 +2573,8 @@
             "structured",
             "fixed_layout",
             "console",
-            "circular_buffer_lines"
+            "circular_buffer_lines",
+            "circular_flush_interval_sec"
           ]
         },
         {
@@ -4074,14 +4096,15 @@
         "mod:pathlib",
         "mod:pyfolds",
         "mod:pyfolds.monitoring",
-        "mod:pyfolds.serialization"
+        "mod:pyfolds.serialization",
+        "mod:pytest"
       ],
       "classes": [
         {
           "id": "cls:tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron",
           "name": "DummyNeuron",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron",
-          "line": 10,
+          "line": 11,
           "bases": [],
           "methods": [
             "mtd:tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.__init__",
@@ -4094,21 +4117,30 @@
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_health_check_critical_for_dead_neurons",
           "name": "test_health_check_critical_for_dead_neurons",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_critical_for_dead_neurons",
-          "line": 18,
+          "line": 19,
           "params": []
         },
         {
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_health_check_uses_fallback_metrics_from_get_metrics_contract",
           "name": "test_health_check_uses_fallback_metrics_from_get_metrics_contract",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_uses_fallback_metrics_from_get_metrics_contract",
-          "line": 27,
+          "line": 28,
           "params": []
         },
         {
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
           "name": "test_versioned_checkpoint_metadata_created_at_is_utc",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
-          "line": 54,
+          "line": 55,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
+          "name": "test_versioned_checkpoint_safetensors_roundtrip",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
+          "line": 81,
           "params": [
             "tmp_path"
           ]
@@ -4117,7 +4149,16 @@
           "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_save_and_load",
           "name": "test_versioned_checkpoint_save_and_load",
           "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_save_and_load",
-          "line": 41,
+          "line": 42,
+          "params": [
+            "tmp_path"
+          ]
+        },
+        {
+          "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises",
+          "name": "test_versioned_checkpoint_shape_validation_raises",
+          "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises",
+          "line": 69,
           "params": [
             "tmp_path"
           ]
@@ -5440,7 +5481,7 @@
           "id": "cls:tests.unit.utils.test_utils.TestIntegration",
           "name": "TestIntegration",
           "qname": "tests.unit.utils.test_utils.TestIntegration",
-          "line": 502,
+          "line": 527,
           "bases": [],
           "methods": [
             "mtd:tests.unit.utils.test_utils.TestIntegration.test_device_with_tensor_ops",
@@ -5459,6 +5500,7 @@
             "mtd:tests.unit.utils.test_utils.TestLogging.test_get_logger",
             "mtd:tests.unit.utils.test_utils.TestLogging.test_import_pyfolds_does_not_add_stream_handler",
             "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_circular_buffer_file_handler",
+            "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_circular_buffer_flushes_on_error",
             "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_console_false_keeps_terminal_clean",
             "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_file_handler",
             "mtd:tests.unit.utils.test_utils.TestLogging.test_logger_fixed_layout",
