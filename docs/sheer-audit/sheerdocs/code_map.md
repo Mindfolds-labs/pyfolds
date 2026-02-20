@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `138`
-- Símbolos: `1007`
+- Símbolos: `1015`
 
 ## Módulos
 
@@ -503,6 +503,7 @@
   - `_serialize_state_dict_safetensors(state_dict)`
   - `_sign_payload_ed25519(payload, private_key_pem)`
   - `_telemetry_snapshot(neuron, max_events)`
+  - `_validate_safetensors_payload(payload)`
   - `_verify_payload_signature_ed25519(payload, signature_hex, public_key_pem)`
   - `crc32c_u32(data)`
   - `is_mind(path)`
@@ -1228,6 +1229,7 @@
   - `mod:pyfolds.utils.types`
   - `mod:pytest`
   - `mod:torch`
+  - `mod:unittest`
 - Classes:
   - `TestMPJRDSynapse` (bases: (sem base explícita))
 
@@ -1334,6 +1336,8 @@
   - `test_fold_writer_finalize_wraps_io_failure_with_phase_context(tmp_path, monkeypatch)`
   - `test_hierarchical_hashes_present_in_metadata(tmp_path)`
   - `test_training_then_save_with_telemetry_and_history_and_nuclear_arrays(tmp_path)`
+  - `test_validate_safetensors_payload_rejects_invalid_json()`
+  - `test_validate_safetensors_payload_rejects_oversized_header()`
 
 ### `tests.unit.telemetry`
 - Arquivo: `tests/unit/telemetry/__init__.py`

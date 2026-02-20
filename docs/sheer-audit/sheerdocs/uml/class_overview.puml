@@ -215,6 +215,8 @@ class "src.pyfolds.core.neuron.MPJRDNeuron" {
   +_apply_online_plasticity()
   +_apply_runtime_injections()
   +_compute_R_endogenous()
+  +_gradient_health_monitor()
+  +_install_gradient_health_monitor()
   +_on_homeostasis_stable()
   +_on_homeostasis_unstable()
   +_refresh_config_references()
@@ -244,6 +246,7 @@ class "src.pyfolds.core.neuron_v2.MPJRDNeuronV2" {
 class "src.pyfolds.core.synapse.MPJRDSynapse" {
   +W()
   +__init__()
+  +_sync_distributed_plasticity_state()
   +_update_with_soft_saturation()
   +consolidate()
   +extra_repr()
@@ -751,6 +754,8 @@ class "tests.unit.core.test_neuron.TestMPJRDNeuron" {
 
 
 class "tests.unit.core.test_synapse.TestMPJRDSynapse" {
+  +test_consolidate_performs_distributed_sync_when_enabled()
+  +test_consolidate_skips_distributed_sync_when_disabled()
   +test_consolidate_transfers_eligibility_and_decays_internal_potential()
   +test_initialization()
   +test_ltp()

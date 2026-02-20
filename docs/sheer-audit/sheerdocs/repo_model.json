@@ -1959,7 +1959,7 @@
       "name": "__post_init__",
       "qname": "src.pyfolds.core.config.MPJRDConfig.__post_init__",
       "file": "src/pyfolds/core/config.py",
-      "line": 159,
+      "line": 160,
       "doc": "Validações pós-inicialização.",
       "params": [
         "self"
@@ -1974,7 +1974,7 @@
       "name": "validate_numerical_safety",
       "qname": "src.pyfolds.core.config.MPJRDConfig.validate_numerical_safety",
       "file": "src/pyfolds/core/config.py",
-      "line": 268,
+      "line": 269,
       "doc": "Valida parâmetros críticos para segurança numérica.",
       "params": [
         "self"
@@ -1989,7 +1989,7 @@
       "name": "get_ts",
       "qname": "src.pyfolds.core.config.MPJRDConfig.get_ts",
       "file": "src/pyfolds/core/config.py",
-      "line": 294,
+      "line": 295,
       "doc": "Retorna constante de tempo em ms para um parâmetro.",
       "params": [
         "self",
@@ -2005,7 +2005,7 @@
       "name": "get_decay_rate",
       "qname": "src.pyfolds.core.config.MPJRDConfig.get_decay_rate",
       "file": "src/pyfolds/core/config.py",
-      "line": 307,
+      "line": 308,
       "doc": "Calcula taxa de decaimento exponencial.",
       "params": [
         "self",
@@ -2022,7 +2022,7 @@
       "name": "to_dict",
       "qname": "src.pyfolds.core.config.MPJRDConfig.to_dict",
       "file": "src/pyfolds/core/config.py",
-      "line": 320,
+      "line": 321,
       "doc": "Converte configuração para dicionário.",
       "params": [
         "self"
@@ -2037,7 +2037,7 @@
       "name": "from_dict",
       "qname": "src.pyfolds.core.config.MPJRDConfig.from_dict",
       "file": "src/pyfolds/core/config.py",
-      "line": 326,
+      "line": 327,
       "doc": "Cria configuração a partir de dicionário.",
       "params": [
         "cls",
@@ -2055,7 +2055,7 @@
       "name": "get_preset",
       "qname": "src.pyfolds.core.config.MPJRDConfig.get_preset",
       "file": "src/pyfolds/core/config.py",
-      "line": 330,
+      "line": 331,
       "doc": "Retorna configuração pré-definida.",
       "params": [
         "self",
@@ -2071,7 +2071,7 @@
       "name": "with_runtime_update",
       "qname": "src.pyfolds.core.config.MPJRDConfig.with_runtime_update",
       "file": "src/pyfolds/core/config.py",
-      "line": 371,
+      "line": 372,
       "doc": "Retorna nova config validada com campos atualizados em runtime.",
       "params": [
         "self"
@@ -2086,7 +2086,7 @@
       "name": "resolve_runtime_alias",
       "qname": "src.pyfolds.core.config.MPJRDConfig.resolve_runtime_alias",
       "file": "src/pyfolds/core/config.py",
-      "line": 375,
+      "line": 376,
       "doc": "Normaliza aliases de parâmetros usados por controladores externos.",
       "params": [
         "self",
@@ -2102,7 +2102,7 @@
       "name": "__repr__",
       "qname": "src.pyfolds.core.config.MPJRDConfig.__repr__",
       "file": "src/pyfolds/core/config.py",
-      "line": 383,
+      "line": 384,
       "doc": "Representação string da configuração.",
       "params": [
         "self"
@@ -2967,12 +2967,45 @@
       "decorators": []
     },
     {
+      "id": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._install_gradient_health_monitor",
+      "kind": "method",
+      "name": "_install_gradient_health_monitor",
+      "qname": "src.pyfolds.core.neuron.MPJRDNeuron._install_gradient_health_monitor",
+      "file": "src/pyfolds/core/neuron.py",
+      "line": 138,
+      "doc": "Instala gancho de saneamento para gradientes com NaN/Inf.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._gradient_health_monitor",
+      "kind": "method",
+      "name": "_gradient_health_monitor",
+      "qname": "src.pyfolds.core.neuron.MPJRDNeuron._gradient_health_monitor",
+      "file": "src/pyfolds/core/neuron.py",
+      "line": 142,
+      "doc": "Gatekeeper contra gradientes corrompidos por falhas de hardware.",
+      "params": [
+        "self",
+        "module",
+        "grad_input",
+        "grad_output"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._validate_internal_devices",
       "kind": "method",
       "name": "_validate_internal_devices",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._validate_internal_devices",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 136,
+      "line": 156,
       "doc": "Valida consistência de devices internos.",
       "params": [
         "self"
@@ -2987,7 +3020,7 @@
       "name": "_on_homeostasis_stable",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_stable",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 164,
+      "line": 184,
       "doc": "Callback quando homeostase se torna estável.",
       "params": [
         "self",
@@ -3003,7 +3036,7 @@
       "name": "_on_homeostasis_unstable",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._on_homeostasis_unstable",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 170,
+      "line": 190,
       "doc": "Callback quando homeostase se torna instável.",
       "params": [
         "self",
@@ -3019,7 +3052,7 @@
       "name": "N",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.N",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 180,
+      "line": 200,
       "doc": "Filamentos [dendrites, synapses].",
       "params": [
         "self"
@@ -3036,7 +3069,7 @@
       "name": "I",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.I",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 185,
+      "line": 205,
       "doc": "Potenciais internos [dendrites, synapses].",
       "params": [
         "self"
@@ -3053,7 +3086,7 @@
       "name": "W",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.W",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 190,
+      "line": 210,
       "doc": "Pesos [dendrites, synapses].",
       "params": [
         "self"
@@ -3070,7 +3103,7 @@
       "name": "protection",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.protection",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 195,
+      "line": 215,
       "doc": "Flags de proteção [dendrites, synapses].",
       "params": [
         "self"
@@ -3087,7 +3120,7 @@
       "name": "theta",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.theta",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 204,
+      "line": 224,
       "doc": null,
       "params": [
         "self"
@@ -3104,7 +3137,7 @@
       "name": "r_hat",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.r_hat",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 208,
+      "line": 228,
       "doc": null,
       "params": [
         "self"
@@ -3121,7 +3154,7 @@
       "name": "queue_runtime_injection",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.queue_runtime_injection",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 212,
+      "line": 232,
       "doc": "Enfileira mutação de parâmetro para aplicação assíncrona no próximo step.",
       "params": [
         "self",
@@ -3140,7 +3173,7 @@
       "name": "_refresh_config_references",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._refresh_config_references",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 217,
+      "line": 237,
       "doc": "Propaga nova configuração para submódulos que cacheiam ``cfg``.",
       "params": [
         "self"
@@ -3157,7 +3190,7 @@
       "name": "_apply_runtime_injections",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._apply_runtime_injections",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 230,
+      "line": 250,
       "doc": "Aplica injeções pendentes sem bloquear o caminho crítico do forward.",
       "params": [
         "self"
@@ -3174,7 +3207,7 @@
       "name": "set_mode",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.set_mode",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 280,
+      "line": 300,
       "doc": "Define modo de aprendizado.",
       "params": [
         "self",
@@ -3190,7 +3223,7 @@
       "name": "_compute_R_endogenous",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._compute_R_endogenous",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 295,
+      "line": 315,
       "doc": "Computa sinal neuromodulador interno.",
       "params": [
         "self",
@@ -3209,7 +3242,7 @@
       "name": "_validate_input_device",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._validate_input_device",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 317,
+      "line": 337,
       "doc": "Valida se input está no device correto.",
       "params": [
         "self",
@@ -3225,7 +3258,7 @@
       "name": "_apply_online_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron._apply_online_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 328,
+      "line": 348,
       "doc": "Aplica regra local imediatamente (modo ONLINE sem defer).",
       "params": [
         "self",
@@ -3247,7 +3280,7 @@
       "name": "forward",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.forward",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 359,
+      "line": 379,
       "doc": "Forward pass do neurônio.\n\nArgs:\n    x: Tensor de entrada [batch, dendrites, synapses]\n    reward: Sinal de recompensa externo\n    mode: Modo de aprendizado (sobrescreve o atual)\n    collect_stats: Se deve coletar estatísticas\n    dt: Passo de tempo (ms)\n\nReturns:\n    Dict com spikes, potenciais e estatísticas",
       "params": [
         "self",
@@ -3270,7 +3303,7 @@
       "name": "step",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.step",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 582,
+      "line": 602,
       "doc": "API explícita de passo temporal (compatível com README).",
       "params": [
         "self",
@@ -3290,7 +3323,7 @@
       "name": "apply_plasticity",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.apply_plasticity",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 602,
+      "line": 622,
       "doc": "Aplica plasticidade acumulada (deferred updates).\n\n✅ CORRIGIDO: Passa mode para as sinapses",
       "params": [
         "self",
@@ -3309,7 +3342,7 @@
       "name": "sleep",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.sleep",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 690,
+      "line": 710,
       "doc": "Ciclo de sono: consolida sinapses.",
       "params": [
         "self",
@@ -3327,7 +3360,7 @@
       "name": "to",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.to",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 715,
+      "line": 735,
       "doc": "Move neurônio para device e valida consistência.",
       "params": [
         "self",
@@ -3343,7 +3376,7 @@
       "name": "get_metrics",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.get_metrics",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 724,
+      "line": 744,
       "doc": "Retorna métricas consolidadas do neurônio.",
       "params": [
         "self"
@@ -3358,7 +3391,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.neuron.MPJRDNeuron.extra_repr",
       "file": "src/pyfolds/core/neuron.py",
-      "line": 767,
+      "line": 787,
       "doc": null,
       "params": [
         "self"
@@ -3568,12 +3601,29 @@
       ]
     },
     {
+      "id": "mtd:src.pyfolds.core.synapse.MPJRDSynapse._sync_distributed_plasticity_state",
+      "kind": "method",
+      "name": "_sync_distributed_plasticity_state",
+      "qname": "src.pyfolds.core.synapse.MPJRDSynapse._sync_distributed_plasticity_state",
+      "file": "src/pyfolds/core/synapse.py",
+      "line": 226,
+      "doc": "Sincroniza buffers plásticos após consolidação em execução distribuída.",
+      "params": [
+        "self"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "torch.no_grad()"
+      ]
+    },
+    {
       "id": "mtd:src.pyfolds.core.synapse.MPJRDSynapse.consolidate",
       "kind": "method",
       "name": "consolidate",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.consolidate",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 226,
+      "line": 257,
       "doc": "Consolida o fator volátil em estável (two-factor consolidation).\n\n✅ OTIMIZADO V2: Remoção TOTAL de sincronização D2H.\nMatemática in-place pura, sem desvios baseados no conteúdo da VRAM.",
       "params": [
         "self",
@@ -3591,7 +3641,7 @@
       "name": "get_state",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.get_state",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 254,
+      "line": 287,
       "doc": "Retorna estado completo da sinapse (sem .item() para tensores).",
       "params": [
         "self"
@@ -3606,7 +3656,7 @@
       "name": "load_state",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.load_state",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 265,
+      "line": 298,
       "doc": "Carrega estado na sinapse.",
       "params": [
         "self",
@@ -3622,7 +3672,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.extra_repr",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 278,
+      "line": 311,
       "doc": "Representação string da sinapse.",
       "params": [
         "self"
@@ -5138,7 +5188,7 @@
       "name": "_init_crc32c_table",
       "qname": "src.pyfolds.serialization.foldio._init_crc32c_table",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 72,
+      "line": 74,
       "doc": "Inicializa tabela CRC32C na primeira chamada.",
       "params": [],
       "returns": null,
@@ -5151,7 +5201,7 @@
       "name": "_crc32c_fallback",
       "qname": "src.pyfolds.serialization.foldio._crc32c_fallback",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 89,
+      "line": 91,
       "doc": null,
       "params": [
         "data"
@@ -5166,7 +5216,7 @@
       "name": "FoldSecurityError",
       "qname": "src.pyfolds.serialization.foldio.FoldSecurityError",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 96,
+      "line": 98,
       "doc": "Erro de segurança ao desserializar payload torch.",
       "params": [],
       "returns": null,
@@ -5181,10 +5231,25 @@
       "name": "_serialize_state_dict_safetensors",
       "qname": "src.pyfolds.serialization.foldio._serialize_state_dict_safetensors",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 102,
+      "line": 104,
       "doc": null,
       "params": [
         "state_dict"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:src.pyfolds.serialization.foldio._validate_safetensors_payload",
+      "kind": "function",
+      "name": "_validate_safetensors_payload",
+      "qname": "src.pyfolds.serialization.foldio._validate_safetensors_payload",
+      "file": "src/pyfolds/serialization/foldio.py",
+      "line": 119,
+      "doc": "Valida limites do header safetensors antes de invocar parser externo.",
+      "params": [
+        "payload"
       ],
       "returns": null,
       "bases": [],
@@ -5196,7 +5261,7 @@
       "name": "_deserialize_state_dict_safetensors",
       "qname": "src.pyfolds.serialization.foldio._deserialize_state_dict_safetensors",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 117,
+      "line": 148,
       "doc": null,
       "params": [
         "payload",
@@ -5212,7 +5277,7 @@
       "name": "crc32c_u32",
       "qname": "src.pyfolds.serialization.foldio.crc32c_u32",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 128,
+      "line": 160,
       "doc": "Retorna CRC32C (Castagnoli) como inteiro unsigned de 32 bits.",
       "params": [
         "data"
@@ -5227,7 +5292,7 @@
       "name": "sha256_hex",
       "qname": "src.pyfolds.serialization.foldio.sha256_hex",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 155,
+      "line": 187,
       "doc": "Retorna digest SHA-256 em formato hexadecimal.",
       "params": [
         "data"
@@ -5242,7 +5307,7 @@
       "name": "_json_bytes",
       "qname": "src.pyfolds.serialization.foldio._json_bytes",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 160,
+      "line": 192,
       "doc": null,
       "params": [
         "obj"
@@ -5257,7 +5322,7 @@
       "name": "_canonical_json",
       "qname": "src.pyfolds.serialization.foldio._canonical_json",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 164,
+      "line": 196,
       "doc": null,
       "params": [
         "obj"
@@ -5272,7 +5337,7 @@
       "name": "_cfg_to_dict",
       "qname": "src.pyfolds.serialization.foldio._cfg_to_dict",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 168,
+      "line": 200,
       "doc": null,
       "params": [
         "cfg"
@@ -5287,7 +5352,7 @@
       "name": "_safe_git_hash",
       "qname": "src.pyfolds.serialization.foldio._safe_git_hash",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 180,
+      "line": 212,
       "doc": null,
       "params": [],
       "returns": null,
@@ -5300,7 +5365,7 @@
       "name": "_telemetry_snapshot",
       "qname": "src.pyfolds.serialization.foldio._telemetry_snapshot",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 192,
+      "line": 224,
       "doc": null,
       "params": [
         "neuron",
@@ -5316,7 +5381,7 @@
       "name": "_history_snapshot",
       "qname": "src.pyfolds.serialization.foldio._history_snapshot",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 214,
+      "line": 246,
       "doc": null,
       "params": [
         "neuron"
@@ -5331,7 +5396,7 @@
       "name": "_build_nuclear_npz",
       "qname": "src.pyfolds.serialization.foldio._build_nuclear_npz",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 224,
+      "line": 256,
       "doc": null,
       "params": [
         "neuron"
@@ -5346,7 +5411,7 @@
       "name": "read_nuclear_arrays",
       "qname": "src.pyfolds.serialization.foldio.read_nuclear_arrays",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 250,
+      "line": 282,
       "doc": "Lê apenas o chunk `nuclear_arrays` para análises científicas parciais.",
       "params": [
         "path",
@@ -5363,7 +5428,7 @@
       "name": "FoldWriter",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 259,
+      "line": 291,
       "doc": "Writer do container .fold/.mind.",
       "params": [],
       "returns": null,
@@ -5376,7 +5441,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.__init__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 262,
+      "line": 294,
       "doc": null,
       "params": [
         "self",
@@ -5395,7 +5460,7 @@
       "name": "__enter__",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.__enter__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 276,
+      "line": 308,
       "doc": null,
       "params": [
         "self"
@@ -5410,7 +5475,7 @@
       "name": "__exit__",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.__exit__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 283,
+      "line": 315,
       "doc": null,
       "params": [
         "self",
@@ -5428,7 +5493,7 @@
       "name": "_compress",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter._compress",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 287,
+      "line": 319,
       "doc": null,
       "params": [
         "self",
@@ -5444,7 +5509,7 @@
       "name": "add_chunk",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.add_chunk",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 295,
+      "line": 327,
       "doc": "Adiciona chunk com compressão, integridade e ECC opcional.\n\nOrdem de escrita:\n    1. compressão (se habilitada)\n    2. checksum (CRC32C/SHA256) do conteúdo comprimido\n    3. codificação ECC do conteúdo comprimido\n    4. persistência: [header | comp | ecc]\n\nNa leitura a ordem é invertida: leitura -> ECC -> verificação -> descompressão.",
       "params": [
         "self",
@@ -5462,7 +5527,7 @@
       "name": "finalize",
       "qname": "src.pyfolds.serialization.foldio.FoldWriter.finalize",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 356,
+      "line": 388,
       "doc": null,
       "params": [
         "self",
@@ -5478,7 +5543,7 @@
       "name": "FoldReader",
       "qname": "src.pyfolds.serialization.foldio.FoldReader",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 404,
+      "line": 436,
       "doc": "Reader do container .fold/.mind com suporte a mmap.",
       "params": [],
       "returns": null,
@@ -5491,7 +5556,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.__init__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 407,
+      "line": 439,
       "doc": null,
       "params": [
         "self",
@@ -5508,7 +5573,7 @@
       "name": "__enter__",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.__enter__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 415,
+      "line": 447,
       "doc": null,
       "params": [
         "self"
@@ -5523,7 +5588,7 @@
       "name": "__exit__",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.__exit__",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 422,
+      "line": 454,
       "doc": null,
       "params": [
         "self",
@@ -5541,7 +5606,7 @@
       "name": "_read_at",
       "qname": "src.pyfolds.serialization.foldio.FoldReader._read_at",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 446,
+      "line": 478,
       "doc": null,
       "params": [
         "self",
@@ -5558,7 +5623,7 @@
       "name": "_read_header_and_index",
       "qname": "src.pyfolds.serialization.foldio.FoldReader._read_header_and_index",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 469,
+      "line": 501,
       "doc": null,
       "params": [
         "self"
@@ -5573,7 +5638,7 @@
       "name": "list_chunks",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.list_chunks",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 541,
+      "line": 573,
       "doc": null,
       "params": [
         "self"
@@ -5588,7 +5653,7 @@
       "name": "_decompress",
       "qname": "src.pyfolds.serialization.foldio.FoldReader._decompress",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 544,
+      "line": 576,
       "doc": null,
       "params": [
         "self",
@@ -5605,7 +5670,7 @@
       "name": "_ecc_codec",
       "qname": "src.pyfolds.serialization.foldio.FoldReader._ecc_codec",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 552,
+      "line": 584,
       "doc": null,
       "params": [
         "self",
@@ -5621,7 +5686,7 @@
       "name": "read_chunk_bytes",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.read_chunk_bytes",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 560,
+      "line": 592,
       "doc": null,
       "params": [
         "self",
@@ -5638,7 +5703,7 @@
       "name": "read_json",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.read_json",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 627,
+      "line": 659,
       "doc": null,
       "params": [
         "self",
@@ -5655,7 +5720,7 @@
       "name": "read_state_dict",
       "qname": "src.pyfolds.serialization.foldio.FoldReader.read_state_dict",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 630,
+      "line": 662,
       "doc": null,
       "params": [
         "self",
@@ -5673,7 +5738,7 @@
       "name": "_TrustedFoldReader",
       "qname": "src.pyfolds.serialization.foldio._TrustedFoldReader",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 640,
+      "line": 672,
       "doc": "Reader dedicado para ambientes de confiança explícita (legado torch.save).",
       "params": [],
       "returns": null,
@@ -5688,7 +5753,7 @@
       "name": "read_torch_legacy",
       "qname": "src.pyfolds.serialization.foldio._TrustedFoldReader.read_torch_legacy",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 643,
+      "line": 675,
       "doc": null,
       "params": [
         "self",
@@ -5706,7 +5771,7 @@
       "name": "_expression_summary",
       "qname": "src.pyfolds.serialization.foldio._expression_summary",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 653,
+      "line": 685,
       "doc": null,
       "params": [
         "neuron"
@@ -5721,7 +5786,7 @@
       "name": "_reproducibility_metadata",
       "qname": "src.pyfolds.serialization.foldio._reproducibility_metadata",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 687,
+      "line": 719,
       "doc": null,
       "params": [],
       "returns": null,
@@ -5734,7 +5799,7 @@
       "name": "_collect_hyperparameters",
       "qname": "src.pyfolds.serialization.foldio._collect_hyperparameters",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 697,
+      "line": 729,
       "doc": null,
       "params": [
         "neuron"
@@ -5749,7 +5814,7 @@
       "name": "_sign_payload_ed25519",
       "qname": "src.pyfolds.serialization.foldio._sign_payload_ed25519",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 704,
+      "line": 736,
       "doc": null,
       "params": [
         "payload",
@@ -5765,7 +5830,7 @@
       "name": "_verify_payload_signature_ed25519",
       "qname": "src.pyfolds.serialization.foldio._verify_payload_signature_ed25519",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 716,
+      "line": 748,
       "doc": null,
       "params": [
         "payload",
@@ -5782,7 +5847,7 @@
       "name": "save_fold_or_mind",
       "qname": "src.pyfolds.serialization.foldio.save_fold_or_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 732,
+      "line": 764,
       "doc": "Salva neurônio MPJRD em container .fold/.mind único e extensível.",
       "params": [
         "neuron",
@@ -5814,7 +5879,7 @@
       "name": "peek_fold_or_mind",
       "qname": "src.pyfolds.serialization.foldio.peek_fold_or_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 853,
+      "line": 885,
       "doc": "Inspeção rápida (header + índice + manifesto), sem carregar state_dict.",
       "params": [
         "path",
@@ -5830,7 +5895,7 @@
       "name": "peek_mind",
       "qname": "src.pyfolds.serialization.foldio.peek_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 868,
+      "line": 900,
       "doc": "Alias semântico para fluxos .mind.",
       "params": [
         "path",
@@ -5846,7 +5911,7 @@
       "name": "load_fold_or_mind",
       "qname": "src.pyfolds.serialization.foldio.load_fold_or_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 874,
+      "line": 906,
       "doc": "Carrega neurônio pelo chunk `torch_state` com validação por chunk.",
       "params": [
         "path",
@@ -5865,7 +5930,7 @@
       "name": "is_mind",
       "qname": "src.pyfolds.serialization.foldio.is_mind",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 944,
+      "line": 976,
       "doc": "Regra de branding: arquivo com chunks IA explícitos é `.mind`.",
       "params": [
         "path"
@@ -5880,7 +5945,7 @@
       "name": "is_mind_chunks",
       "qname": "src.pyfolds.serialization.foldio.is_mind_chunks",
       "file": "src/pyfolds/serialization/foldio.py",
-      "line": 951,
+      "line": 983,
       "doc": "Indica se um conjunto de chunks representa conteúdo com extensão `.mind`.",
       "params": [
         "chunks"
@@ -11932,7 +11997,7 @@
       "name": "TestMPJRDSynapse",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 9,
+      "line": 11,
       "doc": "Test synapse.",
       "params": [],
       "returns": null,
@@ -11945,7 +12010,7 @@
       "name": "test_initialization",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_initialization",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 12,
+      "line": 14,
       "doc": "Test initialization.",
       "params": [
         "self",
@@ -11961,7 +12026,7 @@
       "name": "test_ltp",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_ltp",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 20,
+      "line": 22,
       "doc": "Test LTP.",
       "params": [
         "self",
@@ -11977,7 +12042,7 @@
       "name": "test_update_respects_plastic_flag",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_respects_plastic_flag",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 36,
+      "line": 38,
       "doc": "When plasticity is disabled, synaptic state must remain unchanged.",
       "params": [
         "self",
@@ -11993,7 +12058,7 @@
       "name": "test_update_filters_inactive_pre_synaptic_activity",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_filters_inactive_pre_synaptic_activity",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 51,
+      "line": 53,
       "doc": "Pre-synaptic activity below threshold should not change I/eligibility.",
       "params": [
         "self",
@@ -12009,7 +12074,7 @@
       "name": "test_update_uses_absolute_dt_and_mode_multiplier",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_uses_absolute_dt_and_mode_multiplier",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 67,
+      "line": 69,
       "doc": "Negative dt should be handled as absolute value in plasticity update.",
       "params": [
         "self",
@@ -12025,7 +12090,7 @@
       "name": "test_saturation_recovery_disables_protection_after_timeout",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_saturation_recovery_disables_protection_after_timeout",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 89,
+      "line": 91,
       "doc": "Protection mode should auto-disable after recovery timeout.",
       "params": [
         "self",
@@ -12041,7 +12106,7 @@
       "name": "test_negative_neuromodulation_promotes_ltd",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_negative_neuromodulation_promotes_ltd",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 109,
+      "line": 111,
       "doc": "Negative neuromodulation should bias update toward LTD.",
       "params": [
         "self",
@@ -12057,7 +12122,7 @@
       "name": "test_consolidate_transfers_eligibility_and_decays_internal_potential",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_transfers_eligibility_and_decays_internal_potential",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 130,
+      "line": 132,
       "doc": "Consolidation should move eligibility into N and decay I.",
       "params": [
         "self",
@@ -12073,8 +12138,40 @@
       "name": "test_update_supports_explicit_hebbian_ltd_component",
       "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_supports_explicit_hebbian_ltd_component",
       "file": "tests/unit/core/test_synapse.py",
-      "line": 146,
+      "line": 148,
       "doc": "Explicit LTD term should reduce/update internal potential when configured.",
+      "params": [
+        "self",
+        "tiny_config"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_performs_distributed_sync_when_enabled",
+      "kind": "method",
+      "name": "test_consolidate_performs_distributed_sync_when_enabled",
+      "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_performs_distributed_sync_when_enabled",
+      "file": "tests/unit/core/test_synapse.py",
+      "line": 171,
+      "doc": "Consolidation should all-reduce plasticity buffers in distributed mode.",
+      "params": [
+        "self",
+        "tiny_config"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_skips_distributed_sync_when_disabled",
+      "kind": "method",
+      "name": "test_consolidate_skips_distributed_sync_when_disabled",
+      "qname": "tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_skips_distributed_sync_when_disabled",
+      "file": "tests/unit/core/test_synapse.py",
+      "line": 190,
+      "doc": "Distributed all-reduce should be skipped when config disables it.",
       "params": [
         "self",
         "tiny_config"
@@ -12325,7 +12422,7 @@
       "name": "_build_neuron",
       "qname": "tests.unit.serialization.test_foldio._build_neuron",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 40,
+      "line": 42,
       "doc": null,
       "params": [
         "enable_telemetry"
@@ -12340,7 +12437,7 @@
       "name": "test_fold_roundtrip_and_peek",
       "qname": "tests.unit.serialization.test_foldio.test_fold_roundtrip_and_peek",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 51,
+      "line": 53,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12355,7 +12452,7 @@
       "name": "test_fold_roundtrip_preserves_state_dict_after_forward_steps",
       "qname": "tests.unit.serialization.test_foldio.test_fold_roundtrip_preserves_state_dict_after_forward_steps",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 80,
+      "line": 82,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12370,7 +12467,7 @@
       "name": "test_training_then_save_with_telemetry_and_history_and_nuclear_arrays",
       "qname": "tests.unit.serialization.test_foldio.test_training_then_save_with_telemetry_and_history_and_nuclear_arrays",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 107,
+      "line": 109,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12385,7 +12482,7 @@
       "name": "test_detects_corruption",
       "qname": "tests.unit.serialization.test_foldio.test_detects_corruption",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 143,
+      "line": 145,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12400,7 +12497,7 @@
       "name": "test_hierarchical_hashes_present_in_metadata",
       "qname": "tests.unit.serialization.test_foldio.test_hierarchical_hashes_present_in_metadata",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 171,
+      "line": 173,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12415,7 +12512,7 @@
       "name": "test_ecc_from_protection_mapping",
       "qname": "tests.unit.serialization.test_foldio.test_ecc_from_protection_mapping",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 192,
+      "line": 194,
       "doc": null,
       "params": [],
       "returns": null,
@@ -12428,7 +12525,7 @@
       "name": "test_ecc_roundtrip_if_available",
       "qname": "tests.unit.serialization.test_foldio.test_ecc_roundtrip_if_available",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 207,
+      "line": 209,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12443,7 +12540,7 @@
       "name": "test_crc32c_matches_known_vector",
       "qname": "tests.unit.serialization.test_foldio.test_crc32c_matches_known_vector",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 234,
+      "line": 236,
       "doc": null,
       "params": [],
       "returns": null,
@@ -12456,7 +12553,7 @@
       "name": "test_fold_reader_bounds_validation_with_mmap",
       "qname": "tests.unit.serialization.test_foldio.test_fold_reader_bounds_validation_with_mmap",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 238,
+      "line": 240,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12471,7 +12568,7 @@
       "name": "test_fold_reader_bounds_validation_negative_values",
       "qname": "tests.unit.serialization.test_foldio.test_fold_reader_bounds_validation_negative_values",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 252,
+      "line": 254,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12486,7 +12583,7 @@
       "name": "test_fold_reader_index_size_validation",
       "qname": "tests.unit.serialization.test_foldio.test_fold_reader_index_size_validation",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 267,
+      "line": 269,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12501,7 +12598,7 @@
       "name": "test_fold_reader_index_offset_validation",
       "qname": "tests.unit.serialization.test_foldio.test_fold_reader_index_offset_validation",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 277,
+      "line": 279,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12516,7 +12613,7 @@
       "name": "test_fold_reader_header_len_validation",
       "qname": "tests.unit.serialization.test_foldio.test_fold_reader_header_len_validation",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 288,
+      "line": 290,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12531,7 +12628,7 @@
       "name": "test_fold_writer_finalize_wraps_io_failure_with_phase_context",
       "qname": "tests.unit.serialization.test_foldio.test_fold_writer_finalize_wraps_io_failure_with_phase_context",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 299,
+      "line": 301,
       "doc": null,
       "params": [
         "tmp_path",
@@ -12547,7 +12644,7 @@
       "name": "test_fold_reader_reports_magic_values",
       "qname": "tests.unit.serialization.test_foldio.test_fold_reader_reports_magic_values",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 316,
+      "line": 318,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12562,7 +12659,7 @@
       "name": "test_fold_reader_exit_closes_file_even_if_mmap_close_fails",
       "qname": "tests.unit.serialization.test_foldio.test_fold_reader_exit_closes_file_even_if_mmap_close_fails",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 327,
+      "line": 329,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12577,7 +12674,7 @@
       "name": "_build_writer_with_chunk",
       "qname": "tests.unit.serialization.test_foldio._build_writer_with_chunk",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 346,
+      "line": 348,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12592,7 +12689,7 @@
       "name": "test_fold_writer_finalize_wraps_failures_with_phase",
       "qname": "tests.unit.serialization.test_foldio.test_fold_writer_finalize_wraps_failures_with_phase",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 393,
+      "line": 395,
       "doc": null,
       "params": [
         "tmp_path",
@@ -12613,7 +12710,7 @@
       "name": "_failing_write_after_first_call",
       "qname": "tests.unit.serialization.test_foldio._failing_write_after_first_call",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 413,
+      "line": 415,
       "doc": null,
       "params": [
         "original_write"
@@ -12628,7 +12725,7 @@
       "name": "test_fold_manifest_includes_governance_sections",
       "qname": "tests.unit.serialization.test_foldio.test_fold_manifest_includes_governance_sections",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 425,
+      "line": 427,
       "doc": null,
       "params": [
         "tmp_path"
@@ -12643,11 +12740,37 @@
       "name": "test_fold_signature_roundtrip_if_cryptography_available",
       "qname": "tests.unit.serialization.test_foldio.test_fold_signature_roundtrip_if_cryptography_available",
       "file": "tests/unit/serialization/test_foldio.py",
-      "line": 450,
+      "line": 452,
       "doc": null,
       "params": [
         "tmp_path"
       ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.serialization.test_foldio.test_validate_safetensors_payload_rejects_oversized_header",
+      "kind": "function",
+      "name": "test_validate_safetensors_payload_rejects_oversized_header",
+      "qname": "tests.unit.serialization.test_foldio.test_validate_safetensors_payload_rejects_oversized_header",
+      "file": "tests/unit/serialization/test_foldio.py",
+      "line": 500,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.serialization.test_foldio.test_validate_safetensors_payload_rejects_invalid_json",
+      "kind": "function",
+      "name": "test_validate_safetensors_payload_rejects_invalid_json",
+      "qname": "tests.unit.serialization.test_foldio.test_validate_safetensors_payload_rejects_invalid_json",
+      "file": "tests/unit/serialization/test_foldio.py",
+      "line": 508,
+      "doc": null,
+      "params": [],
       "returns": null,
       "bases": [],
       "decorators": []
@@ -17373,6 +17496,18 @@
     {
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
+      "dst": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._install_gradient_health_monitor",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
+      "dst": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._gradient_health_monitor",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.neuron.MPJRDNeuron",
       "dst": "mtd:src.pyfolds.core.neuron.MPJRDNeuron._validate_internal_devices",
       "meta": {}
     },
@@ -17638,6 +17773,12 @@
       "type": "CONTAINS",
       "src": "cls:src.pyfolds.core.synapse.MPJRDSynapse",
       "dst": "mtd:src.pyfolds.core.synapse.MPJRDSynapse.update",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:src.pyfolds.core.synapse.MPJRDSynapse",
+      "dst": "mtd:src.pyfolds.core.synapse.MPJRDSynapse._sync_distributed_plasticity_state",
       "meta": {}
     },
     {
@@ -18706,6 +18847,12 @@
       "type": "CONTAINS",
       "src": "mod:src.pyfolds.serialization.foldio",
       "dst": "fn:src.pyfolds.serialization.foldio._serialize_state_dict_safetensors",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:src.pyfolds.serialization.foldio",
+      "dst": "fn:src.pyfolds.serialization.foldio._validate_safetensors_payload",
       "meta": {}
     },
     {
@@ -22521,6 +22668,12 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.core.test_synapse",
+      "dst": "mod:unittest",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.unit.core.test_synapse",
       "dst": "mod:pytest",
       "meta": {}
     },
@@ -22600,6 +22753,18 @@
       "type": "CONTAINS",
       "src": "cls:tests.unit.core.test_synapse.TestMPJRDSynapse",
       "dst": "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_update_supports_explicit_hebbian_ltd_component",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:tests.unit.core.test_synapse.TestMPJRDSynapse",
+      "dst": "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_performs_distributed_sync_when_enabled",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "cls:tests.unit.core.test_synapse.TestMPJRDSynapse",
+      "dst": "mtd:tests.unit.core.test_synapse.TestMPJRDSynapse.test_consolidate_skips_distributed_sync_when_disabled",
       "meta": {}
     },
     {
@@ -22954,6 +23119,18 @@
       "type": "CONTAINS",
       "src": "mod:tests.unit.serialization.test_foldio",
       "dst": "fn:tests.unit.serialization.test_foldio.test_fold_signature_roundtrip_if_cryptography_available",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.serialization.test_foldio",
+      "dst": "fn:tests.unit.serialization.test_foldio.test_validate_safetensors_payload_rejects_oversized_header",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.serialization.test_foldio",
+      "dst": "fn:tests.unit.serialization.test_foldio.test_validate_safetensors_payload_rejects_invalid_json",
       "meta": {}
     },
     {
@@ -24406,8 +24583,8 @@
   "findings": [],
   "metrics": {
     "python_files": 138,
-    "symbols": 1007,
-    "edges": 1505,
+    "symbols": 1015,
+    "edges": 1514,
     "findings": 0,
     "internal_import_edges": 104
   }
