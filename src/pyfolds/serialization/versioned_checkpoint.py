@@ -131,6 +131,9 @@ class VersionedCheckpoint:
         safe_types.extend([MPJRDConfig, NeuronConfig])
 
         try:
+            torch.serialization.add_safe_globals(
+                [NeuronConfig, dict, list, str, float]
+            )
             torch.serialization.add_safe_globals(safe_types)
         except AttributeError:
             return

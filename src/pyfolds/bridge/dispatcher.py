@@ -9,7 +9,28 @@ import torch
 
 
 class MindDispatcher:
-    """Interface agnóstica para exportação de dados do Core PyFolds."""
+    """Único ponto de saída de dados do PyFolds para o ecossistema Mind."""
+
+    @staticmethod
+    def capture_event(
+        layer_id: str,
+        spikes: torch.Tensor | Any,
+        weights: torch.Tensor | Any,
+        metrics: dict[str, Any] | Any,
+    ) -> dict[str, Any]:
+        """Prepara dados serializáveis para MindStream/MindAudis sem acoplamento."""
+        return {
+            "origin": "pyfolds_v2.1.1",
+            "layer": layer_id,
+            "ts": datetime.now(UTC).isoformat(),
+            "payload": {
+                "activity": spikes.detach().cpu().tolist()
+                if hasattr(spikes, "detach")
+                else spikes,
+                "weights_avg": float(weights.mean()) if hasattr(weights, "mean") else 0.0,
+                "health": metrics,
+            },
+        }
 
     @staticmethod
     def prepare_payload(
@@ -18,18 +39,20 @@ class MindDispatcher:
         weights: torch.Tensor | Any,
         health_score: float,
     ) -> dict[str, Any]:
-        """Prepara pacote serializável para consumo externo."""
-        spikes_value = (
-            spikes.detach().cpu().tolist() if isinstance(spikes, torch.Tensor) else spikes
+        """Mantém contrato legado do dispatcher para consumidores atuais."""
+        event = MindDispatcher.capture_event(
+            layer_id=layer_id,
+            spikes=spikes,
+            weights=weights,
+            metrics=health_score,
         )
-        weights_mean = float(weights.mean()) if isinstance(weights, torch.Tensor) else 0.0
         return {
-            "layer_id": layer_id,
-            "timestamp": datetime.now(UTC).isoformat(),
+            "layer_id": event["layer"],
+            "timestamp": event["ts"],
             "data": {
-                "spikes": spikes_value,
-                "weights_mean": weights_mean,
-                "health": health_score,
+                "spikes": event["payload"]["activity"],
+                "weights_mean": event["payload"]["weights_avg"],
+                "health": event["payload"]["health"],
             },
         }
 
