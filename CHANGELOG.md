@@ -9,6 +9,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 - Canonical root `CONTRIBUTING.md` and `CHANGELOG.md` to strengthen governance onboarding.
+- `WeightIntegrityMonitor` para verificação periódica de hash SHA-256 dos pesos em runtime, com foco em detecção de corrupção silenciosa durante treinos longos.
+- ADR-046 para formalizar monitoramento de integridade de pesos em memória e sua estratégia operacional.
 - `docs/development/DEVELOPMENT_HUB.md` compatibility shim.
 - Release process content in `docs/development/release_process.md`.
 - ADR traceability note in `src/pyfolds/serialization/foldio.py`.

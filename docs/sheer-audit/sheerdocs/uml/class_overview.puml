@@ -284,17 +284,6 @@ class "src.pyfolds.layers.wave_layer.MPJRDWaveLayer" {
 }
 
 
-class "src.pyfolds.monitoring.health.HealthStatus" {
-}
-class "src.pyfolds.monitoring.health.NeuronHealthCheck" {
-  +__init__()
-  +check()
-}
-class "src.pyfolds.monitoring.health.NeuronHealthMonitor" {
-  +__init__()
-  +check_health()
-  +get_health_score()
-}
 
 class "src.pyfolds.monitoring.mindcontrol.MindControl" {
   +__init__()

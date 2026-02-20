@@ -25,7 +25,7 @@
       "name": "__getattr__",
       "qname": "src.pyfolds.__getattr__",
       "file": "src/pyfolds/__init__.py",
-      "line": 164,
+      "line": 166,
       "doc": "Provide deprecated v1 aliases while keeping v2 names canonical.",
       "params": [
         "name"
@@ -4097,126 +4097,6 @@
       "decorators": []
     },
     {
-      "id": "cls:src.pyfolds.monitoring.health.HealthStatus",
-      "kind": "class",
-      "name": "HealthStatus",
-      "qname": "src.pyfolds.monitoring.health.HealthStatus",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 11,
-      "doc": "Estados de saúde operacional calculados pelo monitoramento.",
-      "params": [],
-      "returns": null,
-      "bases": [
-        "Enum"
-      ],
-      "decorators": []
-    },
-    {
-      "id": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "kind": "class",
-      "name": "NeuronHealthCheck",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 19,
-      "doc": "Monitora métricas de saúde e gera alertas de operação.",
-      "params": [],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
-      "kind": "method",
-      "name": "__init__",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 22,
-      "doc": null,
-      "params": [
-        "self",
-        "neuron",
-        "thresholds"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.check",
-      "kind": "method",
-      "name": "check",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthCheck.check",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 30,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "kind": "class",
-      "name": "NeuronHealthMonitor",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 53,
-      "doc": "Monitor de saúde contínuo para execução longa.",
-      "params": [],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
-      "kind": "method",
-      "name": "__init__",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 56,
-      "doc": null,
-      "params": [
-        "self",
-        "neuron",
-        "check_every_n_steps"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
-      "kind": "method",
-      "name": "check_health",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 62,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
-      "id": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
-      "kind": "method",
-      "name": "get_health_score",
-      "qname": "src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
-      "file": "src/pyfolds/monitoring/health.py",
-      "line": 95,
-      "doc": null,
-      "params": [
-        "self"
-      ],
-      "returns": null,
-      "bases": [],
-      "decorators": []
-    },
-    {
       "id": "mod:src.pyfolds.monitoring.mindcontrol",
       "kind": "module",
       "name": "mindcontrol",
@@ -8118,7 +7998,7 @@
       "name": "get_logger",
       "qname": "src.pyfolds.utils.logging.PyFoldsLogger.get_logger",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 178,
+      "line": 177,
       "doc": "Retorna logger configurado.",
       "params": [
         "self",
@@ -8135,7 +8015,7 @@
       "name": "add_file_handler",
       "qname": "src.pyfolds.utils.logging.PyFoldsLogger.add_file_handler",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 190,
+      "line": 189,
       "doc": "Adiciona handler de arquivo adicional com rotação.",
       "params": [
         "self",
@@ -8154,7 +8034,7 @@
       "name": "get_logger",
       "qname": "src.pyfolds.utils.logging.get_logger",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 216,
+      "line": 215,
       "doc": "Função conveniência para obter logger.",
       "params": [
         "name"
@@ -8169,7 +8049,7 @@
       "name": "setup_run_logging",
       "qname": "src.pyfolds.utils.logging.setup_run_logging",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 223,
+      "line": 222,
       "doc": "Configuração recomendada para execução (treino/debug em produção).\n\nCria automaticamente um arquivo incremental e configura logging para arquivo\ncom terminal silencioso por padrão.\n\nReturns:\n    Tupla ``(logger, log_path)``.",
       "params": [
         "app",
@@ -8192,7 +8072,7 @@
       "name": "setup_logging",
       "qname": "src.pyfolds.utils.logging.setup_logging",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 263,
+      "line": 262,
       "doc": "Setup rápido de logging.",
       "params": [
         "log_file",
@@ -8213,7 +8093,7 @@
       "name": "CircularBufferFileHandler",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 285,
+      "line": 284,
       "doc": "Handler TXT com buffer circular em número de linhas.\n\nMantém somente as últimas ``capacity_lines`` mensagens no arquivo.\nPara reduzir custo de I/O, as gravações são feitas sob demanda via\n``flush_interval_sec`` ou imediatamente para eventos de erro.",
       "params": [],
       "returns": null,
@@ -8228,7 +8108,7 @@
       "name": "__init__",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.__init__",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 293,
+      "line": 292,
       "doc": null,
       "params": [
         "self",
@@ -8247,7 +8127,7 @@
       "name": "_flush_to_disk",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 324,
+      "line": 323,
       "doc": null,
       "params": [
         "self"
@@ -8262,7 +8142,7 @@
       "name": "emit",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.emit",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 332,
+      "line": 331,
       "doc": null,
       "params": [
         "self",
@@ -8278,7 +8158,7 @@
       "name": "_flush_to_disk",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler._flush_to_disk",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 350,
+      "line": 349,
       "doc": null,
       "params": [
         "self"
@@ -8293,7 +8173,7 @@
       "name": "close",
       "qname": "src.pyfolds.utils.logging.CircularBufferFileHandler.close",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 358,
+      "line": 357,
       "doc": null,
       "params": [
         "self"
@@ -8308,7 +8188,7 @@
       "name": "next_log_path",
       "qname": "src.pyfolds.utils.logging.next_log_path",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 365,
+      "line": 364,
       "doc": "Gera caminho de log incremental: NNN_app_version_YYYYMMDD_HHMMSS.log.",
       "params": [
         "log_dir",
@@ -8325,7 +8205,7 @@
       "name": "build_log_path",
       "qname": "src.pyfolds.utils.logging.build_log_path",
       "file": "src/pyfolds/utils/logging.py",
-      "line": 382,
+      "line": 381,
       "doc": "Alias de compatibilidade para ``next_log_path``.",
       "params": [
         "log_dir",
@@ -11558,6 +11438,32 @@
       "decorators": []
     },
     {
+      "id": "fn:tests.unit.core.test_health_monitor.test_weight_integrity_monitor_detects_change",
+      "kind": "function",
+      "name": "test_weight_integrity_monitor_detects_change",
+      "qname": "tests.unit.core.test_health_monitor.test_weight_integrity_monitor_detects_change",
+      "file": "tests/unit/core/test_health_monitor.py",
+      "line": 22,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_health_monitor.test_weight_integrity_monitor_respects_interval",
+      "kind": "function",
+      "name": "test_weight_integrity_monitor_respects_interval",
+      "qname": "tests.unit.core.test_health_monitor.test_weight_integrity_monitor_respects_interval",
+      "file": "tests/unit/core/test_health_monitor.py",
+      "line": 38,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mod:tests.unit.core.test_homeostasis",
       "kind": "module",
       "name": "test_homeostasis",
@@ -11760,7 +11666,7 @@
       "name": "DummyNeuron",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 11,
+      "line": 12,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11773,7 +11679,7 @@
       "name": "__init__",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.__init__",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 12,
+      "line": 13,
       "doc": null,
       "params": [
         "self",
@@ -11789,7 +11695,7 @@
       "name": "get_metrics",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.DummyNeuron.get_metrics",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 15,
+      "line": 16,
       "doc": null,
       "params": [
         "self"
@@ -11804,7 +11710,7 @@
       "name": "test_health_check_critical_for_dead_neurons",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_critical_for_dead_neurons",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 19,
+      "line": 20,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11817,7 +11723,7 @@
       "name": "test_health_check_uses_fallback_metrics_from_get_metrics_contract",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_health_check_uses_fallback_metrics_from_get_metrics_contract",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 28,
+      "line": 29,
       "doc": null,
       "params": [],
       "returns": null,
@@ -11830,7 +11736,7 @@
       "name": "test_versioned_checkpoint_save_and_load",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_save_and_load",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 42,
+      "line": 43,
       "doc": null,
       "params": [
         "tmp_path"
@@ -11845,7 +11751,7 @@
       "name": "test_versioned_checkpoint_metadata_created_at_is_utc",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_metadata_created_at_is_utc",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 55,
+      "line": 56,
       "doc": null,
       "params": [
         "tmp_path"
@@ -11860,7 +11766,7 @@
       "name": "test_versioned_checkpoint_shape_validation_raises_on_mismatch",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_shape_validation_raises_on_mismatch",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 69,
+      "line": 70,
       "doc": null,
       "params": [
         "tmp_path"
@@ -11875,11 +11781,37 @@
       "name": "test_versioned_checkpoint_safetensors_roundtrip",
       "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
       "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
-      "line": 86,
+      "line": 87,
       "doc": null,
       "params": [
         "tmp_path"
       ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_detects_unexpected_mutation",
+      "kind": "function",
+      "name": "test_model_integrity_monitor_detects_unexpected_mutation",
+      "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_detects_unexpected_mutation",
+      "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
+      "line": 110,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_initializes_hash_on_first_check",
+      "kind": "function",
+      "name": "test_model_integrity_monitor_initializes_hash_on_first_check",
+      "qname": "tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_initializes_hash_on_first_check",
+      "file": "tests/unit/core/test_monitoring_and_checkpoint.py",
+      "line": 129,
+      "doc": null,
+      "params": [],
       "returns": null,
       "bases": [],
       "decorators": []
@@ -18400,84 +18332,6 @@
     },
     {
       "type": "IMPORT",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "mod:__future__",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "mod:enum",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "mod:typing",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "mod:torch",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "cls:src.pyfolds.monitoring.health.HealthStatus",
-      "meta": {}
-    },
-    {
-      "type": "INHERITS",
-      "src": "cls:src.pyfolds.monitoring.health.HealthStatus",
-      "dst": "cls:*.Enum",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.__init__",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthCheck",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthCheck.check",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "mod:src.pyfolds.monitoring.health",
-      "dst": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.__init__",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.check_health",
-      "meta": {}
-    },
-    {
-      "type": "CONTAINS",
-      "src": "cls:src.pyfolds.monitoring.health.NeuronHealthMonitor",
-      "dst": "mtd:src.pyfolds.monitoring.health.NeuronHealthMonitor.get_health_score",
-      "meta": {}
-    },
-    {
-      "type": "IMPORT",
       "src": "mod:src.pyfolds.monitoring.mindcontrol",
       "dst": "mod:__future__",
       "meta": {}
@@ -22743,6 +22597,18 @@
       "meta": {}
     },
     {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_health_monitor",
+      "dst": "fn:tests.unit.core.test_health_monitor.test_weight_integrity_monitor_detects_change",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_health_monitor",
+      "dst": "fn:tests.unit.core.test_health_monitor.test_weight_integrity_monitor_respects_interval",
+      "meta": {}
+    },
+    {
       "type": "IMPORT",
       "src": "mod:tests.unit.core.test_homeostasis",
       "dst": "mod:pytest",
@@ -22877,6 +22743,12 @@
     {
       "type": "IMPORT",
       "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "mod:torch",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
       "dst": "mod:pyfolds.monitoring",
       "meta": {}
     },
@@ -22938,6 +22810,18 @@
       "type": "CONTAINS",
       "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
       "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_versioned_checkpoint_safetensors_roundtrip",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_detects_unexpected_mutation",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_monitoring_and_checkpoint",
+      "dst": "fn:tests.unit.core.test_monitoring_and_checkpoint.test_model_integrity_monitor_initializes_hash_on_first_check",
       "meta": {}
     },
     {
@@ -25083,12 +24967,23 @@
       "meta": {}
     }
   ],
-  "findings": [],
+  "findings": [
+    {
+      "code": "PARSE_ERROR",
+      "severity": "ERROR",
+      "file": "src/pyfolds/monitoring/health.py",
+      "line": 102,
+      "column": 62,
+      "message": "invalid decimal literal (<unknown>, line 102)",
+      "hint": null,
+      "excerpt": null
+    }
+  ],
   "metrics": {
     "python_files": 139,
-    "symbols": 1035,
-    "edges": 1544,
-    "findings": 0,
+    "symbols": 1031,
+    "edges": 1536,
+    "findings": 1,
     "internal_import_edges": 104
   }
 }
