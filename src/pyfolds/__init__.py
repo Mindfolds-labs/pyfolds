@@ -7,7 +7,7 @@ v1 names as compatibility aliases with deprecation warnings.
 from typing import Any, Dict
 import warnings
 
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 
 # ===== CORE V2 SURFACE =====
 from .core.config import MPJRDConfig as NeuronConfig
@@ -33,6 +33,7 @@ from .serialization import (
     is_mind,
     NoECC,
     ReedSolomonECC,
+    ECCProtector,
     ecc_from_protection,
 )
 from .monitoring import (
@@ -115,6 +116,7 @@ __all__ = [
     "is_mind",
     "NoECC",
     "ReedSolomonECC",
+    "ECCProtector",
     "ecc_from_protection",
     "HealthStatus",
     "NeuronHealthCheck",

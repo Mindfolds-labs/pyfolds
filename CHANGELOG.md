@@ -31,6 +31,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Fixed refractory threshold consistency by prioritizing `theta_eff` in refractory masking.
 - Fixed health monitoring fallback to `spike_rate=0.0` (instead of `1.0`) when only `r_hat` is absent.
 
+## [2.0.2] - 2026-02-20
+
+### Added
+- ADR 0042 formalizando blindagem de checkpoint com safetensors, validação de shape e ECC sidecar.
+- Novo utilitário `ECCProtector` para proteção/recuperação Reed-Solomon de chunk único.
+
+### Changed
+- `VersionedCheckpoint` agora suporta fluxo opcional `use_safetensors=True` com sidecar `.json` e ECC configurável (`off|low|med|high`).
+- `CircularBufferFileHandler` passou a usar flush temporizado (`circular_flush_interval_sec`) com flush imediato em nível `ERROR` ou superior.
+
+### Fixed
+- Carregamento de checkpoint agora valida invariantes de shape antes de `load_state_dict`, evitando falhas silenciosas de incompatibilidade estrutural.
+
 ## [2.0.1] - 2026-02-20
 
 ### Changed

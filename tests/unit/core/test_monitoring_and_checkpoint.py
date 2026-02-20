@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
+import pytest
 import pyfolds
 
 from pyfolds.monitoring import HealthStatus, NeuronHealthCheck
@@ -63,3 +64,32 @@ def test_versioned_checkpoint_metadata_created_at_is_utc(tmp_path):
     assert created_at.endswith("Z")
     assert datetime.fromisoformat(created_at.replace("Z", "+00:00")).tzinfo is not None
 
+
+
+def test_versioned_checkpoint_shape_validation_raises(tmp_path):
+    model_a = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4))
+    model_b = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=3, n_synapses_per_dendrite=4))
+    ckpt = VersionedCheckpoint(model_a, version="1.0.0")
+
+    path = Path(tmp_path) / "shape-check.pt"
+    ckpt.save(str(path))
+
+    with pytest.raises(ValueError, match="Shape mismatch"):
+        VersionedCheckpoint.load(str(path), model=model_b)
+
+
+def test_versioned_checkpoint_safetensors_roundtrip(tmp_path):
+    safetensors = pytest.importorskip("safetensors")
+    assert safetensors is not None
+
+    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    neuron = pyfolds.MPJRDNeuron(cfg)
+    ckpt = VersionedCheckpoint(neuron, version="1.0.0")
+
+    path = Path(tmp_path) / "neuron-safe.pt"
+    payload = ckpt.save(str(path), use_safetensors=True, ecc_protection="low")
+    loaded = VersionedCheckpoint.load(str(path.with_suffix('.safetensors')), model=neuron)
+
+    assert payload["integrity_hash"] == loaded["integrity_hash"]
+    assert loaded["metadata"]["version"] == "1.0.0"
+    assert path.with_suffix('.json').exists()

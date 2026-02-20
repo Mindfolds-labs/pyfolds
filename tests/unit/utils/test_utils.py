@@ -459,7 +459,12 @@ class TestLogging:
         log_file = tmp_path / "circular.log"
 
         logger_manager = PyFoldsLogger()
-        logger_manager.setup(level="INFO", log_file=log_file, circular_buffer_lines=3)
+        logger_manager.setup(
+            level="INFO",
+            log_file=log_file,
+            circular_buffer_lines=3,
+            circular_flush_interval_sec=0,
+        )
 
         logger = get_logger('test.circular')
         for idx in range(5):
@@ -470,6 +475,26 @@ class TestLogging:
         assert any("linha-2" in line for line in content)
         assert any("linha-3" in line for line in content)
         assert any("linha-4" in line for line in content)
+
+    def test_logger_circular_buffer_flushes_on_error(self, tmp_path):
+        log_file = tmp_path / "circular-error.log"
+
+        logger_manager = PyFoldsLogger()
+        logger_manager.setup(
+            level="INFO",
+            log_file=log_file,
+            circular_buffer_lines=10,
+            circular_flush_interval_sec=60,
+        )
+
+        logger = get_logger('test.circular.error')
+        logger.info("linha-info-bufferizada")
+        assert not log_file.exists()
+
+        logger.error("linha-error-flush")
+        content = log_file.read_text(encoding="utf-8")
+        assert "linha-info-bufferizada" in content
+        assert "linha-error-flush" in content
 
     def test_multiple_loggers_same_name(self):
         """Testa se get_logger com mesmo nome retorna mesmo logger."""
