@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.19, pytest-9.0.2, pluggy-1.6.0
+preflight: torch detectado
+rootdir: /workspace/pyfolds
+configfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)
+collected 5 items
+
+tests/integration/test_neuron_advanced.py .                              [ 20%]
+tests/unit/advanced/test_adaptation.py ..                                [ 60%]
+tests/unit/neuron/test_backprop_bap.py .                                 [ 80%]
+tests/unit/test_public_import_surface.py .                               [100%]
+
+=============================== warnings summary ===============================
+tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain
+  /workspace/pyfolds/tests/integration/test_neuron_advanced.py:37: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain
+  /workspace/pyfolds/tests/unit/neuron/test_backprop_bap.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(backprop_max_gain=1.2)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 5 passed, 2 warnings in 2.32s =========================

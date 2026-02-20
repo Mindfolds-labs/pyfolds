@@ -1,0 +1,108 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.19, pytest-9.0.2, pluggy-1.6.0 -- /root/.pyenv/versions/3.10.19/bin/python
+cachedir: .pytest_cache
+preflight: torch detectado
+rootdir: /workspace/pyfolds
+configfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)
+collecting ... collected 5 items
+
+tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain FAILED [ 20%]
+tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_respects_string_inference_mode FAILED [ 40%]
+tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_forward_updates_u_for_downstream_mixins FAILED [ 60%]
+tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain FAILED [ 80%]
+tests/unit/test_public_import_surface.py::test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0 FAILED [100%]
+
+=================================== FAILURES ===================================
+___ TestAdvancedNeuron.test_backprop_disabled_does_not_apply_dendritic_gain ____
+tests/integration/test_neuron_advanced.py:61: in test_backprop_disabled_does_not_apply_dendritic_gain
+    assert torch.allclose(out_disabled["v_dend"], out_base["v_dend"])
+E   assert False
+E    +  where False = <built-in method allclose of type object at 0x7fd9294e5920>(tensor([[0.0172]]), tensor([[0.0086]]))
+E    +    where <built-in method allclose of type object at 0x7fd9294e5920> = torch.allclose
+------------------------------ Captured log call -------------------------------
+WARNING  pyfolds.neuron.140573987859536:neuron.py:467 ⚠️ Neurônio hipoativo! rate=0.000 (threshold=0.01)
+WARNING  pyfolds.neuron.140573987860256:neuron.py:467 ⚠️ Neurônio hipoativo! rate=0.000 (threshold=0.01)
+______ TestAdaptationMixin.test_adaptation_respects_string_inference_mode ______
+tests/unit/advanced/test_adaptation.py:78: in test_adaptation_respects_string_inference_mode
+    out = neuron.forward(x, mode='inference')
+src/pyfolds/advanced/backprop.py:123: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/advanced/short_term.py:135: in forward
+    output = super().forward(x_modulated, _x_pre_stp=x, **kwargs)  # type: ignore
+src/pyfolds/advanced/stdp.py:200: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/advanced/adaptation.py:81: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/advanced/refractory.py:124: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/utils/validation.py:77: in wrapper
+    return func(self, x, *args, **kwargs)
+src/pyfolds/core/neuron.py:495: in forward
+    "mode": effective_mode.value,
+E   AttributeError: 'str' object has no attribute 'value'
+_______ TestAdaptationMixin.test_forward_updates_u_for_downstream_mixins _______
+tests/unit/advanced/test_adaptation.py:92: in test_forward_updates_u_for_downstream_mixins
+    out = neuron.forward(x, mode='online')
+src/pyfolds/advanced/backprop.py:123: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/advanced/short_term.py:135: in forward
+    output = super().forward(x_modulated, _x_pre_stp=x, **kwargs)  # type: ignore
+src/pyfolds/advanced/stdp.py:200: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/advanced/adaptation.py:81: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/advanced/refractory.py:124: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/utils/validation.py:77: in wrapper
+    return func(self, x, *args, **kwargs)
+src/pyfolds/core/neuron.py:495: in forward
+    "mode": effective_mode.value,
+E   AttributeError: 'str' object has no attribute 'value'
+_____ test_bap_amplification_changes_dendritic_computation_and_clamps_gain _____
+tests/unit/neuron/test_backprop_bap.py:14: in test_bap_amplification_changes_dendritic_computation_and_clamps_gain
+    baseline = base_neuron.forward(x, mode="inference")
+src/pyfolds/advanced/backprop.py:123: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/advanced/short_term.py:135: in forward
+    output = super().forward(x_modulated, _x_pre_stp=x, **kwargs)  # type: ignore
+src/pyfolds/advanced/stdp.py:200: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/advanced/adaptation.py:81: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/advanced/refractory.py:124: in forward
+    output = super().forward(x, **kwargs)
+src/pyfolds/utils/validation.py:77: in wrapper
+    return func(self, x, *args, **kwargs)
+src/pyfolds/core/neuron.py:495: in forward
+    "mode": effective_mode.value,
+E   AttributeError: 'str' object has no attribute 'value'
+___ test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0 ____
+tests/unit/test_public_import_surface.py:36: in test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0
+    assert not hasattr(pyfolds, "MPJRDConfig")
+E   AssertionError: assert not True
+E    +  where True = hasattr(pyfolds, 'MPJRDConfig')
+=============================== warnings summary ===============================
+tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain
+  /workspace/pyfolds/tests/integration/test_neuron_advanced.py:37: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(
+
+tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain
+  /workspace/pyfolds/tests/unit/neuron/test_backprop_bap.py:6: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    cfg = pyfolds.MPJRDConfig(backprop_max_gain=1.2)
+
+tests/unit/test_public_import_surface.py::test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0
+  /workspace/pyfolds/tests/unit/test_public_import_surface.py:36: DeprecationWarning: 'pyfolds.MPJRDConfig' está depreciado e será removido em versão futura; use 'pyfolds.NeuronConfig'
+    assert not hasattr(pyfolds, "MPJRDConfig")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_neuron_advanced.py::TestAdvancedNeuron::test_backprop_disabled_does_not_apply_dendritic_gain - assert False
+ +  where False = <built-in method allclose of type object at 0x7fd9294e5920>(tensor([[0.0172]]), tensor([[0.0086]]))
+ +    where <built-in method allclose of type object at 0x7fd9294e5920> = torch.allclose
+FAILED tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_adaptation_respects_string_inference_mode - AttributeError: 'str' object has no attribute 'value'
+FAILED tests/unit/advanced/test_adaptation.py::TestAdaptationMixin::test_forward_updates_u_for_downstream_mixins - AttributeError: 'str' object has no attribute 'value'
+FAILED tests/unit/neuron/test_backprop_bap.py::test_bap_amplification_changes_dendritic_computation_and_clamps_gain - AttributeError: 'str' object has no attribute 'value'
+FAILED tests/unit/test_public_import_surface.py::test_v1_aliases_emit_deprecation_warning_and_match_v2_targets_until_2_0 - AssertionError: assert not True
+ +  where True = hasattr(pyfolds, 'MPJRDConfig')
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 5 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+======================== 5 failed, 3 warnings in 2.33s =========================

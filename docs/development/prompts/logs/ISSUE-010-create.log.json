@@ -1,0 +1,7 @@
+{
+  "evento": "create_issue",
+  "issue": "ISSUE-010",
+  "arquivo": "docs/development/prompts/relatorios/ISSUE-010-falhas-regressivas-na-su-te-completa-de-testes.md",
+  "checksum": "839418716c8a5c4710773b368faddca159bee672b6473083c760088a72f0a66b",
+  "timestamp": "2026-02-20T04:01:20.814634+00:00"
+}

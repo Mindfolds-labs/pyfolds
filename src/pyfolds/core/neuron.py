@@ -17,7 +17,7 @@ Características:
 
 import torch
 import torch.nn as nn
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 from threading import Lock
 from .config import MPJRDConfig
 from .base import BaseNeuron
@@ -26,7 +26,7 @@ from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator
 from .dendrite_integration import DendriticIntegration
-from ..utils.types import LearningMode
+from ..utils.types import LearningMode, normalize_learning_mode
 from ..utils.validation import validate_input
 
 # ✅ LOGGING
@@ -285,7 +285,7 @@ class MPJRDNeuron(BaseNeuron):
         expected_shape_fn=lambda self: (self.cfg.n_dendrites, self.cfg.n_synapses_per_dendrite),
     )
     def forward(self, x: torch.Tensor, reward: Optional[float] = None,
-                mode: Optional[LearningMode] = None,
+                mode: Optional[Union[LearningMode, str]] = None,
                 collect_stats: bool = True,
                 dt: float = 1.0,
                 defer_homeostasis: bool = False) -> Dict[str, Any]:
@@ -302,7 +302,8 @@ class MPJRDNeuron(BaseNeuron):
         Returns:
             Dict com spikes, potenciais e estatísticas
         """
-        effective_mode = mode if mode is not None else self.mode
+        normalized_mode = normalize_learning_mode(mode)
+        effective_mode = normalized_mode if normalized_mode is not None else self.mode
         
         # Valida device
         self._validate_input_device(x)
@@ -323,7 +324,7 @@ class MPJRDNeuron(BaseNeuron):
             )
             v_dend = torch.nan_to_num(v_dend, nan=0.0, posinf=1e6, neginf=-1e6)
 
-        if hasattr(self, "dendrite_amplification"):
+        if getattr(self.cfg, "backprop_enabled", True) and hasattr(self, "dendrite_amplification"):
             max_gain = getattr(self.cfg, "backprop_max_gain", 2.0)
             amp = (1.0 + self.dendrite_amplification.to(device)).unsqueeze(0)
             amp = amp.clamp(1.0, max_gain)
@@ -506,7 +507,7 @@ class MPJRDNeuron(BaseNeuron):
         x: torch.Tensor,
         reward: Optional[float] = None,
         dt: float = 1.0,
-        mode: Optional[LearningMode] = None,
+        mode: Optional[Union[LearningMode, str]] = None,
         collect_stats: bool = True,
     ) -> Dict[str, torch.Tensor]:
         """API explícita de passo temporal (compatível com README)."""

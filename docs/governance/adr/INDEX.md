@@ -58,6 +58,7 @@
 | ADR-039 | Auditoria de prontidão para publicação no PyPI (ISSUE-038) | Ativo | 2026-02-18 | [ADR-039-auditoria-prontidao-publicacao-pypi.md](ADR-039-auditoria-prontidao-publicacao-pypi.md) |
 | ADR-040 | Governança de execução: issues no HUB e plano ordenado 1→4 | Ativo | 2026-02-19 | [ADR-040-governanca-fluxo-issues-no-hub-e-planos-1-a-4.md](ADR-040-governanca-fluxo-issues-no-hub-e-planos-1-a-4.md) |
 | ADR-041 | Ordem de execução de mixins, homeostase pós-refratário e contrato de saída de layer | Ativo | 2026-02-20 | [ADR-041-ordem-de-execucao-de-mixins-homeostase-pos-refratario-e-contrato-de-saida-de-layer.md](ADR-041-ordem-de-execucao-de-mixins-homeostase-pos-refratario-e-contrato-de-saida-de-layer.md) |
+| ADR-042 | Governança de execução integral de testes e dossiê de qualidade | Ativo | 2026-02-20 | [ADR-042-governanca-de-execucao-integral-de-testes-e-dossie-de-qualidade.md](ADR-042-governanca-de-execucao-integral-de-testes-e-dossie-de-qualidade.md) |
 
 ## ADRs legados e superseded
 

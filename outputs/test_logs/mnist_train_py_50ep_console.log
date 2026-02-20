@@ -1,0 +1,101 @@
+Epoch 1/50 | loss=2.3200 | train=11.38% | test=11.52%
+Neuron metrics | spike_rate=0.000000
+Epoch 2/50 | loss=2.2990 | train=12.30% | test=9.57%
+Neuron metrics | spike_rate=0.000000
+Epoch 3/50 | loss=2.2909 | train=12.74% | test=8.79%
+Neuron metrics | spike_rate=0.000000
+Epoch 4/50 | loss=2.2849 | train=12.84% | test=10.35%
+Neuron metrics | spike_rate=0.000000
+Epoch 5/50 | loss=2.2747 | train=13.09% | test=8.40%
+Neuron metrics | spike_rate=0.000000
+Epoch 6/50 | loss=2.2624 | train=13.82% | test=9.57%
+Neuron metrics | spike_rate=0.000000
+Epoch 7/50 | loss=2.2513 | train=17.53% | test=8.01%
+Neuron metrics | spike_rate=0.000000
+Epoch 8/50 | loss=2.2414 | train=18.07% | test=11.13%
+Neuron metrics | spike_rate=0.000000
+Epoch 9/50 | loss=2.2157 | train=25.20% | test=10.35%
+Neuron metrics | spike_rate=0.000000
+Epoch 10/50 | loss=2.1923 | train=25.78% | test=10.16%
+Neuron metrics | spike_rate=0.000000
+Epoch 11/50 | loss=2.1756 | train=26.81% | test=9.96%
+Neuron metrics | spike_rate=0.000000
+Epoch 12/50 | loss=2.1465 | train=27.15% | test=8.59%
+Neuron metrics | spike_rate=0.000000
+Epoch 13/50 | loss=2.1229 | train=28.52% | test=8.98%
+Neuron metrics | spike_rate=0.000000
+Epoch 14/50 | loss=2.0814 | train=32.03% | test=10.55%
+Neuron metrics | spike_rate=0.000000
+Epoch 15/50 | loss=2.0416 | train=37.30% | test=9.57%
+Neuron metrics | spike_rate=0.000000
+Epoch 16/50 | loss=1.9997 | train=39.60% | test=8.98%
+Neuron metrics | spike_rate=0.000000
+Epoch 17/50 | loss=1.9718 | train=38.28% | test=8.59%
+Neuron metrics | spike_rate=0.000000
+Epoch 18/50 | loss=1.9284 | train=41.41% | test=10.35%
+Neuron metrics | spike_rate=0.000000
+Epoch 19/50 | loss=1.8951 | train=42.04% | test=8.01%
+Neuron metrics | spike_rate=0.000000
+Epoch 20/50 | loss=1.8432 | train=44.34% | test=10.55%
+Neuron metrics | spike_rate=0.000000
+Epoch 21/50 | loss=1.8088 | train=46.24% | test=8.98%
+Neuron metrics | spike_rate=0.000000
+Epoch 22/50 | loss=1.7738 | train=47.95% | test=10.35%
+Neuron metrics | spike_rate=0.000000
+Epoch 23/50 | loss=1.7474 | train=46.58% | test=11.52%
+Neuron metrics | spike_rate=0.000000
+Epoch 24/50 | loss=1.6859 | train=50.54% | test=10.16%
+Neuron metrics | spike_rate=0.000000
+Epoch 25/50 | loss=1.6510 | train=52.10% | test=9.18%
+Neuron metrics | spike_rate=0.000000
+Epoch 26/50 | loss=1.6062 | train=53.56% | test=9.77%
+Neuron metrics | spike_rate=0.000000
+Epoch 27/50 | loss=1.5844 | train=52.15% | test=9.96%
+Neuron metrics | spike_rate=0.000000
+Epoch 28/50 | loss=1.5611 | train=52.73% | test=10.16%
+Neuron metrics | spike_rate=0.000000
+Epoch 29/50 | loss=1.5412 | train=53.76% | test=10.55%
+Neuron metrics | spike_rate=0.000000
+Epoch 30/50 | loss=1.4959 | train=55.62% | test=9.96%
+Neuron metrics | spike_rate=0.000000
+Epoch 31/50 | loss=1.4594 | train=56.74% | test=9.57%
+Neuron metrics | spike_rate=0.000000
+Epoch 32/50 | loss=1.4240 | train=58.35% | test=10.16%
+Neuron metrics | spike_rate=0.000000
+Epoch 33/50 | loss=1.3890 | train=59.42% | test=9.57%
+Neuron metrics | spike_rate=0.000000
+Epoch 34/50 | loss=1.3563 | train=59.96% | test=10.35%
+Neuron metrics | spike_rate=0.000000
+Epoch 35/50 | loss=1.3429 | train=60.35% | test=10.74%
+Neuron metrics | spike_rate=0.000000
+Epoch 36/50 | loss=1.3425 | train=58.84% | test=9.96%
+Neuron metrics | spike_rate=0.000000
+Epoch 37/50 | loss=1.2939 | train=62.35% | test=10.35%
+Neuron metrics | spike_rate=0.000000
+Epoch 38/50 | loss=1.2757 | train=61.87% | test=9.77%
+Neuron metrics | spike_rate=0.000000
+Epoch 39/50 | loss=1.2624 | train=61.87% | test=9.77%
+Neuron metrics | spike_rate=0.000000
+Epoch 40/50 | loss=1.2276 | train=63.67% | test=10.94%
+Neuron metrics | spike_rate=0.000000
+Epoch 41/50 | loss=1.2116 | train=64.01% | test=10.55%
+Neuron metrics | spike_rate=0.000000
+Epoch 42/50 | loss=1.1933 | train=64.11% | test=10.16%
+Neuron metrics | spike_rate=0.000000
+Epoch 43/50 | loss=1.1639 | train=66.85% | test=9.77%
+Neuron metrics | spike_rate=0.000000
+Epoch 44/50 | loss=1.1540 | train=65.82% | test=10.16%
+Neuron metrics | spike_rate=0.000000
+Epoch 45/50 | loss=1.1232 | train=65.82% | test=10.16%
+Neuron metrics | spike_rate=0.000000
+Epoch 46/50 | loss=1.1029 | train=68.12% | test=10.35%
+Neuron metrics | spike_rate=0.000000
+Epoch 47/50 | loss=1.0854 | train=67.87% | test=9.18%
+Neuron metrics | spike_rate=0.000000
+Epoch 48/50 | loss=1.0806 | train=68.46% | test=9.77%
+Neuron metrics | spike_rate=0.000000
+Epoch 49/50 | loss=1.0631 | train=69.24% | test=10.35%
+Neuron metrics | spike_rate=0.000000
+Epoch 50/50 | loss=1.0436 | train=69.34% | test=10.35%
+Neuron metrics | spike_rate=0.000000
+FINAL SUMMARY | final_acc=10.35% | best_acc=11.52% | final_loss=1.0436
