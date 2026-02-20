@@ -3,7 +3,7 @@ import pyfolds
 
 
 def test_bap_amplification_changes_dendritic_computation_and_clamps_gain():
-    cfg = pyfolds.MPJRDConfig(backprop_max_gain=1.2)
+    cfg = pyfolds.NeuronConfig(backprop_max_gain=1.2)
     base_neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
     amp_neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
     amp_neuron.load_state_dict(base_neuron.state_dict(), strict=False)

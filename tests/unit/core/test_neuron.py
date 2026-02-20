@@ -29,7 +29,7 @@ class TestMPJRDNeuron:
 
     def test_nmda_shunting_exposes_dendritic_contribution(self, batch_size):
         """Modo nmda_shunting deve retornar contribuição por dendrito."""
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             n_dendrites=2,
             n_synapses_per_dendrite=4,
             dendrite_integration_mode="nmda_shunting",
@@ -68,7 +68,7 @@ class TestMPJRDNeuron:
 
     def test_online_plasticity_updates_when_not_deferred(self, small_config):
         """Modo ONLINE deve atualizar N/I quando defer_updates=False."""
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             n_dendrites=small_config.n_dendrites,
             n_synapses_per_dendrite=small_config.n_synapses_per_dendrite,
             defer_updates=False,
@@ -93,7 +93,7 @@ class TestMPJRDNeuron:
 
     def test_batch_plasticity_preserves_local_pre_synaptic_rate(self):
         """BATCH deve manter média local por sinapse (sem normalização cruzada)."""
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             n_dendrites=1,
             n_synapses_per_dendrite=4,
             defer_updates=True,
@@ -140,7 +140,7 @@ class TestMPJRDNeuron:
 
     def test_nmda_theta_eff_caps_unreachable_threshold(self):
         """NMDA+shunting deve limitar theta efetivo à capacidade somática."""
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             n_dendrites=4,
             n_synapses_per_dendrite=2,
             theta_init=4.5,

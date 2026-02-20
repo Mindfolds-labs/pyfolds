@@ -6,7 +6,7 @@ from pyfolds.monitoring import NeuronHealthMonitor, WeightIntegrityMonitor
 
 
 def test_health_monitor_runs_and_scores():
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4, device="cpu")
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4, device="cpu")
     neuron = pyfolds.MPJRDNeuron(cfg)
     monitor = NeuronHealthMonitor(neuron, check_every_n_steps=1)
 

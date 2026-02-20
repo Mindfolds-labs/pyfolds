@@ -10,7 +10,7 @@ class TestNeuromodulator:
     
     def test_external_mode(self):
         """Test external mode."""
-        cfg = pyfolds.MPJRDConfig(neuromod_mode="external")
+        cfg = pyfolds.NeuronConfig(neuromod_mode="external")
         from pyfolds.core import Neuromodulator
         
         mod = Neuromodulator(cfg)
@@ -20,7 +20,7 @@ class TestNeuromodulator:
     
     def test_surprise_mode(self):
         """Test surprise mode."""
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             neuromod_mode="surprise",
             sup_k=2.0
         )
@@ -34,7 +34,7 @@ class TestNeuromodulator:
 
     def test_rejects_non_finite_inputs(self):
         """Non-finite scalars must fail fast to avoid unstable dynamics."""
-        cfg = pyfolds.MPJRDConfig(neuromod_mode="surprise")
+        cfg = pyfolds.NeuronConfig(neuromod_mode="surprise")
         from pyfolds.core import Neuromodulator
 
         mod = Neuromodulator(cfg)
@@ -47,7 +47,7 @@ class TestNeuromodulator:
 
     def test_infers_output_device_from_tensor_inputs(self):
         """Output tensor should stay on same device when device arg is omitted."""
-        cfg = pyfolds.MPJRDConfig(neuromod_mode="surprise")
+        cfg = pyfolds.NeuronConfig(neuromod_mode="surprise")
         from pyfolds.core import Neuromodulator
 
         mod = Neuromodulator(cfg)

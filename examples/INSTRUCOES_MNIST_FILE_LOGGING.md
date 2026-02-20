@@ -2,7 +2,7 @@
 
 ## Imports recomendados
 ```python
-from pyfolds import MPJRDConfig, MPJRDLayer, LearningMode, VersionedCheckpoint
+from pyfolds import NeuronConfig, AdaptiveNeuronLayer, LearningMode, VersionedCheckpoint
 from pyfolds.advanced import MPJRDNeuronAdvanced
 ```
 
@@ -43,5 +43,5 @@ payload = VersionedCheckpoint.load(
 
 ## Boas práticas
 - Sempre usar o mesmo `device` para neurônio/camada e entrada.
-- Garantir shape de entrada válido para `MPJRDLayer`: `[B,N,D,S]`, `[B,N,D]` ou `[B,D,S]`.
+- Garantir shape de entrada válido para `AdaptiveNeuronLayer`: `[B,N,D,S]`, `[B,N,D]` ou `[B,D,S]`.
 - Manter batchs pequenos em testes para execução rápida e reproduzível.

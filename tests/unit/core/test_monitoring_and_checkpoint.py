@@ -42,7 +42,7 @@ def test_health_check_uses_fallback_metrics_from_get_metrics_contract():
     assert any("neurônios mortos" in alert for alert in alerts)
 
 def test_versioned_checkpoint_save_and_load(tmp_path):
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     neuron = pyfolds.MPJRDNeuron(cfg)
     ckpt = VersionedCheckpoint(neuron, version="1.0.0")
 
@@ -55,7 +55,7 @@ def test_versioned_checkpoint_save_and_load(tmp_path):
     assert loaded["metadata"]["experiment"] == "unit"
 
 def test_versioned_checkpoint_metadata_created_at_is_utc(tmp_path):
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     neuron = pyfolds.MPJRDNeuron(cfg)
     ckpt = VersionedCheckpoint(neuron, version="1.0.0")
 
@@ -69,8 +69,8 @@ def test_versioned_checkpoint_metadata_created_at_is_utc(tmp_path):
 
 
 def test_versioned_checkpoint_shape_validation_raises_on_mismatch(tmp_path):
-    cfg_source = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
-    cfg_target = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=5)
+    cfg_source = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg_target = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=5)
     source = pyfolds.MPJRDNeuron(cfg_source)
     target = pyfolds.MPJRDNeuron(cfg_target)
 
@@ -86,7 +86,7 @@ def test_versioned_checkpoint_shape_validation_raises_on_mismatch(tmp_path):
 
 
 def test_versioned_checkpoint_safetensors_roundtrip(tmp_path):
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     neuron = pyfolds.MPJRDNeuron(cfg)
     ckpt = VersionedCheckpoint(neuron, version="1.0.0")
 
@@ -109,7 +109,7 @@ def test_versioned_checkpoint_safetensors_roundtrip(tmp_path):
 
 
 def test_model_integrity_monitor_detects_unexpected_mutation():
-    model = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4))
+    model = pyfolds.MPJRDNeuron(pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4))
     monitor = ModelIntegrityMonitor(model, check_every_n_steps=1)
 
     baseline = monitor.set_baseline()
@@ -128,7 +128,7 @@ def test_model_integrity_monitor_detects_unexpected_mutation():
 
 
 def test_model_integrity_monitor_initializes_hash_on_first_check():
-    model = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4))
+    model = pyfolds.MPJRDNeuron(pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4))
     monitor = ModelIntegrityMonitor(model, check_every_n_steps=1)
 
     payload = monitor.check_integrity()
@@ -139,7 +139,7 @@ def test_model_integrity_monitor_initializes_hash_on_first_check():
 
 
 def test_weight_integrity_monitor_detects_mutation_between_checks():
-    model = pyfolds.MPJRDNeuron(pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4))
+    model = pyfolds.MPJRDNeuron(pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4))
     monitor = WeightIntegrityMonitor(model, check_every_n_steps=1)
 
     first = monitor.check()
@@ -158,7 +158,7 @@ def test_weight_integrity_monitor_detects_mutation_between_checks():
 def test_versioned_checkpoint_load_secure_validates_hash_and_shapes(tmp_path):
     safetensors = pytest.importorskip("safetensors")
 
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     model = pyfolds.MPJRDNeuron(cfg)
     ckpt = VersionedCheckpoint(model, version="2.1.0")
 
@@ -181,7 +181,7 @@ def test_versioned_checkpoint_load_secure_validates_hash_and_shapes(tmp_path):
 def test_versioned_checkpoint_load_secure_fails_on_hash_mismatch(tmp_path):
     safetensors = pytest.importorskip("safetensors")
 
-    cfg = pyfolds.MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     model = pyfolds.MPJRDNeuron(cfg)
     state = model.state_dict()
 

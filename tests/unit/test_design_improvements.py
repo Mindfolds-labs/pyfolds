@@ -1,7 +1,7 @@
 import pytest
 
 from pyfolds.advanced import MPJRDNeuronAdvanced
-from pyfolds.core import MPJRDConfig
+from pyfolds import NeuronConfig
 from pyfolds.core.base import BaseNeuron
 from pyfolds.factory import NeuronFactory, NeuronType
 from pyfolds.network import NetworkBuilder
@@ -29,7 +29,7 @@ class DummyNeuron(BaseNeuron):
 
 
 def test_factory_creates_builtin_types():
-    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
 
     basic = NeuronFactory.create(NeuronType.BASIC, cfg)
     advanced = NeuronFactory.create(NeuronType.ADVANCED, cfg)
@@ -39,7 +39,7 @@ def test_factory_creates_builtin_types():
 
 
 def test_factory_custom_registry_and_unknown_type():
-    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     NeuronFactory.register("dummy", DummyNeuron)
 
     custom = NeuronFactory.create("dummy", cfg)
@@ -50,7 +50,7 @@ def test_factory_custom_registry_and_unknown_type():
 
 
 def test_learning_mode_context_restores_even_on_error():
-    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
     neuron = NeuronFactory.create(NeuronType.BASIC, cfg)
 
     assert neuron.mode == LearningMode.ONLINE
@@ -64,7 +64,7 @@ def test_learning_mode_context_restores_even_on_error():
 
 
 def test_network_builder_connects_layers_and_builds():
-    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
 
     net = (
         NetworkBuilder("builder_net")

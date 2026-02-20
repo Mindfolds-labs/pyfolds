@@ -2,14 +2,14 @@ import struct
 
 import pytest
 
-from pyfolds.core.config import MPJRDConfig
+from pyfolds import NeuronConfig
 from pyfolds.core.neuron import MPJRDNeuron
 from pyfolds.serialization import FoldReader, save_fold_or_mind
 from pyfolds.serialization.foldio import HEADER_FMT, MAGIC
 
 
 def _build_neuron() -> MPJRDNeuron:
-    cfg = MPJRDConfig(
+    cfg = NeuronConfig(
         n_dendrites=2,
         n_synapses_per_dendrite=4,
         device="cpu",

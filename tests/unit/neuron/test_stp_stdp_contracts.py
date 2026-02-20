@@ -3,7 +3,7 @@ import pyfolds
 
 
 def test_stdp_reads_pre_stp_input_for_pre_spikes_and_ltd_uses_pre_spike_gate():
-    cfg = pyfolds.MPJRDConfig(
+    cfg = pyfolds.NeuronConfig(
         n_dendrites=1,
         n_synapses_per_dendrite=1,
         plasticity_mode="stdp",

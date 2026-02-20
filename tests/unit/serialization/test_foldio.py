@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 import torch
 
-from pyfolds.core.config import MPJRDConfig
+from pyfolds import NeuronConfig
 from pyfolds.core.neuron import MPJRDNeuron
 from pyfolds.serialization import (
     FoldReader,
@@ -40,7 +40,7 @@ except Exception:
 
 
 def _build_neuron(enable_telemetry: bool = False) -> MPJRDNeuron:
-    cfg = MPJRDConfig(
+    cfg = NeuronConfig(
         n_dendrites=2,
         n_synapses_per_dendrite=4,
         device="cpu",

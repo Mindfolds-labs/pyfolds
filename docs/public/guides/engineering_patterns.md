@@ -10,10 +10,10 @@ Use `create_neuron` para deixar a escolha de classe desacoplada do código clien
 
 ```python
 from pyfolds.core import create_neuron
-from pyfolds.core import MPJRDConfig
+from pyfolds import NeuronConfig
 from pyfolds.wave import MPJRDWaveConfig
 
-core_neuron = create_neuron(MPJRDConfig())
+core_neuron = create_neuron(NeuronConfig())
 wave_neuron = create_neuron(MPJRDWaveConfig())
 ```
 
@@ -37,7 +37,7 @@ Os neurônios validam automaticamente:
 import torch
 import pyfolds
 
-cfg = pyfolds.MPJRDConfig()
+cfg = pyfolds.NeuronConfig()
 neuron = pyfolds.MPJRDNeuron(cfg)
 
 x_invalido = torch.randint(0, 2, (2, cfg.n_dendrites, cfg.n_synapses_per_dendrite))
@@ -52,7 +52,7 @@ neuron(x_invalido)  # TypeError: x deve ser tensor de ponto flutuante
 import pyfolds
 from pyfolds.serialization import VersionedCheckpoint
 
-cfg = pyfolds.MPJRDConfig()
+cfg = pyfolds.NeuronConfig()
 model = pyfolds.MPJRDNeuron(cfg)
 
 ckpt = VersionedCheckpoint(model, version="2.1.0")

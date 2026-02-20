@@ -3,7 +3,7 @@ import pyfolds
 
 
 def test_forward_clamps_non_finite_dendritic_sum(monkeypatch):
-    cfg = pyfolds.MPJRDConfig()
+    cfg = pyfolds.NeuronConfig()
     neuron = pyfolds.MPJRDNeuron(cfg)
 
     def bad_forward(self, x):

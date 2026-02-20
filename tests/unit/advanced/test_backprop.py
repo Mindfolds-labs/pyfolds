@@ -66,7 +66,7 @@ class TestBackpropMixin:
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
 
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             n_dendrites=full_config.n_dendrites,
             n_synapses_per_dendrite=full_config.n_synapses_per_dendrite,
             bap_proportional=True,
@@ -89,7 +89,7 @@ class TestBackpropMixin:
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
 
-        cfg = pyfolds.MPJRDConfig(
+        cfg = pyfolds.NeuronConfig(
             n_dendrites=1,
             n_synapses_per_dendrite=1,
             t_refrac_abs=2.0,

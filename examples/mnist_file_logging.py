@@ -20,7 +20,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 
 import pyfolds
-from pyfolds import LearningMode, MPJRDConfig, MPJRDLayer, VersionedCheckpoint
+from pyfolds import LearningMode, NeuronConfig, AdaptiveNeuronLayer, VersionedCheckpoint
 from pyfolds.advanced import MPJRDNeuronAdvanced
 
 try:
@@ -66,7 +66,7 @@ class SyntheticMNISTDataset(Dataset):
 
 
 class MNISTMPJRDModel(nn.Module):
-    def __init__(self, cfg: MPJRDConfig, n_neurons: int, device: torch.device):
+    def __init__(self, cfg: NeuronConfig, n_neurons: int, device: torch.device):
         super().__init__()
         self.cfg = cfg
         self.n_neurons = n_neurons
@@ -76,7 +76,7 @@ class MNISTMPJRDModel(nn.Module):
         self.proj = nn.Linear(784, self.total_synapses)
         nn.init.uniform_(self.proj.weight, -0.2, 0.2)
 
-        self.mpjrd_layer = MPJRDLayer(
+        self.mpjrd_layer = AdaptiveNeuronLayer(
             n_neurons=n_neurons,
             cfg=cfg,
             name="hidden",
@@ -212,7 +212,7 @@ def run_training(config_override: TrainConfig | None = None) -> dict[str, object
     print_status(f"Iniciando - PyTorch {torch.__version__} / pyfolds {pyfolds.__version__}")
     print_status(f"Device: {device}")
 
-    mp_cfg = MPJRDConfig(
+    mp_cfg = NeuronConfig(
         n_dendrites=4,
         n_synapses_per_dendrite=8,
         n_min=1,

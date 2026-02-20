@@ -1,12 +1,13 @@
 import pyfolds
 
-from pyfolds.core import MPJRDConfig, create_neuron
+from pyfolds import NeuronConfig
+from pyfolds.core import create_neuron
 from pyfolds.core.factory import NeuronFactory, NeuronType
 from pyfolds.wave import MPJRDWaveConfig, MPJRDWaveNeuron
 
 
 def test_create_neuron_infers_standard_type():
-    neuron = create_neuron(MPJRDConfig())
+    neuron = create_neuron(NeuronConfig())
     assert isinstance(neuron, pyfolds.MPJRDNeuron)
 
 
@@ -16,7 +17,7 @@ def test_create_neuron_infers_wave_type():
 
 
 def test_factory_raises_for_unregistered_type():
-    cfg = MPJRDConfig()
+    cfg = NeuronConfig()
     NeuronFactory._registry.clear()
 
     try:

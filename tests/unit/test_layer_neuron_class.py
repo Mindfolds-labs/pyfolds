@@ -1,16 +1,16 @@
-"""Tests for MPJRDLayer with custom neuron class."""
+"""Tests for AdaptiveNeuronLayer with custom neuron class."""
 
 import pytest
 import torch
 
-from pyfolds import MPJRDConfig
+from pyfolds import NeuronConfig
 from pyfolds.core import MPJRDNeuronV2
-from pyfolds.layers import MPJRDLayer
+from pyfolds import AdaptiveNeuronLayer
 
 
 def test_layer_accepts_neuron_v2():
-    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
-    layer = MPJRDLayer(n_neurons=3, cfg=cfg, neuron_cls=MPJRDNeuronV2)
+    cfg = NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    layer = AdaptiveNeuronLayer(n_neurons=3, cfg=cfg, neuron_cls=MPJRDNeuronV2)
 
     x = torch.randn(5, 3, 2, 4)
     out = layer(x)
@@ -22,21 +22,21 @@ def test_layer_accepts_neuron_v2():
 
 
 def test_layer_rejects_invalid_neuron_cls():
-    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    cfg = NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
 
     with pytest.raises(TypeError):
-        MPJRDLayer(n_neurons=2, cfg=cfg, neuron_cls=torch.nn.Linear)
+        AdaptiveNeuronLayer(n_neurons=2, cfg=cfg, neuron_cls=torch.nn.Linear)
 
 
 def test_layer_has_no_legacy_neuron_class_attr():
-    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
-    layer = MPJRDLayer(n_neurons=3, cfg=cfg)
+    cfg = NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+    layer = AdaptiveNeuronLayer(n_neurons=3, cfg=cfg)
     assert not hasattr(layer, "neuron_class")
 
 
 def test_layer_forwards_dt_to_neurons(monkeypatch):
-    cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=2)
-    layer = MPJRDLayer(n_neurons=2, cfg=cfg)
+    cfg = NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=2)
+    layer = AdaptiveNeuronLayer(n_neurons=2, cfg=cfg)
 
     seen_dt = []
 
