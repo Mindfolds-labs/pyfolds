@@ -57,3 +57,7 @@ Passos:
 - [HUB_CONTROLE.md](../HUB_CONTROLE.md)
 - [ADR 0040](../../governance/adr/legado/0040-conclusao-do-ciclo-issue-e-foco-em-execucao.md)
 - [ADR 0041](../../adr/0041-modelo-de-fases-ciclo-continuo-e-legado.md)
+
+- [HUB de Legado](../legado/HUB_LEGADO.md)
+
+- Para evitar falha por ID duplicado, use `python tools/create_issue_report.py --auto-id --tema "..." --prioridade "Alta" --area "..."`.

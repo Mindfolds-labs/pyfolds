@@ -18,6 +18,7 @@ contributing
 testing
 packaging
 prompts
+legado/HUB_LEGADO
 diagrams/index
 ```
 
@@ -25,3 +26,5 @@ diagrams/index
 - [Execution queue](execution_queue.md)
 - [Hub de Controle (existente)](HUB_CONTROLE.md)
 - [Development Hub (compat)](DEVELOPMENT_HUB.md)
+
+- [Hub de Legado](legado/HUB_LEGADO.md)
