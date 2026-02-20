@@ -148,12 +148,18 @@ class RefractoryMixin(TimedMixin):
         
         # Bloqueia spikes apenas no refratário absoluto
         final_spikes = torch.where(blocked, torch.zeros_like(spikes_rel), spikes_rel)
-        
+
+        in_refractory_now = blocked | (theta_boost > 0)
+        self._set_refractory_state(bool(in_refractory_now.any().item()))
+
         # Atualiza output
         output['spikes'] = final_spikes
         output['spike_rate'] = float(final_spikes.mean().item())
         output['refrac_blocked'] = blocked
         output['theta_boost'] = theta_boost
+
+        # Atualiza estado refratário antes da homeostase
+        self._update_refractory_batch(final_spikes, dt=kwargs.get('dt', 1.0))
 
         effective_mode = kwargs.get("mode", getattr(self, "mode", None))
         collect_stats = kwargs.get("collect_stats", True)
@@ -163,10 +169,10 @@ class RefractoryMixin(TimedMixin):
             and effective_mode is not None
             and str(getattr(effective_mode, "value", effective_mode)) != "inference"
         ):
-            self.homeostasis.update(output['spike_rate'])
-        
-        # Atualiza estado refratário
-        self._update_refractory_batch(final_spikes, dt=kwargs.get('dt', 1.0))
+            self.homeostasis.update(
+                output['spike_rate'],
+                in_refractory_period=self.in_refractory_period,
+            )
 
         if hasattr(self, '_update_adaptation_after_spike'):
             self._update_adaptation_after_spike(final_spikes)
@@ -176,6 +182,7 @@ class RefractoryMixin(TimedMixin):
     def reset_refractory(self):
         """Reseta o estado refratário."""
         self.last_spike_time = None
+        self._set_refractory_state(False)
         # Nota: time_counter NÃO é resetado aqui pois é compartilhado
     
     def get_refractory_metrics(self) -> dict:

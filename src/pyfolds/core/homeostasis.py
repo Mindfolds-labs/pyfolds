@@ -53,6 +53,7 @@ class HomeostasisController(nn.Module):
         self,
         current_rate: Union[float, torch.Tensor],
         clamp_theta: bool = True,
+        in_refractory_period: bool = False,
     ) -> torch.Tensor:
         """
         Atualiza parâmetros homeostáticos (PID-like).
@@ -61,10 +62,14 @@ class HomeostasisController(nn.Module):
             current_rate: Taxa atual no intervalo [0, 1].
                 Aceita float ou tensor escalar.
             clamp_theta: Se deve limitar `theta` entre [theta_min, theta_max].
+            in_refractory_period: Se True, congela atualização de limiar neste passo.
 
         Returns:
             torch.Tensor: theta atualizado (tensor escalar shape [1]).
         """
+        if in_refractory_period:
+            return self.theta
+
         rate = float(current_rate) if isinstance(current_rate, torch.Tensor) else current_rate
         if not isinstance(rate, (int, float)):
             raise TypeError(f"current_rate deve ser float ou Tensor, recebido {type(rate)}")

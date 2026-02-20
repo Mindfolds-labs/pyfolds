@@ -106,3 +106,22 @@ class TestRefractoryMixin:
         neuron.forward(x, dt=1.0)
 
         assert neuron.time_counter.item() == pytest.approx(1.0)
+
+
+    def test_homeostasis_does_not_update_theta_in_refractory(self, full_config):
+        """Theta must remain frozen while any sample is in refractory period."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
+        x = torch.ones(1, full_config.n_dendrites, full_config.n_synapses_per_dendrite)
+
+        theta_before = neuron.theta.clone()
+        neuron.time_counter.fill_(1.0)
+        neuron.last_spike_time = torch.tensor([0.0])
+
+        out = neuron.forward(x, dt=1.0)
+
+        assert out['refrac_blocked'][0].item() is True
+        assert neuron.in_refractory_period is True
+        assert torch.allclose(neuron.theta, theta_before)

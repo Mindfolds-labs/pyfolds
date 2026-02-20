@@ -309,11 +309,19 @@ class MPJRDNeuron(BaseNeuron):
         
         device = self.theta.device
         B, D, _ = x.shape
+        self._set_refractory_state(False)
 
         # ===== 1. INTEGRAÇÃO DENDRÍTICA =====
         v_dend = torch.zeros(B, D, device=device)
         for d_idx, dend in enumerate(self.dendrites):
             v_dend[:, d_idx] = dend(x[:, d_idx, :])
+
+        if not torch.isfinite(v_dend).all():
+            self.logger.warning(
+                "event=non_finite_dendritic_sum action=nan_to_num_clamp mode=%s",
+                effective_mode.value if hasattr(effective_mode, "value") else str(effective_mode),
+            )
+            v_dend = torch.nan_to_num(v_dend, nan=0.0, posinf=1e6, neginf=-1e6)
 
         if hasattr(self, "dendrite_amplification"):
             max_gain = getattr(self.cfg, "backprop_max_gain", 2.0)
@@ -387,7 +395,10 @@ class MPJRDNeuron(BaseNeuron):
 
         # ===== 7. HOMEOSTASE =====
         if effective_mode != LearningMode.INFERENCE and collect_stats and not defer_homeostasis:
-            self.homeostasis.update(spike_rate)
+            self.homeostasis.update(
+                spike_rate,
+                in_refractory_period=self.in_refractory_period,
+            )
 
         # ===== 8. NEUROMODULAÇÃO =====
         if self.cfg.neuromod_mode == "external":
