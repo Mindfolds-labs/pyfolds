@@ -11,7 +11,7 @@ import shutil
 import subprocess
 import warnings
 from dataclasses import asdict, is_dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -20,6 +20,8 @@ import torch
 from .ecc import ReedSolomonECC, ecc_from_protection
 
 from pyfolds.core.config import MPJRDConfig
+
+NeuronConfig = MPJRDConfig
 
 try:
     from safetensors.torch import load_file as load_safetensors_file
@@ -98,7 +100,7 @@ class VersionedCheckpoint:
     def _metadata(self, extra: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Gera metadados para o checkpoint."""
         metadata = {
-            "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "created_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
             "version": self.version,
             "git_hash": self._git_hash(),
             "config": self._cfg_dict(),
@@ -126,7 +128,7 @@ class VersionedCheckpoint:
             bytes,
             type(None),
         ]
-        safe_types.append(MPJRDConfig)
+        safe_types.extend([MPJRDConfig, NeuronConfig])
 
         torch.serialization.add_safe_globals(safe_types)
         cls._safe_globals_registered = True

@@ -1,5 +1,8 @@
 """Camada de neurônios MPJRD - VERSÃO FINAL CORRIGIDA"""
 
+from contextlib import contextmanager
+import warnings
+
 import torch
 import torch.nn as nn
 from typing import Optional, Dict, List, Any, Type
@@ -167,13 +170,14 @@ class MPJRDLayer(nn.Module):
             # Modo treinamento: permite gradientes
             for i, neuron in enumerate(self.neurons):
                 x_neuron = x[:, i, :, :].to(neuron.theta.device)
-                out = neuron(
-                    x_neuron,  # [batch, dendrites, synapses]
-                    reward=reward,
-                    mode=mode,
-                    dt=dt,
-                    **neuron_kwargs,
-                )
+                with self._suppress_dict_backward_hook_warning():
+                    out = neuron(
+                        x_neuron,  # [batch, dendrites, synapses]
+                        reward=reward,
+                        mode=mode,
+                        dt=dt,
+                        **neuron_kwargs,
+                    )
                 spikes[:, i] = out['spikes']
                 spike_rates[i] = out['spike_rate']
                 theta_values[i] = out['theta']
@@ -195,13 +199,14 @@ class MPJRDLayer(nn.Module):
             with torch.no_grad():
                 for i, neuron in enumerate(self.neurons):
                     x_neuron = x[:, i, :, :].to(neuron.theta.device)
-                    out = neuron(
-                        x_neuron,
-                        reward=reward,
-                        mode=mode,
-                        dt=dt,
-                        **neuron_kwargs,
-                    )
+                    with self._suppress_dict_backward_hook_warning():
+                        out = neuron(
+                            x_neuron,
+                            reward=reward,
+                            mode=mode,
+                            dt=dt,
+                            **neuron_kwargs,
+                        )
                     spikes[:, i] = out['spikes']
                     spike_rates[i] = out['spike_rate']
                     theta_values[i] = out['theta']
@@ -240,6 +245,17 @@ class MPJRDLayer(nn.Module):
             })
 
         return output
+
+    @contextmanager
+    def _suppress_dict_backward_hook_warning(self):
+        """Silencia warning conhecido do PyTorch para hooks com saída em dicionário."""
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                category=UserWarning,
+                message=r".*does not return a single Tensor or a tuple of Tensors.*",
+            )
+            yield
 
     def _prepare_input(self, x: torch.Tensor) -> torch.Tensor:
         """
