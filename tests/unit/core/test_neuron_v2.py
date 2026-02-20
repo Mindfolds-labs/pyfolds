@@ -66,3 +66,18 @@ def test_theta_eff_caps_unreachable_threshold():
 
     assert out["somatic"].max().item() > (cfg.n_dendrites - 1e-3) * 0.5
     assert out["spikes"].mean().item() > 0.0
+
+
+def test_vectorization_and_forward_integrity_batch64():
+    """Valida vetorização em lote e estabilidade numérica do forward."""
+    cfg = pyfolds.MPJRDConfig(n_dendrites=16, n_synapses_per_dendrite=8)
+    neuron = pyfolds.MPJRDNeuronV2(cfg)
+
+    batch_size = 64
+    x = torch.rand(batch_size, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
+    out = neuron(x, collect_stats=False)
+
+    assert out["spikes"].shape[0] == batch_size
+    assert out["u"].shape[0] == batch_size
+    assert not torch.isnan(out["u"]).any()
+    assert not torch.isnan(out["v_dend"]).any()
