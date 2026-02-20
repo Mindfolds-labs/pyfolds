@@ -6,8 +6,8 @@
   },
   "metrics": {
     "python_files": 138,
-    "symbols": 1015,
-    "edges": 1514,
+    "symbols": 1017,
+    "edges": 1520,
     "findings": 0,
     "internal_import_edges": 104
   },
@@ -1220,7 +1220,7 @@
           "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControl",
           "name": "MindControl",
           "qname": "src.pyfolds.monitoring.mindcontrol.MindControl",
-          "line": 99,
+          "line": 102,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.monitoring.mindcontrol.MindControl.__init__",
@@ -1234,7 +1234,7 @@
           "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControlEngine",
           "name": "MindControlEngine",
           "qname": "src.pyfolds.monitoring.mindcontrol.MindControlEngine",
-          "line": 42,
+          "line": 45,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.monitoring.mindcontrol.MindControlEngine.__init__",
@@ -1247,7 +1247,7 @@
           "id": "cls:src.pyfolds.monitoring.mindcontrol.MindControlSink",
           "name": "MindControlSink",
           "qname": "src.pyfolds.monitoring.mindcontrol.MindControlSink",
-          "line": 137,
+          "line": 140,
           "bases": [
             "Sink"
           ],
@@ -1482,6 +1482,7 @@
         "mod:os",
         "mod:pathlib",
         "mod:platform",
+        "mod:shutil",
         "mod:src.pyfolds.serialization.ecc",
         "mod:struct",
         "mod:subprocess",
@@ -1496,7 +1497,7 @@
           "id": "cls:src.pyfolds.serialization.foldio.FoldReader",
           "name": "FoldReader",
           "qname": "src.pyfolds.serialization.foldio.FoldReader",
-          "line": 436,
+          "line": 438,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.foldio.FoldReader.__enter__",
@@ -1516,7 +1517,7 @@
           "id": "cls:src.pyfolds.serialization.foldio.FoldSecurityError",
           "name": "FoldSecurityError",
           "qname": "src.pyfolds.serialization.foldio.FoldSecurityError",
-          "line": 98,
+          "line": 99,
           "bases": [
             "RuntimeError"
           ],
@@ -1526,7 +1527,7 @@
           "id": "cls:src.pyfolds.serialization.foldio.FoldWriter",
           "name": "FoldWriter",
           "qname": "src.pyfolds.serialization.foldio.FoldWriter",
-          "line": 291,
+          "line": 293,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.foldio.FoldWriter.__enter__",
@@ -1555,7 +1556,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._build_nuclear_npz",
           "name": "_build_nuclear_npz",
           "qname": "src.pyfolds.serialization.foldio._build_nuclear_npz",
-          "line": 256,
+          "line": 258,
           "params": [
             "neuron"
           ]
@@ -1564,7 +1565,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._canonical_json",
           "name": "_canonical_json",
           "qname": "src.pyfolds.serialization.foldio._canonical_json",
-          "line": 196,
+          "line": 195,
           "params": [
             "obj"
           ]
@@ -1573,7 +1574,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._cfg_to_dict",
           "name": "_cfg_to_dict",
           "qname": "src.pyfolds.serialization.foldio._cfg_to_dict",
-          "line": 200,
+          "line": 199,
           "params": [
             "cfg"
           ]
@@ -1582,7 +1583,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._collect_hyperparameters",
           "name": "_collect_hyperparameters",
           "qname": "src.pyfolds.serialization.foldio._collect_hyperparameters",
-          "line": 729,
+          "line": 734,
           "params": [
             "neuron"
           ]
@@ -1591,7 +1592,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._crc32c_fallback",
           "name": "_crc32c_fallback",
           "qname": "src.pyfolds.serialization.foldio._crc32c_fallback",
-          "line": 91,
+          "line": 92,
           "params": [
             "data"
           ]
@@ -1600,7 +1601,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._deserialize_state_dict_safetensors",
           "name": "_deserialize_state_dict_safetensors",
           "qname": "src.pyfolds.serialization.foldio._deserialize_state_dict_safetensors",
-          "line": 148,
+          "line": 149,
           "params": [
             "payload",
             "map_location"
@@ -1610,7 +1611,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._expression_summary",
           "name": "_expression_summary",
           "qname": "src.pyfolds.serialization.foldio._expression_summary",
-          "line": 685,
+          "line": 690,
           "params": [
             "neuron"
           ]
@@ -1619,7 +1620,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._history_snapshot",
           "name": "_history_snapshot",
           "qname": "src.pyfolds.serialization.foldio._history_snapshot",
-          "line": 246,
+          "line": 248,
           "params": [
             "neuron"
           ]
@@ -1628,14 +1629,14 @@
           "id": "fn:src.pyfolds.serialization.foldio._init_crc32c_table",
           "name": "_init_crc32c_table",
           "qname": "src.pyfolds.serialization.foldio._init_crc32c_table",
-          "line": 74,
+          "line": 75,
           "params": []
         },
         {
           "id": "fn:src.pyfolds.serialization.foldio._json_bytes",
           "name": "_json_bytes",
           "qname": "src.pyfolds.serialization.foldio._json_bytes",
-          "line": 192,
+          "line": 191,
           "params": [
             "obj"
           ]
@@ -1644,7 +1645,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._optional_import",
           "name": "_optional_import",
           "qname": "src.pyfolds.serialization.foldio._optional_import",
-          "line": 36,
+          "line": 37,
           "params": [
             "module_name"
           ]
@@ -1653,21 +1654,21 @@
           "id": "fn:src.pyfolds.serialization.foldio._reproducibility_metadata",
           "name": "_reproducibility_metadata",
           "qname": "src.pyfolds.serialization.foldio._reproducibility_metadata",
-          "line": 719,
+          "line": 724,
           "params": []
         },
         {
           "id": "fn:src.pyfolds.serialization.foldio._safe_git_hash",
           "name": "_safe_git_hash",
           "qname": "src.pyfolds.serialization.foldio._safe_git_hash",
-          "line": 212,
+          "line": 211,
           "params": []
         },
         {
           "id": "fn:src.pyfolds.serialization.foldio._serialize_state_dict_safetensors",
           "name": "_serialize_state_dict_safetensors",
           "qname": "src.pyfolds.serialization.foldio._serialize_state_dict_safetensors",
-          "line": 104,
+          "line": 105,
           "params": [
             "state_dict"
           ]
@@ -1676,7 +1677,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._sign_payload_ed25519",
           "name": "_sign_payload_ed25519",
           "qname": "src.pyfolds.serialization.foldio._sign_payload_ed25519",
-          "line": 736,
+          "line": 741,
           "params": [
             "payload",
             "private_key_pem"
@@ -1686,7 +1687,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._telemetry_snapshot",
           "name": "_telemetry_snapshot",
           "qname": "src.pyfolds.serialization.foldio._telemetry_snapshot",
-          "line": 224,
+          "line": 226,
           "params": [
             "neuron",
             "max_events"
@@ -1696,7 +1697,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._validate_safetensors_payload",
           "name": "_validate_safetensors_payload",
           "qname": "src.pyfolds.serialization.foldio._validate_safetensors_payload",
-          "line": 119,
+          "line": 120,
           "params": [
             "payload"
           ]
@@ -1705,7 +1706,7 @@
           "id": "fn:src.pyfolds.serialization.foldio._verify_payload_signature_ed25519",
           "name": "_verify_payload_signature_ed25519",
           "qname": "src.pyfolds.serialization.foldio._verify_payload_signature_ed25519",
-          "line": 748,
+          "line": 753,
           "params": [
             "payload",
             "signature_hex",
@@ -1716,7 +1717,7 @@
           "id": "fn:src.pyfolds.serialization.foldio.crc32c_u32",
           "name": "crc32c_u32",
           "qname": "src.pyfolds.serialization.foldio.crc32c_u32",
-          "line": 160,
+          "line": 161,
           "params": [
             "data"
           ]
@@ -1725,7 +1726,7 @@
           "id": "fn:src.pyfolds.serialization.foldio.is_mind",
           "name": "is_mind",
           "qname": "src.pyfolds.serialization.foldio.is_mind",
-          "line": 976,
+          "line": 981,
           "params": [
             "path"
           ]
@@ -1734,7 +1735,7 @@
           "id": "fn:src.pyfolds.serialization.foldio.is_mind_chunks",
           "name": "is_mind_chunks",
           "qname": "src.pyfolds.serialization.foldio.is_mind_chunks",
-          "line": 983,
+          "line": 988,
           "params": [
             "chunks"
           ]
@@ -1743,7 +1744,7 @@
           "id": "fn:src.pyfolds.serialization.foldio.load_fold_or_mind",
           "name": "load_fold_or_mind",
           "qname": "src.pyfolds.serialization.foldio.load_fold_or_mind",
-          "line": 906,
+          "line": 911,
           "params": [
             "path",
             "neuron_class",
@@ -1756,7 +1757,7 @@
           "id": "fn:src.pyfolds.serialization.foldio.peek_fold_or_mind",
           "name": "peek_fold_or_mind",
           "qname": "src.pyfolds.serialization.foldio.peek_fold_or_mind",
-          "line": 885,
+          "line": 890,
           "params": [
             "path",
             "use_mmap"
@@ -1766,7 +1767,7 @@
           "id": "fn:src.pyfolds.serialization.foldio.peek_mind",
           "name": "peek_mind",
           "qname": "src.pyfolds.serialization.foldio.peek_mind",
-          "line": 900,
+          "line": 905,
           "params": [
             "path",
             "use_mmap"
@@ -1776,7 +1777,7 @@
           "id": "fn:src.pyfolds.serialization.foldio.read_nuclear_arrays",
           "name": "read_nuclear_arrays",
           "qname": "src.pyfolds.serialization.foldio.read_nuclear_arrays",
-          "line": 282,
+          "line": 284,
           "params": [
             "path",
             "use_mmap",
@@ -1787,7 +1788,7 @@
           "id": "fn:src.pyfolds.serialization.foldio.save_fold_or_mind",
           "name": "save_fold_or_mind",
           "qname": "src.pyfolds.serialization.foldio.save_fold_or_mind",
-          "line": 764,
+          "line": 769,
           "params": [
             "neuron",
             "path",
@@ -1813,7 +1814,7 @@
           "id": "fn:src.pyfolds.serialization.foldio.sha256_hex",
           "name": "sha256_hex",
           "qname": "src.pyfolds.serialization.foldio.sha256_hex",
-          "line": 187,
+          "line": 178,
           "params": [
             "data"
           ]
@@ -1829,7 +1830,10 @@
         "mod:dataclasses",
         "mod:datetime",
         "mod:hashlib",
+        "mod:hmac",
+        "mod:os",
         "mod:pathlib",
+        "mod:shutil",
         "mod:subprocess",
         "mod:torch",
         "mod:typing",
@@ -1840,15 +1844,17 @@
           "id": "cls:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
           "name": "VersionedCheckpoint",
           "qname": "src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint",
-          "line": 16,
+          "line": 19,
           "bases": [],
           "methods": [
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__init__",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.__repr__",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._cfg_dict",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_hash",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._compute_plain_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._git_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._metadata",
+            "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint._verify_hash",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.load",
             "mtd:src.pyfolds.serialization.versioned_checkpoint.VersionedCheckpoint.save"
           ]
@@ -2491,7 +2497,7 @@
           "id": "fn:src.pyfolds.utils.logging.build_log_path",
           "name": "build_log_path",
           "qname": "src.pyfolds.utils.logging.build_log_path",
-          "line": 338,
+          "line": 346,
           "params": [
             "log_dir",
             "app",
@@ -2511,7 +2517,7 @@
           "id": "fn:src.pyfolds.utils.logging.next_log_path",
           "name": "next_log_path",
           "qname": "src.pyfolds.utils.logging.next_log_path",
-          "line": 321,
+          "line": 329,
           "params": [
             "log_dir",
             "app",

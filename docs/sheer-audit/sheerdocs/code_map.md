@@ -2,7 +2,7 @@
 
 - Repositório: `pyfolds`
 - Arquivos Python: `138`
-- Símbolos: `1015`
+- Símbolos: `1017`
 
 ## Módulos
 
@@ -473,6 +473,7 @@
   - `mod:os`
   - `mod:pathlib`
   - `mod:platform`
+  - `mod:shutil`
   - `mod:src.pyfolds.serialization.ecc`
   - `mod:struct`
   - `mod:subprocess`
@@ -522,7 +523,10 @@
   - `mod:dataclasses`
   - `mod:datetime`
   - `mod:hashlib`
+  - `mod:hmac`
+  - `mod:os`
   - `mod:pathlib`
+  - `mod:shutil`
   - `mod:subprocess`
   - `mod:torch`
   - `mod:typing`
