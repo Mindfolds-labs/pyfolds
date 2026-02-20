@@ -5,7 +5,7 @@ import logging
 import logging.handlers
 import sys
 from collections import deque
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from threading import Lock
 from typing import Deque, Optional, Tuple, Union
@@ -43,7 +43,7 @@ class StructuredFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         log_obj = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -75,6 +75,7 @@ class FixedLayoutFormatter(logging.Formatter):
 
         msg = record.getMessage().replace("\n", "\\n").replace("\r", "\\r")
         return f"{date} {time_} | {level} | {logger_name} | {file_line} | {msg}"
+
 
 class PyFoldsLogger:
     """Gerenciador singleton de logging para PyFolds."""
@@ -221,8 +222,6 @@ def get_logger(name: str) -> logging.Logger:
     return logger_manager.get_logger(name)
 
 
-
-
 def setup_run_logging(
     app: str = "pyfolds",
     version: Optional[str] = None,
@@ -245,6 +244,7 @@ def setup_run_logging(
     if version is None:
         try:
             import pyfolds as _pyfolds
+
             version = getattr(_pyfolds, "__version__", "unknown")
         except Exception:
             version = "unknown"
@@ -259,9 +259,17 @@ def setup_run_logging(
         console=console,
         fixed_layout=fixed_layout,
     )
-    logger = logger_manager.get_logger(app, level=level if isinstance(level, int) else getattr(logging, str(level).upper(), logging.INFO))
+    logger = logger_manager.get_logger(
+        app,
+        level=(
+            level
+            if isinstance(level, int)
+            else getattr(logging, str(level).upper(), logging.INFO)
+        ),
+    )
     logger.info("Run logging configured: %s", log_path)
     return logger, log_path
+
 
 def setup_logging(
     log_file: Optional[str] = None,
@@ -316,7 +324,7 @@ class CircularBufferFileHandler(logging.Handler):
         self._lock = Lock()
         self._buffer: Deque[str] = deque(maxlen=capacity_lines)
         self._line_count = 0
-        self._last_flush = datetime.utcnow()
+        self._last_flush = datetime.now(UTC)
         self._dirty = False
 
         if self.path.exists():
@@ -332,7 +340,7 @@ class CircularBufferFileHandler(logging.Handler):
                 self._line_count = len(self._buffer)
                 self._dirty = True
 
-                elapsed = (datetime.utcnow() - self._last_flush).total_seconds()
+                elapsed = (datetime.now(UTC) - self._last_flush).total_seconds()
                 should_flush = elapsed >= self.flush_interval_sec
                 if record.levelno >= logging.ERROR:
                     should_flush = True
@@ -348,7 +356,7 @@ class CircularBufferFileHandler(logging.Handler):
             content += "\n"
         self.path.write_text(content, encoding=self.encoding)
         self._line_count = len(self._buffer)
-        self._last_flush = datetime.utcnow()
+        self._last_flush = datetime.now(UTC)
         self._dirty = False
 
     def close(self) -> None:

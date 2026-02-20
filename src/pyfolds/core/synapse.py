@@ -32,7 +32,7 @@ __all__ = ["MPJRDSynapse"]
 class MPJRDSynapse(nn.Module):
     """
     Sinapse MPJRD com plasticidade three-factor e two-factor consolidation.
-    
+
     ✅ OTIMIZADO: trabalha com tensores diretamente
     ✅ CONFIGURÁVEL: usa constantes da config
     ✅ MODOS: suporta multiplicador de learning rate por modo
@@ -104,19 +104,42 @@ class MPJRDSynapse(nn.Module):
         self.I.clamp_(cfg.i_min, cfg.i_max)
 
     @torch.no_grad()
-    def update(self, 
-               pre_rate: torch.Tensor, 
-               post_rate: torch.Tensor,
-               R: torch.Tensor, 
-               dt: float = 1.0,
-               mode: Optional[LearningMode] = None) -> None:
+    def _sanitize_state_buffers(self) -> None:
+        """Recupera buffers da sinapse após corrupção transitória (ex.: bitflip ECC)."""
+        finite_i = torch.nan_to_num(
+            self.I, nan=0.0, posinf=self.cfg.i_max, neginf=self.cfg.i_min
+        )
+        self.I.copy_(finite_i.clamp(self.cfg.i_min, self.cfg.i_max))
+
+        finite_elig = torch.nan_to_num(
+            self.eligibility, nan=0.0, posinf=1e6, neginf=-1e6
+        )
+        self.eligibility.copy_(finite_elig)
+
+        finite_sat = torch.nan_to_num(
+            self.sat_time, nan=0.0, posinf=self.cfg.saturation_recovery_time, neginf=0.0
+        )
+        self.sat_time.copy_(finite_sat.clamp_min(0.0))
+
+        clamped_n = self.N.to(dtype=torch.int32).clamp(self.cfg.n_min, self.cfg.n_max)
+        self.N.copy_(clamped_n)
+
+    @torch.no_grad()
+    def update(
+        self,
+        pre_rate: torch.Tensor,
+        post_rate: torch.Tensor,
+        R: torch.Tensor,
+        dt: float = 1.0,
+        mode: Optional[LearningMode] = None,
+    ) -> None:
         """
         Atualização baseada em taxas (Three-factor learning rule).
-        
+
         ✅ OTIMIZADO: trabalha com tensores, evita .item() no caminho crítico
         ✅ MODOS: aplica multiplicador de learning rate baseado no modo
         ✅ FILTRO: aplica activity_threshold para sinapses inativas
-        
+
         Args:
             pre_rate: Taxa pré-sináptica [B] ou [1]
             post_rate: Taxa pós-sináptica [1]
@@ -126,6 +149,8 @@ class MPJRDSynapse(nn.Module):
         """
         if not self.cfg.plastic:
             return
+
+        self._sanitize_state_buffers()
 
         cfg = self.cfg
         dt = abs(dt)
@@ -203,12 +228,12 @@ class MPJRDSynapse(nn.Module):
             torch.full_like(self.I, cfg.ltd_threshold_saturated),
             torch.full_like(self.I, cfg.i_ltd_th),
         )
-        
+
         if self.I <= ltd_th:
             if self.N > cfg.n_min:
                 self.N.add_(-1)
                 self.I.zero_()
-                
+
                 # Se estava protegido e saiu da saturação
                 if self.N.item() == cfg.n_max - 1 and self.protection.item():
                     self.protection.fill_(False)
@@ -218,7 +243,9 @@ class MPJRDSynapse(nn.Module):
         # Atualização vetorial/máscara para evitar sync D2H via `.item()`.
         self.sat_time.add_(self.protection.to(dtype=self.sat_time.dtype) * dt)
         if cfg.saturation_recovery_time > 0:
-            recovery_mask = self.protection & (self.sat_time >= cfg.saturation_recovery_time)
+            recovery_mask = self.protection & (
+                self.sat_time >= cfg.saturation_recovery_time
+            )
             self.protection.masked_fill_(recovery_mask, False)
             self.sat_time.masked_fill_(recovery_mask, 0.0)
 
@@ -228,7 +255,10 @@ class MPJRDSynapse(nn.Module):
         if not self.cfg.distributed_sync_on_consolidate:
             return
 
-        if not torch.distributed.is_available() or not torch.distributed.is_initialized():
+        if (
+            not torch.distributed.is_available()
+            or not torch.distributed.is_initialized()
+        ):
             return
 
         world_size = torch.distributed.get_world_size()
@@ -243,11 +273,15 @@ class MPJRDSynapse(nn.Module):
         torch.distributed.all_reduce(self.I, op=torch.distributed.ReduceOp.SUM)
         self.I.div_(float(world_size))
 
-        torch.distributed.all_reduce(self.eligibility, op=torch.distributed.ReduceOp.SUM)
+        torch.distributed.all_reduce(
+            self.eligibility, op=torch.distributed.ReduceOp.SUM
+        )
         self.eligibility.div_(float(world_size))
 
         protection_float = self.protection.to(dtype=torch.float32)
-        torch.distributed.all_reduce(protection_float, op=torch.distributed.ReduceOp.SUM)
+        torch.distributed.all_reduce(
+            protection_float, op=torch.distributed.ReduceOp.SUM
+        )
         self.protection.copy_(protection_float >= (world_size * 0.5))
 
         torch.distributed.all_reduce(self.sat_time, op=torch.distributed.ReduceOp.SUM)
@@ -267,7 +301,9 @@ class MPJRDSynapse(nn.Module):
 
         # 1. Matemática Vetorial sem Condicionais
         # Se a elegibilidade for 0, delta_n será calculado como +0 automaticamente.
-        transfer = self.eligibility.to(dtype=torch.float32) * (self.cfg.consolidation_rate * abs(dt))
+        transfer = self.eligibility.to(dtype=torch.float32) * (
+            self.cfg.consolidation_rate * abs(dt)
+        )
         delta_n = torch.round(transfer).to(dtype=self.N.dtype)
 
         # 2. Adição Maciça In-Place
@@ -287,28 +323,30 @@ class MPJRDSynapse(nn.Module):
     def get_state(self) -> dict:
         """Retorna estado completo da sinapse (sem .item() para tensores)."""
         return {
-            'N': self.N.clone(),
-            'I': self.I.clone(),
-            'W': self.W.clone(),
-            'protection': self.protection.clone(),
-            'sat_time': self.sat_time.clone(),
-            'eligibility': self.eligibility.clone(),
+            "N": self.N.clone(),
+            "I": self.I.clone(),
+            "W": self.W.clone(),
+            "protection": self.protection.clone(),
+            "sat_time": self.sat_time.clone(),
+            "eligibility": self.eligibility.clone(),
         }
 
     def load_state(self, state: dict) -> None:
         """Carrega estado na sinapse."""
-        if 'N' in state:
-            self.N.data = state['N'].to(self.N.device)
-        if 'I' in state:
-            self.I.data = state['I'].to(self.I.device)
-        if 'protection' in state:
-            self.protection.data = state['protection'].to(self.protection.device)
-        if 'sat_time' in state:
-            self.sat_time.data = state['sat_time'].to(self.sat_time.device)
-        if 'eligibility' in state:
-            self.eligibility.data = state['eligibility'].to(self.eligibility.device)
+        if "N" in state:
+            self.N.data = state["N"].to(self.N.device)
+        if "I" in state:
+            self.I.data = state["I"].to(self.I.device)
+        if "protection" in state:
+            self.protection.data = state["protection"].to(self.protection.device)
+        if "sat_time" in state:
+            self.sat_time.data = state["sat_time"].to(self.sat_time.device)
+        if "eligibility" in state:
+            self.eligibility.data = state["eligibility"].to(self.eligibility.device)
 
     def extra_repr(self) -> str:
         """Representação string da sinapse."""
-        return (f"N={self.N.item()}, I={self.I.item():.2f}, "
-                f"W={self.W.item():.3f}, prot={self.protection.item()}")
+        return (
+            f"N={self.N.item()}, I={self.I.item():.2f}, "
+            f"W={self.W.item():.3f}, prot={self.protection.item()}"
+        )
