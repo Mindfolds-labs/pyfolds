@@ -17,6 +17,8 @@ from typing import Any, Dict, Optional
 
 import torch
 
+from .ecc import ReedSolomonECC, ecc_from_protection
+
 try:
     from safetensors.torch import load_file as load_safetensors_file
     from safetensors.torch import save_file as save_safetensors_file

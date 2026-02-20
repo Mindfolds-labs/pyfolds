@@ -19,6 +19,9 @@ import torch.nn as nn
 from typing import Optional, Dict
 
 
+_LOGGER = logging.getLogger(__name__)
+
+
 class InhibitionLayer(nn.Module):
     """
     Camada de inibição GABA para redes MPJRD.
@@ -100,7 +103,7 @@ class InhibitionLayer(nn.Module):
     
     def _init_E2I_weights(self) -> torch.Tensor:
         """Inicializa pesos E→I com conectividade esparsa determinística."""
-        generator = torch.Generator(device='cpu')
+        generator = torch.Generator()
         generator.manual_seed(self.seed)
 
         dense_weights = torch.nn.init.xavier_uniform_(
@@ -171,7 +174,6 @@ class InhibitionLayer(nn.Module):
                 'inh_potential': [n_inh] potencial dos inibitórios
                 'feedforward_input': [n_inh] input feedforward
         """
-        logger = logging.getLogger(__name__)
         self.step_count.add_(1)
 
         # ===== FEEDFORWARD: E → I =====
@@ -189,7 +191,7 @@ class InhibitionLayer(nn.Module):
 
         inh_rate = inh_spikes.float().mean().item()
         if inh_rate > 0.5:
-            logger.warning(f"⚠️ Alto nível de inibição: {inh_rate:.1%}")
+            _LOGGER.warning(f"⚠️ Alto nível de inibição: {inh_rate:.1%}")
 
         return {
             'inh_spikes': inh_spikes,  # [n_inh]

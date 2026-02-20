@@ -104,8 +104,8 @@ class ShortTermDynamicsMixin:
 
     def _align_short_term_buffers_device(self, device: torch.device) -> None:
         """Realinha buffers STP para ``device`` preservando registro no módulo."""
-        self._buffers['u_stp'] = self.u_stp.to(device=device)
-        self._buffers['R_stp'] = self.R_stp.to(device=device)
+        self.u_stp = self.u_stp.to(device=device)
+        self.R_stp = self.R_stp.to(device=device)
     
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         """

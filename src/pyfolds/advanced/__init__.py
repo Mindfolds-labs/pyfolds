@@ -183,7 +183,7 @@ class MPJRDWaveNeuronAdvanced(
 
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
-        MPJRDNeuronAdvanced._init_advanced_mixins(self, cfg, is_wave=True)
+        self._init_advanced_mixins(cfg, is_wave=True)
 
 
 class MPJRDLayerAdvanced(MPJRDLayer):

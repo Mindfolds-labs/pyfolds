@@ -1,11 +1,16 @@
 """Dendrito MPJRD - Agregação vetorizada de sinapses - VERSÃO OTIMIZADA"""
 
+import logging
+
 import torch
 import torch.nn as nn
 from typing import Optional, Dict
 from threading import Lock
 from .config import MPJRDConfig
 from .synapse import MPJRDSynapse
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class MPJRDDendrite(nn.Module):
@@ -31,6 +36,7 @@ class MPJRDDendrite(nn.Module):
         
         # Cache único (dicionário)
         self._cached_states = None
+        self._cached_W = None
         self._cache_invalid = True
         self._cache_lock = Lock()
 
@@ -43,36 +49,34 @@ class MPJRDDendrite(nn.Module):
             if not self._cache_invalid and self._cached_states is not None:
                 return
 
-            first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
-            device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
+        first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
+        device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
 
-            # ✅ ÚNICO LOOP sobre sinapses (coleta tudo de uma vez)
-            N_list = []
-            I_list = []
-            # Nota técnica:
-            # O núcleo MPJRD mantém apenas estados estruturais (N) e voláteis (I)
-            # por sinapse. Estados de STP (u, R) pertencem ao módulo avançado
-            # (ShortTermDynamicsMixin) em nível de neurônio, não ao core de sinapse.
-            has_short_term_state = all(hasattr(syn, "u") and hasattr(syn, "R") for syn in self.synapses)
-            u_list = [] if has_short_term_state else None
-            R_list = [] if has_short_term_state else None
+        N_list = []
+        I_list = []
+        has_short_term_state = all(hasattr(syn, "u") and hasattr(syn, "R") for syn in self.synapses)
+        u_list = [] if has_short_term_state else None
+        R_list = [] if has_short_term_state else None
 
-            for syn in self.synapses:
-                N_list.append(syn.N.to(device))
-                I_list.append(syn.I.to(device))
-                if has_short_term_state:
-                    u_list.append(syn.u.to(device))
-                    R_list.append(syn.R.to(device))
+        for syn in self.synapses:
+            N_list.append(syn.N.to(device))
+            I_list.append(syn.I.to(device))
+            if has_short_term_state:
+                u_list.append(syn.u.to(device))
+                R_list.append(syn.R.to(device))
 
-            # ✅ Concatena de uma vez (operação vetorizada)
-            self._cached_states = {
-                'N': torch.cat(N_list).to(torch.int32),
-                'I': torch.cat(I_list),
-                **({'u': torch.cat(u_list), 'R': torch.cat(R_list)} if has_short_term_state else {})
-            }
+        cached_states = {
+            'N': torch.cat(N_list).to(torch.int32),
+            'I': torch.cat(I_list),
+            **({'u': torch.cat(u_list), 'R': torch.cat(R_list)} if has_short_term_state else {})
+        }
+        cached_w = torch.log2(1.0 + cached_states['N'].float()) / self.cfg.w_scale
 
-            # ✅ W é derivado de N (calculado sob demanda, cacheado)
-            self._cached_W = torch.log2(1.0 + self._cached_states['N'].float()) / self.cfg.w_scale
+        with self._cache_lock:
+            if not self._cache_invalid and self._cached_states is not None:
+                return
+            self._cached_states = cached_states
+            self._cached_W = cached_w
             self._cache_invalid = False
 
     def _invalidate_cache(self):
@@ -136,7 +140,10 @@ class MPJRDDendrite(nn.Module):
         v_dend = torch.einsum('s,bs->b', weights, x_flat)  # [B]
 
         # Proteção numérica para cenários com taxa alta
-        v_dend = torch.clamp(v_dend, min=-10.0, max=10.0)
+        clamped = torch.clamp(v_dend, min=-10.0, max=10.0)
+        if not torch.equal(clamped, v_dend):
+            _LOGGER.warning("event=dendrite_clamp applied=true min=-10 max=10")
+        v_dend = clamped
 
         return v_dend
 

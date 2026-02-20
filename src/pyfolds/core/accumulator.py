@@ -229,11 +229,8 @@ class StatisticsAccumulator(nn.Module):
         """Retorna médias de todas as estatísticas acumuladas."""
         stats = AccumulatedStats()
 
-        if not self.has_data:
-            return stats
-
         with self._lock:
-            if self.acc_count.item() <= 0:
+            if not self.initialized.item() or self.acc_count.item() <= 0:
                 return stats
             count = self.acc_count.float().clamp_min(1.0)
         

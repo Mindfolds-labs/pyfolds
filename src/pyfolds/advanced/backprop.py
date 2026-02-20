@@ -65,11 +65,17 @@ class BackpropMixin(TimedMixin):
         if not self.backprop_queue:
             return
 
-        time_since_last = max(0.0, current_time - self._last_backprop_time)
-        decay_amp = math.exp(-time_since_last / self.backprop_amp_tau)
-        decay_trace = math.exp(-time_since_last / self.backprop_trace_tau)
-
-        self.dendrite_amplification.mul_(decay_amp)
+        should_decay = not (
+            self._last_backprop_time == 0.0
+            and bool(torch.all(self.dendrite_amplification == 0).item())
+        )
+        if should_decay:
+            time_since_last = max(0.0, current_time - self._last_backprop_time)
+            decay_amp = math.exp(-time_since_last / self.backprop_amp_tau)
+            decay_trace = math.exp(-time_since_last / self.backprop_trace_tau)
+            self.dendrite_amplification.mul_(decay_amp)
+        else:
+            decay_trace = 1.0
 
         first_event = self.backprop_queue[0]
         batch_size = first_event["v_dend"].shape[0]

@@ -132,9 +132,11 @@ class STDPMixin:
             delta_total = (delta_ltd + delta_ltp).mean(dim=0)  # [D, S]
             with torch.no_grad():
                 for d_idx, dend in enumerate(self.dendrites):
+                    syn_i = torch.stack([syn.I for syn in dend.synapses], dim=0)
+                    syn_i.add_(delta_total[d_idx].to(syn_i.device).view(-1, 1))
+                    syn_i.clamp_(self.cfg.i_min, self.cfg.i_max)
                     for s_idx, syn in enumerate(dend.synapses):
-                        syn.I.add_(delta_total[d_idx, s_idx])
-                        syn.I.clamp_(self.cfg.i_min, self.cfg.i_max)
+                        syn.I.copy_(syn_i[s_idx])
                     dend._invalidate_cache()
 
         # Adiciona traço pós

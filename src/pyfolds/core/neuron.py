@@ -98,6 +98,7 @@ class MPJRDNeuron(BaseNeuron):
         self.mode = LearningMode.ONLINE
         self.register_buffer("mode_switches", torch.tensor(0))
         self.register_buffer("sleep_count", torch.tensor(0))
+        self.register_buffer("_theta_cap_buf", torch.zeros(1))
         self.logger.debug(f"   ✅ Modo inicial: {self.mode.value}")
         
         # ===== THREAD SAFETY PARA TELEMETRIA =====
@@ -442,8 +443,9 @@ class MPJRDNeuron(BaseNeuron):
                 self.cfg.shunting_eps + self.cfg.shunting_strength * d_float
             )
             theta_cap = u_cap - 1e-3
-            theta_cap_tensor = torch.tensor([theta_cap], device=device, dtype=self.theta.dtype)
-            theta_eff = torch.minimum(theta_eff, theta_cap_tensor)
+            theta_cap_buf = self._theta_cap_buf.to(device=device, dtype=self.theta.dtype)
+            theta_cap_buf.fill_(theta_cap)
+            theta_eff = torch.minimum(theta_eff, theta_cap_buf)
             theta_max_eff = min(self.cfg.theta_max, theta_cap)
             if self.cfg.theta_min <= theta_max_eff:
                 theta_eff = torch.clamp(theta_eff, min=self.cfg.theta_min, max=theta_max_eff)
@@ -456,8 +458,9 @@ class MPJRDNeuron(BaseNeuron):
             dend_contribution = dend_out.contribution
         elif integration_mode == "wta_soft":
             theta_cap = float(self.cfg.n_dendrites) - 1e-3
-            theta_cap_tensor = torch.tensor([theta_cap], device=device, dtype=self.theta.dtype)
-            theta_eff = torch.minimum(theta_eff, theta_cap_tensor)
+            theta_cap_buf = self._theta_cap_buf.to(device=device, dtype=self.theta.dtype)
+            theta_cap_buf.fill_(theta_cap)
+            theta_eff = torch.minimum(theta_eff, theta_cap_buf)
             theta_max_eff = min(self.cfg.theta_max, theta_cap)
             if self.cfg.theta_min <= theta_max_eff:
                 theta_eff = torch.clamp(theta_eff, min=self.cfg.theta_min, max=theta_max_eff)
@@ -738,7 +741,6 @@ class MPJRDNeuron(BaseNeuron):
     def to(self, device: torch.device) -> 'MPJRDNeuron':
         """Move neurônio para device e valida consistência."""
         super().to(device)
-        self._validate_internal_devices()
         self.logger.debug(f"📦 Neurônio movido para {device}")
         return self
 
