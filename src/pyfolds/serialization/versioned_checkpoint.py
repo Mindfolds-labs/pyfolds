@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import os
+import pickle
 import shutil
 import subprocess
 import warnings
@@ -195,6 +196,15 @@ class VersionedCheckpoint:
         except TypeError:
             # Compatibilidade com versões do PyTorch sem argumento weights_only
             ckpt = torch.load(path, map_location=map_location)
+        except pickle.UnpicklingError as exc:
+            # Compatibilidade com checkpoints serializados com protocolo/objetos
+            # ainda não suportados pelo modo weights_only=True (PyTorch >=2.6).
+            warnings.warn(
+                "Fallback para torch.load(weights_only=False) devido a "
+                f"incompatibilidade do formato seguro: {exc}",
+                RuntimeWarning,
+            )
+            ckpt = torch.load(path, map_location=map_location, weights_only=False)
         
         model_state = ckpt["model_state"]
         metadata = ckpt.get("metadata", {})
