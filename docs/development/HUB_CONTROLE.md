@@ -45,6 +45,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-006 | Concluída | Plano 4: Consolidar correções de código e testes mínimos | Codex | 2026-02-19 |
 | ISSUE-010 | Concluída | Falhas regressivas na suíte completa de testes | Codex | 2026-02-20 |
 | ISSUE-011 | Concluída | Micro-otimização do forward e análise dos testes pulados | Codex | 2026-02-20 |
+| ISSUE-012 | Concluída | Validar assinatura digital opcional e medir overhead de telemetria | Codex | 2026-02-20 |
 | ISSUE-005 | Concluída | Plano 3: Executar validações e registrar evidências no HUB | Codex | 2026-02-19 |
 <!-- HUB:QUEUE:END -->
 
@@ -124,6 +125,16 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > **Prioridade:** `Alta` · **Área:** `Qualidade/Performance`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-011-otimizacao-forward-e-analise-de-skips.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-011-otimizacao-forward-e-analise-de-skips.md)
+
+> [!TIP]
+> **ISSUE-012** · Validar assinatura digital opcional e medir overhead de telemetria
+>
+> **Status:** ✅ Concluída  
+> **Responsável:** Codex  
+> **Data:** 2026-02-20  
+> **Prioridade:** `Alta` · **Área:** `Segurança/Performance`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-012-validacao-criptografia-e-telemetria.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-012-validacao-criptografia-e-telemetria.md)
 
 > [!TIP]
 > **ISSUE-005** · Plano 3: Executar validações e registrar evidências no HUB
