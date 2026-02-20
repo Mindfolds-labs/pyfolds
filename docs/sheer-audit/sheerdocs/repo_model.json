@@ -10321,6 +10321,45 @@
       "decorators": []
     },
     {
+      "id": "mod:tests.tools.test_id_registry",
+      "kind": "module",
+      "name": "test_id_registry",
+      "qname": "tests.tools.test_id_registry",
+      "file": "tests/tools/test_id_registry.py",
+      "line": 1,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.tools.test_id_registry.test_next_issue_id_has_prefix",
+      "kind": "function",
+      "name": "test_next_issue_id_has_prefix",
+      "qname": "tests.tools.test_id_registry.test_next_issue_id_has_prefix",
+      "file": "tests/tools/test_id_registry.py",
+      "line": 4,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.tools.test_id_registry.test_next_adr_id_has_prefix",
+      "kind": "function",
+      "name": "test_next_adr_id_has_prefix",
+      "qname": "tests.tools.test_id_registry.test_next_adr_id_has_prefix",
+      "file": "tests/tools/test_id_registry.py",
+      "line": 10,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
       "id": "mod:tests.tools.test_link_validation",
       "kind": "module",
       "name": "test_link_validation",
@@ -22407,6 +22446,24 @@
     },
     {
       "type": "IMPORT",
+      "src": "mod:tests.tools.test_id_registry",
+      "dst": "mod:tools",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.tools.test_id_registry",
+      "dst": "fn:tests.tools.test_id_registry.test_next_issue_id_has_prefix",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.tools.test_id_registry",
+      "dst": "fn:tests.tools.test_id_registry.test_next_adr_id_has_prefix",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
       "src": "mod:tests.tools.test_link_validation",
       "dst": "mod:tools.validate_issue_format",
       "meta": {}
@@ -25612,9 +25669,9 @@
   ],
   "findings": [],
   "metrics": {
-    "python_files": 139,
-    "symbols": 1059,
-    "edges": 1572,
+    "python_files": 140,
+    "symbols": 1062,
+    "edges": 1575,
     "findings": 0,
     "internal_import_edges": 104
   }

@@ -5,9 +5,9 @@
     "commit": null
   },
   "metrics": {
-    "python_files": 139,
-    "symbols": 1059,
-    "edges": 1572,
+    "python_files": 140,
+    "symbols": 1062,
+    "edges": 1575,
     "findings": 0,
     "internal_import_edges": 104
   },
@@ -3547,6 +3547,31 @@
           "id": "fn:tests.tools.test_create_issue_report.test_generate_yaml_frontmatter_contains_id",
           "name": "test_generate_yaml_frontmatter_contains_id",
           "qname": "tests.tools.test_create_issue_report.test_generate_yaml_frontmatter_contains_id",
+          "line": 4,
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "mod:tests.tools.test_id_registry",
+      "qname": "tests.tools.test_id_registry",
+      "file": "tests/tools/test_id_registry.py",
+      "imports": [
+        "mod:tools"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.tools.test_id_registry.test_next_adr_id_has_prefix",
+          "name": "test_next_adr_id_has_prefix",
+          "qname": "tests.tools.test_id_registry.test_next_adr_id_has_prefix",
+          "line": 10,
+          "params": []
+        },
+        {
+          "id": "fn:tests.tools.test_id_registry.test_next_issue_id_has_prefix",
+          "name": "test_next_issue_id_has_prefix",
+          "qname": "tests.tools.test_id_registry.test_next_issue_id_has_prefix",
           "line": 4,
           "params": []
         }

@@ -81,6 +81,7 @@ package "tests.test_fold_fuzz" {}
 package "tests.test_stress_long" {}
 package "tests.tools.test_batch_create_issues" {}
 package "tests.tools.test_create_issue_report" {}
+package "tests.tools.test_id_registry" {}
 package "tests.tools.test_link_validation" {}
 package "tests.tools.test_sync_hub_auto" {}
 package "tests.tools.test_validate_issue_format" {}

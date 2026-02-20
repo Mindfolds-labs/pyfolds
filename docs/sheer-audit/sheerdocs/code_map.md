@@ -1,8 +1,8 @@
 # Code Map (Sheer Audit)
 
 - Repositório: `pyfolds`
-- Arquivos Python: `139`
-- Símbolos: `1059`
+- Arquivos Python: `140`
+- Símbolos: `1062`
 
 ## Módulos
 
@@ -994,6 +994,14 @@
   - `mod:tools.create_issue_report`
 - Funções:
   - `test_generate_yaml_frontmatter_contains_id()`
+
+### `tests.tools.test_id_registry`
+- Arquivo: `tests/tools/test_id_registry.py`
+- Imports:
+  - `mod:tools`
+- Funções:
+  - `test_next_adr_id_has_prefix()`
+  - `test_next_issue_id_has_prefix()`
 
 ### `tests.tools.test_link_validation`
 - Arquivo: `tests/tools/test_link_validation.py`

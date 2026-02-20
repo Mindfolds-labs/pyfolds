@@ -661,6 +661,7 @@ class "tests.performance.test_memory_usage.TestMemoryUsage" {
 
 
 
+
 class "tests.training.mnist_cifar_training_reference.PyFoldsMLP" {
   +__init__()
   +forward()
