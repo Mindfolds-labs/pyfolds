@@ -8876,6 +8876,66 @@
       "decorators": []
     },
     {
+      "id": "mod:tests.performance.test_telemetry_overhead",
+      "kind": "module",
+      "name": "test_telemetry_overhead",
+      "qname": "tests.performance.test_telemetry_overhead",
+      "file": "tests/performance/test_telemetry_overhead.py",
+      "line": 1,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.performance.test_telemetry_overhead._sync_if_cuda",
+      "kind": "function",
+      "name": "_sync_if_cuda",
+      "qname": "tests.performance.test_telemetry_overhead._sync_if_cuda",
+      "file": "tests/performance/test_telemetry_overhead.py",
+      "line": 10,
+      "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.performance.test_telemetry_overhead._measure_forward_loop",
+      "kind": "function",
+      "name": "_measure_forward_loop",
+      "qname": "tests.performance.test_telemetry_overhead._measure_forward_loop",
+      "file": "tests/performance/test_telemetry_overhead.py",
+      "line": 15,
+      "doc": "Run repeated forward calls and collect per-step duration in milliseconds.",
+      "params": [
+        "neuron",
+        "x"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.performance.test_telemetry_overhead.test_forward_telemetry_ringbuffer_overhead",
+      "kind": "function",
+      "name": "test_forward_telemetry_ringbuffer_overhead",
+      "qname": "tests.performance.test_telemetry_overhead.test_forward_telemetry_ringbuffer_overhead",
+      "file": "tests/performance/test_telemetry_overhead.py",
+      "line": 42,
+      "doc": "Compare forward-pass timing with and without telemetry enabled.",
+      "params": [
+        "small_config"
+      ],
+      "returns": null,
+      "bases": [],
+      "decorators": [
+        "pytest.mark.performance",
+        "pytest.mark.slow"
+      ]
+    },
+    {
       "id": "mod:tests.test_concurrent_reads",
       "kind": "module",
       "name": "test_concurrent_reads",
@@ -11265,6 +11325,19 @@
       "file": "tests/unit/core/test_neuron_v2.py",
       "line": 54,
       "doc": null,
+      "params": [],
+      "returns": null,
+      "bases": [],
+      "decorators": []
+    },
+    {
+      "id": "fn:tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
+      "kind": "function",
+      "name": "test_vectorization_and_forward_integrity_batch64",
+      "qname": "tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
+      "file": "tests/unit/core/test_neuron_v2.py",
+      "line": 71,
+      "doc": "Valida vetorização em lote e estabilidade numérica do forward.",
       "params": [],
       "returns": null,
       "bases": [],
@@ -20131,6 +20204,48 @@
     },
     {
       "type": "IMPORT",
+      "src": "mod:tests.performance.test_telemetry_overhead",
+      "dst": "mod:time",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.performance.test_telemetry_overhead",
+      "dst": "mod:pytest",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.performance.test_telemetry_overhead",
+      "dst": "mod:pyfolds",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
+      "src": "mod:tests.performance.test_telemetry_overhead",
+      "dst": "mod:torch",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.performance.test_telemetry_overhead",
+      "dst": "fn:tests.performance.test_telemetry_overhead._sync_if_cuda",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.performance.test_telemetry_overhead",
+      "dst": "fn:tests.performance.test_telemetry_overhead._measure_forward_loop",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.performance.test_telemetry_overhead",
+      "dst": "fn:tests.performance.test_telemetry_overhead.test_forward_telemetry_ringbuffer_overhead",
+      "meta": {}
+    },
+    {
+      "type": "IMPORT",
       "src": "mod:tests.test_concurrent_reads",
       "dst": "mod:hashlib",
       "meta": {}
@@ -21513,6 +21628,12 @@
       "type": "CONTAINS",
       "src": "mod:tests.unit.core.test_neuron_v2",
       "dst": "fn:tests.unit.core.test_neuron_v2.test_theta_eff_caps_unreachable_threshold",
+      "meta": {}
+    },
+    {
+      "type": "CONTAINS",
+      "src": "mod:tests.unit.core.test_neuron_v2",
+      "dst": "fn:tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
       "meta": {}
     },
     {
@@ -23402,9 +23523,9 @@
   ],
   "findings": [],
   "metrics": {
-    "python_files": 135,
-    "symbols": 965,
-    "edges": 1445,
+    "python_files": 136,
+    "symbols": 970,
+    "edges": 1453,
     "findings": 0,
     "internal_import_edges": 101
   }

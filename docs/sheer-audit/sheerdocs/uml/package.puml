@@ -71,6 +71,7 @@ package "tests.integration.test_training_loop" {}
 package "tests.performance" {}
 package "tests.performance.test_batch_speed" {}
 package "tests.performance.test_memory_usage" {}
+package "tests.performance.test_telemetry_overhead" {}
 package "tests.test_concurrent_reads" {}
 package "tests.test_corruption_detection" {}
 package "tests.test_fold_corruption" {}

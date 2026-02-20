@@ -5,9 +5,9 @@
     "commit": null
   },
   "metrics": {
-    "python_files": 135,
-    "symbols": 965,
-    "edges": 1445,
+    "python_files": 136,
+    "symbols": 970,
+    "edges": 1453,
     "findings": 0,
     "internal_import_edges": 101
   },
@@ -3052,6 +3052,46 @@
       "functions": []
     },
     {
+      "id": "mod:tests.performance.test_telemetry_overhead",
+      "qname": "tests.performance.test_telemetry_overhead",
+      "file": "tests/performance/test_telemetry_overhead.py",
+      "imports": [
+        "mod:pyfolds",
+        "mod:pytest",
+        "mod:time",
+        "mod:torch"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "id": "fn:tests.performance.test_telemetry_overhead._measure_forward_loop",
+          "name": "_measure_forward_loop",
+          "qname": "tests.performance.test_telemetry_overhead._measure_forward_loop",
+          "line": 15,
+          "params": [
+            "neuron",
+            "x"
+          ]
+        },
+        {
+          "id": "fn:tests.performance.test_telemetry_overhead._sync_if_cuda",
+          "name": "_sync_if_cuda",
+          "qname": "tests.performance.test_telemetry_overhead._sync_if_cuda",
+          "line": 10,
+          "params": []
+        },
+        {
+          "id": "fn:tests.performance.test_telemetry_overhead.test_forward_telemetry_ringbuffer_overhead",
+          "name": "test_forward_telemetry_ringbuffer_overhead",
+          "qname": "tests.performance.test_telemetry_overhead.test_forward_telemetry_ringbuffer_overhead",
+          "line": 42,
+          "params": [
+            "small_config"
+          ]
+        }
+      ]
+    },
+    {
       "id": "mod:tests.test_concurrent_reads",
       "qname": "tests.test_concurrent_reads",
       "file": "tests/test_concurrent_reads.py",
@@ -4014,6 +4054,13 @@
           "name": "test_theta_eff_caps_unreachable_threshold",
           "qname": "tests.unit.core.test_neuron_v2.test_theta_eff_caps_unreachable_threshold",
           "line": 54,
+          "params": []
+        },
+        {
+          "id": "fn:tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
+          "name": "test_vectorization_and_forward_integrity_batch64",
+          "qname": "tests.unit.core.test_neuron_v2.test_vectorization_and_forward_integrity_batch64",
+          "line": 71,
           "params": []
         }
       ]
