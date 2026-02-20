@@ -3574,7 +3574,7 @@
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.consolidate",
       "file": "src/pyfolds/core/synapse.py",
       "line": 225,
-      "doc": "Consolida o fator volátil em estável (two-factor consolidation).\n\n✅ OTIMIZADO: usa i_decay_sleep da config",
+      "doc": "Consolida o fator volátil em estável (two-factor consolidation).\n\n✅ OTIMIZADO V2: Remoção TOTAL de sincronização D2H.\nMatemática in-place pura, sem desvios baseados no conteúdo da VRAM.",
       "params": [
         "self",
         "dt"
@@ -3591,7 +3591,7 @@
       "name": "get_state",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.get_state",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 254,
+      "line": 253,
       "doc": "Retorna estado completo da sinapse (sem .item() para tensores).",
       "params": [
         "self"
@@ -3606,7 +3606,7 @@
       "name": "load_state",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.load_state",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 265,
+      "line": 264,
       "doc": "Carrega estado na sinapse.",
       "params": [
         "self",
@@ -3622,7 +3622,7 @@
       "name": "extra_repr",
       "qname": "src.pyfolds.core.synapse.MPJRDSynapse.extra_repr",
       "file": "src/pyfolds/core/synapse.py",
-      "line": 278,
+      "line": 277,
       "doc": "Representação string da sinapse.",
       "params": [
         "self"
