@@ -21,7 +21,7 @@ from .adaptation import AdaptationMixin
 from .short_term import ShortTermDynamicsMixin
 from .backprop import BackpropMixin
 from .inhibition import InhibitionLayer, InhibitionMixin
-from .wave import WaveMixin
+from .wave import WaveDynamicsMixin
 
 from ..core.neuron import MPJRDNeuron as MPJRDNeuronBase
 from ..wave import MPJRDWaveNeuron as MPJRDWaveNeuronBase
@@ -36,6 +36,7 @@ __all__ = [
     "AdaptationMixin",
     "ShortTermDynamicsMixin",
     "BackpropMixin",
+    "WaveDynamicsMixin",
     "InhibitionLayer",
     "InhibitionMixin",
     "WaveMixin",
@@ -47,6 +48,7 @@ __all__ = [
 
 
 class MPJRDNeuronAdvanced(
+    WaveDynamicsMixin,  # opcional: ativa wave quando cfg.wave_enabled=True
     # ✅ ORDEM CORRETA:
     BackpropMixin,  # 1º: amplifica entrada (antes de tudo)
     ShortTermDynamicsMixin,  # 2º: modula entrada (temporário)
@@ -71,6 +73,7 @@ class MPJRDNeuronAdvanced(
 
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
+        self._init_wave_dynamics(cfg)
         self._init_advanced_mixins(cfg, is_wave=False)
 
     def _init_advanced_mixins(self, cfg, is_wave: bool = False) -> None:
@@ -174,6 +177,7 @@ class MPJRDNeuronAdvanced(
 
 
 class MPJRDWaveNeuronAdvanced(
+    WaveDynamicsMixin,
     BackpropMixin,
     ShortTermDynamicsMixin,
     STDPMixin,
@@ -185,6 +189,7 @@ class MPJRDWaveNeuronAdvanced(
 
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
+        self._init_wave_dynamics(cfg)
         self._init_advanced_mixins(cfg, is_wave=True)
 
 
