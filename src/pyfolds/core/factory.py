@@ -115,6 +115,9 @@ def register_default_neurons() -> None:
 
 def infer_neuron_type(cfg: MPJRDConfig) -> NeuronType:
     """Infere tipo de neurônio com base na configuração."""
+    if bool(getattr(cfg, "wave_enabled", False)):
+        return NeuronType.WAVE
+
     try:
         from ..wave.config import MPJRDWaveConfig
 
