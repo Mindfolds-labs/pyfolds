@@ -21,6 +21,7 @@ from .adaptation import AdaptationMixin
 from .short_term import ShortTermDynamicsMixin
 from .backprop import BackpropMixin
 from .inhibition import InhibitionLayer, InhibitionMixin
+from .wave import WaveMixin
 
 from ..core.neuron import MPJRDNeuron as MPJRDNeuronBase
 from ..wave import MPJRDWaveNeuron as MPJRDWaveNeuronBase
@@ -37,6 +38,7 @@ __all__ = [
     "BackpropMixin",
     "InhibitionLayer",
     "InhibitionMixin",
+    "WaveMixin",
     "MPJRDNeuronAdvanced",
     "MPJRDLayerAdvanced",
     "MPJRDWaveNeuronAdvanced",

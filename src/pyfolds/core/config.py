@@ -163,6 +163,22 @@ class MPJRDConfig:
     max_log_weight: float = 10.0
     float_precision: str = "float32"
     numerical_stability_checks: bool = True
+
+    # ===== WAVE (OSCILAÇÃO COMO MECANISMO) =====
+    wave_enabled: bool = False
+    wave_n_frequencies: int = 8
+    wave_base_frequency: float = 10.0
+    wave_frequency_step: float = 5.0
+    wave_phase_sensitivity: float = 1.0
+    wave_phase_decay: float = 0.98
+    wave_phase_buffer_size: int = 32
+    wave_learning_rate_gain: float = 1.0
+    wave_focus_gain: float = 1.0
+    wave_excitation_gain: float = 1.0
+    wave_stability_gain: float = 1.0
+    wave_sleep_consolidation: bool = True
+    wave_sleep_replay_rate: float = 0.1
+    wave_sleep_pruning_threshold: float = 0.01
     
     def __post_init__(self):
         """Validações pós-inicialização."""
@@ -263,6 +279,27 @@ class MPJRDConfig:
                 "weight_quantization inválido: "
                 f"{self.weight_quantization}. Use: 'logN' ou 'uniformW'"
             )
+
+        if self.wave_n_frequencies <= 0:
+            raise ValueError("wave_n_frequencies must be > 0")
+
+        if self.wave_base_frequency <= 0:
+            raise ValueError("wave_base_frequency must be > 0")
+
+        if self.wave_frequency_step < 0:
+            raise ValueError("wave_frequency_step must be >= 0")
+
+        if not 0 < self.wave_phase_decay <= 1:
+            raise ValueError("wave_phase_decay must be in (0, 1]")
+
+        if self.wave_phase_buffer_size <= 0:
+            raise ValueError("wave_phase_buffer_size must be > 0")
+
+        if self.wave_sleep_replay_rate < 0:
+            raise ValueError("wave_sleep_replay_rate must be >= 0")
+
+        if self.wave_sleep_pruning_threshold < 0:
+            raise ValueError("wave_sleep_pruning_threshold must be >= 0")
         
         # Warnings
         if self.ltd_threshold_saturated > self.i_ltd_th:

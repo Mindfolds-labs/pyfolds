@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from typing import Optional, Tuple
+import warnings
 
 from ..core.config import MPJRDConfig
 
@@ -34,6 +35,11 @@ class MPJRDWaveConfig(MPJRDConfig):
 
     def __post_init__(self):
         super().__post_init__()
+        warnings.warn(
+            "MPJRDWaveConfig está depreciado; use MPJRDConfig com campos wave_*.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
         if self.phase_buffer_size <= 0:
             raise ValueError("phase_buffer_size must be > 0")
