@@ -202,6 +202,18 @@ class MPJRDConfig:
     wave_sleep_consolidation: bool = True
     wave_sleep_replay_rate: float = 0.1
     wave_sleep_pruning_threshold: float = 0.01
+
+    # ===== CONFIGURAÇÕES DO NOETIC =====
+    max_engrams: int = 10_000_000
+    pruning_threshold: float = 0.1
+    engram_n_frequencies: int = 8
+    enable_specialization: bool = True
+    synthesis_threshold: float = 0.6
+    sleep_cycle_hours: float = 24.0
+    replay_batch_size: int = 32
+    model_name: str = "Noetic"
+    save_checkpoints: bool = True
+    checkpoint_interval: int = 86400
     
     def __post_init__(self):
         """Validações pós-inicialização."""
