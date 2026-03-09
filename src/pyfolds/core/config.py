@@ -508,6 +508,29 @@ class MPJRDConfig:
         }
         return aliases.get(name, name)
 
+
+    def validate_combination(self) -> list[Warning]:
+        """Retorna avisos para combinações potencialmente problemáticas."""
+        out: list[Warning] = []
+
+        if self.wave_enabled and self.wave_n_frequencies < 4:
+            out.append(Warning("wave_enabled=True com wave_n_frequencies < 4 pode reduzir resolução espectral"))
+
+        if self.adaptation_enabled and self.adaptation_tau < self.t_refrac_rel:
+            out.append(Warning("adaptation_tau < t_refrac_rel pode conflitar entre SFA e refratário"))
+
+        if (
+            self.plasticity_mode == "stdp"
+            and self.tau_pre == self.tau_post
+            and self.A_plus == self.A_minus
+        ):
+            out.append(Warning("Configuração STDP neutra: tau_pre==tau_post e A_plus==A_minus"))
+
+        if self.circadian_enabled and self.circadian_cycle_hours > 24:
+            out.append(Warning("circadian_cycle_hours > 24 é biologicamente incomum"))
+
+        return out
+
     def __repr__(self) -> str:
         """Representação string da configuração."""
         lines = ["MPJRDConfig:"]

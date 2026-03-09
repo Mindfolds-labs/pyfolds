@@ -4,7 +4,8 @@
 from __future__ import annotations
 
 import math
-from typing import Dict, Tuple
+import warnings
+from typing import Dict, Optional, Tuple
 
 import torch
 import torch.nn as nn
@@ -14,10 +15,11 @@ from ..utils.types import LearningMode, normalize_learning_mode
 from .time_mixin import TimedMixin
 
 
-class WaveNeuromodulator:
+class WaveNeuromodulator(nn.Module):
     """Neuromodulação genérica alinhada aos modos de execução do PyFolds."""
 
     def __init__(self, cfg: MPJRDConfig):
+        super().__init__()
         self.cfg = cfg
         self.learning_rate = cfg.wave_learning_rate_gain
         self.focus_gain = cfg.wave_focus_gain
@@ -88,7 +90,7 @@ class WaveMixin(TimedMixin):
     def _init_wave(self, cfg: MPJRDConfig) -> None:
         self._ensure_time_counter()
         self.wave_cfg = cfg
-        self.neuromod = WaveNeuromodulator(cfg)
+        self.neuromodulator = WaveNeuromodulator(cfg)
 
         self.oscillators = nn.ModuleList(
             [
@@ -106,24 +108,35 @@ class WaveMixin(TimedMixin):
         self.register_buffer("last_sync", torch.tensor(0.0))
         self.register_buffer("consolidation_buffer", torch.zeros(1000))
 
+
+    @property
+    def neuromod(self) -> WaveNeuromodulator:
+        """Alias de compatibilidade para código legado (use neuromodulator)."""
+        warnings.warn("`neuromod` está deprecated; use `neuromodulator`.", DeprecationWarning, stacklevel=2)
+        return self.neuromodulator
+
+    @neuromod.setter
+    def neuromod(self, value: WaveNeuromodulator) -> None:
+        self.neuromodulator = value
+
     def set_wave_mode(self, mode: LearningMode | str) -> None:
         mode_val = normalize_learning_mode(mode)
         if mode_val is None:
             return
-        self.neuromod.set_mode(mode_val)
+        self.neuromodulator.set_mode(mode_val)
         if mode_val == LearningMode.SLEEP and self.wave_cfg.wave_sleep_consolidation:
             self._sleep_consolidation()
 
     def _update_oscillators(self, dt: float) -> None:
         for osc in self.oscillators:
-            osc.update(dt, self.neuromod)
+            osc.update(dt, self.neuromodulator)
 
     def _wave_modulate(self, x: torch.Tensor, dt: float = 0.001) -> Tuple[torch.Tensor, Dict]:
         self._update_oscillators(dt)
         combined_sin = torch.zeros(1, device=x.device)
 
         for i, osc in enumerate(self.oscillators):
-            amp = self.neuromod.modulate_amplitude(self.wave_amplitudes[i])
+            amp = self.neuromodulator.modulate_amplitude(self.wave_amplitudes[i])
             sin_val, _ = osc.get_wave(amp)
             combined_sin = combined_sin + sin_val
 
@@ -135,11 +148,11 @@ class WaveMixin(TimedMixin):
             "wave_phase_mean": sum(float(osc.phase.item()) for osc in self.oscillators) / len(self.oscillators),
             "wave_frequencies": [float(osc.frequency.item()) for osc in self.oscillators],
             "wave_amplitudes": self.wave_amplitudes.detach().cpu().tolist(),
-            "wave_mode": self.neuromod.current_mode.value,
-            "wave_learning_rate": self.neuromod.learning_rate,
-            "wave_focus": self.neuromod.focus_gain,
-            "wave_excitation": self.neuromod.excitation_gain,
-            "wave_stability": self.neuromod.stability_gain,
+            "wave_mode": self.neuromodulator.current_mode.value,
+            "wave_learning_rate": self.neuromodulator.learning_rate,
+            "wave_focus": self.neuromodulator.focus_gain,
+            "wave_excitation": self.neuromodulator.excitation_gain,
+            "wave_stability": self.neuromodulator.stability_gain,
         }
         return x_mod, wave_state
 
@@ -192,10 +205,10 @@ class WaveMixin(TimedMixin):
             / len(self.oscillators),
             "wave_mean_amplitude": float(self.wave_amplitudes.mean().item()),
             "wave_last_sync": float(self.last_sync.item()),
-            "wave_learning_rate": float(self.neuromod.learning_rate),
-            "wave_focus": float(self.neuromod.focus_gain),
-            "wave_excitation": float(self.neuromod.excitation_gain),
-            "wave_stability": float(self.neuromod.stability_gain),
+            "wave_learning_rate": float(self.neuromodulator.learning_rate),
+            "wave_focus": float(self.neuromodulator.focus_gain),
+            "wave_excitation": float(self.neuromodulator.excitation_gain),
+            "wave_stability": float(self.neuromodulator.stability_gain),
         }
 
     def reset_wave_state(self) -> None:

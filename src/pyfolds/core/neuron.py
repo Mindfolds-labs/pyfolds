@@ -546,13 +546,15 @@ class MPJRDNeuron(BaseNeuron):
             dend_contribution = None
 
         u_raw = u
-        if hasattr(self, "_apply_sfa_before_threshold"):
-            u = self._apply_sfa_before_threshold(u, dt=dt)
         spikes = (u >= theta_eff).float()
 
         # ===== 5. ESTATÍSTICAS =====
         spike_rate = spikes.mean().item()
-        saturation_ratio = self._compute_saturation_ratio()
+        saturation_ratio = (
+            self._compute_saturation_ratio()
+            if self.cfg.neuromod_mode == "capacity"
+            else 0.0
+        )
 
         # ===== 6. VALIDAÇÃO ANTES DE HOMEOSTASE =====
         if not (isinstance(spike_rate, float) and -0.1 <= spike_rate <= 1.1):

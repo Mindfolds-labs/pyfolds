@@ -118,7 +118,7 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
         """Executa ciclo de sono com replay, pruning e síntese."""
         logger.info("sleep_start age=%s", self.get_age_string())
         self.mode = LearningMode.SLEEP
-        self.neuromod.set_mode(LearningMode.SLEEP)
+        self.neuromodulator.set_mode(LearningMode.SLEEP)
         self.engram_bank.replay(batch_size=int(getattr(self.cfg, "replay_batch_size", 32)))
         self.engram_bank.consolidate(pruning=True)
 
@@ -129,8 +129,6 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
                 self.discoveries.add_(1)
 
         self.sleep_cycles.add_(1)
-        self.mode = LearningMode.ONLINE
-        self.neuromod.set_mode(LearningMode.ONLINE)
         logger.info("sleep_end cycles=%s", int(self.sleep_cycles.item()))
 
     def get_age_string(self) -> str:
