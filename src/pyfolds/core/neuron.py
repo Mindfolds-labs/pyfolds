@@ -223,6 +223,11 @@ class MPJRDNeuron(BaseNeuron):
         return torch.stack([d.N for d in self.dendrites])
 
     @property
+    def L(self) -> torch.Tensor:
+        """Níveis discretos de peso [dendrites, synapses]."""
+        return torch.stack([d.L for d in self.dendrites])
+
+    @property
     def I(self) -> torch.Tensor:  # noqa: E743
         """Potenciais internos [dendrites, synapses]."""
         return torch.stack([d.I for d in self.dendrites])
@@ -248,6 +253,12 @@ class MPJRDNeuron(BaseNeuron):
     @property
     def r_hat(self) -> torch.Tensor:
         return self.homeostasis.r_hat
+
+    def _compute_saturation_ratio(self) -> float:
+        """Calcula taxa de saturação conforme modo de quantização de peso."""
+        if self.cfg.weight_quantization == "uniformW":
+            return (self.L == (self.cfg.n_levels - 1)).float().mean().item()
+        return (self.N == self.cfg.n_max).float().mean().item()
 
     @torch.no_grad()
     def queue_runtime_injection(self, name: str, value: Any) -> None:
@@ -541,7 +552,7 @@ class MPJRDNeuron(BaseNeuron):
 
         # ===== 5. ESTATÍSTICAS =====
         spike_rate = spikes.mean().item()
-        saturation_ratio = (self.N == self.cfg.n_max).float().mean().item()
+        saturation_ratio = self._compute_saturation_ratio()
 
         # ===== 6. VALIDAÇÃO ANTES DE HOMEOSTASE =====
         if not (isinstance(spike_rate, float) and -0.1 <= spike_rate <= 1.1):
@@ -735,7 +746,7 @@ class MPJRDNeuron(BaseNeuron):
         post_rate_float = max(0.0, min(1.0, post_rate_float))
         post_rate_t = torch.tensor([post_rate_float], device=device)
 
-        saturation_ratio = (self.N == cfg.n_max).float().mean().item()
+        saturation_ratio = self._compute_saturation_ratio()
 
         if cfg.neuromod_mode == "external":
             R = float(reward) if reward is not None else 0.0
@@ -842,6 +853,7 @@ class MPJRDNeuron(BaseNeuron):
             "r_hat": self.r_hat.item(),
             "step_count": self.homeostasis.step_count.item(),
             "N_mean": N_flat.mean().item(),
+            "L_mean": self.L.float().mean().item(),
             "N_std": N_flat.std().item(),
             "N_min": N_flat.min().item(),
             "N_max": N_flat.max().item(),
@@ -852,7 +864,7 @@ class MPJRDNeuron(BaseNeuron):
             "I_std": I_flat.std().item(),
             "I_min": I_flat.min().item(),
             "I_max": I_flat.max().item(),
-            "saturation_ratio": (self.N == self.cfg.n_max).float().mean().item(),
+            "saturation_ratio": self._compute_saturation_ratio(),
             "protection_ratio": self.protection.float().mean().item(),
             "total_synapses": self.N.numel(),
             "total_dendrites": len(self.dendrites),

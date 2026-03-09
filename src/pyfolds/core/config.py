@@ -12,6 +12,7 @@ PlasticityMode = Literal["stdp", "hebbian", "both", "none"]
 RefracMode = Literal["absolute", "relative", "both"]
 STDPInputSource = Literal["raw", "stp"]
 LTDRule = Literal["classic", "current"]
+WeightQuantization = Literal["logN", "uniformW"]
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,8 @@ class MPJRDConfig:
     n_min: int = 0
     n_max: int = 31
     w_scale: float = 5.0
+    weight_quantization: WeightQuantization = "logN"
+    n_levels: int = 32
     
     # ===== MECANISMO 2: PLASTICIDADE (I) =====
     i_eta: float = 0.01
@@ -255,20 +258,10 @@ class MPJRDConfig:
                 f"{self.ltd_rule}. Use: 'classic' ou 'current'"
             )
 
-        if self.stdp_consolidation_scale < 0:
+        if self.weight_quantization not in {"logN", "uniformW"}:
             raise ValueError(
-                "stdp_consolidation_scale deve ser >= 0, "
-                f"recebido {self.stdp_consolidation_scale}"
-            )
-
-        if self.max_eligibility <= 0:
-            raise ValueError(
-                f"max_eligibility deve ser > 0, recebido {self.max_eligibility}"
-            )
-
-        if self.tau_consolidation <= 0:
-            raise ValueError(
-                f"tau_consolidation deve ser > 0, recebido {self.tau_consolidation}"
+                "weight_quantization inválido: "
+                f"{self.weight_quantization}. Use: 'logN' ou 'uniformW'"
             )
         
         # Warnings
@@ -291,6 +284,9 @@ class MPJRDConfig:
         if self.w_scale <= 0:
             raise ValueError(f"w_scale deve ser > 0, recebido {self.w_scale}")
 
+        if self.n_levels < 2:
+            raise ValueError(f"n_levels deve ser >= 2, recebido {self.n_levels}")
+
         if self.n_max > 2**30:
             raise ValueError(f"n_max={self.n_max} pode causar overflow numérico em log2")
 
@@ -305,12 +301,17 @@ class MPJRDConfig:
                 f"recebido {self.float_precision}"
             )
 
-        max_w = math.log2(1.0 + self.n_max) / self.w_scale
+        max_w = self.w_max
         if max_w > 100.0:
             warnings.warn(
                 f"W pode atingir {max_w:.1f}; risco de gradiente instável.",
                 RuntimeWarning,
             )
+
+    @property
+    def w_max(self) -> float:
+        """Peso máximo derivado da lei logarítmica atual."""
+        return math.log2(1.0 + self.n_max) / self.w_scale
     
     def get_ts(self, param_name: str) -> float:
         """Retorna constante de tempo em ms para um parâmetro."""
