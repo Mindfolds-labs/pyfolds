@@ -21,8 +21,11 @@ from .adaptation import AdaptationMixin
 from .short_term import ShortTermDynamicsMixin
 from .backprop import BackpropMixin
 from .inhibition import InhibitionLayer, InhibitionMixin
-from .wave import WaveDynamicsMixin
+from .wave import WaveDynamicsMixin, WaveMixin
 from .circadian import CircadianWaveMixin
+from .engram import EngramBank, Engram, EngramType
+from .specialization import SpecializationEngine, KnowledgeHierarchy
+from .noetic_model import NoeticCore
 
 from ..core.neuron import MPJRDNeuron as MPJRDNeuronBase
 from ..wave import MPJRDWaveNeuron as MPJRDWaveNeuronBase
@@ -46,6 +49,12 @@ __all__ = [
     "MPJRDLayerAdvanced",
     "MPJRDWaveNeuronAdvanced",
     "MPJRDWaveLayerAdvanced",
+    "EngramBank",
+    "Engram",
+    "EngramType",
+    "SpecializationEngine",
+    "KnowledgeHierarchy",
+    "NoeticCore",
 ]
 
 
