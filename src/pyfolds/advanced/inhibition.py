@@ -126,21 +126,10 @@ class InhibitionLayer(nn.Module):
         Cada inibitório inibe todos os excitatórios,
         mas com força decaindo com a distância.
         """
-        W = torch.zeros(self.n_inh, self.n_exc)
-        
-        # Assumindo neurônios organizados linearmente por índice
-        for i in range(self.n_inh):
-            # Centro da influência deste inibitório
-            center = (i / self.n_inh) * self.n_exc
-            positions = torch.arange(self.n_exc, dtype=torch.float32)
-            distances = torch.abs(positions - center)
-            
-            # Gaussiana: força decai com a distância
-            # sigma proporcional ao tamanho da população
-            sigma = self.n_exc / 10.0
-            W[i] = torch.exp(-distances**2 / (2 * sigma**2)) * 0.8
-        
-        return W
+        centers = torch.linspace(0, self.n_exc - 1, self.n_inh, dtype=torch.float32).unsqueeze(1)
+        positions = torch.arange(self.n_exc, dtype=torch.float32).unsqueeze(0)
+        sigma = self.n_exc / 10.0
+        return torch.exp(-((positions - centers) ** 2) / (2 * sigma**2)) * 0.8
     
     def _create_lateral_kernel(self) -> torch.Tensor:
         """
@@ -150,15 +139,9 @@ class InhibitionLayer(nn.Module):
             Tensor [n_exc, n_exc] com pesos de inibição lateral
         """
         positions = torch.arange(self.n_exc, dtype=torch.float32)
-        kernel = torch.zeros(self.n_exc, self.n_exc)
-        
-        for i in range(self.n_exc):
-            distances = torch.abs(positions - i)
-            kernel[i] = torch.exp(-distances**2 / (2 * self.lateral_sigma**2))
-        
-        # Remove auto-conexão (neurônio não inibe a si mesmo)
+        diff = positions.unsqueeze(0) - positions.unsqueeze(1)
+        kernel = torch.exp(-(diff**2) / (2 * self.lateral_sigma**2))
         kernel.fill_diagonal_(0)
-        
         return kernel
     
     def forward(self, exc_spikes: torch.Tensor) -> Dict[str, torch.Tensor]:

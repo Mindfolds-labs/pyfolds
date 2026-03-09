@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import hashlib
 import logging
 import math
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 import torch
 import torch.nn as nn
@@ -116,6 +115,7 @@ class EngramBank(nn.Module):
         similarity_threshold: float = 0.7,
         pruning_threshold: float = 0.1,
         enable_indexing: bool = True,
+        eviction_strategy: Literal["importance", "lru", "lru_importance"] = "importance",
     ) -> None:
         """Inicializa capacidade, índices e buffers de estatísticas."""
         super().__init__()
@@ -124,6 +124,7 @@ class EngramBank(nn.Module):
         self.similarity_threshold = similarity_threshold
         self.pruning_threshold = pruning_threshold
         self.enable_indexing = enable_indexing
+        self.eviction_strategy = eviction_strategy
         self.engrams: Dict[str, Engram] = {}
         self.area_index: Dict[str, List[str]] = defaultdict(list)
         self.phase_index: Dict[int, List[str]] = defaultdict(list)
@@ -157,9 +158,10 @@ class EngramBank(nn.Module):
         elif wave_pattern.numel() > self.n_frequencies:
             wave_pattern = wave_pattern[: self.n_frequencies]
 
-        pattern_hash = hashlib.sha256(wave_pattern.cpu().numpy().tobytes()).hexdigest()[:16]
+        # assinatura é usada para indexação/identificação, não para segurança criptográfica
+        pattern_int = int(wave_pattern[:4].sum().item() * 1e6) & 0xFFFFFFFF
         timestamp = time.time()
-        signature = f"{pattern_hash}_{int(age)}_{int(phase)}_{int(timestamp*1e6)}_{int(self.total_engrams.item())}"
+        signature = f"{pattern_int:08x}_{int(age)}_{int(phase)}_{int(timestamp*1e6)}_{int(self.total_engrams.item())}"
         freqs = torch.linspace(10.0, 100.0, self.n_frequencies, device=wave_pattern.device)
         gen = torch.Generator(device=wave_pattern.device)
         gen.manual_seed(int(self._rng_seed.item()) + int(self.total_engrams.item()))
@@ -304,11 +306,22 @@ class EngramBank(nn.Module):
             self._index_engram(e)
 
     def _prune_oldest(self) -> None:
-        """Poda 10% dos engrams com pior ranking de importância/idade."""
+        """Poda 10% dos engrams conforme estratégia de eviction configurada."""
         if len(self.engrams) <= self.max_engrams:
             return
-        ranked = sorted((e.importance, -e.formation_age, sig) for sig, e in self.engrams.items())
-        for _, _, sig in ranked[: max(1, int(0.1 * len(self.engrams)))]:
+        now = time.time()
+
+        def score(sig: str, e: Engram) -> float:
+            if self.eviction_strategy == "lru":
+                return float(e.last_access)
+            if self.eviction_strategy == "lru_importance":
+                recency_score = 1.0 / (1.0 + (now - e.last_access) / 3600.0)
+                access_frequency = min(1.0, e.access_count / 100.0)
+                return (e.importance * 0.6) + (recency_score * 0.3) + (access_frequency * 0.1)
+            return (e.importance * 1.0) + (e.formation_age * 1e-6)
+
+        ranked = sorted(((score(sig, e), sig) for sig, e in self.engrams.items()), key=lambda x: x[0])
+        for _, sig in ranked[: max(1, int(0.1 * len(self.engrams)))]:
             del self.engrams[sig]
         self._rebuild_indexes()
         self.total_engrams.fill_(len(self.engrams))
@@ -334,6 +347,7 @@ class EngramBank(nn.Module):
                 "n_frequencies": self.n_frequencies,
                 "similarity_threshold": self.similarity_threshold,
                 "pruning_threshold": self.pruning_threshold,
+                "eviction_strategy": self.eviction_strategy,
             },
             "stats": self.get_stats(),
         }
@@ -346,6 +360,7 @@ class EngramBank(nn.Module):
         self.n_frequencies = int(cfg.get("n_frequencies", self.n_frequencies))
         self.similarity_threshold = float(cfg.get("similarity_threshold", self.similarity_threshold))
         self.pruning_threshold = float(cfg.get("pruning_threshold", self.pruning_threshold))
+        self.eviction_strategy = str(cfg.get("eviction_strategy", self.eviction_strategy))
 
         for sig, data in state.get("engrams", {}).items():
             engram = Engram(

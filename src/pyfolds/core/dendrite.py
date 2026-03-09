@@ -49,39 +49,33 @@ class MPJRDDendrite(nn.Module):
             if not self._cache_invalid and self._cached_states is not None:
                 return
 
-        first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
-        device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
+            first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
+            device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
 
-        N_list = []
-        I_list = []
-        L_list = []
-        W_list = []
-        has_short_term_state = all(hasattr(syn, "u") and hasattr(syn, "R") for syn in self.synapses)
-        u_list = [] if has_short_term_state else None
-        R_list = [] if has_short_term_state else None
+            N_list = []
+            I_list = []
+            L_list = []
+            W_list = []
+            has_short_term_state = all(hasattr(syn, "u") and hasattr(syn, "R") for syn in self.synapses)
+            u_list = [] if has_short_term_state else None
+            R_list = [] if has_short_term_state else None
 
-        for syn in self.synapses:
-            N_list.append(syn.N.to(device))
-            L_list.append(syn.L.to(device))
-            I_list.append(syn.I.to(device))
-            W_list.append(syn.W.to(device))
-            if has_short_term_state:
-                u_list.append(syn.u.to(device))
-                R_list.append(syn.R.to(device))
+            for syn in self.synapses:
+                N_list.append(syn.N.to(device))
+                L_list.append(syn.L.to(device))
+                I_list.append(syn.I.to(device))
+                W_list.append(syn.W.to(device))
+                if has_short_term_state:
+                    u_list.append(syn.u.to(device))
+                    R_list.append(syn.R.to(device))
 
-        cached_states = {
-            'N': torch.cat(N_list).to(torch.int32),
-            'L': torch.cat(L_list).to(torch.int32),
-            'I': torch.cat(I_list),
-            **({'u': torch.cat(u_list), 'R': torch.cat(R_list)} if has_short_term_state else {})
-        }
-        cached_w = torch.cat(W_list)
-
-        with self._cache_lock:
-            if not self._cache_invalid and self._cached_states is not None:
-                return
-            self._cached_states = cached_states
-            self._cached_W = cached_w
+            self._cached_states = {
+                'N': torch.cat(N_list).to(torch.int32),
+                'L': torch.cat(L_list).to(torch.int32),
+                'I': torch.cat(I_list),
+                **({'u': torch.cat(u_list), 'R': torch.cat(R_list)} if has_short_term_state else {})
+            }
+            self._cached_W = torch.cat(W_list)
             self._cache_invalid = False
 
     def _invalidate_cache(self):

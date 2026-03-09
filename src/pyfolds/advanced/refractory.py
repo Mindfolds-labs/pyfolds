@@ -176,6 +176,8 @@ class RefractoryMixin(TimedMixin):
 
         if hasattr(self, '_update_adaptation_after_spike'):
             self._update_adaptation_after_spike(final_spikes)
+
+        self._increment_time(kwargs.get('dt', 1.0))
         
         return output
     

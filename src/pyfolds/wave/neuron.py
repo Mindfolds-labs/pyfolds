@@ -75,6 +75,7 @@ class MPJRDWaveNeuron(MPJRDNeuron):
         collect_stats: bool = True,
         target_class: Optional[int] = None,
         dt: float = 1.0,
+        defer_homeostasis: bool = False,
     ) -> Dict[str, torch.Tensor]:
         effective_mode = mode if mode is not None else self.mode
 
@@ -95,7 +96,7 @@ class MPJRDWaveNeuron(MPJRDNeuron):
         spike_rate = spikes.mean().item()
         saturation_ratio = (self.N == self.cfg.n_max).float().mean().item()
 
-        if effective_mode != LearningMode.INFERENCE and collect_stats:
+        if effective_mode != LearningMode.INFERENCE and collect_stats and not defer_homeostasis:
             self.homeostasis.update(spike_rate)
 
         if self.cfg.neuromod_mode == "external":

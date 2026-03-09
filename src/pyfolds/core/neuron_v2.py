@@ -26,6 +26,7 @@ class MPJRDNeuronV2(MPJRDNeuron):
         mode: Optional[LearningMode] = None,
         collect_stats: bool = True,
         dt: float = 1.0,
+        defer_homeostasis: bool = False,
     ) -> Dict[str, Union[torch.Tensor, float, str]]:
         """
         Forward pass com integração cooperativa.
@@ -85,7 +86,7 @@ class MPJRDNeuronV2(MPJRDNeuron):
         saturation_ratio = (self.N == self.cfg.n_max).float().mean().item()
 
         # ===== 7. HOMEOSTASE =====
-        if effective_mode != LearningMode.INFERENCE and collect_stats:
+        if effective_mode != LearningMode.INFERENCE and collect_stats and not defer_homeostasis:
             self.homeostasis.update(spike_rate)
 
         # ===== 8. NEUROMODULAÇÃO =====
