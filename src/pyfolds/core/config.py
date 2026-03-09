@@ -144,6 +144,16 @@ class MPJRDConfig:
     dendritic_threshold: float = 0.0
     latency_scale: float = 1.0
     amplitude_eps: float = 1e-6
+    circadian_enabled: bool = False
+    circadian_cycle_hours: float = 12.0
+    circadian_day_start_hour: float = 6.0
+    circadian_phase_bins: int = 24
+    circadian_am_cortisol: float = 1.0
+    circadian_pm_cortisol: float = 0.4
+    circadian_am_melatonin: float = 0.2
+    circadian_pm_melatonin: float = 0.8
+    circadian_auto_mode: bool = False
+    circadian_sleep_duration: float = 60.0
 
     # ===== INIBIÇÃO =====
     inhibition_trainable_i2e: bool = False
@@ -257,6 +267,23 @@ class MPJRDConfig:
         if not (0.0 < self.active_synapses_ratio <= 1.0):
             raise ValueError(
                 f"active_synapses_ratio must be in (0, 1], got {self.active_synapses_ratio}"
+            )
+
+        if self.circadian_cycle_hours <= 0:
+            raise ValueError(
+                "circadian_cycle_hours must be > 0, "
+                f"got {self.circadian_cycle_hours}"
+            )
+
+        if self.circadian_phase_bins <= 0:
+            raise ValueError(
+                f"circadian_phase_bins must be > 0, got {self.circadian_phase_bins}"
+            )
+
+        if self.circadian_sleep_duration <= 0:
+            raise ValueError(
+                "circadian_sleep_duration must be > 0, "
+                f"got {self.circadian_sleep_duration}"
             )
 
         if self.stdp_input_source not in {"raw", "stp"}:

@@ -22,6 +22,7 @@ from .short_term import ShortTermDynamicsMixin
 from .backprop import BackpropMixin
 from .inhibition import InhibitionLayer, InhibitionMixin
 from .wave import WaveDynamicsMixin
+from .circadian import CircadianWaveMixin
 
 from ..core.neuron import MPJRDNeuron as MPJRDNeuronBase
 from ..wave import MPJRDWaveNeuron as MPJRDWaveNeuronBase
@@ -37,6 +38,7 @@ __all__ = [
     "ShortTermDynamicsMixin",
     "BackpropMixin",
     "WaveDynamicsMixin",
+    "CircadianWaveMixin",
     "InhibitionLayer",
     "InhibitionMixin",
     "MPJRDNeuronAdvanced",
@@ -47,6 +49,7 @@ __all__ = [
 
 
 class MPJRDNeuronAdvanced(
+    CircadianWaveMixin,
     WaveDynamicsMixin,  # opcional: ativa wave quando cfg.wave_enabled=True
     # ✅ ORDEM CORRETA:
     BackpropMixin,  # 1º: amplifica entrada (antes de tudo)
@@ -73,6 +76,7 @@ class MPJRDNeuronAdvanced(
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
         self._init_wave_dynamics(cfg)
+        self._init_circadian(cfg)
         self._init_advanced_mixins(cfg, is_wave=False)
 
     def _init_advanced_mixins(self, cfg, is_wave: bool = False) -> None:
@@ -176,6 +180,7 @@ class MPJRDNeuronAdvanced(
 
 
 class MPJRDWaveNeuronAdvanced(
+    CircadianWaveMixin,
     WaveDynamicsMixin,
     BackpropMixin,
     ShortTermDynamicsMixin,
@@ -189,6 +194,7 @@ class MPJRDWaveNeuronAdvanced(
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
         self._init_wave_dynamics(cfg)
+        self._init_circadian(cfg)
         self._init_advanced_mixins(cfg, is_wave=True)
 
 
