@@ -1,45 +1,38 @@
-"""Imagination: expansão latente controlada no espaço conceitual."""
+"""Engram-backed memory recall adapter for LEIBREG."""
 
 from __future__ import annotations
 
-from typing import Tuple
+from typing import Any, Dict, Optional
 
 import torch
-from torch import Tensor, nn
+import torch.nn as nn
+
+from pyfolds.advanced.engram import EngramBank
 
 
 class Imagination(nn.Module):
-    """Gera hipótese latente refinada e score de confiança."""
+    """Recall memories from EngramBank using conceptual queries."""
 
-    def __init__(self, *, hidden_dim: int = 16, dropout: float = 0.0, return_confidence: bool = True) -> None:
+    def __init__(self, engram_bank: Optional[EngramBank], associative_memory: Optional[Any] = None) -> None:
         super().__init__()
-        if hidden_dim <= 0:
-            raise ValueError(f"hidden_dim deve ser > 0, recebido: {hidden_dim}")
-        if not (0.0 <= dropout < 1.0):
-            raise ValueError(f"dropout deve estar em [0, 1), recebido: {dropout}")
+        self.engram_bank = engram_bank
+        self.associative_memory = associative_memory
 
-        self.return_confidence = bool(return_confidence)
-        self.net = nn.Sequential(
-            nn.Linear(4, hidden_dim),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, 4),
-        )
-        self.confidence_head = nn.Sequential(nn.Linear(4, 1), nn.Sigmoid())
+    def forward(self, q: torch.Tensor, k: int = 10, area: Optional[str] = None, query_phase: Optional[float] = None) -> Dict[str, Any]:
+        if self.engram_bank is None:
+            return {"concepts": [], "experiences": [], "scores": torch.empty(0), "backend": "missing"}
 
-    def _validate(self, x: Tensor) -> Tensor:
-        if not isinstance(x, Tensor):
-            raise TypeError(f"Entrada deve ser torch.Tensor, recebido: {type(x)!r}")
-        if x.shape[-1] != 4:
-            raise ValueError(f"Última dimensão deve ser 4, recebido: {x.shape[-1]}")
-        return x.float()
+        query = q.detach().float().flatten().cpu()
+        matches = self.engram_bank.search_by_resonance(query_pattern=query, query_phase=query_phase, area=area, top_k=k)
+        concepts = [m.concept for m in matches]
+        experiences = [m.to_dict() for m in matches]
 
-    def forward(self, x: Tensor) -> Tuple[Tensor, Tensor | None]:
-        """Retorna (hipótese_refinada, confiança_opcional)."""
-        state = self._validate(x)
-        delta = self.net(state)
-        hypothesis = state + delta
-        if not self.return_confidence:
-            return hypothesis, None
-        confidence = self.confidence_head(hypothesis)
-        return hypothesis, confidence
+        if matches:
+            mem = torch.stack([m.wave_pattern.float() for m in matches], dim=0)
+            qn = query / query.norm(p=2).clamp_min(1e-8)
+            mn = mem / mem.norm(p=2, dim=-1, keepdim=True).clamp_min(1e-8)
+            scores = torch.matmul(mn, qn)
+        else:
+            scores = torch.empty(0)
+
+        return {"concepts": concepts, "experiences": experiences, "scores": scores, "backend": "engram_bank"}

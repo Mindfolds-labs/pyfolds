@@ -1,7 +1,21 @@
-"""LEIBREG conceptual processing layer for PyFolds."""
+"""Experimental LEIBREG (Reasoning + Engram + Geometry) subsystem."""
 
+from .config import LeibregConfig
 from .imagination import Imagination
-from .reg_core import REGCore
+from .leibniz_layer import LeibnizLayer
+from .leibreg_bridge import NoeticLeibregBridge
+from .reg_core import ProximityAttention, REGBlock, REGCore
+from .sigreg import SIGReg
 from .wordspace import WordSpace
 
-__all__ = ["WordSpace", "REGCore", "Imagination"]
+__all__ = [
+    "LeibregConfig",
+    "WordSpace",
+    "LeibnizLayer",
+    "ProximityAttention",
+    "REGBlock",
+    "REGCore",
+    "Imagination",
+    "SIGReg",
+    "NoeticLeibregBridge",
+]

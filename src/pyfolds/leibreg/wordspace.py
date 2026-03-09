@@ -1,88 +1,78 @@
-"""WordSpace: projeção multimodal para espaço conceitual comum 4D."""
+"""Geometric conceptual space for LEIBREG."""
 
 from __future__ import annotations
 
-from typing import Mapping, Optional
+from typing import Optional
 
 import torch
-from torch import Tensor, nn
+import torch.nn as nn
+import torch.nn.functional as F
 
-DEFAULT_CONCEPT_DIM = 4
+from .types import WordSpaceOutput
 
 
 class WordSpace(nn.Module):
-    """Projeta representações multimodais para um espaço conceitual comum.
-
-    Cada modalidade possui adaptador próprio para evitar suposições sobre
-    dimensionalidades equivalentes entre texto, imagem e memória.
-    """
-
-    _VALID_MODALITIES = {"text", "image", "memory"}
+    """Learnable concept embeddings with optional wave-aware modulation."""
 
     def __init__(
         self,
-        text_dim: int,
-        image_dim: int,
-        memory_dim: int,
-        *,
-        concept_dim: int = DEFAULT_CONCEPT_DIM,
-        normalize: bool = True,
+        concept_count: int,
+        dim_base: int = 4,
+        dim_context: int = 0,
+        normalize_output: bool = True,
+        wave_enabled: bool = False,
+        eps: float = 1e-8,
     ) -> None:
         super().__init__()
-        if concept_dim <= 0:
-            raise ValueError(f"concept_dim deve ser > 0, recebido: {concept_dim}")
-        self.concept_dim = int(concept_dim)
-        self.normalize = bool(normalize)
+        if concept_count <= 0:
+            raise ValueError("concept_count must be > 0")
+        if dim_base <= 0:
+            raise ValueError("dim_base must be > 0")
+        if dim_context < 0:
+            raise ValueError("dim_context must be >= 0")
 
-        self.text_adapter = self._make_adapter(text_dim, "text_dim")
-        self.image_adapter = self._make_adapter(image_dim, "image_dim")
-        self.memory_adapter = self._make_adapter(memory_dim, "memory_dim")
+        self.concept_count = concept_count
+        self.dim_base = dim_base
+        self.dim_context = dim_context
+        self.normalize_output = normalize_output
+        self.wave_enabled = wave_enabled
+        self.eps = eps
 
-    def _make_adapter(self, input_dim: int, name: str) -> nn.Linear:
-        if input_dim <= 0:
-            raise ValueError(f"{name} deve ser > 0, recebido: {input_dim}")
-        return nn.Linear(int(input_dim), self.concept_dim)
+        self.base_embedding = nn.Embedding(concept_count, dim_base)
+        self.context_embedding = nn.Embedding(concept_count, dim_context) if dim_context > 0 else None
+        nn.init.normal_(self.base_embedding.weight, mean=0.0, std=0.02)
+        if self.context_embedding is not None:
+            nn.init.normal_(self.context_embedding.weight, mean=0.0, std=0.02)
 
-    def _validate_input(self, x: Tensor, *, expected_last_dim: int, modality: str) -> Tensor:
-        if not isinstance(x, Tensor):
-            raise TypeError(f"Entrada da modalidade '{modality}' deve ser torch.Tensor, recebido: {type(x)!r}")
-        if x.ndim == 0:
-            raise ValueError(f"Entrada da modalidade '{modality}' deve ter ao menos 1 dimensão.")
-        if x.shape[-1] != expected_last_dim:
-            raise ValueError(
-                f"Dimensão inválida para '{modality}': esperado último eixo={expected_last_dim}, recebido={x.shape[-1]}."
-            )
-        return x.float()
+    def forward(self, concept_ids: torch.Tensor, wave_phase: Optional[torch.Tensor] = None) -> WordSpaceOutput:
+        if concept_ids.numel() == 0:
+            raise ValueError("concept_ids cannot be empty")
+        if concept_ids.dtype not in (torch.int64, torch.int32, torch.int16, torch.int8):
+            raise TypeError("concept_ids must be an integer tensor")
+        if torch.any(concept_ids < 0) or torch.any(concept_ids >= self.concept_count):
+            raise ValueError("concept_ids contains out-of-range values")
 
-    def _post_process(self, x: Tensor) -> Tensor:
-        if self.normalize:
-            x = torch.nn.functional.normalize(x, p=2, dim=-1, eps=1e-8)
-        return x
+        q_base = self.base_embedding(concept_ids.long())
+        if self.wave_enabled and wave_phase is not None:
+            q_base = q_base * (1.0 + 0.1 * torch.sin(wave_phase).to(q_base.device))
 
-    def _project(self, x: Tensor, adapter: nn.Linear, *, modality: str) -> Tensor:
-        valid_x = self._validate_input(x, expected_last_dim=adapter.in_features, modality=modality)
-        return self._post_process(adapter(valid_x))
+        q_context = self.context_embedding(concept_ids.long()) if self.context_embedding is not None else None
+        q_total = torch.cat([q_base, q_context], dim=-1) if q_context is not None else q_base
 
-    def project_text(self, x: Tensor) -> Tensor:
-        """Projeta representação textual para o espaço conceitual."""
-        return self._project(x, self.text_adapter, modality="text")
+        if self.normalize_output:
+            q_total = F.normalize(q_total, p=2, dim=-1, eps=self.eps)
 
-    def project_image(self, x: Tensor) -> Tensor:
-        """Projeta representação visual para o espaço conceitual."""
-        return self._project(x, self.image_adapter, modality="image")
-
-    def project_memory(self, x: Tensor) -> Tensor:
-        """Projeta representação de memória para o espaço conceitual."""
-        return self._project(x, self.memory_adapter, modality="memory")
-
-    def project(self, x: Tensor, *, modality: str) -> Tensor:
-        """Projeta tensor de uma modalidade explícita para o espaço conceitual."""
-        if modality not in self._VALID_MODALITIES:
-            raise ValueError(f"Modalidade inválida '{modality}'. Opções: {sorted(self._VALID_MODALITIES)}")
-        handlers: Mapping[str, nn.Module] = {
-            "text": self.project_text,
-            "image": self.project_image,
-            "memory": self.project_memory,
+        return {
+            "q_base": q_base,
+            "q_context": q_context,
+            "q_total": q_total,
+            "dim_total": int(q_total.shape[-1]),
         }
-        fn = handlers[modality]
-        return fn(x)  # type: ignore[operator]
+
+    def distance(self, a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+        """Compute L2 distance in conceptual space."""
+        return torch.linalg.norm(a - b, dim=-1)
+
+    def similarity(self, a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+        """Compute stable cosine similarity in conceptual space."""
+        return F.cosine_similarity(a, b, dim=-1, eps=self.eps)

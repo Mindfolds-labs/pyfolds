@@ -1,68 +1,86 @@
-"""REGCore: refinamento geométrico por proximidade no WordSpace."""
+"""Proximity-based reasoning core for LEIBREG."""
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Optional
 
 import torch
-from torch import Tensor, nn
+import torch.nn as nn
 
-MetricName = Literal["euclidean", "cosine"]
+
+class ProximityAttention(nn.Module):
+    """Distance-kernel attention over ``[batch, seq, dim]`` tensors.
+
+    Complexity is quadratic in sequence length due to pairwise distances.
+    """
+
+    def __init__(self, dim: int, kernel: str = "gaussian", temperature: float = 1.0, eps: float = 1e-8) -> None:
+        super().__init__()
+        if dim <= 0:
+            raise ValueError("dim must be > 0")
+        self.value = nn.Linear(dim, dim)
+        self.kernel = kernel
+        self.temperature = max(float(temperature), 1e-4)
+        self.eps = eps
+
+    def _kernelize(self, dist: torch.Tensor) -> torch.Tensor:
+        scaled = dist / self.temperature
+        if self.kernel == "gaussian":
+            weights = torch.exp(-(scaled**2))
+        elif self.kernel == "inverse":
+            weights = 1.0 / (1.0 + scaled)
+        elif self.kernel == "cauchy":
+            weights = 1.0 / (1.0 + scaled**2)
+        else:
+            raise ValueError(f"Unsupported kernel: {self.kernel}")
+        return weights
+
+    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
+        if x.ndim != 3:
+            raise ValueError("x must have shape [batch, seq, dim]")
+        dist = torch.cdist(x, x, p=2)
+        w = self._kernelize(dist)
+        if mask is not None:
+            # mask: [batch, seq], True=valid
+            if mask.shape != x.shape[:2]:
+                raise ValueError("mask must have shape [batch, seq]")
+            pair_mask = (mask.unsqueeze(1) & mask.unsqueeze(2)).to(w.dtype)
+            w = w * pair_mask
+        denom = w.sum(dim=-1, keepdim=True).clamp_min(self.eps)
+        attn = w / denom
+        v = self.value(x)
+        return torch.matmul(attn, v)
+
+
+class REGBlock(nn.Module):
+    """Residual proximity-attention block with feedforward network."""
+
+    def __init__(self, dim: int, ff_mult: int = 4, kernel: str = "gaussian", temperature: float = 1.0) -> None:
+        super().__init__()
+        hidden = ff_mult * dim
+        self.attn = ProximityAttention(dim=dim, kernel=kernel, temperature=temperature)
+        self.norm1 = nn.LayerNorm(dim)
+        self.ff = nn.Sequential(nn.Linear(dim, hidden), nn.GELU(), nn.Linear(hidden, dim))
+        self.norm2 = nn.LayerNorm(dim)
+
+    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
+        x = self.norm1(x + self.attn(x, mask=mask))
+        x = self.norm2(x + self.ff(x))
+        return x
 
 
 class REGCore(nn.Module):
-    """Refina conceitos no espaço 4D usando vizinhança geométrica.
+    """Stacked REG blocks."""
 
-    Hipótese: o raciocínio relacional pode ser aproximado por difusão local
-    ponderada por proximidade, evitando mecanismo de atenção completo.
-    """
-
-    def __init__(
-        self,
-        *,
-        metric: MetricName = "euclidean",
-        temperature: float = 1.0,
-        residual: float = 0.5,
-        num_steps: int = 1,
-    ) -> None:
+    def __init__(self, dim: int, depth: int = 2, kernel: str = "gaussian", temperature: float = 1.0) -> None:
         super().__init__()
-        if metric not in {"euclidean", "cosine"}:
-            raise ValueError("metric deve ser 'euclidean' ou 'cosine'.")
-        if temperature <= 0:
-            raise ValueError(f"temperature deve ser > 0, recebido: {temperature}")
-        if not (0.0 <= residual <= 1.0):
-            raise ValueError(f"residual deve estar em [0, 1], recebido: {residual}")
-        if num_steps <= 0:
-            raise ValueError(f"num_steps deve ser > 0, recebido: {num_steps}")
+        if depth <= 0:
+            raise ValueError("depth must be > 0")
+        self.blocks = nn.ModuleList(
+            [REGBlock(dim=dim, kernel=kernel, temperature=temperature) for _ in range(depth)]
+        )
 
-        self.metric = metric
-        self.temperature = float(temperature)
-        self.residual = float(residual)
-        self.num_steps = int(num_steps)
-
-    def _pairwise_scores(self, x: Tensor) -> Tensor:
-        if self.metric == "euclidean":
-            distances = torch.cdist(x, x, p=2)
-            return -distances / self.temperature
-        x_norm = torch.nn.functional.normalize(x, p=2, dim=-1, eps=1e-8)
-        similarities = torch.matmul(x_norm, x_norm.transpose(-1, -2))
-        return similarities / self.temperature
-
-    def _validate(self, x: Tensor) -> None:
-        if not isinstance(x, Tensor):
-            raise TypeError(f"Entrada deve ser torch.Tensor, recebido: {type(x)!r}")
-        if x.ndim != 3:
-            raise ValueError(f"Entrada deve ter shape [batch, n_tokens, 4], recebido: {tuple(x.shape)}")
-        if x.shape[-1] != 4:
-            raise ValueError(f"Última dimensão deve ser 4 (WordSpace), recebido: {x.shape[-1]}")
-
-    def forward(self, x: Tensor) -> Tensor:
-        """Aplica refinamento iterativo e mistura residual."""
-        self._validate(x)
-        state = x.float()
-        for _ in range(self.num_steps):
-            scores = self._pairwise_scores(state)
-            weights = torch.softmax(scores, dim=-1)
-            neighborhood = torch.matmul(weights, state)
-            state = (self.residual * state) + ((1.0 - self.residual) * neighborhood)
-        return state
+    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
+        for block in self.blocks:
+            x = block(x, mask=mask)
+        return x
