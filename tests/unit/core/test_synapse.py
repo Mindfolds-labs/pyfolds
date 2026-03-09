@@ -18,6 +18,7 @@ class TestMPJRDSynapse:
         syn = MPJRDSynapse(tiny_config)
         assert syn.N.numel() == 1
         assert syn.I.numel() == 1
+        assert syn.stdp_eligibility.numel() == 1
     
     def test_ltp(self, tiny_config):
         """Test LTP."""
@@ -67,6 +68,7 @@ class TestMPJRDSynapse:
 
         assert syn.I.item() == pytest.approx(0.0)
         assert syn.eligibility.item() == pytest.approx(0.0)
+        assert syn.stdp_eligibility.item() == pytest.approx(0.0)
 
     def test_update_uses_absolute_dt_and_mode_multiplier(self, tiny_config):
         """Negative dt should be handled as absolute value in plasticity update."""
@@ -133,20 +135,28 @@ class TestMPJRDSynapse:
 
         assert syn.I.item() <= 0.0
 
-    def test_consolidate_transfers_eligibility_and_decays_internal_potential(self, tiny_config):
-        """Consolidation should move eligibility into N and decay I."""
+    def test_consolidate_transfers_combined_eligibility_and_decays_internal_potential(self, tiny_config):
+        """Consolidation should combine hebbian + STDP eligibility into N and decay I."""
         from pyfolds import NeuronConfig
         from pyfolds.core import MPJRDSynapse
 
-        cfg = NeuronConfig(**{**tiny_config.to_dict(), "consolidation_rate": 1.0, "i_decay_sleep": 0.5})
+        cfg = NeuronConfig(**{
+            **tiny_config.to_dict(),
+            "consolidation_rate": 1.0,
+            "stdp_consolidation_scale": 0.5,
+            "tau_consolidation": 2.0,
+            "i_decay_sleep": 0.5,
+        })
         syn = MPJRDSynapse(cfg, init_n=5)
         syn.eligibility.fill_(2.0)
+        syn.stdp_eligibility.fill_(2.0)
         syn.I.fill_(4.0)
 
-        syn.consolidate(dt=1.0)
+        syn.consolidate(dt=2.0)
 
-        assert syn.N.item() == 7
+        assert syn.N.item() == 8
         assert syn.eligibility.item() == pytest.approx(0.0)
+        assert syn.stdp_eligibility.item() == pytest.approx(0.0)
         assert syn.I.item() == pytest.approx(2.0)
 
 
@@ -182,6 +192,7 @@ class TestMPJRDSynapse:
         cfg = NeuronConfig(**{**tiny_config.to_dict(), "distributed_sync_on_consolidate": True})
         syn = MPJRDSynapse(cfg, init_n=4)
         syn.eligibility.fill_(2.0)
+        syn.stdp_eligibility.fill_(1.0)
 
         fake_dist = mock.Mock()
         fake_dist.is_available.return_value = True
@@ -192,7 +203,7 @@ class TestMPJRDSynapse:
         with mock.patch.object(torch, "distributed", fake_dist):
             syn.consolidate(dt=1.0)
 
-        assert fake_dist.all_reduce.call_count == 5
+        assert fake_dist.all_reduce.call_count == 6
 
     def test_consolidate_skips_distributed_sync_when_disabled(self, tiny_config):
         """Distributed all-reduce should be skipped when config disables it."""

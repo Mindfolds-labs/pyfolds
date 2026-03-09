@@ -124,6 +124,8 @@ class MPJRDConfig:
     stdp_trace_threshold: float = 0.01
     stdp_input_source: STDPInputSource = "raw"
     ltd_rule: LTDRule = "current"
+    stdp_consolidation_scale: float = 1.0
+    max_eligibility: float = 1e6
 
     # ===== THRESHOLDS E REPRODUTIBILIDADE =====
     spike_threshold: float = 0.5
@@ -150,6 +152,7 @@ class MPJRDConfig:
     plastic: bool = True
     defer_updates: bool = True
     consolidation_rate: float = 0.1
+    tau_consolidation: float = 1.0
     distributed_sync_on_consolidate: bool = True
     eps: float = 1e-8
     dt: float = 1.0

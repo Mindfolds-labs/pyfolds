@@ -19,8 +19,8 @@ class STDPMixin:
 
     Notes
     -----
-    A atualização é aplicada ao tensor consolidado ``self.I`` quando disponível,
-    com *clamp* para o intervalo ``[cfg.i_min, cfg.i_max]``.
+    A atualização STDP acumula em ``syn.stdp_eligibility`` para consolidação
+    separada do traço Hebbiano ``syn.eligibility``.
 
     References
     ----------
@@ -125,19 +125,17 @@ class STDPMixin:
         ltp_mask = (self.trace_pre > trace_threshold).float()
         delta_ltp = self.A_plus * self.trace_pre * ltp_mask * post_expanded
 
-        # Aplica atualização diretamente nas sinapses reais.
-        # self.I é uma visão consolidada/cached e não deve receber add_ in-place.
+        # Acumula atualização STDP em buffer separado para consolidação posterior.
         if hasattr(self, "dendrites"):
             # Invariante ao batch-size: normaliza atualização por amostra.
             delta_total = (delta_ltd + delta_ltp).mean(dim=0)  # [D, S]
+            max_elig = getattr(self.cfg, "max_eligibility", 1e6)
             with torch.no_grad():
                 for d_idx, dend in enumerate(self.dendrites):
-                    syn_i = torch.stack([syn.I for syn in dend.synapses], dim=0)
-                    syn_i.add_(delta_total[d_idx].to(syn_i.device).view(-1, 1))
-                    syn_i.clamp_(self.cfg.i_min, self.cfg.i_max)
+                    delta_row = delta_total[d_idx]
                     for s_idx, syn in enumerate(dend.synapses):
-                        syn.I.copy_(syn_i[s_idx])
-                    dend._invalidate_cache()
+                        syn.stdp_eligibility.add_(delta_row[s_idx].to(syn.stdp_eligibility.device))
+                        syn.stdp_eligibility.clamp_(-max_elig, max_elig)
 
         # Adiciona traço pós
         self.trace_post.add_(post_expanded)

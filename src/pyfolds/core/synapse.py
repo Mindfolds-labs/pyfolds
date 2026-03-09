@@ -60,8 +60,9 @@ class MPJRDSynapse(nn.Module):
         self.register_buffer("protection", torch.tensor([False], dtype=torch.bool))
         self.register_buffer("sat_time", torch.zeros(1, dtype=torch.float32))
 
-        # Traço para consolidação two-factor
+        # Traços para consolidação (Hebb + STDP separados)
         self.register_buffer("eligibility", torch.zeros(1, dtype=torch.float32))
+        self.register_buffer("stdp_eligibility", torch.zeros(1, dtype=torch.float32))
 
         # Estado de curto prazo (u, R) para compatibilidade
         self.register_buffer("u", torch.tensor([cfg.u0], dtype=torch.float32))
@@ -193,9 +194,22 @@ class MPJRDSynapse(nn.Module):
         self.I.copy_(finite_i.clamp(self.cfg.i_min, self.cfg.i_max))
 
         finite_elig = torch.nan_to_num(
-            self.eligibility, nan=0.0, posinf=1e6, neginf=-1e6
+            self.eligibility,
+            nan=0.0,
+            posinf=self.cfg.max_eligibility,
+            neginf=-self.cfg.max_eligibility,
         )
-        self.eligibility.copy_(finite_elig)
+        self.eligibility.copy_(finite_elig.clamp(-self.cfg.max_eligibility, self.cfg.max_eligibility))
+
+        finite_stdp_elig = torch.nan_to_num(
+            self.stdp_eligibility,
+            nan=0.0,
+            posinf=self.cfg.max_eligibility,
+            neginf=-self.cfg.max_eligibility,
+        )
+        self.stdp_eligibility.copy_(
+            finite_stdp_elig.clamp(-self.cfg.max_eligibility, self.cfg.max_eligibility)
+        )
 
         finite_sat = torch.nan_to_num(
             self.sat_time, nan=0.0, posinf=self.cfg.saturation_recovery_time, neginf=0.0
@@ -376,6 +390,11 @@ class MPJRDSynapse(nn.Module):
         )
         self.eligibility.div_(float(world_size))
 
+        torch.distributed.all_reduce(
+            self.stdp_eligibility, op=torch.distributed.ReduceOp.SUM
+        )
+        self.stdp_eligibility.div_(float(world_size))
+
         protection_float = self.protection.to(dtype=torch.float32)
         torch.distributed.all_reduce(
             protection_float, op=torch.distributed.ReduceOp.SUM
@@ -399,9 +418,12 @@ class MPJRDSynapse(nn.Module):
 
         # 1. Matemática Vetorial sem Condicionais
         # Se a elegibilidade for 0, delta_n será calculado como +0 automaticamente.
-        transfer = self.eligibility.to(dtype=torch.float32) * (
-            self.cfg.consolidation_rate * abs(dt)
+        dt_abs = abs(dt)
+        consolidation_scale = self.cfg.consolidation_rate * (dt_abs / self.cfg.tau_consolidation)
+        combined_eligibility = self.eligibility + (
+            self.stdp_eligibility * self.cfg.stdp_consolidation_scale
         )
+        transfer = combined_eligibility.to(dtype=torch.float32) * consolidation_scale
         delta_n = torch.round(transfer).to(dtype=self.N.dtype)
 
         # 2. Adição Maciça In-Place
@@ -418,6 +440,7 @@ class MPJRDSynapse(nn.Module):
 
         # 3. Reseta elegibilidade massivamente
         self.eligibility.zero_()
+        self.stdp_eligibility.zero_()
 
         # 4. Decaimento natural de I
         if self.I.numel() > 0:
@@ -435,6 +458,7 @@ class MPJRDSynapse(nn.Module):
             "protection": self.protection.clone(),
             "sat_time": self.sat_time.clone(),
             "eligibility": self.eligibility.clone(),
+            "stdp_eligibility": self.stdp_eligibility.clone(),
         }
 
     def load_state(self, state: dict) -> None:
@@ -451,6 +475,8 @@ class MPJRDSynapse(nn.Module):
             self.sat_time.data = state["sat_time"].to(self.sat_time.device)
         if "eligibility" in state:
             self.eligibility.data = state["eligibility"].to(self.eligibility.device)
+        if "stdp_eligibility" in state:
+            self.stdp_eligibility.data = state["stdp_eligibility"].to(self.stdp_eligibility.device)
 
         self._sanitize_state_buffers()
 
