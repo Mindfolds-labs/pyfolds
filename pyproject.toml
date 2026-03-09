@@ -21,6 +21,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+
+interop = [
+  "tensorflow-cpu>=2.20.0",
+  "onnx>=1.16.0",
+  "onnxruntime>=1.18.0",
+  "onnx-tf>=1.10.0",
+  "tensorboard>=2.14.0",
+  "keras-tuner>=1.4.7",
+]
 full = [
   "tensorflow-cpu>=2.20.0",
   "zstandard>=0.21.0",
