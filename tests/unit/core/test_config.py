@@ -90,3 +90,22 @@ def test_n_levels_validation():
     """n_levels precisa ser >= 2."""
     with pytest.raises(ValueError):
         pyfolds.NeuronConfig(n_levels=1)
+
+
+def test_circadian_defaults_are_valid():
+    cfg = pyfolds.NeuronConfig()
+    assert cfg.circadian_enabled is False
+    assert cfg.circadian_cycle_hours == 12.0
+
+
+def test_circadian_validation_rejects_invalid_values():
+    with pytest.raises(ValueError):
+        pyfolds.NeuronConfig(circadian_cycle_hours=0)
+
+    with pytest.raises(ValueError):
+        pyfolds.NeuronConfig(circadian_phase_bins=0)
+
+
+def test_circadian_sleep_duration_validation_rejects_invalid_values():
+    with pytest.raises(ValueError):
+        pyfolds.NeuronConfig(circadian_sleep_duration=0)
