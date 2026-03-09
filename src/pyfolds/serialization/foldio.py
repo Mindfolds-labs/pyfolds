@@ -27,12 +27,17 @@ import time
 import warnings
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
 
 from .ecc import ECCCodec, NoECC, ReedSolomonECC, ecc_from_protection
+from .encryption_fast import FastEncryptor
+from .merkle_fast import FastMerkleTree
+from .provenance_light import LightProvenance
+from .security_levels import SecurityLevel, get_security_config
+from .sharding_raid import RAIDSharding
 
 def _optional_import(module_name: str) -> Any:
     try:
@@ -299,11 +304,28 @@ class FoldWriter:
         compress: str = "zstd",
         zstd_level: int = 3,
         ecc: Optional[ECCCodec] = None,
+        security_level: Union[str, SecurityLevel] = SecurityLevel.BASIC,
+        encrypt: bool = False,
+        encryption_key: Optional[bytes] = None,
+        shard: bool = False,
+        async_mode: bool = False,
+        provenance: bool = False,
+        trust_private_key_pem: Optional[str] = None,
     ):
         self.path = path
         self.compress = compress
         self.zstd_level = zstd_level
         self.ecc = ecc or NoECC()
+        self.security_level = SecurityLevel.parse(security_level)
+        self.security = get_security_config(self.security_level)
+        self.encrypt = bool(encrypt and self.security.encryption)
+        self.encryption_key = encryption_key
+        self.shard = bool(shard and self.security.sharding)
+        self.async_mode = async_mode
+        self.provenance = LightProvenance() if (provenance and self.security.provenance) else None
+        self.trust_private_key_pem = trust_private_key_pem
+        self._encryptor = FastEncryptor(encryption_key) if self.encrypt and encryption_key else None
+        self._sharder = RAIDSharding() if self.shard else None
         self._chunks: List[Dict[str, Any]] = []
         self._f = None
 
@@ -346,6 +368,11 @@ class FoldWriter:
             )
 
         comp, flags = self._compress(payload)
+        enc_meta: Dict[str, Any] = {}
+        if self._encryptor is not None:
+            nonce, comp = self._encryptor.encrypt(comp, aad=name.encode("utf-8"))
+            enc_meta = {"encrypted": True, "nonce_hex": nonce.hex(), "aad": name}
+
         if len(comp) > MAX_CHUNK_SIZE:
             raise ValueError(
                 f"Chunk comprimido '{name}' muito grande: {len(comp)} bytes "
@@ -384,15 +411,30 @@ class FoldWriter:
                 "sha256": sha,
                 "ecc_algo": ecc_result.ecc_algo,
                 "ecc_len": len(ecc_result.ecc_bytes),
+                **enc_meta,
             }
         )
+        if self.provenance is not None:
+            self.provenance.add("append_chunk", {"name": name, "encrypted": bool(enc_meta)})
 
     def finalize(self, metadata: Dict[str, Any]) -> None:
         phase = "prepare_index"
         try:
             chunk_hashes = {chunk["name"]: chunk["sha256"] for chunk in self._chunks}
             metadata = dict(metadata)
+            metadata["security_level"] = self.security_level.value
+            metadata["security_features"] = asdict(self.security)
             metadata["chunk_hashes"] = chunk_hashes
+            if self.provenance is not None:
+                self.provenance.add("finalize", {"path": self.path, "chunks": len(self._chunks)})
+                metadata["provenance"] = self.provenance.to_dict()
+            if self._sharder is not None:
+                shards = self._sharder.split(_canonical_json(metadata))
+                metadata["sharding"] = {
+                    "data_shards": self._sharder.data_shards,
+                    "parity_shards": self._sharder.parity_shards,
+                    "shard_count": len(shards),
+                }
             manifest_source = json.dumps(metadata, sort_keys=True, separators=(",", ":")).encode("utf-8")
             metadata["manifest_hash"] = sha256_hex(manifest_source)
 
@@ -403,6 +445,17 @@ class FoldWriter:
                 "metadata": metadata,
                 "chunks": self._chunks,
             }
+            if self.security.merkle:
+                leaves = [
+                    _canonical_json({"name": c["name"], "sha256": c["sha256"], "offset": c["offset"]})
+                    for c in self._chunks
+                ]
+                index["merkle_root"] = FastMerkleTree(leaves).root.hex()
+            if self.security.trust_block and self.trust_private_key_pem:
+                from .trust_block import TrustBlock
+
+                tb = TrustBlock.build(metadata=metadata, index={k: v for k, v in index.items() if k != "metadata"}, private_key_pem=self.trust_private_key_pem)
+                index["trust_block"] = tb.to_bytes().decode("utf-8")
             index_bytes = _json_bytes(index)
 
             phase = "write_index"
@@ -438,9 +491,18 @@ class FoldWriter:
 class FoldReader:
     """Reader do container .fold/.mind com suporte a mmap."""
 
-    def __init__(self, path: str, use_mmap: bool = True):
+    def __init__(
+        self,
+        path: str,
+        use_mmap: bool = True,
+        decryption_key: Optional[bytes] = None,
+        trust_public_key_pem: Optional[str] = None,
+    ):
         self.path = path
         self.use_mmap = use_mmap
+        self.decryption_key = decryption_key
+        self.trust_public_key_pem = trust_public_key_pem
+        self._decryptor = FastEncryptor(decryption_key) if decryption_key else None
         self._f = None
         self._mm = None
         self.header: Dict[str, Any] = {}
@@ -572,6 +634,21 @@ class FoldReader:
                 stacklevel=2,
             )
 
+        if self.index.get("merkle_root"):
+            leaves = [
+                _canonical_json({"name": c["name"], "sha256": c["sha256"], "offset": c["offset"]})
+                for c in self.index.get("chunks", [])
+            ]
+            if leaves and FastMerkleTree(leaves).root.hex() != self.index.get("merkle_root"):
+                raise FoldSecurityError("Merkle root inválido no índice")
+
+        if self.index.get("trust_block") and self.trust_public_key_pem:
+            from .trust_block import verify_header
+
+            ok = verify_header(self.index["trust_block"].encode("utf-8"), self.trust_public_key_pem)
+            if not ok:
+                raise FoldSecurityError("Trust block inválido para a chave pública informada")
+
     def list_chunks(self) -> List[str]:
         return [chunk["name"] for chunk in self.index.get("chunks", [])]
 
@@ -650,6 +727,14 @@ class FoldReader:
                     raise FoldSecurityError(
                         "Manifest hash divergente: metadados podem estar corrompidos ou adulterados."
                     )
+
+        if chunk.get("encrypted"):
+            if self._decryptor is None:
+                raise FoldSecurityError("Chunk criptografado requer decryption_key")
+            nonce_hex = chunk.get("nonce_hex")
+            if not nonce_hex:
+                raise FoldSecurityError("Chunk criptografado sem nonce")
+            comp = self._decryptor.decrypt(bytes.fromhex(nonce_hex), comp, aad=name.encode("utf-8"))
 
         raw = self._decompress(comp, flags)
         if len(raw) != uncomp_len:
