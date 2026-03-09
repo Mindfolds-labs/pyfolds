@@ -2,18 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Dict, Optional, TypedDict
+from typing import Dict, TypedDict
 
 import torch
 
 
 class WordSpaceOutput(TypedDict):
-    """Output structure for :class:`WordSpace`."""
-
     q_base: torch.Tensor
-    q_context: Optional[torch.Tensor]
     q_total: torch.Tensor
-    dim_total: int
+    phase_applied: torch.Tensor
+    norm: torch.Tensor
 
 
 TelemetryPayload = Dict[str, float]

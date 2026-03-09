@@ -1,64 +1,74 @@
-"""Proximity-based reasoning core for LEIBREG."""
+"""Geometric resonance reasoning core for LEIBREG.
+
+Pairwise distance attention has O(seq^2) complexity.
+"""
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional
 
 import torch
-import torch.nn as nn
+from torch import nn
+
+from pyfolds.telemetry.types import TelemetryEvent
 
 
-class ProximityAttention(nn.Module):
-    """Distance-kernel attention over ``[batch, seq, dim]`` tensors.
+class ResonanceAttention(nn.Module):
+    """Distance-kernel self-attention on tensors of shape ``[batch, seq, dim]``."""
 
-    Complexity is quadratic in sequence length due to pairwise distances.
-    """
-
-    def __init__(self, dim: int, kernel: str = "gaussian", temperature: float = 1.0, eps: float = 1e-8) -> None:
+    def __init__(self, dim: int, init_temperature: float = 0.1, eps: float = 1e-8, telemetry_collector: Optional[Any] = None) -> None:
         super().__init__()
         if dim <= 0:
             raise ValueError("dim must be > 0")
         self.value = nn.Linear(dim, dim)
-        self.kernel = kernel
-        self.temperature = max(float(temperature), 1e-4)
+        self.log_temp = nn.Parameter(torch.tensor(float(init_temperature)).log())
         self.eps = eps
+        self.telemetry_collector = telemetry_collector
 
-    def _kernelize(self, dist: torch.Tensor) -> torch.Tensor:
-        scaled = dist / self.temperature
-        if self.kernel == "gaussian":
-            weights = torch.exp(-(scaled**2))
-        elif self.kernel == "inverse":
-            weights = 1.0 / (1.0 + scaled)
-        elif self.kernel == "cauchy":
-            weights = 1.0 / (1.0 + scaled**2)
-        else:
-            raise ValueError(f"Unsupported kernel: {self.kernel}")
-        return weights
+    @property
+    def temperature(self) -> torch.Tensor:
+        return self.log_temp.exp().clamp_min(1e-5)
+
+    def _emit(self, payload: dict[str, float]) -> None:
+        if self.telemetry_collector is None:
+            return
+        try:
+            self.telemetry_collector.emit(TelemetryEvent(0.0, "leibreg_resonance", "leibreg.reg_core", 0, payload))
+        except Exception:
+            return
 
     def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
         if x.ndim != 3:
-            raise ValueError("x must have shape [batch, seq, dim]")
+            raise ValueError("x must be [batch, seq, dim]")
         dist = torch.cdist(x, x, p=2)
-        w = self._kernelize(dist)
+        temp = self.temperature.to(dtype=x.dtype, device=x.device)
+        kernel = 1.0 / (1.0 + (dist / temp) ** 2)
         if mask is not None:
-            # mask: [batch, seq], True=valid
             if mask.shape != x.shape[:2]:
-                raise ValueError("mask must have shape [batch, seq]")
-            pair_mask = (mask.unsqueeze(1) & mask.unsqueeze(2)).to(w.dtype)
-            w = w * pair_mask
-        denom = w.sum(dim=-1, keepdim=True).clamp_min(self.eps)
-        attn = w / denom
-        v = self.value(x)
-        return torch.matmul(attn, v)
+                raise ValueError("mask must be [batch, seq]")
+            valid = (mask.unsqueeze(1) & mask.unsqueeze(2)).to(dtype=kernel.dtype)
+            kernel = kernel * valid
+        attn = kernel / kernel.sum(dim=-1, keepdim=True).clamp_min(self.eps)
+        out = torch.matmul(attn, self.value(x))
+
+        entropy = -(attn * (attn.clamp_min(self.eps)).log()).sum(dim=-1).mean()
+        self._emit(
+            {
+                "resonance_temperature": float(temp.mean().item()),
+                "distance_mean": float(dist.mean().item()),
+                "attention_entropy": float(entropy.item()),
+            }
+        )
+        return out
 
 
 class REGBlock(nn.Module):
-    """Residual proximity-attention block with feedforward network."""
+    """Pre-norm residual resonance block."""
 
-    def __init__(self, dim: int, ff_mult: int = 4, kernel: str = "gaussian", temperature: float = 1.0) -> None:
+    def __init__(self, dim: int, ff_mult: int = 4, telemetry_collector: Optional[Any] = None) -> None:
         super().__init__()
-        hidden = ff_mult * dim
-        self.attn = ProximityAttention(dim=dim, kernel=kernel, temperature=temperature)
+        hidden = dim * ff_mult
+        self.attn = ResonanceAttention(dim=dim, telemetry_collector=telemetry_collector)
         self.norm1 = nn.LayerNorm(dim)
         self.ff = nn.Sequential(nn.Linear(dim, hidden), nn.GELU(), nn.Linear(hidden, dim))
         self.norm2 = nn.LayerNorm(dim)
@@ -70,17 +80,19 @@ class REGBlock(nn.Module):
 
 
 class REGCore(nn.Module):
-    """Stacked REG blocks."""
+    """Stack of :class:`REGBlock` layers."""
 
-    def __init__(self, dim: int, depth: int = 2, kernel: str = "gaussian", temperature: float = 1.0) -> None:
+    def __init__(self, dim: int = 4, depth: int = 2, telemetry_collector: Optional[Any] = None) -> None:
         super().__init__()
         if depth <= 0:
             raise ValueError("depth must be > 0")
-        self.blocks = nn.ModuleList(
-            [REGBlock(dim=dim, kernel=kernel, temperature=temperature) for _ in range(depth)]
-        )
+        self.blocks = nn.ModuleList([REGBlock(dim=dim, telemetry_collector=telemetry_collector) for _ in range(depth)])
 
     def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
         for block in self.blocks:
             x = block(x, mask=mask)
         return x
+
+
+# Backward compatibility alias.
+ProximityAttention = ResonanceAttention
