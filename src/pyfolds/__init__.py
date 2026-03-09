@@ -88,6 +88,18 @@ from .telemetry import (
     SleepPayload,
 )
 
+from .leibreg import (
+    LeibregConfig,
+    WordSpace,
+    LeibnizLayer,
+    ProximityAttention,
+    REGBlock,
+    REGCore,
+    Imagination,
+    SIGReg,
+    NoeticLeibregBridge,
+)
+
 from .advanced import (
     MPJRDNeuronAdvanced,
     MPJRDLayerAdvanced,
@@ -181,6 +193,15 @@ __all__ = [
     "ForwardPayload",
     "CommitPayload",
     "SleepPayload",
+    "LeibregConfig",
+    "WordSpace",
+    "LeibnizLayer",
+    "ProximityAttention",
+    "REGBlock",
+    "REGCore",
+    "Imagination",
+    "SIGReg",
+    "NoeticLeibregBridge",
     # Advanced
     "MPJRDNeuronAdvanced",
     "MPJRDLayerAdvanced",
