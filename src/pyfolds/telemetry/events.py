@@ -1,141 +1,72 @@
-"""Eventos de telemetria para neurônios MPJRD"""
+"""Factories for standardized telemetry events."""
+
+from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
-from typing import Literal, Any, Dict, Optional, Union, Callable
+from typing import Any, Callable
 
-Phase = Literal["forward", "commit", "sleep", "mode_change"]
-
-# Tipo para payload que pode ser eager ou lazy
-PayloadType = Union[Dict[str, Any], Callable[[], Dict[str, Any]]]
+from .types import TelemetryEvent
 
 
-@dataclass(frozen=True)
-class TelemetryEvent:
-    """
-    Evento base de telemetria com suporte a lazy evaluation.
-    
-    Attributes:
-        step_id: ID do passo atual
-        phase: Fase do evento (forward, commit, sleep)
-        mode: Modo de aprendizado
-        _payload: Dicionário ou função que retorna o payload
-        timestamp: Timestamp de alta precisão (perf_counter)
-        wall_time: Timestamp de parede (para análise temporal)
-        neuron_id: ID opcional do neurônio
-    """
-    step_id: int
-    phase: Phase
-    mode: str
-    _payload: PayloadType
-    timestamp: float = field(default_factory=lambda: time.perf_counter())  # ⚡ Alta precisão
-    wall_time: float = field(default_factory=lambda: time.time())          # ⏰ Para referência
-    neuron_id: Optional[str] = None
-    
-    @property
-    def payload(self) -> Dict[str, Any]:
-        """Avalia payload lazy se necessário."""
-        if callable(self._payload):
-            return self._payload()
-        return self._payload
+def _event(event_type: str, source: str, step: int, payload: dict[str, Any], **kwargs: Any) -> TelemetryEvent:
+    return TelemetryEvent(timestamp=time.time(), event_type=event_type, source=source, step=step, payload=payload, **kwargs)
 
 
-def forward_event(step_id: int, mode: str, neuron_id: Optional[str] = None, 
-                  **payload: Any) -> TelemetryEvent:
-    """
-    Cria evento de forward pass (eager).
-    
-    Args:
-        step_id: ID do passo
-        mode: Modo de aprendizado
-        neuron_id: ID do neurônio (opcional)
-        **payload: Métricas a serem coletadas
-    """
-    return TelemetryEvent(
-        step_id=step_id,
-        phase="forward",
-        mode=mode,
-        neuron_id=neuron_id,
-        _payload=payload
-    )
+# new api
+
+def make_spike_event(source: str, step: int, rate: float, neuron_id: str | None = None) -> TelemetryEvent:
+    return _event("spike", source, step, {"rate": float(rate), "neuron_id": neuron_id})
 
 
-def forward_event_lazy(step_id: int, mode: str,
-                       payload_fn: Callable[[], Dict[str, Any]],
-                       neuron_id: Optional[str] = None) -> TelemetryEvent:
-    """
-    Cria evento de forward pass com lazy evaluation (economia de CPU).
-    
-    Args:
-        step_id: ID do passo
-        mode: Modo de aprendizado
-        neuron_id: ID do neurônio (opcional)
-        payload_fn: Função que retorna o payload (só é chamada se o evento for emitido)
-    
-    Example:
-        >>> telem.emit(forward_event_lazy(
-        ...     step_id=step,
-        ...     mode="online",
-        ...     payload_fn=lambda: {
-        ...         'spike_rate': neuron.get_spike_rate(),  # Só calcula se necessário
-        ...         'theta': neuron.theta.item()
-        ...     }
-        ... ))
-    """
-    return TelemetryEvent(
-        step_id=step_id,
-        phase="forward",
-        mode=mode,
-        neuron_id=neuron_id,
-        _payload=payload_fn
-    )
+def make_loss_event(source: str, step: int, loss: float, epoch: int | None = None) -> TelemetryEvent:
+    return _event("loss", source, step, {"loss": float(loss)}, epoch=epoch)
 
 
-def commit_event(step_id: int, mode: str, neuron_id: Optional[str] = None, 
-                 **payload: Any) -> TelemetryEvent:
-    """Cria evento de commit (plasticidade)."""
-    return TelemetryEvent(
-        step_id=step_id,
-        phase="commit",
-        mode=mode,
-        neuron_id=neuron_id,
-        _payload=payload
-    )
+def make_engram_event(source: str, step: int, action: str, count: int | None = None, **extra: Any) -> TelemetryEvent:
+    payload = {"action": action, "count": count}
+    payload.update(extra)
+    return _event(f"engram_{action}", source, step, payload)
 
 
-def commit_event_lazy(step_id: int, mode: str,
-                      payload_fn: Callable[[], Dict[str, Any]],
-                      neuron_id: Optional[str] = None) -> TelemetryEvent:
-    """Cria evento de commit com lazy evaluation."""
-    return TelemetryEvent(
-        step_id=step_id,
-        phase="commit",
-        mode=mode,
-        neuron_id=neuron_id,
-        _payload=payload_fn
-    )
+def make_specialization_event(source: str, step: int, specialization: str, score: float | None = None) -> TelemetryEvent:
+    return _event("specialization_update", source, step, {"specialization": specialization, "score": score})
 
 
-def sleep_event(step_id: int, mode: str, neuron_id: Optional[str] = None, 
-                **payload: Any) -> TelemetryEvent:
-    """Cria evento de sleep (consolidação)."""
-    return TelemetryEvent(
-        step_id=step_id,
-        phase="sleep",
-        mode=mode,
-        neuron_id=neuron_id,
-        _payload=payload
-    )
+def make_checkpoint_event(source: str, step: int, action: str, path: str) -> TelemetryEvent:
+    return _event(f"checkpoint_{action}", source, step, {"path": path})
 
 
-def sleep_event_lazy(step_id: int, mode: str,
-                     payload_fn: Callable[[], Dict[str, Any]],
-                     neuron_id: Optional[str] = None) -> TelemetryEvent:
-    """Cria evento de sleep com lazy evaluation."""
-    return TelemetryEvent(
-        step_id=step_id,
-        phase="sleep",
-        mode=mode,
-        neuron_id=neuron_id,
-        _payload=payload_fn
-    )
+def make_latency_event(source: str, step: int, latency_ms: float, phase: str = "forward") -> TelemetryEvent:
+    return _event("forward_latency", source, step, {"latency_ms": float(latency_ms), "phase": phase})
+
+
+# legacy api compatibility
+
+def forward_event(step_id: int, mode: str, neuron_id: str | None = None, **payload: Any) -> TelemetryEvent:
+    payload.setdefault("neuron_id", neuron_id)
+    return _event("forward", mode, step_id, payload)
+
+
+def commit_event(step_id: int, mode: str, neuron_id: str | None = None, **payload: Any) -> TelemetryEvent:
+    payload.setdefault("neuron_id", neuron_id)
+    return _event("commit", mode, step_id, payload)
+
+
+def sleep_event(step_id: int, mode: str, neuron_id: str | None = None, **payload: Any) -> TelemetryEvent:
+    payload.setdefault("neuron_id", neuron_id)
+    return _event("sleep", mode, step_id, payload)
+
+
+def forward_event_lazy(step_id: int, mode: str, payload_fn: Callable[[], dict[str, Any]], neuron_id: str | None = None) -> TelemetryEvent:
+    payload = payload_fn(); payload.setdefault("neuron_id", neuron_id)
+    return _event("forward", mode, step_id, payload)
+
+
+def commit_event_lazy(step_id: int, mode: str, payload_fn: Callable[[], dict[str, Any]], neuron_id: str | None = None) -> TelemetryEvent:
+    payload = payload_fn(); payload.setdefault("neuron_id", neuron_id)
+    return _event("commit", mode, step_id, payload)
+
+
+def sleep_event_lazy(step_id: int, mode: str, payload_fn: Callable[[], dict[str, Any]], neuron_id: str | None = None) -> TelemetryEvent:
+    payload = payload_fn(); payload.setdefault("neuron_id", neuron_id)
+    return _event("sleep", mode, step_id, payload)

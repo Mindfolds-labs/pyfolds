@@ -1,62 +1,56 @@
-"""Telemetry system for MPJRD neurons.
+"""Telemetry APIs (legacy and async collector)."""
 
-This module provides:
-- Structured events (forward, commit, sleep)
-- Thread-safe circular buffer
-- Multiple sinks (memory, console, JSON, distributor)
-- Controller with off/light/heavy profiles
-- Decorator for automatic telemetry
-- Typed payloads
-
-Basic usage:
-    from pyfolds.telemetry import TelemetryConfig, TelemetryController, forward_event
-    
-    cfg = TelemetryConfig(profile="light", sample_every=50)
-    telem = TelemetryController(cfg)
-    
-    if telem.enabled() and telem.should_emit(step_id):
-        telem.emit(forward_event(step_id, mode="online", spike_rate=0.15))
-"""
-
+from .buffer import RingBufferThreadSafe
+from .collector import TelemetryCollector
+from .controller import Profile, TelemetryConfig as LegacyTelemetryConfig, TelemetryController, TelemetryProfile
+from .decorator import telemetry
 from .events import (
-    TelemetryEvent,
-    forward_event,
-    forward_event_lazy,
     commit_event,
     commit_event_lazy,
+    forward_event,
+    forward_event_lazy,
+    make_checkpoint_event,
+    make_engram_event,
+    make_latency_event,
+    make_loss_event,
+    make_specialization_event,
+    make_spike_event,
     sleep_event,
     sleep_event_lazy,
 )
+from .exporters import BaseExporter, CSVExporter, ConsoleExporter, PrometheusExporter, TensorBoardExporter
 from .ringbuffer import RingBuffer
-from .sinks import (
-    Sink,
-    NoOpSink,
-    MemorySink,
-    ConsoleSink,
-    JSONLinesSink,
-    BufferedJSONLinesSink,
-    DistributorSink,
-)
-from .controller import TelemetryController, TelemetryConfig, Profile, TelemetryProfile
-from .decorator import telemetry
-from .types import ForwardPayload, CommitPayload, SleepPayload
-
-__version__ = "2.1.1"
+from .sinks import BufferedJSONLinesSink, ConsoleSink, DistributorSink, JSONLinesSink, MemorySink, NoOpSink, Sink
+from .types import CommitPayload, ForwardPayload, SleepPayload, TelemetryConfig, TelemetryEvent, TelemetryStats
 
 __all__ = [
-    # Events
+    "TelemetryCollector",
+    "TelemetryConfig",
     "TelemetryEvent",
+    "TelemetryStats",
+    "RingBufferThreadSafe",
+    "BaseExporter",
+    "ConsoleExporter",
+    "CSVExporter",
+    "TensorBoardExporter",
+    "PrometheusExporter",
+    "make_spike_event",
+    "make_loss_event",
+    "make_engram_event",
+    "make_specialization_event",
+    "make_checkpoint_event",
+    "make_latency_event",
     "forward_event",
     "commit_event",
     "sleep_event",
     "forward_event_lazy",
     "commit_event_lazy",
     "sleep_event_lazy",
-    
-    # Buffer
+    "TelemetryController",
+    "LegacyTelemetryConfig",
+    "Profile",
+    "TelemetryProfile",
     "RingBuffer",
-    
-    # Sinks
     "Sink",
     "NoOpSink",
     "MemorySink",
@@ -64,21 +58,8 @@ __all__ = [
     "JSONLinesSink",
     "BufferedJSONLinesSink",
     "DistributorSink",
-    
-    # Controller
-    "TelemetryController",
-    "TelemetryConfig",
-    "Profile",
-    "TelemetryProfile",
-    
-    # Decorator
     "telemetry",
-    
-    # Types
     "ForwardPayload",
     "CommitPayload",
     "SleepPayload",
-    
-    # Metadata
-    "__version__",
 ]

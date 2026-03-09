@@ -22,6 +22,17 @@ dependencies = [
 
 [project.optional-dependencies]
 
+observability = [
+  "tensorboard>=2.14.0",
+  "prometheus-client>=0.20.0",
+  "psutil>=5.9.0",
+  "jaxtyping>=0.2.34",
+  "beartype>=0.18.5",
+]
+benchmark = [
+  "psutil>=5.9.0",
+]
+
 interop = [
   "tensorflow-cpu>=2.20.0",
   "onnx>=1.16.0",
@@ -50,7 +61,7 @@ serialization = [
   "google-crc32c>=1.5.0",
   "safetensors>=0.4.3",
 ]
-telemetry = ["matplotlib>=3.7.0"]
+telemetry = ["matplotlib>=3.7.0", "tensorboard>=2.14.0", "prometheus-client>=0.20.0"]
 dev = [
   "pytest>=7.0.0",
   "tensorflow-cpu>=2.20.0",
