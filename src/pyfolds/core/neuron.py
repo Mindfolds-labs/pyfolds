@@ -465,8 +465,10 @@ class MPJRDNeuron(BaseNeuron):
         self._set_refractory_state(False)
 
         # ===== 1. INTEGRAÇÃO DENDRÍTICA =====
-        # Micro-otimização: evita alocação + escrita indexada em loop,
-        # preservando semântica e shape [B, D].
+        # Nota técnica (modelagem): este loop preserva isolamento por dendrito,
+        # útil para manter equivalência com regras locais de plasticidade.
+        # Uma vetorização futura deve provar equivalência numérica (v_dend/u/spikes)
+        # e de gradiente antes de substituir este caminho de referência.
         dendrite_outputs = [
             dend(x[:, d_idx, :]) for d_idx, dend in enumerate(self.dendrites)
         ]
