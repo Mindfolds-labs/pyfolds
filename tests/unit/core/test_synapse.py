@@ -211,3 +211,129 @@ class TestMPJRDSynapse:
             syn.consolidate(dt=1.0)
 
         fake_dist.all_reduce.assert_not_called()
+
+
+def test_logN_backward_compat():
+    """Modo logN deve manter lei de peso original."""
+    from pyfolds import NeuronConfig
+    from pyfolds.core import MPJRDSynapse
+
+    cfg = NeuronConfig(weight_quantization="logN", n_max=31, w_scale=5.0)
+    syn = MPJRDSynapse(cfg, init_n=0)
+
+    for n in range(0, 32):
+        syn.N.fill_(n)
+        expected = torch.log2(torch.tensor(1.0 + n)) / cfg.w_scale
+        assert syn.W.item() == pytest.approx(expected.item(), abs=1e-12)
+
+
+def test_uniformW_constant_step():
+    """uniformW deve ter degrau constante de peso entre níveis consecutivos."""
+    from pyfolds import NeuronConfig
+    from pyfolds.core import MPJRDSynapse
+
+    cfg = NeuronConfig(weight_quantization="uniformW", n_levels=32, n_max=31, w_scale=5.0)
+    syn = MPJRDSynapse(cfg, init_n=0)
+
+    steps = []
+    for l in range(cfg.n_levels - 1):
+        syn.L.fill_(l)
+        w0 = syn.W.item()
+        syn.L.fill_(l + 1)
+        w1 = syn.W.item()
+        steps.append(w1 - w0)
+
+    reference = steps[0]
+    for step in steps[1:]:
+        assert step == pytest.approx(reference, abs=1e-7)
+
+
+def test_uniformW_bounds():
+    """Atualizações em uniformW devem clamp L em [0, levels-1]."""
+    from pyfolds import NeuronConfig
+    from pyfolds.core import MPJRDSynapse
+
+    cfg = NeuronConfig(weight_quantization="uniformW", n_levels=32, i_ltp_th=1.0, i_ltd_th=-1.0)
+    syn = MPJRDSynapse(cfg, init_n=cfg.n_max)
+    syn.L.fill_(cfg.n_levels - 1)
+
+    for _ in range(5):
+        syn.I.fill_(cfg.i_ltp_th + 1.0)
+        syn.update(torch.tensor([1.0]), torch.tensor([1.0]), torch.tensor([1.0]))
+    assert syn.L.item() == cfg.n_levels - 1
+
+    syn.protection.fill_(False)
+    for _ in range(40):
+        syn.I.fill_(cfg.i_ltd_th - 1.0)
+        syn.update(torch.tensor([1.0]), torch.tensor([0.0]), torch.tensor([1.0]))
+    assert syn.L.item() == 0
+
+
+def test_uniformW_monotonic():
+    """Peso deve crescer monotonicamente com L no modo uniformW."""
+    from pyfolds import NeuronConfig
+    from pyfolds.core import MPJRDSynapse
+
+    cfg = NeuronConfig(weight_quantization="uniformW", n_levels=32)
+    syn = MPJRDSynapse(cfg, init_n=0)
+
+    for l in range(cfg.n_levels - 1):
+        syn.L.fill_(l)
+        w0 = syn.W.item()
+        syn.L.fill_(l + 1)
+        w1 = syn.W.item()
+        assert w1 > w0
+
+
+def test_uniformW_wmax():
+    """Último nível de uniformW deve atingir w_max."""
+    from pyfolds import NeuronConfig
+    from pyfolds.core import MPJRDSynapse
+
+    cfg = NeuronConfig(weight_quantization="uniformW", n_levels=32)
+    syn = MPJRDSynapse(cfg, init_n=0)
+
+    syn.L.fill_(cfg.n_levels - 1)
+    assert syn.W.item() == pytest.approx(cfg.w_max)
+
+
+def test_uniformW_updates_change_L_and_keep_N_as_telemetry():
+    """No modo uniformW, plasticidade altera L e mantém N sincronizado."""
+    from pyfolds import NeuronConfig
+    from pyfolds.core import MPJRDSynapse
+
+    cfg = NeuronConfig(weight_quantization="uniformW", n_levels=32, n_max=31)
+    syn = MPJRDSynapse(cfg, init_n=0)
+
+    syn.L.fill_(10)
+    syn.N.fill_(0)
+    syn.I.fill_(cfg.i_ltp_th + 1.0)
+    syn.update(torch.tensor([1.0]), torch.tensor([1.0]), torch.tensor([1.0]))
+
+    assert syn.L.item() == 11
+    expected_n = round((11 / (cfg.n_levels - 1)) * cfg.n_max)
+    assert syn.N.item() == expected_n
+
+
+def test_synapse_state_roundtrip_preserves_quantized_state():
+    """Serialização deve preservar estado discreto e pesos em roundtrip."""
+    from pyfolds import NeuronConfig
+    from pyfolds.core import MPJRDSynapse
+
+    cfg = NeuronConfig(weight_quantization="uniformW", n_levels=32, n_max=31)
+    source = MPJRDSynapse(cfg, init_n=0)
+    source.L.fill_(17)
+    source.I.fill_(1.23)
+    source.eligibility.fill_(0.77)
+    source.protection.fill_(True)
+    source.sat_time.fill_(4.0)
+    state = source.get_state()
+
+    target = MPJRDSynapse(cfg, init_n=0)
+    target.load_state(state)
+
+    assert target.L.item() == source.L.item()
+    expected_n = round((source.L.item() / (cfg.n_levels - 1)) * cfg.n_max)
+    assert target.N.item() == expected_n
+    assert target.W.item() == pytest.approx(source.W.item())
+    assert target.I.item() == pytest.approx(source.I.item())

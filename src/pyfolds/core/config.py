@@ -12,6 +12,7 @@ PlasticityMode = Literal["stdp", "hebbian", "both", "none"]
 RefracMode = Literal["absolute", "relative", "both"]
 STDPInputSource = Literal["raw", "stp"]
 LTDRule = Literal["classic", "current"]
+WeightQuantization = Literal["logN", "uniformW"]
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,8 @@ class MPJRDConfig:
     n_min: int = 0
     n_max: int = 31
     w_scale: float = 5.0
+    weight_quantization: WeightQuantization = "logN"
+    n_levels: int = 32
     
     # ===== MECANISMO 2: PLASTICIDADE (I) =====
     i_eta: float = 0.01
@@ -251,6 +254,12 @@ class MPJRDConfig:
                 "ltd_rule inválido: "
                 f"{self.ltd_rule}. Use: 'classic' ou 'current'"
             )
+
+        if self.weight_quantization not in {"logN", "uniformW"}:
+            raise ValueError(
+                "weight_quantization inválido: "
+                f"{self.weight_quantization}. Use: 'logN' ou 'uniformW'"
+            )
         
         # Warnings
         if self.ltd_threshold_saturated > self.i_ltd_th:
@@ -272,6 +281,9 @@ class MPJRDConfig:
         if self.w_scale <= 0:
             raise ValueError(f"w_scale deve ser > 0, recebido {self.w_scale}")
 
+        if self.n_levels < 2:
+            raise ValueError(f"n_levels deve ser >= 2, recebido {self.n_levels}")
+
         if self.n_max > 2**30:
             raise ValueError(f"n_max={self.n_max} pode causar overflow numérico em log2")
 
@@ -286,12 +298,17 @@ class MPJRDConfig:
                 f"recebido {self.float_precision}"
             )
 
-        max_w = math.log2(1.0 + self.n_max) / self.w_scale
+        max_w = self.w_max
         if max_w > 100.0:
             warnings.warn(
                 f"W pode atingir {max_w:.1f}; risco de gradiente instável.",
                 RuntimeWarning,
             )
+
+    @property
+    def w_max(self) -> float:
+        """Peso máximo derivado da lei logarítmica atual."""
+        return math.log2(1.0 + self.n_max) / self.w_scale
     
     def get_ts(self, param_name: str) -> float:
         """Retorna constante de tempo em ms para um parâmetro."""

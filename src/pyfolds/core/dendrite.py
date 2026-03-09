@@ -54,23 +54,28 @@ class MPJRDDendrite(nn.Module):
 
         N_list = []
         I_list = []
+        L_list = []
+        W_list = []
         has_short_term_state = all(hasattr(syn, "u") and hasattr(syn, "R") for syn in self.synapses)
         u_list = [] if has_short_term_state else None
         R_list = [] if has_short_term_state else None
 
         for syn in self.synapses:
             N_list.append(syn.N.to(device))
+            L_list.append(syn.L.to(device))
             I_list.append(syn.I.to(device))
+            W_list.append(syn.W.to(device))
             if has_short_term_state:
                 u_list.append(syn.u.to(device))
                 R_list.append(syn.R.to(device))
 
         cached_states = {
             'N': torch.cat(N_list).to(torch.int32),
+            'L': torch.cat(L_list).to(torch.int32),
             'I': torch.cat(I_list),
             **({'u': torch.cat(u_list), 'R': torch.cat(R_list)} if has_short_term_state else {})
         }
-        cached_w = torch.log2(1.0 + cached_states['N'].float()) / self.cfg.w_scale
+        cached_w = torch.cat(W_list)
 
         with self._cache_lock:
             if not self._cache_invalid and self._cached_states is not None:
@@ -93,6 +98,12 @@ class MPJRDDendrite(nn.Module):
         return self._cached_states['N']
 
     @property
+    def L(self) -> torch.Tensor:
+        """Níveis de quantização uniformes [S]."""
+        self._ensure_cache_valid()
+        return self._cached_states['L']
+
+    @property
     def I(self) -> torch.Tensor:  # noqa: E743
         """Potencial interno [S] - ✅ retorna do cache."""
         self._ensure_cache_valid()
@@ -112,10 +123,8 @@ class MPJRDDendrite(nn.Module):
 
     @property
     def W(self) -> torch.Tensor:
-        """Pesos [S] derivados de N - ✅ cacheado."""
+        """Pesos [S] derivados da regra ativa da sinapse - ✅ cacheado."""
         self._ensure_cache_valid()
-        if self._cached_W is None:
-            self._cached_W = torch.log2(1.0 + self.N.float()) / self.cfg.w_scale
         return self._cached_W
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -197,6 +206,7 @@ class MPJRDDendrite(nn.Module):
         r_state = self.R
         states = {
             'N': self.N.clone(),
+            'L': self.L.clone(),
             'W': self.W.clone(),
             'I': self.I.clone(),
             }
@@ -211,6 +221,8 @@ class MPJRDDendrite(nn.Module):
         for idx, syn in enumerate(self.synapses):
             if 'N' in states:
                 syn.N.data = states['N'][idx].view(1)
+            if 'L' in states:
+                syn.L.data = states['L'][idx].view(1)
             if 'I' in states:
                 syn.I.data = states['I'][idx].view(1)
             if 'u' in states and hasattr(syn, 'u'):

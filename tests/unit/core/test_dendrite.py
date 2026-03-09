@@ -66,3 +66,27 @@ class TestMPJRDDendrite:
         for i, pre in enumerate(captured):
             assert pre.shape == (1,)
             assert torch.isclose(pre[0], pre_rate[i])
+
+
+def test_dendrite_uses_synapse_weight_property_in_uniform_mode():
+    """Dendrite.W deve refletir syn.W e não recalcular fórmula local."""
+    from pyfolds import NeuronConfig
+    from pyfolds.core import MPJRDDendrite
+
+    cfg = NeuronConfig(
+        n_dendrites=1,
+        n_synapses_per_dendrite=2,
+        weight_quantization="uniformW",
+        n_levels=32,
+        n_max=31,
+    )
+    dend = MPJRDDendrite(cfg, dendrite_id=0)
+
+    dend.synapses[0].L.fill_(0)
+    dend.synapses[0].N.fill_(cfg.n_max)  # propositalmente inconsistente
+    dend.synapses[1].L.fill_(cfg.n_levels - 1)
+    dend.synapses[1].N.fill_(0)  # propositalmente inconsistente
+    dend._invalidate_cache()
+
+    expected = torch.stack([dend.synapses[0].W.squeeze(), dend.synapses[1].W.squeeze()])
+    assert torch.allclose(dend.W, expected)

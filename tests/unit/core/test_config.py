@@ -76,3 +76,17 @@ def test_hebbian_ltd_ratio_must_be_non_negative():
 
     with pytest.raises(ValueError, match="hebbian_ltd_ratio"):
         NeuronConfig(hebbian_ltd_ratio=-0.1)
+
+
+def test_weight_quantization_defaults_and_w_max():
+    """Config deve manter logN por padrão e expor w_max derivado."""
+    cfg = pyfolds.NeuronConfig()
+    assert cfg.weight_quantization == "logN"
+    assert cfg.n_levels == 32
+    assert cfg.w_max == pytest.approx(1.0)
+
+
+def test_n_levels_validation():
+    """n_levels precisa ser >= 2."""
+    with pytest.raises(ValueError):
+        pyfolds.NeuronConfig(n_levels=1)

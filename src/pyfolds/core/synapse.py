@@ -49,6 +49,10 @@ class MPJRDSynapse(nn.Module):
             init_n = int(torch.randint(low, high, (1,)).item())
         self.register_buffer("N", torch.tensor([init_n], dtype=torch.int32))
 
+        init_l = self._n_to_l(init_n)
+        self.register_buffer("L", torch.tensor([init_l], dtype=torch.int32))
+        self._sync_quantized_state_from_initialization()
+
         # Potencial interno
         self.register_buffer("I", torch.zeros(1, dtype=torch.float32))
 
@@ -63,6 +67,88 @@ class MPJRDSynapse(nn.Module):
         self.register_buffer("u", torch.tensor([cfg.u0], dtype=torch.float32))
         self.register_buffer("R", torch.tensor([cfg.R0], dtype=torch.float32))
 
+    def _is_uniform_mode(self) -> bool:
+        """Retorna True quando a quantização ativa usa níveis lineares em W."""
+        return self.cfg.weight_quantization == "uniformW"
+
+    @property
+    def _l_min(self) -> int:
+        return 0
+
+    @property
+    def _l_max(self) -> int:
+        return self.cfg.n_levels - 1
+
+    def _n_to_l(self, n_value: int) -> int:
+        """Mapeia N para o nível discreto L de forma proporcional."""
+        if self.cfg.n_max <= 0:
+            return self._l_min
+        scaled = (float(n_value) / float(self.cfg.n_max)) * float(self._l_max)
+        return int(round(min(max(scaled, self._l_min), self._l_max)))
+
+    def _l_to_n(self, l_value: int) -> int:
+        """Mapeia L para N para manter telemetria compatível."""
+        scaled = (float(l_value) / float(max(1, self._l_max))) * float(self.cfg.n_max)
+        return int(round(min(max(scaled, self.cfg.n_min), self.cfg.n_max)))
+
+    def _sync_quantized_state_from_initialization(self) -> None:
+        """Sincroniza buffers N/L após inicialização."""
+        if self._is_uniform_mode():
+            self._sync_n_from_l()
+            return
+
+        self.L.fill_(self._n_to_l(int(self.N.item())))
+
+    def _sync_n_from_l(self) -> None:
+        """Mantém ``N`` coerente com ``L`` para telemetria/compatibilidade."""
+        self.N.fill_(self._l_to_n(int(self.L.item())))
+
+    def _current_level(self) -> int:
+        """Retorna o estado discreto ativo da sinapse."""
+        if self._is_uniform_mode():
+            return int(self.L.item())
+        return int(self.N.item())
+
+    def _set_current_level(self, level: int) -> None:
+        """Atualiza o estado discreto ativo com clamp por modo."""
+        if self._is_uniform_mode():
+            self.L.fill_(level)
+            self.L.clamp_(self._l_min, self._l_max)
+            self._sync_n_from_l()
+            return
+
+        self.N.fill_(level)
+        self.N.clamp_(self.cfg.n_min, self.cfg.n_max)
+        self.L.fill_(self._n_to_l(int(self.N.item())))
+
+    def _weight_from_current_state(self) -> torch.Tensor:
+        """Computa o peso efetivo a partir do estado discreto ativo."""
+        if self._is_uniform_mode():
+            levels_minus_one = max(1, self.cfg.n_levels - 1)
+            return (self.L.float() / float(levels_minus_one)) * self.cfg.w_max
+
+        return safe_weight_law(
+            self.N,
+            w_scale=self.cfg.w_scale,
+            max_log_val=self.cfg.max_log_weight,
+            enforce_checks=self.cfg.numerical_stability_checks,
+        )
+
+    @torch.no_grad()
+    def _apply_weight_step(self, delta: int) -> None:
+        """Aplica passo discreto no estado de peso conforme o modo ativo."""
+        self._set_current_level(self._current_level() + int(delta))
+
+    def _at_upper_bound(self) -> bool:
+        """Indica se o estado discreto já está saturado no máximo."""
+        upper = self._l_max if self._is_uniform_mode() else self.cfg.n_max
+        return self._current_level() >= upper
+
+    def _at_lower_bound(self) -> bool:
+        """Indica se o estado discreto já está saturado no mínimo."""
+        lower = self._l_min if self._is_uniform_mode() else self.cfg.n_min
+        return self._current_level() <= lower
+
     @property
     def W(self) -> torch.Tensor:
         """
@@ -74,12 +160,7 @@ class MPJRDSynapse(nn.Module):
         Returns:
             Tensor escalar com o peso derivado em ponto flutuante.
         """
-        return safe_weight_law(
-            self.N,
-            w_scale=self.cfg.w_scale,
-            max_log_val=self.cfg.max_log_weight,
-            enforce_checks=self.cfg.numerical_stability_checks,
-        )
+        return self._weight_from_current_state()
 
     @torch.no_grad()
     def _update_with_soft_saturation(self, delta_mean: torch.Tensor) -> None:
@@ -123,6 +204,13 @@ class MPJRDSynapse(nn.Module):
 
         clamped_n = self.N.to(dtype=torch.int32).clamp(self.cfg.n_min, self.cfg.n_max)
         self.N.copy_(clamped_n)
+        clamped_l = self.L.to(dtype=torch.int32).clamp(self._l_min, self._l_max)
+        self.L.copy_(clamped_l)
+
+        if self._is_uniform_mode():
+            self._sync_n_from_l()
+        else:
+            self.L.fill_(self._n_to_l(int(self.N.item())))
 
     @torch.no_grad()
     def update(
@@ -210,8 +298,8 @@ class MPJRDSynapse(nn.Module):
         # ===== LTP (Promoção) =====
         # Usa comparação tensorial, evita .item() no caminho crítico
         if self.I >= cfg.i_ltp_th:
-            if self.N < cfg.n_max:
-                self.N.add_(1)
+            if not self._at_upper_bound():
+                self._apply_weight_step(+1)
                 self.I.zero_()
                 self.protection.fill_(False)
                 self.sat_time.zero_()
@@ -230,12 +318,12 @@ class MPJRDSynapse(nn.Module):
         )
 
         if self.I <= ltd_th:
-            if self.N > cfg.n_min:
-                self.N.add_(-1)
+            if not self._at_lower_bound():
+                self._apply_weight_step(-1)
                 self.I.zero_()
 
                 # Se estava protegido e saiu da saturação
-                if self.N.item() == cfg.n_max - 1 and self.protection.item():
+                if (not self._at_upper_bound()) and self.protection.item():
                     self.protection.fill_(False)
                     self.sat_time.zero_()
 
@@ -265,10 +353,20 @@ class MPJRDSynapse(nn.Module):
         if world_size <= 1:
             return
 
-        n_float = self.N.to(dtype=torch.float32)
-        torch.distributed.all_reduce(n_float, op=torch.distributed.ReduceOp.SUM)
-        n_float.div_(float(world_size))
-        self.N.copy_(torch.round(n_float).to(dtype=self.N.dtype))
+        if self._is_uniform_mode():
+            l_float = self.L.to(dtype=torch.float32)
+            torch.distributed.all_reduce(l_float, op=torch.distributed.ReduceOp.SUM)
+            l_float.div_(float(world_size))
+            self.L.copy_(torch.round(l_float).to(dtype=self.L.dtype))
+            self.L.clamp_(self._l_min, self._l_max)
+            self.N.fill_(self._l_to_n(int(self.L.item())))
+        else:
+            n_float = self.N.to(dtype=torch.float32)
+            torch.distributed.all_reduce(n_float, op=torch.distributed.ReduceOp.SUM)
+            n_float.div_(float(world_size))
+            self.N.copy_(torch.round(n_float).to(dtype=self.N.dtype))
+            self.N.clamp_(self.cfg.n_min, self.cfg.n_max)
+            self.L.fill_(self._n_to_l(int(self.N.item())))
 
         torch.distributed.all_reduce(self.I, op=torch.distributed.ReduceOp.SUM)
         self.I.div_(float(world_size))
@@ -308,8 +406,15 @@ class MPJRDSynapse(nn.Module):
 
         # 2. Adição Maciça In-Place
         # Adicionar +0 na GPU é exponencialmente mais barato que sincronizar um torch.any()
-        self.N.add_(delta_n)
-        self.N.clamp_(self.cfg.n_min, self.cfg.n_max)
+        if self._is_uniform_mode():
+            delta_l = torch.round(transfer).to(dtype=self.L.dtype)
+            self.L.add_(delta_l)
+            self.L.clamp_(self._l_min, self._l_max)
+            self.N.fill_(self._l_to_n(int(self.L.item())))
+        else:
+            self.N.add_(delta_n)
+            self.N.clamp_(self.cfg.n_min, self.cfg.n_max)
+            self.L.fill_(self._n_to_l(int(self.N.item())))
 
         # 3. Reseta elegibilidade massivamente
         self.eligibility.zero_()
@@ -324,6 +429,7 @@ class MPJRDSynapse(nn.Module):
         """Retorna estado completo da sinapse (sem .item() para tensores)."""
         return {
             "N": self.N.clone(),
+            "L": self.L.clone(),
             "I": self.I.clone(),
             "W": self.W.clone(),
             "protection": self.protection.clone(),
@@ -335,6 +441,8 @@ class MPJRDSynapse(nn.Module):
         """Carrega estado na sinapse."""
         if "N" in state:
             self.N.data = state["N"].to(self.N.device)
+        if "L" in state:
+            self.L.data = state["L"].to(self.L.device)
         if "I" in state:
             self.I.data = state["I"].to(self.I.device)
         if "protection" in state:
@@ -344,9 +452,11 @@ class MPJRDSynapse(nn.Module):
         if "eligibility" in state:
             self.eligibility.data = state["eligibility"].to(self.eligibility.device)
 
+        self._sanitize_state_buffers()
+
     def extra_repr(self) -> str:
         """Representação string da sinapse."""
         return (
-            f"N={self.N.item()}, I={self.I.item():.2f}, "
+            f"N={self.N.item()}, L={self.L.item()}, I={self.I.item():.2f}, "
             f"W={self.W.item():.3f}, prot={self.protection.item()}"
         )
