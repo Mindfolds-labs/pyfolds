@@ -80,23 +80,23 @@ class TestSTDPMixin:
         
         assert neuron._should_apply_stdp(LearningMode.ONLINE) is True
         assert neuron._should_apply_stdp(LearningMode.INFERENCE) is False
-    def test_stdp_updates_underlying_synapses_online(self, full_config):
-        """Online STDP update deve persistir nas sinapses reais."""
+    def test_stdp_updates_stdp_eligibility_online(self, full_config):
+        """Online STDP update deve acumular em stdp_eligibility."""
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
 
         neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
-        before = torch.stack([torch.cat([s.I for s in d.synapses]) for d in neuron.dendrites])
+        before = torch.stack([torch.cat([s.stdp_eligibility for s in d.synapses]) for d in neuron.dendrites])
 
         x = torch.ones(2, full_config.n_dendrites, full_config.n_synapses_per_dendrite)
         post_spike = torch.ones(2)
 
         neuron._update_stdp_traces(x, post_spike, dt=1.0)
 
-        after = torch.stack([torch.cat([s.I for s in d.synapses]) for d in neuron.dendrites])
+        after = torch.stack([torch.cat([s.stdp_eligibility for s in d.synapses]) for d in neuron.dendrites])
         assert not torch.allclose(after, before)
-        assert torch.all(after >= full_config.i_min)
-        assert torch.all(after <= full_config.i_max)
+        assert torch.all(after >= -full_config.max_eligibility)
+        assert torch.all(after <= full_config.max_eligibility)
 
     def test_stdp_input_source_raw_vs_stp(self):
         """raw deve detectar spike pré mesmo quando STP deprime abaixo do limiar."""
@@ -154,17 +154,17 @@ class TestSTDPMixin:
             n._ensure_traces(1, torch.device("cpu"))
             n.trace_post.fill_(1.0)
             n.trace_pre.zero_()
-            n.dendrites[0].synapses[0].I.fill_(0.5)
+            n.dendrites[0].synapses[0].stdp_eligibility.fill_(0.5)
 
         x_no_pre = torch.zeros(1, 1, 1)
-        before_classic = n_classic.dendrites[0].synapses[0].I.item()
-        before_current = n_current.dendrites[0].synapses[0].I.item()
+        before_classic = n_classic.dendrites[0].synapses[0].stdp_eligibility.item()
+        before_current = n_current.dendrites[0].synapses[0].stdp_eligibility.item()
 
         n_classic._update_stdp_traces(x_no_pre, torch.ones(1), dt=1.0)
         n_current._update_stdp_traces(x_no_pre, torch.ones(1), dt=1.0)
 
-        after_classic = n_classic.dendrites[0].synapses[0].I.item()
-        after_current = n_current.dendrites[0].synapses[0].I.item()
+        after_classic = n_classic.dendrites[0].synapses[0].stdp_eligibility.item()
+        after_current = n_current.dendrites[0].synapses[0].stdp_eligibility.item()
 
         assert after_classic == before_classic
         assert after_current <= before_current
@@ -192,11 +192,11 @@ class TestSTDPMixin:
         x8 = torch.ones(8, 1, 1)
         p8 = torch.ones(8)
 
-        before1 = n_b1.dendrites[0].synapses[0].I.item()
-        before8 = n_b8.dendrites[0].synapses[0].I.item()
+        before1 = n_b1.dendrites[0].synapses[0].stdp_eligibility.item()
+        before8 = n_b8.dendrites[0].synapses[0].stdp_eligibility.item()
         n_b1._update_stdp_traces(x1, p1, dt=1.0)
         n_b8._update_stdp_traces(x8, p8, dt=1.0)
-        delta1 = n_b1.dendrites[0].synapses[0].I.item() - before1
-        delta8 = n_b8.dendrites[0].synapses[0].I.item() - before8
+        delta1 = n_b1.dendrites[0].synapses[0].stdp_eligibility.item() - before1
+        delta8 = n_b8.dendrites[0].synapses[0].stdp_eligibility.item() - before8
 
         assert delta1 == pytest.approx(delta8, rel=1e-6, abs=1e-6)
