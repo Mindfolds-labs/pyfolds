@@ -206,14 +206,7 @@ class WaveMixin(TimedMixin):
         self.phase_history.zero_()
         self.phase_ptr.zero_()
         self.last_sync.zero_()
-=======
-"""Mixin para dinâmica wave opcional em neurônios avançados."""
 
-from __future__ import annotations
-
-from typing import Dict, Optional
-
-import torch
 
 
 class WaveDynamicsMixin:
@@ -320,4 +313,3 @@ class WaveDynamicsMixin:
             phase_factor = 1.0 + self.cfg.phase_plasticity_gain * float(self.last_phase_sync.item())
             reward = reward * phase_factor
         super().apply_plasticity(dt=dt, reward=reward)
-
