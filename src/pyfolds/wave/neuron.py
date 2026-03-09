@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import torch
+import warnings
 from typing import Dict, Optional
 
 from ..core.neuron import MPJRDNeuron
@@ -15,6 +16,11 @@ class MPJRDWaveNeuron(MPJRDNeuron):
     """Neurônio v3.0 com saída oscilatória em quadratura."""
 
     def __init__(self, cfg: MPJRDWaveConfig, **kwargs):
+        warnings.warn(
+            "MPJRDWaveNeuron está depreciado; use WaveMixin com MPJRDNeuron.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         super().__init__(cfg=cfg, **kwargs)
         self.cfg: MPJRDWaveConfig = cfg
 

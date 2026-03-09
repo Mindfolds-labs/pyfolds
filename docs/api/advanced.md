@@ -7,6 +7,7 @@ Mixins e mecanismos avançados para extensão do neurônio MPJRD.
 - `RefractoryMixin`
 - `AdaptationMixin`
 - `InhibitionLayer`
+- `WaveMixin`
 
 ## Uso
 Use composição via mixins para adicionar mecanismos sem alterar o núcleo do modelo.

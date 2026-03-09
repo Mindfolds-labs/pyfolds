@@ -39,6 +39,7 @@ __all__ = [
     "WaveDynamicsMixin",
     "InhibitionLayer",
     "InhibitionMixin",
+    "WaveMixin",
     "MPJRDNeuronAdvanced",
     "MPJRDLayerAdvanced",
     "MPJRDWaveNeuronAdvanced",
