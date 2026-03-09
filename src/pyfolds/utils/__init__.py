@@ -1,66 +1,55 @@
-"""Utilitários para PyFolds - VERSÃO CORRIGIDA
+"""Utility helpers exported by :mod:`pyfolds.utils`."""
 
-Este módulo fornece funções auxiliares e tipos para todo o framework:
-- Funções matemáticas seguras (divisão, clamps, inicialização)
-- Gerenciamento de device (CPU/GPU)
-- Modos de aprendizado e configurações
-- Logging profissional (TRACE, DEBUG, INFO, WARNING)
-
-Uso básico:
-    from pyfolds.utils import safe_div, clamp_rate, get_device, LearningMode, get_logger
-    
-    device = get_device()
-    x = torch.randn(10).to(device)
-    y = torch.randn(10).to(device)
-    z = safe_div(x, y)
-    
-    mode = LearningMode.ONLINE
-    print(mode.description)
-    
-    # Logging
-    logger = get_logger(__name__)
-    logger.info("Mensagem informativa")
-    logger.trace("Mensagem de trace")  # Nível personalizado
-"""
-
-from .math import safe_div, clamp_rate, clamp_R, xavier_init, calculate_vc_dimension
-from .device import infer_device, ensure_device, get_device, DeviceManager  # ✅ Adicionado DeviceManager
+from .compat import (
+    OptionalDependencyError,
+    has_beartype,
+    has_jaxtyping,
+    has_onnx,
+    has_prometheus,
+    has_psutil,
+    has_tensorboard,
+    has_tensorflow,
+    has_zstandard,
+    require_prometheus,
+    require_tensorboard,
+)
+from .device import DeviceManager, ensure_device, get_device, infer_device
+from .logging import (
+    TRACE_LEVEL,
+    PyFoldsLogger,
+    build_log_path,
+    get_logger,
+    next_log_path,
+    setup_run_logging,
+    trace,
+)
+from .math import calculate_vc_dimension, clamp_R, clamp_rate, safe_div, xavier_init
 from .types import (
-    LearningMode,
-    ConnectionType,
-    ModeConfig,
-    AdaptationOutput,
     AdaptationConfig,
+    AdaptationOutput,
+    ConnectionType,
+    LearningMode,
+    ModeConfig,
     normalize_learning_mode,
 )
-
-# Logging
-from .logging import get_logger, PyFoldsLogger, trace, TRACE_LEVEL, setup_run_logging, next_log_path, build_log_path
-from .validation import validate_input, validate_device_consistency
+from .validation import validate_device_consistency, validate_input
 
 __all__ = [
-    # Math
     "safe_div",
-    "clamp_rate", 
+    "clamp_rate",
     "clamp_R",
     "xavier_init",
     "calculate_vc_dimension",
-    
-    # Device
     "infer_device",
-    "ensure_device", 
+    "ensure_device",
     "get_device",
-    "DeviceManager",  # ✅ Adicionado
-    
-    # Types
+    "DeviceManager",
     "LearningMode",
     "ConnectionType",
     "ModeConfig",
     "AdaptationOutput",
     "AdaptationConfig",
     "normalize_learning_mode",
-    
-    # Logging
     "get_logger",
     "PyFoldsLogger",
     "trace",
@@ -70,4 +59,15 @@ __all__ = [
     "build_log_path",
     "validate_input",
     "validate_device_consistency",
+    "OptionalDependencyError",
+    "has_tensorboard",
+    "has_prometheus",
+    "has_psutil",
+    "has_jaxtyping",
+    "has_beartype",
+    "has_zstandard",
+    "has_onnx",
+    "has_tensorflow",
+    "require_tensorboard",
+    "require_prometheus",
 ]
