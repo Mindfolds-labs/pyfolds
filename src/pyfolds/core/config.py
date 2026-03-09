@@ -3,7 +3,7 @@
 from dataclasses import dataclass, replace
 import warnings
 import math
-from typing import Literal, Dict, Optional
+from typing import Literal, Dict, Optional, Tuple
 
 # Literals para modos configuráveis
 NeuromodMode = Literal["external", "capacity", "surprise"]
@@ -132,6 +132,19 @@ class MPJRDConfig:
     random_seed: Optional[int] = None
     active_synapses_ratio: float = 0.25
 
+    # ===== MECANISMO WAVE (OPCIONAL) =====
+    wave_enabled: bool = False
+    base_frequency: float = 12.0
+    frequency_step: float = 4.0
+    class_frequencies: Optional[Tuple[float, ...]] = None
+    phase_decay: float = 0.98
+    phase_buffer_size: int = 32
+    phase_sensitivity: float = 1.0
+    phase_plasticity_gain: float = 0.25
+    dendritic_threshold: float = 0.0
+    latency_scale: float = 1.0
+    amplitude_eps: float = 1e-6
+
     # ===== INIBIÇÃO =====
     inhibition_trainable_i2e: bool = False
     
@@ -257,6 +270,23 @@ class MPJRDConfig:
                 "ltd_rule inválido: "
                 f"{self.ltd_rule}. Use: 'classic' ou 'current'"
             )
+
+        if self.phase_buffer_size <= 0:
+            raise ValueError("phase_buffer_size must be > 0")
+        if self.base_frequency <= 0:
+            raise ValueError("base_frequency must be > 0")
+        if self.frequency_step < 0:
+            raise ValueError("frequency_step must be >= 0")
+        if self.phase_decay <= 0 or self.phase_decay > 1:
+            raise ValueError("phase_decay must be in (0, 1]")
+        if self.amplitude_eps <= 0:
+            raise ValueError("amplitude_eps must be > 0")
+
+        if self.class_frequencies is not None:
+            if len(self.class_frequencies) == 0:
+                raise ValueError("class_frequencies cannot be empty")
+            if any(f <= 0 for f in self.class_frequencies):
+                raise ValueError("all class_frequencies must be > 0")
 
         if self.weight_quantization not in {"logN", "uniformW"}:
             raise ValueError(

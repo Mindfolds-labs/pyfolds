@@ -16,6 +16,12 @@ def test_create_neuron_infers_wave_type():
     assert isinstance(neuron, MPJRDWaveNeuron)
 
 
+def test_create_neuron_infers_wave_type_from_base_config_flag():
+    cfg = NeuronConfig(wave_enabled=True)
+    neuron = create_neuron(cfg)
+    assert isinstance(neuron, MPJRDWaveNeuron)
+
+
 def test_factory_raises_for_unregistered_type():
     cfg = NeuronConfig()
     NeuronFactory._registry.clear()
