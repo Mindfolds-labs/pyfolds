@@ -124,7 +124,12 @@ def create_accumulator(cfg, track_extra: bool = False):
         n_dendrites=cfg.n_dendrites,
         n_synapses=cfg.n_synapses_per_dendrite,
         eps=cfg.eps,
-        track_extra=track_extra
+        track_extra=track_extra,
+        mode=getattr(cfg, "stats_accumulator_mode", "dense"),
+        activity_threshold=getattr(cfg, "activity_threshold", 0.01),
+        sparse_min_activity_ratio=getattr(cfg, "sparse_min_activity_ratio", 0.15),
+        scientific_debug_stats=getattr(cfg, "scientific_debug_stats", False),
+        enable_profiling=getattr(cfg, "enable_accumulator_profiling", False),
     )
 
 

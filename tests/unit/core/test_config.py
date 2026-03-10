@@ -109,3 +109,21 @@ def test_circadian_validation_rejects_invalid_values():
 def test_circadian_sleep_duration_validation_rejects_invalid_values():
     with pytest.raises(ValueError):
         pyfolds.NeuronConfig(circadian_sleep_duration=0)
+
+
+def test_stats_accumulator_mode_validation():
+    with pytest.raises(ValueError):
+        pyfolds.NeuronConfig(stats_accumulator_mode="invalid")
+
+
+def test_sparse_min_activity_ratio_validation():
+    with pytest.raises(ValueError):
+        pyfolds.NeuronConfig(sparse_min_activity_ratio=1.1)
+
+
+def test_new_defaults_for_accumulator_and_cache_flags():
+    cfg = pyfolds.NeuronConfig()
+    assert cfg.stats_accumulator_mode == "dense"
+    assert cfg.sparse_min_activity_ratio == pytest.approx(0.15)
+    assert cfg.enable_accumulator_profiling is False
+    assert cfg.enable_weight_cache is True

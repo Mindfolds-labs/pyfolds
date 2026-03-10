@@ -13,6 +13,7 @@ RefracMode = Literal["absolute", "relative", "both"]
 STDPInputSource = Literal["raw", "stp"]
 LTDRule = Literal["classic", "current"]
 WeightQuantization = Literal["logN", "uniformW"]
+StatsAccumulatorMode = Literal["dense", "sparse_masked"]
 
 
 @dataclass(frozen=True)
@@ -71,6 +72,11 @@ class MPJRDConfig:
     
     # ✅ NOVO: Threshold para considerar sinapse ativa
     activity_threshold: float = 0.01
+    stats_accumulator_mode: StatsAccumulatorMode = "dense"
+    sparse_min_activity_ratio: float = 0.15
+    scientific_debug_stats: bool = False
+    enable_accumulator_profiling: bool = False
+    enable_weight_cache: bool = True
     
     # ✅ NOVO: Epsilon para homeostase (evita divisão por zero)
     homeostasis_eps: float = 1e-7
@@ -253,6 +259,18 @@ class MPJRDConfig:
         
         if self.activity_threshold <= 0:
             raise ValueError(f"activity_threshold must be > 0, got {self.activity_threshold}")
+
+        if self.stats_accumulator_mode not in {"dense", "sparse_masked"}:
+            raise ValueError(
+                "stats_accumulator_mode inválido: "
+                f"{self.stats_accumulator_mode}. Use: 'dense' ou 'sparse_masked'"
+            )
+
+        if not 0.0 <= self.sparse_min_activity_ratio <= 1.0:
+            raise ValueError(
+                "sparse_min_activity_ratio deve estar em [0, 1], "
+                f"recebido {self.sparse_min_activity_ratio}"
+            )
         
         if self.homeostasis_eps <= 0:
             raise ValueError(f"homeostasis_eps must be > 0, got {self.homeostasis_eps}")
@@ -399,6 +417,11 @@ class MPJRDConfig:
         if self.max_log_weight <= 0:
             raise ValueError(
                 f"max_log_weight deve ser > 0, recebido {self.max_log_weight}"
+            )
+
+        if self.activity_threshold >= 1e6:
+            raise ValueError(
+                "activity_threshold muito alto; pode inviabilizar estatísticas por atividade"
             )
 
         if self.float_precision not in {"float32", "float64"}:
