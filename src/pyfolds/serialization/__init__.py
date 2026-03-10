@@ -1,5 +1,6 @@
 """Módulos de serialização e checkpointing."""
 
+from .strategies import JSONStrategy, SerializationStrategy, TorchCheckpointStrategy, ZstdFoldStrategy
 from .foldio import FoldReader, FoldWriter, load_fold_or_mind, peek_fold_or_mind, save_fold_or_mind
 from .versioned_checkpoint import VersionedCheckpoint
 from .ecc import ECCCodec, ECCProtector, ECCResult, NoECC, ReedSolomonECC, ecc_from_protection
@@ -26,6 +27,10 @@ from .foldio import (
 )
 
 __all__ = [
+    "TorchCheckpointStrategy",
+    "JSONStrategy",
+    "ZstdFoldStrategy",
+    "SerializationStrategy",
     "VersionedCheckpoint",
     "ECCCodec",
     "ECCProtector",

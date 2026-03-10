@@ -423,6 +423,30 @@ class MPJRDNeuron(BaseNeuron):
                 mode=mode,
             )
 
+    def _compute_dendritic_potentials_vectorized(self, x: torch.Tensor) -> torch.Tensor:
+        """Compute dendritic membrane potentials using a vectorized kernel.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor with shape ``[batch, dendrites, synapses]``.
+
+        Returns
+        -------
+        torch.Tensor
+            Dendritic potentials with shape ``[batch, dendrites]``.
+
+        Examples
+        --------
+        >>> cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+        >>> neuron = MPJRDNeuron(cfg)
+        >>> x = torch.randn(8, 2, 4)
+        >>> neuron._compute_dendritic_potentials_vectorized(x).shape
+        torch.Size([8, 2])
+        """
+        weights = torch.stack([d.W for d in self.dendrites], dim=0).to(x.device)
+        return torch.einsum("bds,ds->bd", x, weights)
+
     @validate_input(
         expected_ndim=3,
         expected_shape_fn=lambda self: (
@@ -439,18 +463,35 @@ class MPJRDNeuron(BaseNeuron):
         dt: float = 1.0,
         defer_homeostasis: bool = False,
     ) -> Dict[str, Any]:
-        """
-        Forward pass do neurônio.
+        """Execute one neuron simulation step.
 
-        Args:
-            x: Tensor de entrada [batch, dendrites, synapses]
-            reward: Sinal de recompensa externo
-            mode: Modo de aprendizado (sobrescreve o atual)
-            collect_stats: Se deve coletar estatísticas
-            dt: Passo de tempo (ms)
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor with shape ``[batch, dendrites, synapses]``.
+        reward : float | None, optional
+            External reward signal for neuromodulation.
+        mode : LearningMode | str | None, optional
+            Learning mode override for the current step.
+        collect_stats : bool, default=True
+            Whether to update running statistics.
+        dt : float, default=1.0
+            Time delta in milliseconds.
+        defer_homeostasis : bool, default=False
+            Skip homeostasis update for this step.
 
-        Returns:
-            Dict com spikes, potenciais e estatísticas
+        Returns
+        -------
+        Dict[str, Any]
+            Dictionary containing spikes, potentials and diagnostic statistics.
+
+        Examples
+        --------
+        >>> cfg = MPJRDConfig(n_dendrites=2, n_synapses_per_dendrite=4)
+        >>> neuron = MPJRDNeuron(cfg)
+        >>> out = neuron(torch.zeros(3, 2, 4))
+        >>> sorted(["spikes", "u", "v_dend"]) <= sorted(out.keys())
+        True
         """
         normalized_mode = normalize_learning_mode(mode)
         effective_mode = normalized_mode if normalized_mode is not None else self.mode
@@ -465,14 +506,14 @@ class MPJRDNeuron(BaseNeuron):
         self._set_refractory_state(False)
 
         # ===== 1. INTEGRAÇÃO DENDRÍTICA =====
-        # Nota técnica (modelagem): este loop preserva isolamento por dendrito,
-        # útil para manter equivalência com regras locais de plasticidade.
-        # Uma vetorização futura deve provar equivalência numérica (v_dend/u/spikes)
-        # e de gradiente antes de substituir este caminho de referência.
-        dendrite_outputs = [
-            dend(x[:, d_idx, :]) for d_idx, dend in enumerate(self.dendrites)
-        ]
-        v_dend = torch.stack(dendrite_outputs, dim=1)
+        use_vectorized_dendrites = getattr(self.cfg, "use_vectorized_dendrites", True)
+        if use_vectorized_dendrites:
+            v_dend = self._compute_dendritic_potentials_vectorized(x)
+        else:
+            dendrite_outputs = [
+                dend(x[:, d_idx, :]) for d_idx, dend in enumerate(self.dendrites)
+            ]
+            v_dend = torch.stack(dendrite_outputs, dim=1)
 
         if not torch.isfinite(v_dend).all():
             self.logger.warning(

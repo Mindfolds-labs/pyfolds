@@ -70,6 +70,8 @@ dev = [
   "mypy>=1.0.0",
   "cryptography>=42.0.0",
   "pytest-cov>=5.0.0",
+  "hypothesis>=6.112.0",
+  "ruff>=0.6.0",
 ]
 examples = [
   "torchvision>=0.15.0",
@@ -115,3 +117,17 @@ line_length = 88
 minversion = "7.0"
 addopts = "-ra -q --strict-markers"
 testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = [
+  "pyfolds.serialization.strategies",
+  "pyfolds.telemetry.low_overhead",
+  "tests.test_neuron_properties",
+]
+strict = true
+

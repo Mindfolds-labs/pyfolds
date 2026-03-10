@@ -2,6 +2,7 @@
 
 from .buffer import RingBufferThreadSafe
 from .collector import TelemetryCollector
+from .low_overhead import LowOverheadMetricsCollector
 from .controller import Profile, TelemetryConfig as LegacyTelemetryConfig, TelemetryController, TelemetryProfile
 from .decorator import telemetry
 from .events import (
@@ -25,6 +26,7 @@ from .types import CommitPayload, ForwardPayload, SleepPayload, TelemetryConfig,
 
 __all__ = [
     "TelemetryCollector",
+    "LowOverheadMetricsCollector",
     "TelemetryConfig",
     "TelemetryEvent",
     "TelemetryStats",

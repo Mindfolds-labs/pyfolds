@@ -1,0 +1,8 @@
+[
+  {"run_id": 1, "throughput": 100.0},
+  {"run_id": 2, "throughput": 98.0},
+  {"run_id": 3, "throughput": 102.0},
+  {"run_id": 4, "throughput": 101.0},
+  {"run_id": 5, "throughput": 99.0},
+  {"run_id": 6, "throughput": 100.5}
+]
