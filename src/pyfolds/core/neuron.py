@@ -86,7 +86,14 @@ class MPJRDNeuron(BaseNeuron):
 
         # Sistema de acumulação unificado
         self.stats_acc = StatisticsAccumulator(
-            cfg.n_dendrites, cfg.n_synapses_per_dendrite, cfg.eps
+            cfg.n_dendrites,
+            cfg.n_synapses_per_dendrite,
+            cfg.eps,
+            mode=cfg.stats_accumulator_mode,
+            activity_threshold=cfg.activity_threshold,
+            sparse_min_activity_ratio=cfg.sparse_min_activity_ratio,
+            scientific_debug_stats=cfg.scientific_debug_stats,
+            enable_profiling=cfg.enable_accumulator_profiling,
         )
         self.logger.debug(
             f"   ✅ Accumulator criado (track_extra={self.stats_acc.track_extra})"
@@ -101,6 +108,12 @@ class MPJRDNeuron(BaseNeuron):
             cfg.theta_dend_ratio,
             cfg.shunting_eps,
         )
+
+        # Cache de pesos dendríticos consolidados para evitar torch.stack por passo
+        self._cached_consolidated_weights: Optional[torch.Tensor] = None
+        self._weight_cache_dirty = True
+        self._weight_cache_enabled = bool(cfg.enable_weight_cache)
+        self._weight_cache_rebuilds = 0
 
         # ===== ESTADO =====
         self.mode = LearningMode.ONLINE
@@ -279,6 +292,12 @@ class MPJRDNeuron(BaseNeuron):
             self.cfg if hasattr(self.stats_acc, "cfg") else getattr(self, "cfg")
         )
         self.dendrite_integration.cfg = self.cfg
+        self.stats_acc.mode = self.cfg.stats_accumulator_mode
+        self.stats_acc.activity_threshold = self.cfg.activity_threshold
+        self.stats_acc.sparse_min_activity_ratio = self.cfg.sparse_min_activity_ratio
+        self.stats_acc.scientific_debug_stats = self.cfg.scientific_debug_stats
+        self.stats_acc.enable_profiling = self.cfg.enable_accumulator_profiling
+        self._weight_cache_enabled = bool(self.cfg.enable_weight_cache)
         for module in self.modules():
             if module is self:
                 continue
@@ -423,6 +442,25 @@ class MPJRDNeuron(BaseNeuron):
                 mode=mode,
             )
 
+    def invalidate_weight_cache(self) -> None:
+        """Marca cache de pesos como sujo (chamar após mutações de peso)."""
+        self._weight_cache_dirty = True
+
+    def _get_consolidated_weights(self, device: torch.device) -> torch.Tensor:
+        """Retorna pesos [D,S] com cache opcional e invalidação explícita."""
+        if not self._weight_cache_enabled:
+            return torch.stack([d.W for d in self.dendrites], dim=0).to(device)
+
+        if self._weight_cache_dirty or self._cached_consolidated_weights is None:
+            self._cached_consolidated_weights = torch.stack([d.W for d in self.dendrites], dim=0)
+            self._weight_cache_rebuilds += 1
+            self._weight_cache_dirty = False
+
+        if self._cached_consolidated_weights.device != device:
+            self._cached_consolidated_weights = self._cached_consolidated_weights.to(device)
+
+        return self._cached_consolidated_weights
+
     def _compute_dendritic_potentials_vectorized(self, x: torch.Tensor) -> torch.Tensor:
         """Compute dendritic membrane potentials using a vectorized kernel.
 
@@ -444,7 +482,7 @@ class MPJRDNeuron(BaseNeuron):
         >>> neuron._compute_dendritic_potentials_vectorized(x).shape
         torch.Size([8, 2])
         """
-        weights = torch.stack([d.W for d in self.dendrites], dim=0).to(x.device)
+        weights = self._get_consolidated_weights(x.device)
         return torch.einsum("bds,ds->bd", x, weights)
 
     @validate_input(
@@ -634,12 +672,16 @@ class MPJRDNeuron(BaseNeuron):
         R_tensor = torch.tensor([R_val], device=device)
 
         # ===== 9. ACUMULAÇÃO (BATCH MODE) =====
+        acc_telem = None
         if (
             collect_stats
             and effective_mode == LearningMode.BATCH
             and self.cfg.defer_updates
         ):
             self.stats_acc.accumulate(x.detach(), gated.detach(), spikes.detach())
+            acc_telem = self.stats_acc.telemetry_snapshot
+        else:
+            acc_telem = None
 
         # ===== 10. ATUALIZAÇÃO IMEDIATA (ONLINE) =====
         if (
@@ -683,6 +725,11 @@ class MPJRDNeuron(BaseNeuron):
                             I_mean=float(self.I.float().mean().item()),
                             W_mean=float(self.W.float().mean().item()),
                             integration_mode=integration_mode,
+                            accumulator_time_ms=(acc_telem["accumulator_time_ms"] if acc_telem else 0.0),
+                            accumulator_activity_ratio=(acc_telem["activity_ratio"] if acc_telem else 0.0),
+                            accumulator_sparse_path_used=(acc_telem["sparse_path_used"] if acc_telem else False),
+                            accumulator_dense_fallback_used=(acc_telem["dense_fallback_used"] if acc_telem else False),
+                            accumulator_nonzero_sample_ratio=(acc_telem["nonzero_sample_ratio"] if acc_telem else 0.0),
                         )
                     )
                 except Exception as exc:
@@ -823,6 +870,7 @@ class MPJRDNeuron(BaseNeuron):
             raise
 
         self.stats_acc.reset()
+        self.invalidate_weight_cache()
         self.logger.debug(
             f"✅ Plasticidade aplicada, R={R:.3f}, post_rate={post_rate_float:.3f}"
         )
@@ -854,6 +902,7 @@ class MPJRDNeuron(BaseNeuron):
         for i, dend in enumerate(self.dendrites):
             self.logger.debug(f"   Dendrito {i}: consolidando...")
             dend.consolidate(dt=duration)
+        self.invalidate_weight_cache()
 
         self.logger.info("✅ Sono concluído")
 
@@ -917,6 +966,9 @@ class MPJRDNeuron(BaseNeuron):
             "mode_switches": self.mode_switches.item(),
             "sleep_count": self.sleep_count.item(),
             "has_pending_updates": self.stats_acc.has_data,
+            "weight_cache_enabled": self._weight_cache_enabled,
+            "weight_cache_dirty": self._weight_cache_dirty,
+            "weight_cache_rebuilds": self._weight_cache_rebuilds,
             "pending_count": (
                 self.stats_acc.acc_count.item() if self.stats_acc.has_data else 0
             ),

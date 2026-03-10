@@ -162,3 +162,45 @@ class TestMPJRDNeuron:
 
         assert out["u"].max().item() > 0.0
         assert out["spikes"].mean().item() > 0.0
+
+
+def test_weight_cache_reuse_and_invalidation():
+    cfg = pyfolds.NeuronConfig(
+        n_dendrites=2,
+        n_synapses_per_dendrite=4,
+        enable_weight_cache=True,
+        device="cpu",
+    )
+    neuron = pyfolds.MPJRDNeuron(cfg)
+    x = torch.randn(3, 2, 4)
+
+    _ = neuron._compute_dendritic_potentials_vectorized(x)
+    rebuilds_after_first = neuron._weight_cache_rebuilds
+    _ = neuron._compute_dendritic_potentials_vectorized(x)
+
+    assert neuron._weight_cache_rebuilds == rebuilds_after_first
+
+    with torch.no_grad():
+        neuron.dendrites[0].synapses[0].N.add_(1)
+        neuron.dendrites[0]._invalidate_cache()
+    neuron.invalidate_weight_cache()
+
+    _ = neuron._compute_dendritic_potentials_vectorized(x)
+    assert neuron._weight_cache_rebuilds == rebuilds_after_first + 1
+
+
+def test_weight_cache_preserves_forward_equivalence():
+    base_cfg = dict(n_dendrites=2, n_synapses_per_dendrite=4, device="cpu", defer_updates=False)
+    cfg_cached = pyfolds.NeuronConfig(**{**base_cfg, "enable_weight_cache": True})
+    cfg_nocache = pyfolds.NeuronConfig(**{**base_cfg, "enable_weight_cache": False})
+
+    neuron_cached = pyfolds.MPJRDNeuron(cfg_cached)
+    neuron_nocache = pyfolds.MPJRDNeuron(cfg_nocache)
+    neuron_nocache.load_state_dict(neuron_cached.state_dict())
+
+    x = torch.randn(5, 2, 4)
+    out_cached = neuron_cached.forward(x, collect_stats=False)
+    out_nocache = neuron_nocache.forward(x, collect_stats=False)
+
+    assert torch.allclose(out_cached["v_dend"], out_nocache["v_dend"], atol=1e-6, rtol=1e-6)
+    assert torch.allclose(out_cached["u"], out_nocache["u"], atol=1e-6, rtol=1e-6)
