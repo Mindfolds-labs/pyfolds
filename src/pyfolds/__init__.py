@@ -7,7 +7,7 @@ v1 names as compatibility aliases with deprecation warnings.
 from typing import Any, Dict
 import warnings
 
-__version__ = "2.1.1"
+__version__ = "2.2.0"
 
 # ===== CORE V2 SURFACE =====
 from .core.config import MPJRDConfig as NeuronConfig
@@ -106,6 +106,13 @@ from .advanced import (
     MPJRDWaveNeuronAdvanced,
     MPJRDWaveLayerAdvanced,
 )
+from .integration import (
+    CognitiveInput,
+    CognitiveBatch,
+    PyFoldsOutput,
+    SurrogateGradientFn,
+    OptimizedMPJRDNeuron,
+)
 ADVANCED_AVAILABLE = True
 
 _V1_ALIAS_MAP = {
@@ -202,6 +209,11 @@ __all__ = [
     "Imagination",
     "SIGReg",
     "NoeticLeibregBridge",
+    "CognitiveInput",
+    "CognitiveBatch",
+    "PyFoldsOutput",
+    "SurrogateGradientFn",
+    "OptimizedMPJRDNeuron",
     # Advanced
     "MPJRDNeuronAdvanced",
     "MPJRDLayerAdvanced",
