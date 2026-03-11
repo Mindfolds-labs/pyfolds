@@ -27,6 +27,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - v1 public aliases remain supported during `1.x` with `DeprecationWarning` and are scheduled for removal in `2.0.0`: `MPJRDConfig` (use `NeuronConfig`), `MPJRDLayer` (use `AdaptiveNeuronLayer`), and `MPJRDNetwork` (use `SpikingNetwork`).
 
 ### Changed
+- STDP agora aplica `ltd_rule` de forma efetiva: `classic` usa gate por spike pré (`pre_spikes`), enquanto `current` preserva o gate legado por spike pós (`post_spike`).
+- Compatibilidade: o default permanece `ltd_rule="current"`, mantendo comportamento legado para usuários que não configuram o parâmetro.
+- ADR-003 recebeu seção "Updated rationale" para registrar o ajuste de racional de plasticidade e o compromisso de retrocompatibilidade.
 - Canonical release version unified to `2.0.3` across package metadata, public modules and docs examples.
 - `docs/ARCHITECTURE.md` diagram reference updated to `docs/architecture/blueprints/`.
 - `docs/development/execution_queue.csv` ISSUE-005 marked as partial in progress.
