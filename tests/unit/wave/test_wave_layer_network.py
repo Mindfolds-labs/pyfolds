@@ -36,3 +36,17 @@ def test_wave_network_forwards_layer_kwargs():
 
     assert out["output"].shape == (1, 2)
     assert "wave_real" in out["layers"]["out"]
+
+
+def test_wave_neuron_phase_pointer_updates_without_reallocating_device():
+    cfg = MPJRDWaveConfig(n_dendrites=1, n_synapses_per_dendrite=2, phase_buffer_size=3)
+    neuron = MPJRDWaveLayer(n_neurons=1, cfg=cfg).neurons[0]
+
+    x = torch.ones(1, 1, 2)
+    initial_device = neuron.phase_pointer.device
+
+    for _ in range(4):
+        neuron(x)
+
+    assert neuron.phase_pointer.device == initial_device
+    assert int(neuron.phase_pointer.item()) == 1
