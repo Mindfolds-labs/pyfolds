@@ -22,7 +22,7 @@ Este documento define a arquitetura do PyFOLDS sob três perspectivas complement
 ### 1.3 Responsabilidades de alto nível
 
 - Integrar sinais em ramos dendríticos com não linearidade local.
-- Aplicar competição espacial (WTA) antes da decisão somática.
+- Executar integração dendrítica/somática com adaptação, refratariedade e disparo antes dos passos de plasticidade/homeostase.
 - Executar homeostase e plasticidade (online/batch/sono).
 - Emitir eventos auditáveis para depuração e governança.
 
@@ -139,7 +139,9 @@ Y_b = \mathbb{1}[U_b\ge\theta_{eff}].
 
 ## 7) Referência de fluxo visual
 
-Fluxo detalhado em Mermaid: `docs/architecture/blueprints/sources/dendritic_processing_flow.mmd`.
+Fluxo detalhado em Mermaid (canônico): `docs/architecture/real_pipeline.md`.
+
+Diagrama legado com WTA hard foi arquivado em `docs/architecture/blueprints/sources/dendritic_processing_flow.mmd`.
 
 ---
 

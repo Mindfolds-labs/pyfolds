@@ -4,6 +4,10 @@
 - [ARCHITECTURE.md](../ARCHITECTURE.md)
 - [ALGORITHM.md](../science/ALGORITHM.md)
 
+## Diagramas canônicos
+- [index.md](index.md)
+- [real_pipeline.md](real_pipeline.md)
+
 ## Blueprints
 - [blueprints/README.md](blueprints/README.md)
 - [blueprints/sources/architecture.mmd](blueprints/sources/architecture.mmd)
