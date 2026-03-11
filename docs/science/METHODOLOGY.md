@@ -16,7 +16,7 @@ A premissa é que cada dendrito funciona como um subcomputador não linear, gera
 
 - **Independentes:**
   - número de dendritos (`D`), sinapses por dendrito (`S`), thresholds, modo de neuromodulação.
-  - presença/ausência de competição WTA.
+  - modo de integração dendrítica (`nmda_shunting`, `wta_soft`, `wta_hard`).
   - modo de treino (`ONLINE`, `BATCH`, `SLEEP`, `INFERENCE`).
 - **Dependentes:**
   - acurácia/F1, robustez a ruído, taxa de disparo, saturação sináptica.
@@ -29,7 +29,7 @@ A premissa é que cada dendrito funciona como um subcomputador não linear, gera
 Comparar MPJRD (compartimentalizado) vs. perceptron linear com orçamento similar.
 
 ### Estudo B — Ablação estrutural
-Remover não linearidade local dendrítica ou WTA e medir queda de desempenho.
+Remover não linearidade local dendrítica ou substituir integração cooperativa por `wta_hard`, medindo queda de desempenho.
 
 ### Estudo C — Continual learning
 Aplicar treinos sequenciais com ciclos de consolidação (`sleep`) e medir retenção.
@@ -52,3 +52,6 @@ Aceitar H1 quando, de forma reprodutível:
 - Salvar configuração (`MPJRDConfig`) por experimento.
 - Registrar seed e versão do commit.
 - Exportar métricas de telemetria por etapa.
+
+
+Ver também: [`docs/science/ALGORITHM.md`](./ALGORITHM.md), [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md) e [`docs/mechanisms/experimental_toggles.md`](../mechanisms/experimental_toggles.md).

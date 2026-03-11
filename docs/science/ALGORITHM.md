@@ -4,7 +4,7 @@
 
 ## 1) Formulação matemática canônica
 
-A dinâmica do neurônio MPJRD é definida por três estágios: integração dendrítica, competição espacial e decisão somática.
+A dinâmica do neurônio MPJRD no runtime é definida por integração dendrítica local, integração/competição configurável entre ramos e decisão somática.
 
 \[
 \boxed{\;y = H(u-\theta)\;}
@@ -13,22 +13,24 @@ A dinâmica do neurônio MPJRD é definida por três estágios: integração den
 onde \(H(\cdot)\) é a função degrau de Heaviside e
 
 \[
-u = \sum_{d=1}^{D} g_d\,v_d,
+u = f_{int}(v,\theta;m),
 \qquad
 v_d = \sigma_d\!\left(\sum_{s=1}^{S} \psi\big(N_{d,s},W_{d,s},I_{d,s}\big)\,x_{d,s}\right).
 \]
 
-### Gating por Winner-Take-All (WTA)
+### Integração entre ramos (runtime atual)
 
-No modo atual:
+O runtime atual não usa WTA duro como mecanismo único. O comportamento depende de `dendrite_integration_mode`:
+
+- `nmda_shunting`: gate sigmoidal por dendrito + normalização divisiva (`DendriticIntegration`);
+- `wta_soft`: soma cooperativa de gates sigmoidais;
+- `wta_hard`: seleção vencedora (mantida para compatibilidade/ablação).
+
+Forma genérica:
 
 \[
-g_d = \mathbb{1}\!\left[d = \arg\max_{j\in\{1,\dots,D\}} v_j\right],
-\qquad
-\sum_{d=1}^{D} g_d = 1.
+\mathbf{u} = f_{int}(\mathbf{v}, \theta; m),\quad m\in\{\texttt{nmda\_shunting},\texttt{wta\_soft},\texttt{wta\_hard}\}.
 \]
-
-Isso garante seletividade espacial e evita a soma indiscriminada de ramos.
 
 ## 2) Tabela de símbolos (padrão de documentação técnica)
 
@@ -39,7 +41,7 @@ Isso garante seletividade espacial e evita a soma indiscriminada de ramos.
 | \(W_{d,s}\) | peso sináptico | \(\mathbb{R}\) |
 | \(I_{d,s}\) | estado interno/inibição local | \(\mathbb{R}\) |
 | \(v_d\) | potencial dendrítico após não linearidade | \(\mathbb{R}\) |
-| \(g_d\) | gate competitivo do ramo | \(\{0,1\}\) |
+| \(g_d\) | gate/ganho por ramo (binário ou contínuo conforme modo) | \(\mathbb{R}_{\ge 0}\) |
 | \(u\) | potencial somático agregado | \(\mathbb{R}\) |
 | \(\theta\) | limiar de disparo | \(\mathbb{R}\) |
 | \(y\) | spike de saída | \(\{0,1\}\) |
@@ -52,19 +54,15 @@ No `forward` de `MPJRDNeuron`, o fluxo computacional é:
    \[
    v_d \leftarrow \texttt{dend}(x[:,d,:])
    \]
-2. **Competição WTA**
+2. **Integração entre ramos (por modo)**
    \[
-   k \leftarrow \arg\max_d(v_d), \quad g_k=1,\; g_{d\neq k}=0
+   u \leftarrow f_{int}(v,\theta; m)
    \]
-3. **Agregação somática**
+3. **Disparo**
    \[
-   u \leftarrow \sum_d g_d v_d
+   y \leftarrow \mathbb{1}[u\ge\theta_{eff}]
    \]
-4. **Disparo**
-   \[
-   y \leftarrow \mathbb{1}[u\ge\theta]
-   \]
-5. **Homeostase, neuromodulação, acumulação batch e telemetria**.
+4. **Homeostase, neuromodulação, acumulação batch e telemetria**.
 
 ## 4) Pseudocódigo em estilo científico (IEEE-friendly)
 
@@ -77,10 +75,8 @@ for d = 1..D do
     V[:, d] ← DENDRITE_INTEGRATE(X[:, d, :], N_d, W_d, I_d)
 end for
 
-K ← argmax_d V[:, d]
-G ← one_hot(K, D)
-U ← sum_d (G[:, d] ⊙ V[:, d])
-Y ← 1[U ≥ θ]
+U ← INTEGRATE_DENDRITES(V, θ, mode)
+Y ← 1[U ≥ θ_eff]
 
 if mode ≠ INFERENCE then
     UPDATE_HOMEOSTASIS(Y)
@@ -89,7 +85,7 @@ end if
 R ← COMPUTE_NEUROMODULATION(signal_ext, state)
 
 if mode = BATCH and defer_updates = true then
-    ACCUMULATE_BATCH_STATS(X, G, Y, R)
+    ACCUMULATE_BATCH_STATS(X, U, Y, R)
 end if
 
 EMIT_TELEMETRY(U, Y, R)
@@ -103,20 +99,19 @@ No `apply_plasticity`, com estatísticas acumuladas:
 \[
 \bar{x}_{d,s} = \frac{1}{T}\sum_{t=1}^{T}x_{d,s}^{(t)},
 \qquad
-\bar{g}_d = \frac{1}{T}\sum_{t=1}^{T}g_d^{(t)},
+\bar{u}_d = \frac{1}{T}\sum_{t=1}^{T}u_d^{(t)},
 \qquad
 \rho_{\text{post}} = \frac{1}{T}\sum_{t=1}^{T}y^{(t)}.
 \]
 
-A taxa pré efetiva por dendrito é modulada por atividade (
-\(\bar{g}_d\)) antes de chamar `update_synapses_rate_based(..., mode=self.mode)`.
+A taxa pré efetiva por dendrito é modulada por atividade antes de chamar `update_synapses_rate_based(..., mode=self.mode)`.
 
 ## 6) Invariante de correção (anti-degeneração)
 
 Para não colapsar para um perceptron quase linear, deve-se preservar:
 
 \[
-\text{(não linearidade local por ramo)} \Rightarrow \text{(competição)} \Rightarrow \text{(agregação somática)}.
+\text{(não linearidade local por ramo)} \Rightarrow \text{(integração/competição)} \Rightarrow \text{(agregação somática)}.
 \]
 
 Violação típica (incorreta): somar todos os sinais sinápticos antes da transformação local.
@@ -124,7 +119,7 @@ Violação típica (incorreta): somar todos os sinais sinápticos antes da trans
 ## 7) Complexidade assintótica
 
 - Integração dendrítica: \(\mathcal{O}(BDS)\)
-- WTA por batch: \(\mathcal{O}(BD)\)
+- Integração/competição entre ramos por batch: \(\mathcal{O}(BD)\)
 - Estado principal (`N`, `W`, `I`): \(\mathcal{O}(DS)\)
 
 ## 8) Guia rápido para manter renderização limpa no GitHub
@@ -133,3 +128,11 @@ Violação típica (incorreta): somar todos os sinais sinápticos antes da trans
 - Evite macros LaTeX avançadas não suportadas pelo renderizador do GitHub.
 - Sempre manter **Tabela de Símbolos** no topo de documentos matemáticos.
 - Para publicação futura (PDF/IEEE), mantenha numeração de algoritmo e nomenclatura estáveis.
+
+## 9) Fluxo real do neurônio
+
+Referências diretas de implementação: `MPJRDNeuron` (`src/pyfolds/core/neuron.py`), `MPJRDNeuronV2` (`src/pyfolds/core/neuron_v2.py`), `DendriticIntegration` (`src/pyfolds/core/dendrite_integration.py`), `AdaptationMixin` (`src/pyfolds/advanced/adaptation.py`) e `RefractoryMixin` (`src/pyfolds/advanced/refractory.py`).
+
+O passo efetivo é: integração dendrítica → integração entre ramos por modo → decisão por `theta_eff` → homeostase (quando aplicável) → plasticidade (`_apply_online_plasticity`/`apply_plasticity`) → telemetria.
+
+Ver também [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md) e [`docs/mechanisms/experimental_toggles.md`](../mechanisms/experimental_toggles.md).

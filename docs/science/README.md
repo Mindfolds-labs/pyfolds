@@ -1,8 +1,10 @@
 # Scientific Foundations & Research
 
 ## Base teórica
+- [ARCHITECTURE.md](../ARCHITECTURE.md)
 - [SCIENTIFIC_LOGIC.md](./SCIENTIFIC_LOGIC.md)
 - [METHODOLOGY.md](./METHODOLOGY.md)
+- [ALGORITHM.md](./ALGORITHM.md)
 - [TEST_PROTOCOL.md](./TEST_PROTOCOL.md)
 - [research/wave/PHASE_CODING.md](../research/wave/PHASE_CODING.md)
 
@@ -13,6 +15,8 @@
 - [research/mpjrd/references.bib](../research/mpjrd/references.bib)
 
 ## Benchmark e validação operacional
+- [mechanisms/README.md](../mechanisms/README.md)
+- [mechanisms/experimental_toggles.md](../mechanisms/experimental_toggles.md)
 - [RELATORIO_TESTES_BENCHMARK.md](../RELATORIO_TESTES_BENCHMARK.md)
 - [BENCHMARKS.md](../assets/BENCHMARKS.md)
 
