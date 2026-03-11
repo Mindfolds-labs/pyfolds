@@ -1,26 +1,26 @@
-# Estratégia de dados, buffers e estado estrutural
+# Data Buffer State Strategy
 
-## Objetivo do mecanismo
-Separar parâmetros, buffers persistentes, buffers de runtime e dados externos.
+## Objetivo
+Definir estratégia de buffers e snapshots para manter rastreabilidade de estado sem bloquear o forward.
 
-## Base científica resumida
-Modelos neurais com estado interno estável e estado dinâmico separado facilitam reprodutibilidade.
+## Variáveis
+- **Entrada:** eventos de execução, métricas de estado e snapshots periódicos.
+- **Controle:** janelas de coleta e frequência de inspeção.
+- **Saída:** buffers de observabilidade e dicionários de diagnóstico.
 
-## Tradução computacional adotada
-`connectivity_mask`/`pruning_mask` como buffers persistentes; traces e caches de runtime com `persistent=False`.
+## Fluxo
+1. Coletar métricas ao longo da execução.
+2. Compactar estado em snapshots leves.
+3. Disponibilizar relatórios para comparação baseline/experimento.
 
-## Arquivos do código afetados
-- `src/pyfolds/core/neuron.py`
-- `src/pyfolds/core/config.py`
+## Custo computacional
+Sobrecarga linear no número de métricas armazenadas; custo controlado por frequência de coleta.
 
-## Flags de ativação/desativação
-`pruning_enabled`, `pruning_strategy`, `consolidate_pruning_after_replay`.
+## Integração
+- `StatisticsAccumulator` e `create_accumulator_from_config` (`src/pyfolds/core/accumulator.py`).
+- `MPJRDNeuron.get_metrics` e `MPJRDNeuron.get_audit_trace_snapshot` (`src/pyfolds/core/neuron.py`).
+- `compare_mechanism_vs_baseline`/`diff_output_stats` para diffs de saída (`src/pyfolds/advanced/experimental.py`).
 
-## Riscos de implementação
-Threshold inadequado pode podar demais.
-
-## Estratégia de teste
-Testes unitários validando presença/ausência em `state_dict` e efeito da máscara no forward.
-
-## Critérios de observabilidade/debug
-Snapshots de conectividade/poda/atividade por fase.
+## Estado
+- **Rótulo:** `Estável`.
+- **Justificativa:** mecanismo usa APIs de telemetria já consolidadas no pipeline core.

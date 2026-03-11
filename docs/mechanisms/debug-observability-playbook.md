@@ -1,25 +1,26 @@
-# Playbook de depuração e observabilidade
+# Debug and Observability Playbook
 
-## Objetivo do mecanismo
-Padronizar coleta de snapshots para diagnóstico rápido.
+## Objetivo
+Padronizar inspeção de mecanismos para facilitar diagnóstico de regressão e validação científica.
 
-## Base científica resumida
-Instrumentação robusta melhora interpretação de dinâmica neural simulada.
+## Variáveis
+- **Entrada:** saídas de forward, snapshots de fase/conectividade e traces de auditoria.
+- **Controle:** toggles de mecanismo e escopo do experimento.
+- **Saída:** relatórios comparativos e evidências de comportamento.
 
-## Tradução computacional adotada
-Funções de snapshot retornam tensores clonados para inspeção sem mutação acidental.
+## Fluxo
+1. Executar baseline e variante com mesmos estímulos.
+2. Coletar snapshots por mecanismo (fase, pruning, engram).
+3. Comparar diffs e registrar interpretação do risco.
 
-## Arquivos do código afetados
-- `src/pyfolds/core/neuron.py`
+## Custo computacional
+Custo extra proporcional ao número de execuções comparadas (tipicamente 2x para baseline+experimento).
 
-## Flags de ativação/desativação
-`audit_mode`, frequência de coleta definida externamente.
+## Integração
+- `collect_mechanism_report` e `compare_mechanism_vs_baseline` (`src/pyfolds/advanced/experimental.py`).
+- `MPJRDNeuron.collect_phase_activity_report` (`src/pyfolds/core/neuron.py`).
+- `MPJRDNeuron.collect_connectivity_snapshot` e `MPJRDNeuron.collect_engram_report` (`src/pyfolds/core/neuron.py`).
 
-## Riscos de implementação
-Overhead quando usado em alta frequência.
-
-## Estratégia de teste
-Teste unitário cobrindo chaves esperadas dos relatórios.
-
-## Critérios de observabilidade/debug
-Checklist: conectividade efetiva, poda, fase, ressonância.
+## Estado
+- **Rótulo:** `Estável`.
+- **Justificativa:** o playbook usa pontos de observabilidade já expostos por APIs públicas internas.

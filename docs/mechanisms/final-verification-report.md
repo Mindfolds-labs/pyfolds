@@ -1,35 +1,26 @@
-# Verificação final dos mecanismos de neural speech tracking
+# Final Verification Report
 
-## Mecanismos implementados
-1. Extração de envelope da fala (Hilbert + Gammatone aproximado).
-2. Detecção de eventos do envelope (acoustic edges).
-3. Phase reset por evento acústico.
-4. Cross-frequency coupling (theta phase x gamma amplitude).
-5. Gradiente espacial de latência.
-6. Rotina automática de análise (`analyze_mechanisms`).
+## Objetivo
+Consolidar critérios mínimos para declarar um mecanismo pronto para uso contínuo no repositório.
 
-## Status de ativação por padrão
-Todos os mecanismos acima estão **desligados por padrão** para preservar baseline:
-- `enable_speech_envelope_tracking = False`
-- `enable_phase_reset_on_audio_event = False`
-- `enable_cross_frequency_coupling = False`
-- `enable_spatial_latency_gradient = False`
+## Variáveis
+- **Entrada:** métricas de execução, snapshots e diffs vs baseline.
+- **Controle:** seleção de mecanismo e conjunto de toggles testados.
+- **Saída:** decisão de aprovação com evidências rastreáveis.
 
-## Mecanismos experimentais
-Todos são marcados como experimentais por dependerem de entrada de áudio e/ou coordenadas neurais opcionais.
+## Fluxo
+1. Rodar baseline e configuração alvo.
+2. Coletar métricas padronizadas de saída e estado interno.
+3. Classificar risco e registrar decisão de manutenção/rollback.
 
-## Verificações executadas
-- Buffers: novo buffer `_latency_delay_steps` registrado em `WaveDynamicsMixin`.
-- `state_dict`: contém buffers extras somente em modelos wave (compatível com registro de buffers do PyTorch).
-- Toggles: testes unitários cobrem desligado/ligado.
-- Baseline preservado: quando flags estão desligadas, payload extra não é injetado.
-- Debug tools: `analyze_mechanisms` provê deltas de atividade, estabilidade, custo e conectividade.
-- Documentação: mini-artigos em `docs/mechanisms/` e ADRs em `docs/adr/`.
+## Custo computacional
+Proporcional ao número de cenários de validação; normalmente múltiplos forwards completos.
 
-## Impacto computacional estimado
-- Envelope Hilbert: baixo (FFT única O(N log N)).
-- Envelope Gammatone aproximado: médio (múltiplas bandas FFT/IRFFT).
-- Event detection: baixo (diferença + threshold).
-- Phase reset: baixo (operação vetorial `where`).
-- PAC: baixo-médio (binning + agregação por bins).
-- Spatial latency kernel: baixo (norma + tanh).
+## Integração
+- `compare_mechanism_vs_baseline` e `collect_mechanism_report` (`src/pyfolds/advanced/experimental.py`).
+- `MPJRDNeuron.get_metrics` (`src/pyfolds/core/neuron.py`).
+- `MPJRDNeuron.collect_pruning_snapshot`/`collect_phase_activity_report` (`src/pyfolds/core/neuron.py`).
+
+## Estado
+- **Rótulo:** `Estável`.
+- **Justificativa:** trata de procedimento de validação já suportado por interfaces existentes.

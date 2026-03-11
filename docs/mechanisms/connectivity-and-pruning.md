@@ -1,25 +1,26 @@
-# Conectividade estrutural e poda
+# Connectivity and Pruning
 
-## Objetivo do mecanismo
-Representar fluxo estrutural e poda com máscaras explícitas e vetorizadas.
+## Objetivo
+Controlar conectividade efetiva via poda para reduzir custo e manter sinapses relevantes.
 
-## Base científica resumida
-Refinamento sináptico é central em aprendizagem e estabilização de circuitos.
+## Variáveis
+- **Entrada:** pesos sinápticos, atividade e estado de replay.
+- **Controle:** `pruning_enabled`, `pruning_strategy`, `pruning_runtime_threshold`.
+- **Saída:** `pruning_mask`, `active_ratio`, `effective_connectivity`.
 
-## Tradução computacional adotada
-Máscara efetiva = `connectivity_mask * pruning_mask` aplicada aos pesos consolidados.
+## Fluxo
+1. Atualizar máscara de poda com regra ativa.
+2. Aplicar máscara à conectividade durante o forward.
+3. Expor snapshots para auditoria e comparação com baseline.
 
-## Arquivos do código afetados
-- `src/pyfolds/core/neuron.py`
+## Custo computacional
+O(S) sobre número de sinapses para atualizar/aplicar máscara; custo extra de memória para snapshots de diagnóstico.
 
-## Flags de ativação/desativação
-`pruning_strategy`: `static`, `phase_scheduled`, `replay_consolidated`.
+## Integração
+- `MPJRDNeuron._refresh_pruning_mask` e `MPJRDNeuron._phase_pruning_gate` (`src/pyfolds/core/neuron.py`).
+- `MPJRDNeuron.collect_connectivity_snapshot` e `MPJRDNeuron.collect_pruning_snapshot` (`src/pyfolds/core/neuron.py`).
+- Campos de poda em `MPJRDConfig` (`src/pyfolds/core/config.py`).
 
-## Riscos de implementação
-Aproximação por magnitude não captura toda causalidade de plasticidade.
-
-## Estratégia de teste
-Teste com mascaramento parcial e comparação de potenciais dendríticos.
-
-## Critérios de observabilidade/debug
-`collect_connectivity_snapshot()` e `collect_pruning_snapshot()`.
+## Estado
+- **Rótulo:** `Estável`.
+- **Justificativa:** fluxo principal de máscara e snapshots já está integrado ao caminho padrão do neurônio.

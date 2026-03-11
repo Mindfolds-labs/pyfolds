@@ -1,35 +1,27 @@
-# Title
-Speech Envelope Extraction for Neural Tracking
+# Speech Envelope Extraction
 
-## Abstract
-Este mecanismo adiciona extração de envelope acústico por Hilbert e por banco de filtros gammatone para alimentar rotinas neurais dependentes de envelope.
+## Objetivo
+Extrair envelope acústico da fala para alimentar mecanismos oscilatórios e métricas de sincronização neural.
 
-## Background
-Literatura de cortical tracking mostra que a escolha do envelope altera robustez de sincronização neural com fala.
+## Variáveis
+- **Entrada:** `audio`, `sample_rate`, `method` (`hilbert` ou `gammatone`).
+- **Controle:** `enable_speech_envelope_tracking`, `speech_envelope_method`.
+- **Saída:** `envelope`, `onset_strength`, `modulation_spectrum`.
 
-## Related neuroscience literature
-- Ding & Simon (2014), cortical entrainment to continuous speech.
-- Gross et al. (2013), tracking dinâmico da fala por oscilações lentas.
+## Fluxo
+1. Converter o sinal para 1D e normalizar formato de tensor.
+2. Calcular envelope por `_analytic_signal_hilbert` ou `_gammatone_envelope`.
+3. Derivar onsets e espectro de modulação para uso pela dinâmica de onda.
 
-## Computational translation
-Função `extract_speech_envelope(audio, sample_rate, method)` retorna envelope, força de onsets e espectro de modulação.
+## Custo computacional
+Predominantemente O(T log T) no caminho Hilbert (FFT) e O(B·T) no caminho gammatone aproximado; memória linear em T.
 
-## Implementation details
-- Método `hilbert`: sinal analítico via FFT e magnitude.
-- Método `gammatone`: aproximação ERB/gammatone em múltiplas bandas + envelope médio.
-- Gatilho por `enable_speech_envelope_tracking`.
+## Integração
+- `extract_speech_envelope` (`src/pyfolds/advanced/speech_tracking.py`).
+- `_analytic_signal_hilbert` e `_gammatone_envelope` (`src/pyfolds/advanced/speech_tracking.py`).
+- `WaveDynamicsMixin.forward` consome o envelope (`src/pyfolds/advanced/wave.py`).
+- `MPJRDConfig.enable_speech_envelope_tracking` e `MPJRDConfig.speech_envelope_method` (`src/pyfolds/core/config.py`).
 
-## Files modified
-- `src/pyfolds/advanced/speech_tracking.py`
-- `src/pyfolds/advanced/wave.py`
-- `src/pyfolds/core/config.py`
-
-## Activation flags
-- `enable_speech_envelope_tracking`
-- `speech_envelope_method`
-
-## Limitations
-Implementação gammatone aproximada (sem dependência externa dedicada).
-
-## Future work
-Adicionar backend opcional com filtros gammatone canônicos (Hohmann) e validação em corpus de fala real.
+## Estado
+- **Rótulo:** `Experimental`.
+- **Justificativa:** o método gammatone é aproximado e ainda sem validação extensiva em corpus externo.

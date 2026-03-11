@@ -1,26 +1,26 @@
-# Phase gating experiment (STDP)
+# Phase Gating Experiment
 
-## Regra implementada
-Com `enable_phase_gating=True`:
+## Objetivo
+Aplicar modulação dependente de fase no update STDP para testar aprendizado seletivo em janelas favoráveis.
 
-`delta_w = base_delta_w * max(0, cos(phase))`
+## Variáveis
+- **Entrada:** `base_delta_w`, `phase`.
+- **Controle:** `enable_phase_gating`.
+- **Saída:** `delta_w` modulado e métricas de aprendizado associadas.
 
-Com toggle desligado, o update STDP permanece igual ao baseline.
+## Fluxo
+1. Calcular update STDP base.
+2. Se toggle ativo, aplicar fator `max(0, cos(phase))`.
+3. Registrar impacto em métricas de atividade/plasticidade.
 
-## Ponto de integração
-`STDPMixin._update_stdp_traces`.
+## Custo computacional
+O(1) adicional por atualização sináptica (cosseno + clamp), sem aumento significativo de memória.
 
-## Métricas coletadas
-- `spike_rate`
-- `average_weight_update`
-- `dendritic_activity_rate`
-- `refractory_block_rate`
-- `adaptation_level_mean`
-- `phase_alignment_mean`
-- `sparsity_ratio`
-- `active_dendrite_ratio`
-- `learning_event_count`
+## Integração
+- `STDPMixin._update_stdp_traces` (`src/pyfolds/advanced/stdp.py`).
+- `MechanismToggleSet.is_enabled` com chave `phase_gating` (`src/pyfolds/advanced/experimental.py`).
+- `MPJRDConfig.enable_phase_gating` (`src/pyfolds/core/config.py`).
 
-## Riscos/limites
-- `dynamic_channel_gating` está em modo mínimo e não deve ser usado como mecanismo validado ainda.
-- `enable_wave_modulation` e `enable_dendritic_threshold_modulation` estão apenas com ponto estrutural nesta etapa.
+## Estado
+- **Rótulo:** `Experimental`.
+- **Justificativa:** técnica está explicitamente guardada por toggle e sem validação final de generalização.
