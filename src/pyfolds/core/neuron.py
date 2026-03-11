@@ -767,8 +767,8 @@ class MPJRDNeuron(BaseNeuron):
     def _local_gate_logit(self, gate_drive: torch.Tensor, eps: float) -> torch.Tensor:
         """Normaliza drive de gate apenas com estatísticas espaciais por amostra."""
         local_mu = gate_drive.mean(dim=1, keepdim=True)
-        local_sigma = gate_drive.std(dim=1, keepdim=True, unbiased=False)
-        return (gate_drive - local_mu) / (local_sigma + eps)
+        local_sigma = gate_drive.std(dim=1, keepdim=True, unbiased=False).clamp_min(eps)
+        return (gate_drive - local_mu) / local_sigma
 
     def forward(
         self,
