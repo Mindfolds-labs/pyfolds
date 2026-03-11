@@ -1234,31 +1234,13 @@ class MPJRDNeuron(BaseNeuron):
             Dicionário com estatísticas globais de estado do neurônio.
         """
 
-        def _iter_synapse_tensors():
-            for dend in self.dendrites:
-                syn_batch = getattr(dend, "synapse_batch", None)
-                if syn_batch is not None:
-                    l_batch = getattr(syn_batch, "L", syn_batch.N)
-                    yield (
-                        syn_batch.N.float().reshape(-1),
-                        l_batch.float().reshape(-1),
-                        syn_batch.I.float().reshape(-1),
-                        syn_batch.W.float().reshape(-1),
-                        syn_batch.protection.float().reshape(-1),
-                    )
-                    continue
-
-                for syn in dend.synapses:
-                    yield (
-                        syn.N.float().reshape(-1),
-                        syn.L.float().reshape(-1),
-                        syn.I.float().reshape(-1),
-                        syn.W.float().reshape(-1),
-                        syn.protection.float().reshape(-1),
-                    )
-
         device = self.theta.device
         n_chunks: list[torch.Tensor] = []
+
+        q_probs = getattr(self, "_metrics_n_quantile_probs", None)
+        if q_probs is None or q_probs.device != device:
+            q_probs = torch.tensor((0.25, 0.5, 0.75), device=device)
+            self._metrics_n_quantile_probs = q_probs
 
         n_count = 0
         n_sum = 0.0
@@ -1282,37 +1264,74 @@ class MPJRDNeuron(BaseNeuron):
         prot_count = 0
         prot_sum = 0.0
 
-        for n_flat, l_flat, i_flat, w_flat, prot_flat in _iter_synapse_tensors():
-            n_chunks.append(n_flat)
+        for dend in self.dendrites:
+            syn_batch = getattr(dend, "synapse_batch", None)
+            if syn_batch is not None:
+                n_flat = syn_batch.N.float().reshape(-1)
+                l_flat = getattr(syn_batch, "L", syn_batch.N).float().reshape(-1)
+                i_flat = syn_batch.I.float().reshape(-1)
+                w_flat = syn_batch.W.float().reshape(-1)
+                prot_flat = syn_batch.protection.float().reshape(-1)
 
-            n_count += int(n_flat.numel())
-            n_sum += float(n_flat.sum().item())
-            n_sumsq += float((n_flat * n_flat).sum().item())
-            n_min = min(n_min, float(n_flat.min().item()))
-            n_max = max(n_max, float(n_flat.max().item()))
+                n_chunks.append(n_flat)
 
-            l_count += int(l_flat.numel())
-            l_sum += float(l_flat.sum().item())
+                n_count += int(n_flat.numel())
+                n_sum += float(n_flat.sum().item())
+                n_sumsq += float((n_flat * n_flat).sum().item())
+                n_min = min(n_min, float(n_flat.min().item()))
+                n_max = max(n_max, float(n_flat.max().item()))
 
-            i_count += int(i_flat.numel())
-            i_sum += float(i_flat.sum().item())
-            i_sumsq += float((i_flat * i_flat).sum().item())
-            i_min = min(i_min, float(i_flat.min().item()))
-            i_max = max(i_max, float(i_flat.max().item()))
+                l_count += int(l_flat.numel())
+                l_sum += float(l_flat.sum().item())
 
-            w_count += int(w_flat.numel())
-            w_sum += float(w_flat.sum().item())
-            w_positive += int((w_flat > 0).sum().item())
+                i_count += int(i_flat.numel())
+                i_sum += float(i_flat.sum().item())
+                i_sumsq += float((i_flat * i_flat).sum().item())
+                i_min = min(i_min, float(i_flat.min().item()))
+                i_max = max(i_max, float(i_flat.max().item()))
 
-            prot_count += int(prot_flat.numel())
-            prot_sum += float(prot_flat.sum().item())
+                w_count += int(w_flat.numel())
+                w_sum += float(w_flat.sum().item())
+                w_positive += int((w_flat > 0).sum().item())
+
+                prot_count += int(prot_flat.numel())
+                prot_sum += float(prot_flat.sum().item())
+                continue
+
+            for syn in dend.synapses:
+                n_flat = syn.N.float().reshape(-1)
+                l_flat = syn.L.float().reshape(-1)
+                i_flat = syn.I.float().reshape(-1)
+                w_flat = syn.W.float().reshape(-1)
+                prot_flat = syn.protection.float().reshape(-1)
+
+                n_chunks.append(n_flat)
+
+                n_count += int(n_flat.numel())
+                n_sum += float(n_flat.sum().item())
+                n_sumsq += float((n_flat * n_flat).sum().item())
+                n_min = min(n_min, float(n_flat.min().item()))
+                n_max = max(n_max, float(n_flat.max().item()))
+
+                l_count += int(l_flat.numel())
+                l_sum += float(l_flat.sum().item())
+
+                i_count += int(i_flat.numel())
+                i_sum += float(i_flat.sum().item())
+                i_sumsq += float((i_flat * i_flat).sum().item())
+                i_min = min(i_min, float(i_flat.min().item()))
+                i_max = max(i_max, float(i_flat.max().item()))
+
+                w_count += int(w_flat.numel())
+                w_sum += float(w_flat.sum().item())
+                w_positive += int((w_flat > 0).sum().item())
+
+                prot_count += int(prot_flat.numel())
+                prot_sum += float(prot_flat.sum().item())
 
         if n_chunks:
             n_flat_all = torch.cat(n_chunks)
-            percentiles = torch.quantile(
-                n_flat_all,
-                torch.tensor([0.25, 0.5, 0.75], device=n_flat_all.device),
-            )
+            percentiles = torch.quantile(n_flat_all, q_probs)
             n_mean = n_sum / n_count
             n_var = max((n_sumsq / n_count) - (n_mean * n_mean), 0.0)
             n_std = n_var**0.5
