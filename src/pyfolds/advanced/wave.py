@@ -75,10 +75,9 @@ class WaveOscillator(nn.Module):
         phase_delta = 2 * math.pi * freq_eff * dt
         self.phase = (self.phase + phase_delta) % (2 * math.pi)
         sin_val = torch.sin(self.phase)
-        cos_val = torch.cos(self.phase)
         self.sin_cache = sin_val
-        self.cos_cache = cos_val
-        return sin_val, cos_val
+        self.cos_cache = torch.cos(self.phase)
+        return sin_val, self.cos_cache
 
     def get_wave(self, amplitude: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         return amplitude * self.sin_cache, amplitude * self.cos_cache

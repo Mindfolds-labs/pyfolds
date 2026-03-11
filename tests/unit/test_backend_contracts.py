@@ -65,6 +65,18 @@ def test_torch_backend_v2_accepts_multidim_batch_contract():
     assert out_v2["v_dend"].shape == (2, 5, cfg.n_dendrites)
     assert out_v2["dendritic_gain"].shape == (2, 5, cfg.n_dendrites)
 
+
+def test_noncontiguous_forward_uses_reshape():
+    cfg = pyfolds.NeuronConfig(n_dendrites=2, n_synapses_per_dendrite=3, device="cpu")
+    neuron_v2 = pyfolds.MPJRDNeuronV2(cfg)
+
+    base = torch.ones(3, 2, 5, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
+    x_noncontig = base.permute(0, 2, 1, 3, 4)
+    assert x_noncontig.is_contiguous() is False
+
+    out = neuron_v2.forward(x_noncontig, collect_stats=False)
+    assert out["spikes"].shape == (3, 5, 2)
+
 def _tf_forward_sequence_equivalent(x_seq: "object") -> "object":
     """Equivalente simples de forward_sequence para validar shape/estabilidade em tf.
 

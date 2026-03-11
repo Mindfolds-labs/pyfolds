@@ -17,3 +17,15 @@ def test_time_counter_increments_at_end_of_forward_step():
 
     assert out0["spikes"][0].item() == 1.0
     assert out1["spikes"][0].item() == 0.0
+
+
+def test_time_counter_single_increment():
+    cfg = pyfolds.NeuronConfig()
+    neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+    x = torch.ones(1, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
+
+    t0 = neuron.time_counter.item()
+    neuron.forward(x, dt=1.0)
+    t1 = neuron.time_counter.item()
+
+    assert t1 - t0 == 1.0

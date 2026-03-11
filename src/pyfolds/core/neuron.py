@@ -621,6 +621,7 @@ class MPJRDNeuron(BaseNeuron):
     ) -> None:
         """Aplica regra local imediatamente (modo ONLINE sem defer)."""
         cfg = self.cfg
+        effective_eta = self._active_i_eta
         post_rate_t = torch.tensor(
             [max(0.0, min(1.0, post_rate))], device=self.theta.device
         )
@@ -632,6 +633,10 @@ class MPJRDNeuron(BaseNeuron):
             pre_rate = (x[:, d_idx, :] * active_mask).sum(dim=0) / active_count
             pre_rate = pre_rate.clamp(0.0, 1.0)
 
+            if effective_eta != float(cfg.i_eta):
+                cfg_for_step = cfg.with_runtime_update(i_eta=effective_eta)
+                dend.cfg = cfg_for_step
+
             dend.update_synapses_rate_based(
                 pre_rate=pre_rate,
                 post_rate=post_rate_t,
@@ -639,6 +644,9 @@ class MPJRDNeuron(BaseNeuron):
                 dt=dt,
                 mode=mode,
             )
+
+            if effective_eta != float(cfg.i_eta):
+                dend.cfg = cfg
 
     def invalidate_weight_cache(self) -> None:
         """Marca cache de pesos como sujo (chamar após mutações de peso)."""
@@ -870,8 +878,6 @@ class MPJRDNeuron(BaseNeuron):
             stability_ratio=float(stability_ratio),
         )
         self._active_i_eta = float(self._latest_policy.effective_eta)
-        self.cfg = self.cfg.with_runtime_update(i_eta=self._active_i_eta)
-        self._refresh_config_references()
 
         if self.network_state == NetworkState.SLEEP_CONSOLIDATION:
             self.run_sleep_cycle(duration=dt)

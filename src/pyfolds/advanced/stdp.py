@@ -114,7 +114,7 @@ class STDPMixin:
         
         # Spike pós é global por amostra e broadcast para [B, 1, 1]
         # (mesma modulação para todos os dendritos/sinapses da amostra).
-        post_expanded = post_spike.view(-1, 1, 1)  # [B, 1, 1]
+        post_expanded = post_spike.reshape(-1, 1, 1)  # [B, 1, 1]
 
         # LTD: onde trace_post > threshold
         trace_threshold = getattr(self.cfg, "stdp_trace_threshold", 0.01)
@@ -132,6 +132,13 @@ class STDPMixin:
             max_elig = getattr(self.cfg, "max_eligibility", 1e6)
             with torch.no_grad():
                 for d_idx, dend in enumerate(self.dendrites):
+                    if getattr(dend, "synapse_batch", None) is not None:
+                        batch = dend.synapse_batch
+                        row = delta_total[d_idx].to(batch.stdp_eligibility.device)
+                        batch.stdp_eligibility.add_(row)
+                        batch.stdp_eligibility.clamp_(-max_elig, max_elig)
+                        continue
+
                     delta_row = delta_total[d_idx]
                     for s_idx, syn in enumerate(dend.synapses):
                         syn.stdp_eligibility.add_(delta_row[s_idx].to(syn.stdp_eligibility.device))

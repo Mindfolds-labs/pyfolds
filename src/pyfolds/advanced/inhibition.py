@@ -167,7 +167,7 @@ class InhibitionLayer(nn.Module):
         # ===== SPIKE INIBITÓRIO =====
         # Média sobre batch para estabilidade
         inh_input_mean = feedforward_input.mean(dim=0)  # [n_inh]
-        self.inh_potential = inh_input_mean
+        self.inh_potential.copy_(inh_input_mean)
         
         # Disparo se potencial >= threshold
         inh_spikes = (self.inh_potential >= self.inh_threshold).float()

@@ -88,7 +88,7 @@ class TestShortTermDynamicsMixin:
 
 
     def test_update_aligns_stp_buffers_to_input_device(self, full_config):
-        """Buffers de STP devem acompanhar device da entrada para evitar mismatch."""
+        """Mismatch de device deve falhar cedo para preservar buffers registrados."""
         if not pyfolds.ADVANCED_AVAILABLE:
             pytest.skip("Advanced module not available")
 
@@ -96,10 +96,12 @@ class TestShortTermDynamicsMixin:
         target_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         x = torch.zeros(2, full_config.n_dendrites, full_config.n_synapses_per_dendrite, device=target_device)
 
-        neuron._update_short_term_dynamics(x, dt=1.0)
+        if target_device.type == "cpu":
+            neuron._update_short_term_dynamics(x, dt=1.0)
+            return
 
-        assert neuron.u_stp.device.type == target_device.type
-        assert neuron.R_stp.device.type == target_device.type
+        with pytest.raises(RuntimeError, match="Buffers STP em device diferente"):
+            neuron._update_short_term_dynamics(x, dt=1.0)
 
 
     def test_stp_buffers_remain_registered_after_device_alignment(self, full_config):
@@ -113,3 +115,16 @@ class TestShortTermDynamicsMixin:
         state = neuron.state_dict()
         assert 'u_stp' in state
         assert 'R_stp' in state
+
+
+def test_short_term_buffers_persist_after_save_load_and_to(full_config):
+    neuron = pyfolds.MPJRDNeuronAdvanced(full_config)
+    state = neuron.state_dict()
+
+    restored = pyfolds.MPJRDNeuronAdvanced(full_config)
+    restored.load_state_dict(state)
+    restored.to(torch.device("cpu"))
+
+    restored_state = restored.state_dict()
+    assert "u_stp" in restored_state
+    assert "R_stp" in restored_state

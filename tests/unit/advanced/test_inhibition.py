@@ -88,6 +88,25 @@ class TestInhibitionLayer:
 
         assert torch.allclose(layer_a.W_E2I, layer_b.W_E2I)
 
+    def test_state_dict_completeness_for_buffers(self):
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        from pyfolds.advanced import InhibitionLayer
+
+        layer = InhibitionLayer(n_excitatory=8, n_inhibitory=2)
+        layer(torch.zeros(2, 8))
+        state = layer.state_dict()
+
+        assert "inh_potential" in state
+        assert "inh_threshold" in state
+        assert "W_E2I" in state
+        assert "lateral_kernel" in state
+
+        layer.to(torch.device("cpu"))
+        state_after = layer.state_dict()
+        assert "inh_potential" in state_after
+
 
 class TestInhibitionMixin:
     """Tests for InhibitionMixin guard clauses."""

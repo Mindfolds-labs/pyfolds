@@ -200,3 +200,28 @@ class TestSTDPMixin:
         delta8 = n_b8.dendrites[0].synapses[0].stdp_eligibility.item() - before8
 
         assert delta1 == pytest.approx(delta8, rel=1e-6, abs=1e-6)
+
+
+def test_stdp_vectorized_synapse_batch_matches_non_vectorized():
+    cfg_kwargs = dict(
+        n_dendrites=1,
+        n_synapses_per_dendrite=3,
+        plasticity_mode="stdp",
+        spike_threshold=0.0,
+        stdp_trace_threshold=0.0,
+        device="cpu",
+    )
+    cfg_vec = pyfolds.NeuronConfig(**cfg_kwargs, use_vectorized_synapses=True)
+    cfg_ref = pyfolds.NeuronConfig(**cfg_kwargs, use_vectorized_synapses=False)
+
+    n_vec = pyfolds.MPJRDNeuronAdvanced(cfg_vec)
+    n_ref = pyfolds.MPJRDNeuronAdvanced(cfg_ref)
+
+    x = torch.ones(2, 1, 3)
+    post = torch.ones(2)
+    n_vec._update_stdp_traces(x, post, dt=1.0)
+    n_ref._update_stdp_traces(x, post, dt=1.0)
+
+    vec_row = n_vec.dendrites[0].synapse_batch.stdp_eligibility
+    ref_row = torch.stack([s.stdp_eligibility.squeeze(0) for s in n_ref.dendrites[0].synapses])
+    assert torch.allclose(vec_row, ref_row, atol=1e-6)

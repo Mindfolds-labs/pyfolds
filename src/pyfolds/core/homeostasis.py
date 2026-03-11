@@ -86,10 +86,13 @@ class HomeostasisController(nn.Module):
         if math.isnan(rate) or math.isinf(rate):
             raise ValueError(f"current_rate inválido (NaN/Inf): {rate}")
 
-        if rate < -self.eps or rate > 1.0 + self.eps:
+        if rate < -10.0 * self.eps or rate > 1.0 + self.eps:
             raise ValueError(f"current_rate deve estar em [0, 1], mas é {rate}")
-        
-        rate = max(0.0, min(1.0, rate))
+
+        if rate < 0.0:
+            rate = 0.0
+        elif rate > 1.0:
+            rate = 1.0
         cfg = self.cfg
 
         # 1. Erro homeostático
