@@ -65,6 +65,7 @@ class MPJRDNeuron(BaseNeuron):
     ):
         super().__init__()
         self.cfg = cfg
+        self._base_i_eta = float(cfg.i_eta)
 
         # ✅ LOGGER específico para este neurônio
         self.logger = get_logger(f"pyfolds.neuron.{name or id(self)}")
@@ -344,6 +345,8 @@ class MPJRDNeuron(BaseNeuron):
                 cfg_field = self.cfg.resolve_runtime_alias(name)
                 if cfg_field in allowed_fields:
                     self.cfg = self.cfg.with_runtime_update(**{cfg_field: float(value)})
+                    if cfg_field == "i_eta":
+                        self._base_i_eta = float(self.cfg.i_eta)
                     self._refresh_config_references()
                     applied += 1
                 continue
@@ -356,10 +359,32 @@ class MPJRDNeuron(BaseNeuron):
                     else value
                 )
                 self.cfg = self.cfg.with_runtime_update(**{cfg_field: casted})
+                if cfg_field == "i_eta":
+                    self._base_i_eta = float(self.cfg.i_eta)
                 self._refresh_config_references()
                 applied += 1
 
         return applied
+
+    def _safe_step_id(self) -> int:
+        """Retorna step_id de forma segura mesmo sem buffer registrado."""
+        step_id_buf = getattr(self, "step_id", None)
+        if step_id_buf is None:
+            return 0
+        return int(step_id_buf.item())
+
+    def _compute_circadian_plasticity_gate(self, dt: float) -> float:
+        """Calcula gate circadiano contínuo para modulação de i_eta."""
+        if not bool(getattr(self.cfg, "circadian_enabled", False)):
+            return 1.0
+
+        cycle_h = max(float(getattr(self.cfg, "circadian_cycle_hours", 12.0)), 1e-6)
+        min_gate = float(getattr(self.cfg, "circadian_plasticity_min", 0.1))
+        max_gate = float(getattr(self.cfg, "circadian_plasticity_max", 1.5))
+        step_idx = float(self._safe_step_id())
+        phase = ((step_idx * float(dt)) / (cycle_h * 3600.0)) * (2.0 * torch.pi)
+        circadian = 0.5 + 0.5 * torch.cos(torch.tensor(phase, dtype=torch.float32)).item()
+        return float(min_gate + (max_gate - min_gate) * circadian)
 
     # ========== CONTROLE DE MODO ==========
 
@@ -534,6 +559,11 @@ class MPJRDNeuron(BaseNeuron):
         normalized_mode = normalize_learning_mode(mode)
         effective_mode = normalized_mode if normalized_mode is not None else self.mode
 
+        circadian_gate = self._compute_circadian_plasticity_gate(dt=dt)
+        if circadian_gate != 1.0:
+            self.cfg = self.cfg.with_runtime_update(i_eta=self._base_i_eta * circadian_gate)
+            self._refresh_config_references()
+
         self._apply_runtime_injections()
 
         # Valida device
@@ -707,8 +737,10 @@ class MPJRDNeuron(BaseNeuron):
         )
 
         with self._telemetry_lock:
-            self.step_id.add_(1)
-            sid = int(self.step_id.item())
+            step_buf = getattr(self, "step_id", None)
+            if step_buf is not None:
+                step_buf.add_(1)
+            sid = self._safe_step_id()
 
             if emit_telemetry and self.telemetry.should_emit(sid):
                 try:
@@ -878,7 +910,7 @@ class MPJRDNeuron(BaseNeuron):
         if self.telemetry is not None and self.telemetry.enabled():
             with self._telemetry_lock:
                 try:
-                    sid = int(self.step_id.item())
+                    sid = self._safe_step_id()
                     self.telemetry.emit(
                         commit_event(
                             step_id=sid,
@@ -909,7 +941,7 @@ class MPJRDNeuron(BaseNeuron):
         if self.telemetry is not None and self.telemetry.enabled():
             with self._telemetry_lock:
                 try:
-                    sid = int(self.step_id.item())
+                    sid = self._safe_step_id()
                     self.telemetry.emit(
                         sleep_event(
                             step_id=sid,

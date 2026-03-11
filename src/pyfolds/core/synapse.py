@@ -63,6 +63,8 @@ class MPJRDSynapse(nn.Module):
         # Traços para consolidação (Hebb + STDP separados)
         self.register_buffer("eligibility", torch.zeros(1, dtype=torch.float32))
         self.register_buffer("stdp_eligibility", torch.zeros(1, dtype=torch.float32))
+        self.register_buffer("age", torch.zeros(1, dtype=torch.float32))
+        self.register_buffer("access_count", torch.zeros(1, dtype=torch.float32))
 
         # Estado de curto prazo (u, R) para compatibilidade
         self.register_buffer("u", torch.tensor([cfg.u0], dtype=torch.float32))
@@ -172,12 +174,12 @@ class MPJRDSynapse(nn.Module):
         near_max = (cfg.i_max - self.I) < 1.0
         damped_delta = delta_mean
 
-        if near_max.any() and damped_delta.item() > 0:
+        if bool(near_max.any()) and bool((damped_delta > 0).all()):
             excess = (self.I[near_max] - cfg.i_max) / 5.0
             damping = 1.0 / (1.0 + torch.exp(excess))
             damped_delta = damped_delta * damping.mean()
 
-        if near_min.any() and damped_delta.item() < 0:
+        if bool(near_min.any()) and bool((damped_delta < 0).all()):
             deficit = (cfg.i_min - self.I[near_min]) / 5.0
             damping = 1.0 / (1.0 + torch.exp(deficit))
             damped_delta = damped_delta * damping.mean()
@@ -274,6 +276,9 @@ class MPJRDSynapse(nn.Module):
         active_mask = (pre_rate > cfg.activity_threshold).float()  # [B]
         pre_rate_filtered = pre_rate * active_mask  # [B]
 
+        if bool(active_mask.any()):
+            self.access_count.add_(active_mask.mean().to(self.access_count.dtype) * dt)
+
         # Hebb LTP = pre * post (broadcast)
         # post_rate é [1], pre_rate_filtered é [B] → resultado [B]
         hebb_ltp = (pre_rate_filtered * post_rate).clamp(0.0, 1.0)  # [B]
@@ -337,7 +342,7 @@ class MPJRDSynapse(nn.Module):
                 self.I.zero_()
 
                 # Se estava protegido e saiu da saturação
-                if (not self._at_upper_bound()) and self.protection.item():
+                if (not self._at_upper_bound()) and bool(self.protection.any()):
                     self.protection.fill_(False)
                     self.sat_time.zero_()
 
@@ -441,8 +446,18 @@ class MPJRDSynapse(nn.Module):
         self.eligibility.zero_()
         self.stdp_eligibility.zero_()
 
+        dt_tensor = torch.tensor(float(dt_abs), dtype=self.I.dtype, device=self.I.device)
+        self.age.add_(dt_tensor)
+
         if self.I.numel() > 0:
             self.I.mul_(self.cfg.i_decay_sleep)
+
+            forget_tau = max(float(self.cfg.forgetting_tau), 1e-6)
+            access_lambda = max(float(self.cfg.forgetting_access_lambda), 0.0)
+            forgetting_base = torch.exp(-self.age / forget_tau)
+            access_boost = torch.exp(-self.access_count / (1.0 + access_lambda))
+            forgetting_factor = (forgetting_base * access_boost).clamp(0.0, 1.0)
+            self.I.mul_(forgetting_factor)
 
         self._sync_distributed_plasticity_state()
 
@@ -457,6 +472,8 @@ class MPJRDSynapse(nn.Module):
             "sat_time": self.sat_time.clone(),
             "eligibility": self.eligibility.clone(),
             "stdp_eligibility": self.stdp_eligibility.clone(),
+            "age": self.age.clone(),
+            "access_count": self.access_count.clone(),
         }
 
     def load_state(self, state: dict) -> None:
@@ -469,6 +486,10 @@ class MPJRDSynapse(nn.Module):
             self.I.data = state["I"].to(self.I.device)
         if "protection" in state:
             self.protection.data = state["protection"].to(self.protection.device)
+        if "age" in state:
+            self.age.data = state["age"].to(self.age.device)
+        if "access_count" in state:
+            self.access_count.data = state["access_count"].to(self.access_count.device)
         if "sat_time" in state:
             self.sat_time.data = state["sat_time"].to(self.sat_time.device)
         if "eligibility" in state:
