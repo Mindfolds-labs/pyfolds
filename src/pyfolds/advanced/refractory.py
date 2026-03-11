@@ -143,8 +143,13 @@ class RefractoryMixin(TimedMixin):
                 f"shape={tuple(theta_raw.shape)}, esperado escalar, [1] ou [{batch_size}]"
             )
 
+        u_raw = output.get('u_raw', output['u'])
+        u_eff = u_raw
+        if hasattr(self, '_apply_sfa_before_threshold'):
+            u_eff = self._apply_sfa_before_threshold(u_raw, dt=kwargs.get('dt', 1.0))
+
         theta_eff = theta + theta_boost
-        spikes_rel = (output['u'] >= theta_eff).float()
+        spikes_rel = (u_eff >= theta_eff).float()
         
         # Bloqueia spikes apenas no refratário absoluto
         final_spikes = torch.where(blocked, torch.zeros_like(spikes_rel), spikes_rel)
@@ -157,9 +162,15 @@ class RefractoryMixin(TimedMixin):
         output['spike_rate'] = float(final_spikes.mean().item())
         output['refrac_blocked'] = blocked
         output['theta_boost'] = theta_boost
+        output['u_raw'] = u_raw
+        output['u_eff'] = u_eff
+        output['u'] = u_eff
 
         # Atualiza estado refratário antes da homeostase
         self._update_refractory_batch(final_spikes, dt=kwargs.get('dt', 1.0))
+
+        if hasattr(self, '_update_adaptation_after_spike'):
+            self._update_adaptation_after_spike(final_spikes)
 
         effective_mode = kwargs.get("mode", getattr(self, "mode", None))
         collect_stats = kwargs.get("collect_stats", True)

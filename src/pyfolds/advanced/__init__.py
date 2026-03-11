@@ -42,6 +42,28 @@ from ..utils.logging import get_logger
 
 logger = logging.getLogger(__name__)
 
+
+def _validate_advanced_mro(cls, base_cls, logger):
+    """Valida ordem mínima de MRO para composição dos mixins avançados."""
+    mro = cls.mro()
+    names = [c.__name__ for c in mro]
+    try:
+        idx_adapt = mro.index(AdaptationMixin)
+        idx_refrac = mro.index(RefractoryMixin)
+        idx_base = mro.index(base_cls)
+    except ValueError as exc:
+        raise RuntimeError(
+            f"MRO inválida para {cls.__name__}: {names}"
+        ) from exc
+
+    if not (idx_adapt < idx_refrac < idx_base):
+        raise RuntimeError(
+            f"Ordem de MRO inesperada em {cls.__name__}: {names}. "
+            "Esperado AdaptationMixin -> RefractoryMixin -> Base."
+        )
+
+    logger.debug("✅ MRO validada (%s): %s", cls.__name__, " -> ".join(names[: idx_base + 1]))
+
 __all__ = [
     "RefractoryMixin",
     "STDPMixin",
@@ -101,6 +123,7 @@ class MPJRDNeuronAdvanced(
         super().__init__(cfg, **kwargs)
         self._init_wave_dynamics(cfg)
         self._init_circadian(cfg)
+        _validate_advanced_mro(type(self), MPJRDNeuronBase, getattr(self, "logger", logger))
         self._init_advanced_mixins(cfg, is_wave=False)
 
     def forward(self, x, **kwargs):
@@ -225,6 +248,7 @@ class MPJRDWaveNeuronAdvanced(
         super().__init__(cfg, **kwargs)
         self._init_wave_dynamics(cfg)
         self._init_circadian(cfg)
+        _validate_advanced_mro(type(self), MPJRDWaveNeuronBase, getattr(self, "logger", logger))
         MPJRDNeuronAdvanced._init_advanced_mixins(self, cfg, is_wave=True)
 
     def forward(self, x, **kwargs):
