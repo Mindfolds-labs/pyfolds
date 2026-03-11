@@ -26,7 +26,7 @@ class TestRefractoryMixin:
         batch_size = 3
         
         neuron._ensure_last_spike_time(batch_size, torch.device('cpu'))
-        neuron.last_spike_time = torch.tensor([-10.0, 1.0, 3.0])
+        neuron.last_spike_time.copy_(torch.tensor([-10.0, 1.0, 3.0]))
         
         blocked, theta_boost = neuron._check_refractory_batch(5.0, batch_size)
         
@@ -38,7 +38,7 @@ class TestRefractoryMixin:
         assert theta_boost[2].item() == 0.0
     
         neuron._ensure_last_spike_time(batch_size=1, device=torch.device("cpu"))
-        neuron.last_spike_time = torch.tensor([0.0])
+        neuron.last_spike_time.copy_(torch.tensor([0.0]))
 
         blocked, theta_boost = neuron._check_refractory_batch(1.0, batch_size=1)
         assert blocked[0].item() is True
@@ -87,7 +87,7 @@ class TestRefractoryMixin:
 
         # Força estado no refratário absoluto para a próxima chamada.
         neuron.time_counter.fill_(1.0)
-        neuron.last_spike_time = torch.tensor([0.0])
+        neuron.last_spike_time.copy_(torch.tensor([0.0]))
 
         second = neuron.forward(x, dt=1.0)
         assert second['refrac_blocked'][0].item() is True
@@ -118,7 +118,8 @@ class TestRefractoryMixin:
 
         theta_before = neuron.theta.clone()
         neuron.time_counter.fill_(1.0)
-        neuron.last_spike_time = torch.tensor([0.0])
+        neuron._ensure_last_spike_time(batch_size=1, device=torch.device("cpu"))
+        neuron.last_spike_time.copy_(torch.tensor([0.0]))
 
         out = neuron.forward(x, dt=1.0)
 

@@ -16,6 +16,14 @@ logger = logging.getLogger(__name__)
 class BackpropMixin(TimedMixin):
     """Mixin para backpropagação dendrítica com opção proporcional."""
 
+    def _backprop_load_state_dict_pre_hook(self, module, state_dict, prefix, *args):
+        amp_key = f"{prefix}dendrite_amplification"
+        if amp_key in state_dict:
+            self.dendrite_amplification.resize_(state_dict[amp_key].shape)
+        trace_key = f"{prefix}backprop_trace"
+        if trace_key in state_dict:
+            self.backprop_trace.resize_(state_dict[trace_key].shape)
+
     def _init_backprop(self, cfg):
         """Inicializa parâmetros de backpropagação a partir da config."""
         self.backprop_delay = cfg.backprop_delay
@@ -32,7 +40,11 @@ class BackpropMixin(TimedMixin):
         D = self.cfg.n_dendrites
         self.register_buffer("dendrite_amplification", torch.zeros(D))
 
-        self.backprop_trace = None
+        if not hasattr(self, "backprop_trace"):
+            self.register_buffer("backprop_trace", torch.empty(0))
+        if not getattr(self, "_backprop_state_hook_registered", False):
+            self.register_load_state_dict_pre_hook(self._backprop_load_state_dict_pre_hook)
+            self._backprop_state_hook_registered = True
         self._last_backprop_time = 0.0
         self.backprop_dropped_events = 0
 
@@ -47,8 +59,15 @@ class BackpropMixin(TimedMixin):
         """Garante que backprop_trace existe com tamanho correto."""
         D = self.cfg.n_dendrites
         S = self.cfg.n_synapses_per_dendrite
-        if self.backprop_trace is None or self.backprop_trace.shape[0] != batch_size:
-            self.backprop_trace = torch.zeros(batch_size, D, S, device=device)
+        needs_resize = (
+            self.backprop_trace.ndim != 3
+            or self.backprop_trace.shape[0] != batch_size
+            or self.backprop_trace.shape[1] != D
+            or self.backprop_trace.shape[2] != S
+        )
+        if needs_resize:
+            self.backprop_trace.resize_(batch_size, D, S)
+            self.backprop_trace.zero_()
 
     def _schedule_backprop(
         self,
@@ -92,7 +111,7 @@ class BackpropMixin(TimedMixin):
         device = first_event["v_dend"].device
         self._ensure_backprop_trace(batch_size, device)
 
-        if self.backprop_trace is not None:
+        if self.backprop_trace.numel() > 0:
             self.backprop_trace.mul_(decay_trace)
 
         self._last_backprop_time = current_time
@@ -141,7 +160,7 @@ class BackpropMixin(TimedMixin):
             )
 
         output["dendrite_amplification"] = self.dendrite_amplification.clone()
-        if self.backprop_trace is not None:
+        if self.backprop_trace.numel() > 0:
             output["backprop_trace_mean"] = self.backprop_trace.mean()
 
         return output
@@ -149,7 +168,7 @@ class BackpropMixin(TimedMixin):
     def reset_backprop(self):
         """Reseta estado de backpropagação."""
         self.dendrite_amplification.zero_()
-        self.backprop_trace = None
+        self.backprop_trace.resize_(0)
         self.backprop_queue.clear()
         self._last_backprop_time = 0.0
         self.backprop_dropped_events = 0
@@ -163,6 +182,6 @@ class BackpropMixin(TimedMixin):
             "backprop_dropped_events": self.backprop_dropped_events,
             "bap_proportional": self.bap_proportional,
         }
-        if self.backprop_trace is not None:
+        if self.backprop_trace.numel() > 0:
             metrics["backprop_trace_mean"] = self.backprop_trace.mean().item()
         return metrics
