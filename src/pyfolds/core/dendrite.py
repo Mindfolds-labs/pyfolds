@@ -215,8 +215,6 @@ class MPJRDDendrite(nn.Module):
     @torch.no_grad()
     def consolidate(self, dt: float = 1.0) -> None:
         """Consolida mudanças sinápticas."""
-        if torch.cuda.is_available():
-            torch.cuda.synchronize()
         if self.synapse_batch is not None:
             self.synapse_batch.consolidate(dt)
         else:

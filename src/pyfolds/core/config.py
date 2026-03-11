@@ -53,6 +53,8 @@ class PlasticityConfig:
     A_plus: float = 1.0
     A_minus: float = 1.0
     neuromod_scale: float = 1.0
+    forgetting_tau: float = 1e12
+    forgetting_access_lambda: float = 0.5
 
 
 @dataclass(frozen=True)
@@ -245,6 +247,8 @@ class MPJRDConfig:
     # ===== NEUROMODULAÇÃO =====
     neuromod_mode: NeuromodMode = "surprise"
     neuromod_scale: float = 1.0
+    forgetting_tau: float = 1e12
+    forgetting_access_lambda: float = 0.5
     
     # Capacidade
     cap_k_sat: float = 1.2
@@ -331,6 +335,8 @@ class MPJRDConfig:
             A_plus=self.A_plus,
             A_minus=self.A_minus,
             neuromod_scale=self.neuromod_scale,
+            forgetting_tau=self.forgetting_tau,
+            forgetting_access_lambda=self.forgetting_access_lambda,
         ))
         object.__setattr__(self, "homeostasis", HomeostasisConfig(
             theta_init=self.theta_init,
@@ -407,6 +413,17 @@ class MPJRDConfig:
 
         if self.neuromod_scale <= 0:
             raise ValueError(f"neuromod_scale must be > 0, got {self.neuromod_scale}")
+
+        if self.forgetting_tau <= 0:
+            raise ValueError(
+                f"forgetting_tau deve ser > 0, recebido {self.forgetting_tau}"
+            )
+
+        if self.forgetting_access_lambda < 0:
+            raise ValueError(
+                "forgetting_access_lambda deve ser >= 0, "
+                f"recebido {self.forgetting_access_lambda}"
+            )
 
         if self.hebbian_ltd_ratio < 0:
             raise ValueError(
