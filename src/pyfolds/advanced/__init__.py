@@ -89,6 +89,11 @@ class MPJRDNeuronAdvanced(
         self._init_circadian(cfg)
         self._init_advanced_mixins(cfg, is_wave=False)
 
+    def forward(self, x, **kwargs):
+        output = super().forward(x, **kwargs)
+        self._increment_time(kwargs.get("dt", 1.0))
+        return output
+
     def _init_advanced_mixins(self, cfg, is_wave: bool = False) -> None:
         """Inicializa mixins avançados com validações e logging de diagnóstico."""
         logger = getattr(self, "logger", get_logger(f"pyfolds.advanced.{id(self)}"))
@@ -207,48 +212,44 @@ class MPJRDWaveNeuronAdvanced(
         self._init_circadian(cfg)
         MPJRDNeuronAdvanced._init_advanced_mixins(self, cfg, is_wave=True)
 
+    def forward(self, x, **kwargs):
+        output = super().forward(x, **kwargs)
+        self._increment_time(kwargs.get("dt", 1.0))
+        return output
 
-class MPJRDLayerAdvanced(MPJRDLayer):
+
+class _BaseAdvancedLayer(MPJRDLayer):
+    """Base para camadas avançadas com variação apenas do `neuron_cls`."""
+
+    _neuron_cls = MPJRDNeuronAdvanced
+
+    def __init__(
+        self,
+        n_neurons: int,
+        cfg,
+        name: str = "",
+        enable_telemetry: bool = False,
+        telemetry_profile: str = "off",
+        device: Optional[torch.device] = None,
+    ):
+        super().__init__(
+            n_neurons=n_neurons,
+            cfg=cfg,
+            name=name,
+            neuron_cls=self._neuron_cls,
+            enable_telemetry=enable_telemetry,
+            telemetry_profile=telemetry_profile,
+            device=device,
+        )
+
+
+class MPJRDLayerAdvanced(_BaseAdvancedLayer):
     """Camada que injeta automaticamente `MPJRDNeuronAdvanced`."""
 
-    def __init__(
-        self,
-        n_neurons: int,
-        cfg,
-        name: str = "",
-        enable_telemetry: bool = False,
-        telemetry_profile: str = "off",
-        device: Optional[torch.device] = None,
-    ):
-        super().__init__(
-            n_neurons=n_neurons,
-            cfg=cfg,
-            name=name,
-            neuron_cls=MPJRDNeuronAdvanced,
-            enable_telemetry=enable_telemetry,
-            telemetry_profile=telemetry_profile,
-            device=device,
-        )
+    _neuron_cls = MPJRDNeuronAdvanced
 
 
-class MPJRDWaveLayerAdvanced(MPJRDLayer):
+class MPJRDWaveLayerAdvanced(_BaseAdvancedLayer):
     """Camada avançada para neurônios wave + mecanismos v2.x."""
 
-    def __init__(
-        self,
-        n_neurons: int,
-        cfg,
-        name: str = "",
-        enable_telemetry: bool = False,
-        telemetry_profile: str = "off",
-        device: Optional[torch.device] = None,
-    ):
-        super().__init__(
-            n_neurons=n_neurons,
-            cfg=cfg,
-            name=name,
-            neuron_cls=MPJRDWaveNeuronAdvanced,
-            enable_telemetry=enable_telemetry,
-            telemetry_profile=telemetry_profile,
-            device=device,
-        )
+    _neuron_cls = MPJRDWaveNeuronAdvanced

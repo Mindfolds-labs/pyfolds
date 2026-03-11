@@ -118,10 +118,10 @@ class MPJRDNeuronV2(MPJRDNeuron):
                 mode=effective_mode,
             )
 
-        spikes = spikes.view(batch_shape)
-        somatic = somatic.view(batch_shape)
-        v_dend = v_dend.view(*batch_shape, D)
-        dendritic_gain = dendritic_gain.view(*batch_shape, D)
+        spikes = spikes.reshape(batch_shape)
+        somatic = somatic.reshape(batch_shape)
+        v_dend = v_dend.reshape(*batch_shape, D)
+        dendritic_gain = dendritic_gain.reshape(*batch_shape, D)
 
         # ===== 10. TELEMETRIA =====
         with self._telemetry_lock:

@@ -58,3 +58,17 @@ class TestHomeostasisController:
         homeo.update(0.0)
 
         assert (initial - homeo.theta.item()) >= 0.05
+
+    def test_small_negative_rate_is_clamped(self, small_config):
+        from pyfolds.core import HomeostasisController
+
+        homeo = HomeostasisController(small_config)
+        homeo.update(-small_config.homeostasis_eps * 0.5)
+        assert homeo.step_count.item() == 1
+
+    def test_clearly_invalid_negative_rate_raises(self, small_config):
+        from pyfolds.core import HomeostasisController
+
+        homeo = HomeostasisController(small_config)
+        with pytest.raises(ValueError):
+            homeo.update(-small_config.homeostasis_eps * 20.0)

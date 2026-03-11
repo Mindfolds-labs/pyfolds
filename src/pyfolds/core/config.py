@@ -229,7 +229,6 @@ class MPJRDConfig:
     active_synapses_ratio: float = 0.25
 
     # ===== MECANISMO WAVE (OPCIONAL) =====
-    wave_enabled: bool = False
     base_frequency: float = 12.0
     frequency_step: float = 4.0
     class_frequencies: Optional[Tuple[float, ...]] = None
@@ -745,10 +744,28 @@ class MPJRDConfig:
 
     def __getattr__(self, name: str):
         """Fallback de compatibilidade para acesso flat via subconfigs."""
-        for sub in (self.topology, self.filament, self.plasticity, self.homeostasis, self.circadian, self.audit):
-            if hasattr(sub, name):
-                return getattr(sub, name)
-        raise AttributeError(f"MPJRDConfig has no attribute '{name}'")
+        subconfigs = (
+            self.topology,
+            self.filament,
+            self.plasticity,
+            self.homeostasis,
+            self.circadian,
+            self.audit,
+        )
+        known_subfields = {
+            field_name
+            for sub in subconfigs
+            for field_name in sub.__dataclass_fields__.keys()
+        }
+        if name in known_subfields:
+            for sub in subconfigs:
+                if name in sub.__dataclass_fields__:
+                    return getattr(sub, name)
+
+        raise AttributeError(
+            f"MPJRDConfig has no attribute '{name}'. "
+            "Atributo desconhecido para config principal e subconfigs."
+        )
 
     def __repr__(self) -> str:
         """Representação string da configuração."""

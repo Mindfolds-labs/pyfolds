@@ -99,18 +99,14 @@ class BackpropMixin(TimedMixin):
                 amplification_gain.clamp(max=self.backprop_max_amp)
             )
 
-            for d_idx in range(self.cfg.n_dendrites):
-                if self.bap_proportional and dend_contribution is not None:
-                    active_samples = (
-                        dend_contribution[:, d_idx] > self.backprop_active_threshold
-                    )
-                else:
-                    active_samples = (
-                        v_dend[:, d_idx] > self.backprop_active_threshold
-                    )
+            if self.bap_proportional and dend_contribution is not None:
+                active_mask = dend_contribution > self.backprop_active_threshold
+            else:
+                active_mask = v_dend > self.backprop_active_threshold
 
-                self.backprop_trace[active_samples, d_idx, :] += self.backprop_signal
-
+            self.backprop_trace.add_(
+                active_mask.unsqueeze(-1).to(self.backprop_trace.dtype) * self.backprop_signal
+            )
             self.backprop_trace.clamp_(max=2.0)
 
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
@@ -131,8 +127,6 @@ class BackpropMixin(TimedMixin):
         output["dendrite_amplification"] = self.dendrite_amplification.clone()
         if self.backprop_trace is not None:
             output["backprop_trace_mean"] = self.backprop_trace.mean()
-
-        self._increment_time(dt)
 
         return output
 

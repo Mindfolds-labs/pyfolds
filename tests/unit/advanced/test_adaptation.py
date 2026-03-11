@@ -94,3 +94,30 @@ class TestAdaptationMixin:
         assert 'u_raw' in out
         assert 'u_eff' in out
         assert torch.allclose(out['u'], out['u_eff'])
+
+
+def test_refractory_blocks_adaptation_spikes(full_config):
+    cfg = pyfolds.NeuronConfig(
+        n_dendrites=1,
+        n_synapses_per_dendrite=1,
+        t_refrac_abs=2.0,
+        theta_init=0.01,
+        theta_min=0.001,
+        adaptation_enabled=True,
+        adaptation_increment=5.0,
+        device="cpu",
+    )
+    neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+    for syn in neuron.dendrites[0].synapses:
+        syn.N.fill_(cfg.n_max)
+    neuron.dendrites[0]._invalidate_cache()
+    neuron.u_stp.fill_(1.0)
+    neuron.R_stp.fill_(1.0)
+
+    x = torch.ones(1, 1, 1) * 10.0
+    out0 = neuron.forward(x, dt=1.0, collect_stats=False)
+    out1 = neuron.forward(x, dt=1.0, collect_stats=False)
+
+    assert out0["spikes"].item() == 1.0
+    assert out1["refrac_blocked"].item() is True
+    assert out1["spikes"].item() == 0.0

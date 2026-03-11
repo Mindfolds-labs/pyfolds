@@ -73,10 +73,11 @@ class ShortTermDynamicsMixin:
                 f"recebido {tuple(x.shape)}"
             )
 
-        # Garante buffers no mesmo device da entrada sem quebrar o registro
-        # de buffers do nn.Module (state_dict/multi-GPU).
         if self.u_stp.device != x.device or self.R_stp.device != x.device:
-            self._align_short_term_buffers_device(x.device)
+            raise RuntimeError(
+                "Buffers STP em device diferente da entrada. "
+                "Use module.to(device) para mover o neurônio inteiro."
+            )
 
         # Detecta spikes pré com threshold configurável
         spike_threshold = getattr(self.cfg, 'spike_threshold', 0.5)
@@ -102,11 +103,6 @@ class ShortTermDynamicsMixin:
         
         self.R_stp.clamp_(0.0, 1.0)
 
-    def _align_short_term_buffers_device(self, device: torch.device) -> None:
-        """Realinha buffers STP para ``device`` preservando registro no módulo."""
-        self.u_stp = self.u_stp.to(device=device)
-        self.R_stp = self.R_stp.to(device=device)
-    
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         """
         Forward pass com dinâmica de curto prazo.
@@ -140,3 +136,7 @@ class ShortTermDynamicsMixin:
         output['modulation_mean'] = modulation.mean()
         
         return output
+
+    def _align_short_term_buffers_device(self, device: torch.device) -> None:
+        """Compatibilidade: move módulo inteiro para preservar buffers registrados."""
+        self.to(device)

@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Protocol, runtime_checkable
 
 import torch
 
@@ -28,6 +28,17 @@ class TemporalMemory:
     last_access: float = 0.0
 
 
+@runtime_checkable
+class _CircadianHost(Protocol):
+    cfg: object
+    mode: LearningMode
+    theta: torch.Tensor
+
+    def set_mode(self, mode: LearningMode) -> None: ...
+    def sleep(self, duration: float = 60.0) -> None: ...
+    def queue_runtime_injection(self, name: str, value: object) -> None: ...
+
+
 class CircadianWaveMixin:
     """Adds 12h AM/PM time awareness and temporal memory to wave outputs.
 
@@ -37,6 +48,10 @@ class CircadianWaveMixin:
     """
 
     def _init_circadian(self, cfg) -> None:
+        if not isinstance(self, _CircadianHost):
+            raise TypeError(
+                "CircadianWaveMixin requer host com contrato explícito de modo/sono/config"
+            )
         self._circadian_enabled = bool(getattr(cfg, "circadian_enabled", False))
         if not self._circadian_enabled:
             return
