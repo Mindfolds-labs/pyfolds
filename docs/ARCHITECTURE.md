@@ -29,7 +29,7 @@ Este documento define a arquitetura do PyFOLDS sob três perspectivas complement
 ### 1.3 Responsabilidades de alto nível
 
 - Integrar sinais em ramos dendríticos com não linearidade local.
-- Executar integração dendrítica/somática com adaptação, refratariedade e disparo antes dos passos de plasticidade/homeostase.
+- Integrar saídas dendríticas com `DendriticIntegration` (modo configurável) antes da decisão somática.
 - Executar homeostase e plasticidade (online/batch/sono).
 - Emitir eventos auditáveis para depuração e governança.
 
@@ -39,51 +39,66 @@ Este documento define a arquitetura do PyFOLDS sob três perspectivas complement
 
 | Container | Responsabilidade principal | Módulos-chave |
 |---|---|---|
-| `pyfolds.core` | Núcleo biofísico e ciclo do neurônio | `config.py`, `synapse.py`, `dendrite.py`, `neuron.py`, `homeostasis.py`, `neuromodulation.py`, `accumulator.py` |
+| `pyfolds.core` | Núcleo biofísico e ciclo do neurônio | `config.py`, `synapse.py`, `dendrite.py`, `neuron.py`, `homeostasis.py`, `neuromodulation.py`, `accumulator.py`, `dendrite_integration.py` |
 | `pyfolds.network` | Orquestração entre múltiplos neurônios | construção e execução de redes |
-| `pyfolds.advanced` | Mecanismos complementares | STDP, refractory, inibição, etc. |
+| `pyfolds.advanced` | Mecanismos complementares | STDP, refractory, adaptation, inibição, etc. |
 | `pyfolds.telemetry` | Observabilidade estruturada | eventos de forward/commit/sleep |
 | `pyfolds.serialization` | Persistência e versionamento | checkpoints com metadados de integridade |
 | `pyfolds.monitoring` | Saúde operacional | classificação `healthy/degraded/critical` |
 
 ---
 
-## 3) Componentes críticos (C3) — `MPJRDNeuron`
+## 3) Componentes críticos (C3) — `MPJRDNeuron`/`MPJRDNeuronV2`
 
-### 3.1 Pipeline interno do `forward`
+### 3.1 Fluxo real do neurônio
 
 \[
 X \in \mathbb{R}^{B\times D\times S}
-\xrightarrow{\text{dendrite integrate}}
+\xrightarrow{\text{integração por dendrito}}
 V \in \mathbb{R}^{B\times D}
-\xrightarrow{\text{WTA}}
-G \in \{0,1\}^{B\times D}
-\xrightarrow{\text{somatic sum}}
+\xrightarrow{\text{DendriticIntegration ou gate cooperativo}}
 U \in \mathbb{R}^{B}
-\xrightarrow{\text{threshold}}
+\xrightarrow{\text{threshold }\theta_{eff}}
 Y \in \{0,1\}^{B}.
 \]
 
-Etapas funcionais:
+Etapas funcionais (runtime):
 
-1. Integração local por ramo.
-2. Integração dendrítica configurável (`wta_hard`, `wta_soft`, `nmda_shunting`).
-3. Soma somática pós-gating (ou saída equivalente do integrador).
-4. Disparo por limiar efetivo \(\theta_{eff}\).
-5. Homeostase (exceto inferência).
-6. Neuromodulação exógena/endógena.
-7. Acumulação estatística (modo batch) ou atualização local imediata (modo online).
-8. Emissão de telemetria.
+1. `MPJRDNeuron.forward` integra entradas por ramo (`v_dend`) usando rota vetorizada ou fallback por `MPJRDDendrite`.
+2. A integração entre ramos depende de `dendrite_integration_mode`:
+   - `nmda_shunting`: `DendriticIntegration` (gate sigmoidal + normalização divisiva);
+   - `wta_soft`: soma cooperativa de gates sigmoidais;
+   - `wta_hard`: seleção vencedora (legado/ablação).
+3. O potencial somático `u` é comparado com `theta_eff` para gerar `spikes`.
+4. Com mixins, o ponto de decisão é refinado:
+   - `AdaptationMixin`: aplica SFA (`u_eff = u - I_adapt`);
+   - `RefractoryMixin`: aplica refratário absoluto/relativo e adia homeostase para pós-refratário.
+5. Homeostase/plasticidade: homeostase fora de `INFERENCE`; plasticidade online (`_apply_online_plasticity`) ou batch (`apply_plasticity`) conforme trilha.
+6. Telemetria e rastros de auditoria são emitidos no boundary do passo.
+
+`MPJRDNeuronV2` preserva o contrato global de saída, com integração cooperativa por soma de `sigmoid(v_dend - \theta/2)`.
 
 ### 3.2 Invariante arquitetural obrigatório
 
 A ordem abaixo **não pode ser quebrada**:
 
 \[
-\text{Local Nonlinearity} \prec \text{Competition} \prec \text{Global Aggregation}.
+\text{Local Nonlinearity} \prec \text{Competition/Integration} \prec \text{Global Aggregation}.
 \]
 
 Esse invariante evita degeneração para um perceptron linearizado.
+
+### 3.3 Implementado vs experimental
+
+| Tema | Implementado (runtime principal) | Experimental / pesquisa |
+|---|---|---|
+| Integração dendrítica | `MPJRDNeuron` com `DendriticIntegration` (`nmda_shunting`) e caminhos `wta_soft`/`wta_hard` configuráveis | Extensões em `wave` e mecanismos opcionais em `advanced` |
+| Variante de neurônio | `MPJRDNeuron` em `src/pyfolds/core/neuron.py` | `MPJRDNeuronV2` e variantes `wave` |
+| Competição entre ramos | Não é exclusivamente WTA; depende de `dendrite_integration_mode` | Ablações explícitas entre WTA duro e integração cooperativa |
+| Adaptação/Refratário | Mixins `AdaptationMixin` e `RefractoryMixin` integráveis ao pipeline | Novas regras temporais e ajustes de parâmetros |
+| Plasticidade/Homeostase | Homeostase ativa fora de inferência e plasticidade por trilha (`ONLINE`/`BATCH`/`SLEEP`) | Gating experimental (fase/canais/wave) por toggles |
+
+Veja também: [Mecanismos experimentais](./mechanisms/experimental_toggles.md) e [fundamentos científicos](./science/SCIENTIFIC_LOGIC.md).
 
 ---
 
@@ -95,8 +110,8 @@ Esse invariante evita degeneração para um perceptron linearizado.
 |---|---|---|---|
 | **Acquisition** | receber lote/sinal | \(X\), metadados de execução | lote validado |
 | **Local Processing** | computar \(V\) por ramo | \(X, N, W, I\) | potenciais dendríticos |
-| **Selection** | aplicar competição espacial | \(V\) | máscara \(G\) |
-| **Decision** | gerar spike | \(G, V, \theta\) | \(Y\), \(U\) |
+| **Selection** | aplicar integração/competição por modo (`nmda_shunting`, `wta_soft`, `wta_hard`) | \(V\) | representação integrada (`gated`/`v_nmda`) |
+| **Decision** | gerar spike | \(U, \theta\) | \(Y\), \(U\) |
 | **Adaptation** | atualizar estado/plasticidade | \(Y\), taxas, modo | estado ajustado |
 | **Observability** | registrar rastros e saúde | estados internos | eventos + status |
 
@@ -114,13 +129,13 @@ forward(
 
 \[
 V_{b,d} = \sigma_d\!\left(\sum_{s=1}^{S} \psi(N_{d,s},W_{d,s},I_{d,s})\,X_{b,d,s}\right),
-\quad
-G_{b,d} = \mathbb{1}\left[d=\arg\max_j V_{b,j}\right],
+\qquad
+U_b = f_{int}(V_b, \theta; \texttt{mode}),
 \]
 \[
-U_b = f_{int}(V_b, \theta),
-\qquad
-Y_b = \mathbb{1}[U_b\ge\theta_{eff}].
+Y_b = \mathbb{1}[U_b\ge\theta_{eff}],
+\quad
+\texttt{mode} \in \{\texttt{nmda\_shunting},\texttt{wta\_soft},\texttt{wta\_hard}\}.
 \]
 
 ---
@@ -176,3 +191,10 @@ As trilhas operacionais canônicas do projeto são: `INFERENCE`, `ONLINE`, `BATC
 - [ ] Executar e registrar validação de `SLEEP`.
 - [ ] Confirmar compatibilidade de contrato legado (`u`) e canônico (`u_values`).
 - [ ] Confirmar rastreabilidade de evidência (comando, resultado, trilha).
+
+## 9) Links cruzados
+
+- Ciência/algoritmo: [`docs/science/ALGORITHM.md`](./science/ALGORITHM.md) e [`docs/science/SCIENTIFIC_LOGIC.md`](./science/SCIENTIFIC_LOGIC.md).
+- Hub de ciência: [`docs/science/README.md`](./science/README.md).
+- Mecanismos de runtime e flags: [`docs/mechanisms/README.md`](./mechanisms/README.md) e [`docs/mechanisms/experimental_toggles.md`](./mechanisms/experimental_toggles.md).
+- Blueprint de fluxo: [`docs/architecture/blueprints/sources/dendritic_processing_flow.mmd`](./architecture/blueprints/sources/dendritic_processing_flow.mmd).

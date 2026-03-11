@@ -3,6 +3,11 @@
 ## Visão arquitetural
 - [ARCHITECTURE.md](../ARCHITECTURE.md)
 - [ALGORITHM.md](../science/ALGORITHM.md)
+- [science/README.md](../science/README.md)
+
+## Mecanismos (runtime e trilhas experimentais)
+- [mechanisms/README.md](../mechanisms/README.md)
+- [mechanisms/experimental_toggles.md](../mechanisms/experimental_toggles.md)
 
 ## Diagramas canônicos
 - [index.md](index.md)

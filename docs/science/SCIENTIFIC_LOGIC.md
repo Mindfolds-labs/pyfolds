@@ -49,7 +49,7 @@ Gidon et al. (2020) mostram evidências de que dendritos humanos geram eventos a
 
 No PyFolds, essa ideia aparece em dois níveis:
 
-- **v2.0 (MPJRD):** competição/gating entre ramos após computação local;
+- **v2.0 (MPJRD):** integração/gating entre ramos após computação local (não restrita a WTA duro);
 - **v3.0 (MPJRD-Wave):** integração cooperativa contínua entre ramos via ativação sigmoid por dendrito (`dendritic_activations`), reduzindo perda de informação causada por seleção dura.
 
 Interpretação: o dendrito deixa de ser “fio passivo” e passa a ser unidade funcional que participa de inferência, plasticidade e explicação.
@@ -108,3 +108,10 @@ A hipótese central do framework é:
 - Gidon, A. et al. (2020). *Dendritic action potentials and computation in human layer 2/3 cortical neurons*. Science.
 - O'Keefe, J., & Recce, M. L. (1993). *Phase relationship between hippocampal place units and the EEG theta rhythm*. Hippocampus.
 - Thorpe, S., Delorme, A., & Van Rullen, R. (2001). *Spike-based strategies for rapid processing*. Neural Networks.
+
+
+## 5. Links relacionados
+
+- Arquitetura de runtime: [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md)
+- Formulação algorítmica: [`docs/science/ALGORITHM.md`](./ALGORITHM.md)
+- Mecanismos experimentais e toggles: [`docs/mechanisms/experimental_toggles.md`](../mechanisms/experimental_toggles.md)
