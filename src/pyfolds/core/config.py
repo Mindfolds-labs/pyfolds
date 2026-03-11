@@ -254,6 +254,7 @@ class MPJRDConfig:
     circadian_plasticity_min: float = 0.1
     circadian_plasticity_max: float = 1.5
     replay_interval_steps: int = 32
+    experimental_circadian_enabled: bool = True
 
     # ===== INIBIÇÃO =====
     inhibition_trainable_i2e: bool = False
@@ -298,6 +299,7 @@ class MPJRDConfig:
 
     # ===== WAVE (OSCILAÇÃO COMO MECANISMO) =====
     wave_enabled: bool = False
+    experimental_wave_enabled: bool = True
     wave_n_frequencies: int = 8
     wave_base_frequency: float = 10.0
     wave_frequency_step: float = 5.0
@@ -322,15 +324,24 @@ class MPJRDConfig:
     enable_spatial_latency_gradient: bool = False
     spatial_latency_max_ms: float = 100.0
     spatial_latency_scale: float = 1.0
+    enable_experimental_coherence_metrics: bool = False
+    coherence_low_threshold: float = 0.35
+    coherence_high_threshold: float = 0.70
+    debug_oscillation_traces: bool = False
 
     # ===== CONFIGURAÇÕES DO NOETIC =====
     max_engrams: int = 10_000_000
     pruning_threshold: float = 0.1
     engram_n_frequencies: int = 8
+    experimental_engram_enabled: bool = True
+    experimental_engram_indexing_enabled: bool = True
+    experimental_engram_cache_enabled: bool = True
     enable_specialization: bool = True
     synthesis_threshold: float = 0.6
     sleep_cycle_hours: float = 24.0
     replay_batch_size: int = 32
+    enable_experimental_phase_resonance: bool = False
+    enable_engram_resonance_telemetry: bool = False
     model_name: str = "Noetic"
     save_checkpoints: bool = True
     checkpoint_interval: int = 86400
@@ -549,6 +560,12 @@ class MPJRDConfig:
             raise ValueError("spatial_latency_max_ms must be >= 0")
         if self.spatial_latency_scale <= 0:
             raise ValueError("spatial_latency_scale must be > 0")
+        if not -1.0 <= self.coherence_low_threshold <= 1.0:
+            raise ValueError("coherence_low_threshold must be in [-1, 1]")
+        if not -1.0 <= self.coherence_high_threshold <= 1.0:
+            raise ValueError("coherence_high_threshold must be in [-1, 1]")
+        if self.coherence_low_threshold > self.coherence_high_threshold:
+            raise ValueError("coherence_low_threshold must be <= coherence_high_threshold")
         if self.frequency_step < 0:
             raise ValueError("frequency_step must be >= 0")
         if self.phase_decay <= 0 or self.phase_decay > 1:
@@ -604,6 +621,18 @@ class MPJRDConfig:
 
         if not 0.0 <= self.pruning_runtime_threshold <= 1.0:
             raise ValueError("pruning_runtime_threshold must be in [0, 1]")
+
+        bool_fields = (
+            "experimental_wave_enabled",
+            "experimental_circadian_enabled",
+            "experimental_engram_enabled",
+            "experimental_engram_indexing_enabled",
+            "experimental_engram_cache_enabled",
+        )
+        for field_name in bool_fields:
+            value = getattr(self, field_name)
+            if not isinstance(value, bool):
+                raise ValueError(f"{field_name} must be bool, got {type(value).__name__}")
         
         # Warnings
         if self.ltd_threshold_saturated > self.i_ltd_th:
