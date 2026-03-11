@@ -18,6 +18,25 @@ A ordem invariável do passo é:
 
 Essa sequência está formalizada em `pyfolds.contracts.CONTRACT_MECHANISM_ORDER`.
 
+
+## Ordem canônica de contrato vs ordem efetiva de wrappers (neurônio avançado)
+
+Para evitar ambiguidades, distinguimos dois níveis:
+
+1. **Ordem canônica de contrato (`contracts/`)**
+   - Sequência normativa e estável dos mecanismos no passo temporal (STP → integração → SFA → threshold → refratário → bAP → STDP → homeostase).
+   - Referência principal para conformidade de backend e testes de contrato.
+
+2. **Ordem efetiva de wrappers no neurônio avançado (`advanced/__init__.py` + mixins)**
+   - A MRO define wrappers que executam parte da lógica no pré-`super()` e parte no pós-`super()`.
+   - Em termos práticos:
+     - `ShortTermDynamicsMixin` atua no pré-`super()` (modula entrada).
+     - `RefractoryMixin` atua no pós-`super()` para decisão final de spike pós-máscara refratária.
+     - `STDPMixin` atualiza plasticidade no pós-`super()`, consumindo spike final do output.
+     - `AdaptationMixin` delega o cálculo de decisão/atualização de spike para o ponto de decisão no refratário (via hooks/métodos auxiliares).
+
+Regra de leitura: a ordem canônica define **semântica de contrato**; a ordem de wrappers define **pontos de aplicação no código** sem alterar a autoridade do spike final pós-refratário.
+
 ## Forma de entrada e saída
 
 - Entrada: `NeuronStepInput(x, dt, time_step)`

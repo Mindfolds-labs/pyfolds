@@ -39,6 +39,24 @@ Fica definido o seguinte contrato arquitetural e de execução:
    - Estados de STP devem permanecer como buffers registrados (`register_buffer`), com atualização in-place.
    - É vedada reatribuição que substitua o objeto do buffer e rompa registro, serialização e/device transfer.
 
+## Amendment
+
+Este adendo explicita a **ordem efetiva por ponto de aplicação** no neurônio avançado, para evitar ambiguidades entre a ordem canônica de contrato e a ordem de wrappers na cadeia `super()`.
+
+### 1) Pré-`super()` (wrappers que atuam antes do núcleo)
+- `ShortTermDynamicsMixin.forward` atualiza estado STP e modula `x` antes de delegar (`super().forward(...)`).
+- `STDPMixin.forward` apenas decide/arma contexto e delega, deixando a atualização para o retorno pós-`super()`.
+- `AdaptationMixin.forward` não altera spike nem `u` neste ponto; apenas delega e expõe métricas no retorno.
+
+### 2) Pós-`super()` (wrappers que atuam após o núcleo)
+- `RefractoryMixin.forward` recalcula decisão de spike com `u`/`theta_eff`, aplica máscara refratária e produz `final_spikes`.
+- Ainda em `RefractoryMixin.forward`, a atualização de adaptação (`_update_adaptation_after_spike`) usa `final_spikes` (pós-refratário).
+- `STDPMixin.forward` executa atualização STDP após o retorno do `super()`, consumindo o spike final presente no output.
+
+### 3) Decisão final de spike (autoridade)
+- A autoridade final de disparo no neurônio avançado é o estágio pós-refratário (`RefractoryMixin`).
+- Portanto, qualquer mecanismo dependente do spike efetivo (homeostase, adaptação pós-spike, telemetria de spike-rate e STDP pós-forward) deve considerar o spike final pós-máscara refratária.
+
 ## Consequências
 ### Positivas
 - Contrato de saída estável e explícito para consumidores de camada.
