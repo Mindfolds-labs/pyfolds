@@ -330,6 +330,8 @@ class MPJRDConfig:
     synthesis_threshold: float = 0.6
     sleep_cycle_hours: float = 24.0
     replay_batch_size: int = 32
+    enable_experimental_phase_resonance: bool = False
+    enable_engram_resonance_telemetry: bool = False
     model_name: str = "Noetic"
     save_checkpoints: bool = True
     checkpoint_interval: int = 86400

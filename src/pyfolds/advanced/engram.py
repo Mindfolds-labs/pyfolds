@@ -117,6 +117,8 @@ class EngramBank(nn.Module):
         pruning_threshold: float = 0.1,
         enable_indexing: bool = True,
         eviction_strategy: Literal["importance", "lru", "lru_importance"] = "importance",
+        enable_experimental_phase_resonance: bool = False,
+        enable_resonance_telemetry: bool = False,
     ) -> None:
         """Inicializa capacidade, índices e buffers de estatísticas."""
         super().__init__()
@@ -126,6 +128,8 @@ class EngramBank(nn.Module):
         self.pruning_threshold = pruning_threshold
         self.enable_indexing = enable_indexing
         self.eviction_strategy = eviction_strategy
+        self.enable_experimental_phase_resonance = enable_experimental_phase_resonance
+        self.enable_resonance_telemetry = enable_resonance_telemetry
         self.engrams: Dict[str, Engram] = {}
         self.area_index: Dict[str, List[str]] = defaultdict(list)
         self.phase_index: Dict[int, List[str]] = defaultdict(list)
@@ -226,6 +230,8 @@ class EngramBank(nn.Module):
 
         candidates = [self.engrams[s] for s in self.area_index.get(area, [])] if area else list(self.engrams.values())
         scores: List[Tuple[Engram, float]] = []
+        cluster_scores: Dict[str, float] = defaultdict(float)
+        total_resonance = 0.0
         for engram in candidates:
             pattern_sim = float(F.cosine_similarity(query_pattern.unsqueeze(0), engram.wave_pattern.unsqueeze(0)).item())
             if pattern_sim < 0.3:
@@ -236,7 +242,37 @@ class EngramBank(nn.Module):
                 pd = min(pd, 360.0 - pd)
                 phase_factor = max(0.0, math.cos(math.radians(pd)) ** 2)
             resonance = pattern_sim * (0.6 + 0.2 * phase_factor + 0.2 * (engram.importance**2))
+            resonance = self._apply_phase_resonance_weight(
+                resonance=resonance,
+                phase_factor=phase_factor,
+                importance=engram.importance,
+            )
             scores.append((engram, resonance))
+            total_resonance += resonance
+            phase_bin = int(engram.circadian_phase / 30.0) * 30
+            cluster_scores[f"area:{engram.area}"] += resonance
+            cluster_scores[f"phase_bin:{phase_bin}"] += resonance
+            for tag in engram.tags:
+                cluster_scores[f"tag:{tag}"] += resonance
+
+        self._emit_telemetry_event(
+            "phase_resonance",
+            {
+                "total_score": round(total_resonance, 6),
+                "query_phase": None if query_phase is None else round(float(query_phase), 6),
+                "area_filter": area,
+                "candidates": len(candidates),
+                "matched": len(scores),
+            },
+        )
+        self._emit_telemetry_event(
+            "resonance_by_cluster",
+            {
+                "query_phase": None if query_phase is None else round(float(query_phase), 6),
+                "area_filter": area,
+                "clusters": {k: round(v, 6) for k, v in sorted(cluster_scores.items()) if v > 0.0},
+            },
+        )
 
         scores.sort(key=lambda item: item[1], reverse=True)
         out = [item[0] for item in scores[:top_k]]
@@ -259,8 +295,26 @@ class EngramBank(nn.Module):
         query_array = query_pattern.contiguous().numpy()
         hasher = hashlib.blake2b(digest_size=32)
         hasher.update(query_array.tobytes())
-        hasher.update(f"|dtype={query_array.dtype}|len={query_array.size}|phase={phase_key}|area={area_key}|top_k={int(top_k)}".encode())
+        hasher.update(
+            (
+                f"|dtype={query_array.dtype}|len={query_array.size}|phase={phase_key}|area={area_key}|"
+                f"top_k={int(top_k)}|experimental_phase_resonance={int(self.enable_experimental_phase_resonance)}"
+            ).encode()
+        )
         return hasher.hexdigest()
+
+    def _apply_phase_resonance_weight(self, resonance: float, phase_factor: float, importance: float) -> float:
+        """Aplica ponderação experimental de fase/ressonância quando ativada."""
+        if not self.enable_experimental_phase_resonance:
+            return resonance
+        boost = 1.0 + 0.15 * max(0.0, phase_factor) * max(0.0, min(1.0, float(importance)))
+        return resonance * boost
+
+    def _emit_telemetry_event(self, event_name: str, payload: Dict[str, Any]) -> None:
+        """Emite telemetria leve via logger somente quando habilitado."""
+        if not self.enable_resonance_telemetry:
+            return
+        logger.info("event=%s payload=%s", event_name, payload)
 
     def create_relation(self, sig1: str, sig2: str, strength: float) -> None:
         """Cria ligação bidirecional entre engrams existentes."""
@@ -289,6 +343,15 @@ class EngramBank(nn.Module):
         for e in replayed:
             e.update_importance(0.05)
         logger.info("replay_batch=%s", len(replayed))
+        self._emit_telemetry_event(
+            "sleep_replay_events",
+            {
+                "batch_size": int(batch_size),
+                "replayed": len(replayed),
+                "top_signatures": [e.signature for e in replayed[:5]],
+                "avg_importance": (sum(e.importance for e in replayed) / len(replayed)) if replayed else 0.0,
+            },
+        )
         return replayed
 
     def consolidate(self, pruning: bool = True) -> Dict[str, int]:

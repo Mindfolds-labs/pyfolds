@@ -87,3 +87,33 @@ def test_search_cache_key_is_deterministic_across_instances() -> None:
     second_key = next(iter(bank2.search_cache))
 
     assert second_key == first_key
+
+
+def test_search_cache_key_changes_with_experimental_phase_mode() -> None:
+    """Evita poluição de cache entre modos base e experimental."""
+    pattern = torch.tensor([1.0, 0.5, -0.25, 0.75], dtype=torch.float32)
+    kwargs = {"query_phase": 45.0, "area": "memoria", "top_k": 3}
+
+    bank_base = EngramBank(max_engrams=10, n_frequencies=4, enable_experimental_phase_resonance=False)
+    bank_base.create_engram(pattern, "alvo", age=0.0, phase=45.0, meridiem="AM", area="memoria")
+    bank_base.search_by_resonance(pattern, use_cache=True, **kwargs)
+    key_base = next(iter(bank_base.search_cache))
+
+    bank_exp = EngramBank(max_engrams=10, n_frequencies=4, enable_experimental_phase_resonance=True)
+    bank_exp.create_engram(pattern, "alvo", age=0.0, phase=45.0, meridiem="AM", area="memoria")
+    bank_exp.search_by_resonance(pattern, use_cache=True, **kwargs)
+    key_exp = next(iter(bank_exp.search_cache))
+
+    assert key_base != key_exp
+
+
+def test_replay_emits_sleep_replay_events_telemetry(caplog) -> None:
+    """Registra telemetria de replay apenas quando habilitada."""
+    bank = EngramBank(max_engrams=10, n_frequencies=4, enable_resonance_telemetry=True)
+    bank.create_engram(torch.ones(4), "a", age=1.0, phase=10.0, meridiem="AM", importance=0.9)
+
+    with caplog.at_level("INFO"):
+        replayed = bank.replay(batch_size=1)
+
+    assert len(replayed) == 1
+    assert any("event=sleep_replay_events" in rec.message for rec in caplog.records)

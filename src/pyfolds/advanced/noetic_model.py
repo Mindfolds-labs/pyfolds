@@ -42,6 +42,8 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
             max_engrams=int(getattr(cfg, "max_engrams", 10_000_000)),
             n_frequencies=int(getattr(cfg, "engram_n_frequencies", cfg.wave_n_frequencies)),
             pruning_threshold=float(getattr(cfg, "pruning_threshold", 0.1)),
+            enable_experimental_phase_resonance=bool(getattr(cfg, "enable_experimental_phase_resonance", False)),
+            enable_resonance_telemetry=bool(getattr(cfg, "enable_engram_resonance_telemetry", False)),
         )
         self.specialization = SpecializationEngine(self.engram_bank)
         self._sync_time_state()
