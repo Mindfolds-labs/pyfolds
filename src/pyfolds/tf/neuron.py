@@ -31,6 +31,21 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
 
     ``integration_mode`` in TensorFlow is intentionally constrained and does not
     replicate all PyTorch modes 1:1.
+
+    State layout
+    ------------
+    The recurrent state is composite and represented as three tensors to remain
+    compatible with ``keras.layers.RNN`` nested-state support:
+
+    1. ``membrane``: soma membrane potential ``[B, U]``.
+    2. ``adapt_state``: lightweight adaptation trace ``[B, U]`` persisted across steps.
+    3. ``context_state``: minimal scalar context ``[B, 1]`` persisted across steps.
+
+    Reset behavior
+    --------------
+    ``get_initial_state`` resets all three state tensors to zeros. During each
+    ``call``/``step``, only these tensors are persisted between time steps; masks,
+    thresholds and static configuration are immutable layer attributes.
     """
 
     def __init__(
@@ -46,6 +61,8 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
         clip_value: float = 10.0,
         connectivity_mask: Optional[tf.Tensor] = None,
         pruning_mask: Optional[tf.Tensor] = None,
+        edge_inference_mode: bool = False,
+        plasticity_mode: str = "none",
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -55,27 +72,31 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
         self.threshold = float(threshold)
         self.decay = float(decay)
         self.default_dt = float(dt)
-        self.integration_mode = str(integration_mode)
+        requested_integration_mode = str(integration_mode)
+        self.integration_mode = (
+            requested_integration_mode
+            if requested_integration_mode == "wta_soft_approx"
+            else "wta_soft_approx"
+        )
+        self.requested_integration_mode = requested_integration_mode
         self.dendritic_threshold = float(dendritic_threshold)
         self.dendritic_gate = str(dendritic_gate)
         self.clip_value = float(clip_value)
         self.connectivity_mask = connectivity_mask
         self.pruning_mask = pruning_mask
+        self.edge_inference_mode = bool(edge_inference_mode)
+        # TensorFlow backend has no online plasticity; force-disable silently on edge.
+        self.plasticity_mode = "none" if self.edge_inference_mode else str(plasticity_mode)
         self._last_diagnostics = {}
-
-        if self.integration_mode != "wta_soft_approx":
-            raise ValueError(
-                "Invalid argument `integration_mode`: TensorFlow backend currently "
-                "supports only `wta_soft_approx` (it does not mirror all PyTorch modes)."
-            )
+        self._integration_mode_blocked = requested_integration_mode != self.integration_mode
         if self.dendritic_gate not in {"sigmoid", "hard"}:
             raise ValueError("Invalid argument `dendritic_gate`: use `sigmoid` or `hard`.")
         if self.clip_value <= 0:
             raise ValueError("Invalid argument `clip_value`: expected a value > 0.")
 
     @property
-    def state_size(self) -> int:
-        return self.units
+    def state_size(self):
+        return (self.units, self.units, 1)
 
     @property
     def output_size(self) -> int:
@@ -90,23 +111,41 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
                 raise ValueError("Provide `batch_size` or `inputs` to infer initial state shape.")
             batch_size = tf.shape(inputs)[0]
 
-        return [tf.zeros((batch_size, self.units), dtype=dtype)]
+        return [
+            tf.zeros((batch_size, self.units), dtype=dtype),
+            tf.zeros((batch_size, self.units), dtype=dtype),
+            tf.zeros((batch_size, 1), dtype=dtype),
+        ]
 
     def step(
         self,
         inputs: tf.Tensor,
-        prev_state: tf.Tensor,
+        prev_membrane: tf.Tensor,
+        prev_adapt_state: tf.Tensor,
+        prev_context_state: tf.Tensor,
         *,
         dt: Optional[float] = None,
         return_diagnostics: bool = False,
-    ) -> Tuple[tf.Tensor, tf.Tensor]:
+    ) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor, tf.Tensor]:
         dt_value = self.default_dt if dt is None else float(dt)
         if dt_value <= 0:
             raise ValueError("Invalid argument `dt`: expected a value > 0.")
 
         soma_current, v_dend = self._compute_somatic_current(inputs)
-        integrated = (self.decay * prev_state) + (soma_current * dt_value)
+        integrated = (self.decay * prev_membrane) + (soma_current * dt_value)
         integrated = tf.clip_by_value(integrated, -self.clip_value, self.clip_value)
+
+        next_adapt_state = tf.clip_by_value(
+            (0.95 * prev_adapt_state) + (0.05 * tf.abs(integrated)),
+            0.0,
+            self.clip_value,
+        )
+        context_signal = tf.reduce_mean(integrated, axis=-1, keepdims=True)
+        next_context_state = tf.clip_by_value(
+            (0.9 * prev_context_state) + (0.1 * context_signal),
+            -self.clip_value,
+            self.clip_value,
+        )
 
         theta_eff = tf.fill(tf.shape(integrated), tf.cast(self.threshold, integrated.dtype))
         spikes = tf.cast(integrated >= theta_eff, integrated.dtype)
@@ -116,11 +155,16 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
         diagnostics = {"u": integrated, "theta_eff": theta_eff}
         if v_dend is not None:
             diagnostics["v_dend"] = v_dend
+        diagnostics["adapt_state"] = next_adapt_state
+        diagnostics["context_state"] = next_context_state
+        diagnostics["edge_inference_mode"] = self.edge_inference_mode
+        diagnostics["plasticity_mode"] = self.plasticity_mode
+        diagnostics["integration_mode_blocked"] = self._integration_mode_blocked
         self._last_diagnostics = diagnostics
 
         if return_diagnostics:
-            return spikes, new_state, diagnostics
-        return spikes, new_state
+            return spikes, new_state, next_adapt_state, next_context_state, diagnostics
+        return spikes, new_state, next_adapt_state, next_context_state
 
     @property
     def last_diagnostics(self):
@@ -186,9 +230,15 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
 
     def call(self, inputs, states, training=None, dt=None):
         del training
-        prev_state = states[0]
-        spikes, new_state = self.step(inputs, prev_state, dt=dt)
-        return spikes, [new_state]
+        prev_membrane, prev_adapt_state, prev_context_state = states
+        spikes, new_membrane, new_adapt_state, new_context_state = self.step(
+            inputs,
+            prev_membrane,
+            prev_adapt_state,
+            prev_context_state,
+            dt=dt,
+        )
+        return spikes, [new_membrane, new_adapt_state, new_context_state]
 
     def get_config(self):
         config = super().get_config()
@@ -199,9 +249,12 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
                 "decay": self.decay,
                 "dt": self.default_dt,
                 "integration_mode": self.integration_mode,
+                "requested_integration_mode": self.requested_integration_mode,
                 "dendritic_threshold": self.dendritic_threshold,
                 "dendritic_gate": self.dendritic_gate,
                 "clip_value": self.clip_value,
+                "edge_inference_mode": self.edge_inference_mode,
+                "plasticity_mode": self.plasticity_mode,
             }
         )
         return config

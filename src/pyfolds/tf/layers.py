@@ -38,5 +38,13 @@ class MPJRDTFLayer(tf.keras.layers.Layer):
         out = self.rnn(inputs, initial_state=initial_state, training=training)
         if self.rnn.return_state:
             spikes, *states = out
-            return {"spikes": spikes, "state": states[0]}
+            membrane, adapt_state, context_state = states
+            return {
+                "spikes": spikes,
+                "state": {
+                    "membrane": membrane,
+                    "adapt_state": adapt_state,
+                    "context_state": context_state,
+                },
+            }
         return {"spikes": out}
