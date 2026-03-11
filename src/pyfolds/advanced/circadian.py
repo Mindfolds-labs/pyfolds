@@ -52,7 +52,7 @@ class CircadianWaveMixin:
             raise TypeError(
                 "CircadianWaveMixin requer host com contrato explícito de modo/sono/config"
             )
-        self._circadian_enabled = bool(getattr(cfg, "circadian_enabled", False))
+        self._circadian_enabled = bool(getattr(cfg, "circadian_enabled", False)) and bool(getattr(cfg, "experimental_circadian_enabled", True))
         if not self._circadian_enabled:
             return
 

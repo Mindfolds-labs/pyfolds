@@ -253,6 +253,7 @@ class MPJRDConfig:
     circadian_plasticity_min: float = 0.1
     circadian_plasticity_max: float = 1.5
     replay_interval_steps: int = 32
+    experimental_circadian_enabled: bool = True
 
     # ===== INIBIÇÃO =====
     inhibition_trainable_i2e: bool = False
@@ -297,6 +298,7 @@ class MPJRDConfig:
 
     # ===== WAVE (OSCILAÇÃO COMO MECANISMO) =====
     wave_enabled: bool = False
+    experimental_wave_enabled: bool = True
     wave_n_frequencies: int = 8
     wave_base_frequency: float = 10.0
     wave_frequency_step: float = 5.0
@@ -330,6 +332,9 @@ class MPJRDConfig:
     max_engrams: int = 10_000_000
     pruning_threshold: float = 0.1
     engram_n_frequencies: int = 8
+    experimental_engram_enabled: bool = True
+    experimental_engram_indexing_enabled: bool = True
+    experimental_engram_cache_enabled: bool = True
     enable_specialization: bool = True
     synthesis_threshold: float = 0.6
     sleep_cycle_hours: float = 24.0
@@ -615,6 +620,18 @@ class MPJRDConfig:
 
         if not 0.0 <= self.pruning_runtime_threshold <= 1.0:
             raise ValueError("pruning_runtime_threshold must be in [0, 1]")
+
+        bool_fields = (
+            "experimental_wave_enabled",
+            "experimental_circadian_enabled",
+            "experimental_engram_enabled",
+            "experimental_engram_indexing_enabled",
+            "experimental_engram_cache_enabled",
+        )
+        for field_name in bool_fields:
+            value = getattr(self, field_name)
+            if not isinstance(value, bool):
+                raise ValueError(f"{field_name} must be bool, got {type(value).__name__}")
         
         # Warnings
         if self.ltd_threshold_saturated > self.i_ltd_th:

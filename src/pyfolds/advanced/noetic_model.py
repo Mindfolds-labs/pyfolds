@@ -37,6 +37,7 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
         self.register_buffer("discoveries", torch.tensor(0, dtype=torch.long))
         self.register_buffer("_name_hash", torch.tensor(0, dtype=torch.long))
         self.mode = LearningMode.ONLINE
+        self._experimental_engram_enabled = bool(getattr(cfg, "experimental_engram_enabled", True))
 
         self.engram_bank = EngramBank(
             max_engrams=int(getattr(cfg, "max_engrams", 10_000_000)),
@@ -84,6 +85,21 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
         else:
             pattern = pattern.to(self.theta.device)
 
+        if not self._experimental_engram_enabled:
+            return Engram(
+                signature="experimental_engram_disabled",
+                concept=concept,
+                engram_type=EngramType.CONCEITO,
+                wave_pattern=pattern.detach().float().flatten(),
+                frequencies=torch.zeros(self.engram_bank.n_frequencies, dtype=torch.float32, device=self.theta.device),
+                phases=torch.zeros(self.engram_bank.n_frequencies, dtype=torch.float32, device=self.theta.device),
+                amplitudes=torch.zeros(self.engram_bank.n_frequencies, dtype=torch.float32, device=self.theta.device),
+                formation_age=float(getattr(self, "age_seconds", torch.tensor(0.0)).item()),
+                circadian_phase=0.0,
+                meridiem="AM",
+                day_of_life=0,
+            )
+
         ctx = self.get_current_context()
         engram = self.engram_bank.create_engram(
             wave_pattern=pattern,
@@ -107,6 +123,8 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
             pattern = torch.tensor(vals, dtype=torch.float32)
         else:
             pattern = query.detach().float()
+        if not self._experimental_engram_enabled:
+            return []
         ctx = self.get_current_context()
         matches = self.engram_bank.search_by_resonance(pattern, query_phase=float(ctx["phase"]), area=area, top_k=top_k)
         return [
@@ -131,8 +149,9 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
         logger.info("sleep_start age=%s", self.get_age_string())
         self.mode = LearningMode.SLEEP
         self.neuromodulator.set_mode(LearningMode.SLEEP)
-        self.engram_bank.replay(batch_size=int(getattr(self.cfg, "replay_batch_size", 32)))
-        self.engram_bank.consolidate(pruning=True)
+        if self._experimental_engram_enabled:
+            self.engram_bank.replay(batch_size=int(getattr(self.cfg, "replay_batch_size", 32)))
+            self.engram_bank.consolidate(pruning=True)
 
         areas = list(self.specialization.areas.keys())
         if len(areas) >= 2 and int(self.sleep_cycles.item()) % 7 == 0:
