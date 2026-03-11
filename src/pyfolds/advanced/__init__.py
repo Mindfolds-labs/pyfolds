@@ -36,6 +36,14 @@ from .speech_tracking import (
     reset_phase_if_event,
 )
 
+from .experimental import (
+    ExperimentalMechanismConfig,
+    MechanismToggleSet,
+    compare_mechanism_vs_baseline,
+    collect_mechanism_report,
+    diff_output_stats,
+)
+
 from ..core.neuron import MPJRDNeuron as MPJRDNeuronBase
 from ..wave import MPJRDWaveNeuron as MPJRDWaveNeuronBase
 from ..layers.layer import MPJRDLayer
@@ -92,6 +100,11 @@ __all__ = [
     "compute_phase_amplitude_coupling",
     "latency_kernel",
     "analyze_mechanisms",
+    "ExperimentalMechanismConfig",
+    "MechanismToggleSet",
+    "compare_mechanism_vs_baseline",
+    "collect_mechanism_report",
+    "diff_output_stats",
 ]
 
 

@@ -4,6 +4,7 @@ import math
 import torch
 from typing import Dict, Optional
 from ..utils.types import LearningMode
+from .experimental import MechanismToggleSet
 
 
 class STDPMixin:
@@ -84,8 +85,13 @@ class STDPMixin:
         return x
 
     def _update_stdp_traces(
-        self, x: torch.Tensor, post_spike: torch.Tensor, dt: float = 1.0, x_pre_stp: torch.Tensor | None = None
-    ):
+        self,
+        x: torch.Tensor,
+        post_spike: torch.Tensor,
+        dt: float = 1.0,
+        x_pre_stp: torch.Tensor | None = None,
+        phase: torch.Tensor | None = None,
+    ) -> Dict[str, float]:
         """Atualiza traços STDP e aplica deltas sinápticos vetorizados.
 
         :param x: Tensor de entrada com shape ``[B, D, S]``.
@@ -131,6 +137,17 @@ class STDPMixin:
         ltp_mask = (self.trace_pre > trace_threshold).float()
         delta_ltp = self.A_plus * self.trace_pre * ltp_mask * post_expanded
 
+        toggles = MechanismToggleSet(self.cfg)
+        phase_gate = self._resolve_phase_gate(phase, post_spike.device, x.shape[0])
+        if toggles.is_enabled("phase_gating"):
+            delta_ltd = delta_ltd * phase_gate
+            delta_ltp = delta_ltp * phase_gate
+
+        if toggles.is_enabled("dynamic_channel_gating"):
+            channel_gate = torch.sigmoid(self.trace_pre.mean(dim=-1, keepdim=True))
+            delta_ltd = delta_ltd * channel_gate
+            delta_ltp = delta_ltp * channel_gate
+
         # Acumula atualização STDP em buffer separado para consolidação posterior.
         if hasattr(self, "dendrites"):
             # Invariante ao batch-size: normaliza atualização por amostra.
@@ -160,6 +177,24 @@ class STDPMixin:
 
         # Adiciona traço pós
         self.trace_post.add_(post_expanded)
+
+        delta_total_abs = (delta_ltd + delta_ltp).abs().mean()
+        return {
+            "average_weight_update": float(delta_total_abs.item()),
+            "phase_alignment_mean": float(phase_gate.mean().item()) if toggles.is_enabled("phase_gating") else 0.0,
+            "learning_event_count": float((delta_ltp.abs() > 0).float().sum().item()),
+        }
+
+    def _resolve_phase_gate(self, phase: torch.Tensor | None, device: torch.device, batch_size: int) -> torch.Tensor:
+        if phase is None:
+            return torch.ones(batch_size, 1, 1, device=device)
+        if phase.ndim == 0:
+            phase = phase.reshape(1).expand(batch_size)
+        phase = phase.reshape(-1).to(device)
+        if phase.shape[0] != batch_size:
+            raise ValueError(f"phase batch mismatch: expected {batch_size}, got {phase.shape[0]}")
+        gate = torch.cos(phase).clamp_min(0.0)
+        return gate.reshape(-1, 1, 1)
 
     def _should_apply_stdp(self, mode: Optional[LearningMode] = None) -> bool:
         """Determina se STDP deve ser aplicado no passo atual.
@@ -218,18 +253,21 @@ class STDPMixin:
         torch.Size([1, 2])
         """
         x_pre_stp = kwargs.pop("_x_pre_stp", x)
+        phase = kwargs.pop("phase", None)
         output = super().forward(x, **kwargs)
 
         mode = kwargs.get("mode", getattr(self, "mode", LearningMode.ONLINE))
         stdp_applied = self._should_apply_stdp(mode)
 
         if stdp_applied:
-            self._update_stdp_traces(
+            stdp_metrics = self._update_stdp_traces(
                 x,
                 output["spikes"],
                 dt=kwargs.get("dt", 1.0),
                 x_pre_stp=x_pre_stp,
+                phase=phase,
             )
+            output.update(stdp_metrics)
 
         # Métricas
         if self.trace_pre is not None:
@@ -239,5 +277,13 @@ class STDPMixin:
         output["stdp_applied"] = torch.tensor(
             stdp_applied, device=output["spikes"].device
         )
+
+        if getattr(self.cfg, "debug_collect_mechanism_metrics", False):
+            output["mechanism_metrics"] = {
+                "spike_rate": float(output["spikes"].float().mean().item()),
+                "average_weight_update": float(output.get("average_weight_update", 0.0)),
+                "phase_alignment_mean": float(output.get("phase_alignment_mean", 0.0)),
+                "learning_event_count": float(output.get("learning_event_count", 0.0)),
+            }
 
         return output
