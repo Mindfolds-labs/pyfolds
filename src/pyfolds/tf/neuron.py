@@ -27,7 +27,7 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
     ) -> None:
         super().__init__(**kwargs)
         if units <= 0:
-            raise ValueError("units deve ser > 0")
+            raise ValueError("Invalid argument `units`: expected a positive integer.")
         self.units = int(units)
         self.threshold = float(threshold)
         self.decay = float(decay)
@@ -47,7 +47,7 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
 
         if batch_size is None:
             if inputs is None:
-                raise ValueError("batch_size ou inputs deve ser informado")
+                raise ValueError("Provide `batch_size` or `inputs` to infer initial state shape.")
             batch_size = tf.shape(inputs)[0]
 
         return [tf.zeros((batch_size, self.units), dtype=dtype)]
@@ -60,6 +60,8 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
         dt: Optional[float] = None,
     ) -> Tuple[tf.Tensor, tf.Tensor]:
         dt_value = self.default_dt if dt is None else float(dt)
+        if dt_value <= 0:
+            raise ValueError("Invalid argument `dt`: expected a value > 0.")
         integrated = (self.decay * prev_state) + (inputs * dt_value)
         spikes = tf.cast(integrated >= self.threshold, integrated.dtype)
         new_state = integrated - (spikes * self.threshold)

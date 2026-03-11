@@ -25,6 +25,8 @@ class MPJRDTFLayer(tf.keras.layers.Layer):
         **cell_kwargs,
     ) -> None:
         super().__init__()
+        if units <= 0:
+            raise ValueError("Invalid argument `units`: expected a positive integer.")
         self.cell = MPJRDTFNeuronCell(units=units, **cell_kwargs)
         self.rnn = tf.keras.layers.RNN(
             self.cell,

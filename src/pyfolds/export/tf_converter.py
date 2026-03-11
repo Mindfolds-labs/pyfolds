@@ -18,7 +18,8 @@ def _require_tf():
         import tensorflow as tf
     except ImportError as exc:
         raise ImportError(
-            "TensorFlow não está instalado. Use `pip install tensorflow-cpu`."
+            "TensorFlow backend requested, but TensorFlow is not installed. "
+            "Install it with `pip install tensorflow` (or `tensorflow-cpu`) and retry."
         ) from exc
     return tf
 
@@ -29,7 +30,7 @@ def _require_onnx_tf_backend():
         from onnx_tf.backend import prepare
     except ImportError as exc:
         raise ImportError(
-            "Conversão ONNX->TF requer dependências opcionais `onnx` e `onnx-tf`."
+            "ONNX->TensorFlow conversion requires optional dependencies `onnx` and `onnx-tf`."
         ) from exc
     return onnx, prepare
 
@@ -44,7 +45,7 @@ def convert_onnx_to_tf(
     src = Path(onnx_path).expanduser().resolve()
     dst = Path(output_dir).expanduser().resolve()
     if not src.exists() or not src.is_file():
-        raise FileNotFoundError(f"Arquivo ONNX inválido: {src}")
+        raise FileNotFoundError(f"Invalid ONNX file path: {src}")
 
     onnx, prepare = _require_onnx_tf_backend()
 
@@ -56,11 +57,11 @@ def convert_onnx_to_tf(
         tf_rep.export_graph(str(dst))
     except Exception as exc:
         raise TFConversionError(
-            "Falha na conversão ONNX->TensorFlow; possível operador incompatível. "
-            f"Detalhe: {exc}"
+            "Failed to convert ONNX to TensorFlow; possibly due to an unsupported operator. "
+            f"Detail: {exc}"
         ) from exc
 
-    logger.info("SavedModel gerado em %s", dst)
+    logger.info("SavedModel generated at %s", dst)
     return dst
 
 
@@ -72,7 +73,7 @@ def validate_tf_saved_model(
     tf = _require_tf()
     model_dir = Path(saved_model_dir).expanduser().resolve()
     if not model_dir.exists() or not model_dir.is_dir():
-        raise FileNotFoundError(f"SavedModel não encontrado: {model_dir}")
+        raise FileNotFoundError(f"SavedModel directory not found: {model_dir}")
 
     loaded = tf.saved_model.load(str(model_dir))
     signatures = list(getattr(loaded, "signatures", {}).keys())

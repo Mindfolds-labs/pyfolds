@@ -39,6 +39,28 @@ def test_tf_cell_state_and_step_contract():
     assert next_state.shape == (2, 3)
 
 
+def test_tf_cell_rejects_non_positive_dt():
+    tf = pytest.importorskip("tensorflow")
+
+    from pyfolds.tf import MPJRDTFNeuronCell
+
+    cell = MPJRDTFNeuronCell(units=2)
+    x = tf.ones((1, 2), dtype=tf.float32)
+    state = cell.get_initial_state(batch_size=1, dtype=tf.float32)[0]
+
+    with pytest.raises(ValueError, match="Invalid argument `dt`"):
+        cell.step(x, state, dt=0.0)
+
+
+def test_tf_layer_rejects_invalid_units():
+    pytest.importorskip("tensorflow")
+
+    from pyfolds.tf import MPJRDTFLayer
+
+    with pytest.raises(ValueError, match="Invalid argument `units`"):
+        MPJRDTFLayer(units=0)
+
+
 def test_tf_layer_integrates_with_keras_rnn():
     tf = pytest.importorskip("tensorflow")
 
