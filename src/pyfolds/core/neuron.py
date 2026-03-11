@@ -622,6 +622,11 @@ class MPJRDNeuron(BaseNeuron):
         """Aplica regra local imediatamente (modo ONLINE sem defer)."""
         cfg = self.cfg
         effective_eta = self._active_i_eta
+        cfg_for_step = (
+            cfg.with_runtime_update(i_eta=effective_eta)
+            if effective_eta != float(cfg.i_eta)
+            else None
+        )
         post_rate_t = torch.tensor(
             [max(0.0, min(1.0, post_rate))], device=self.theta.device
         )
@@ -633,8 +638,7 @@ class MPJRDNeuron(BaseNeuron):
             pre_rate = (x[:, d_idx, :] * active_mask).sum(dim=0) / active_count
             pre_rate = pre_rate.clamp(0.0, 1.0)
 
-            if effective_eta != float(cfg.i_eta):
-                cfg_for_step = cfg.with_runtime_update(i_eta=effective_eta)
+            if cfg_for_step is not None:
                 dend.cfg = cfg_for_step
 
             dend.update_synapses_rate_based(
@@ -645,7 +649,7 @@ class MPJRDNeuron(BaseNeuron):
                 mode=mode,
             )
 
-            if effective_eta != float(cfg.i_eta):
+            if cfg_for_step is not None:
                 dend.cfg = cfg
 
     def invalidate_weight_cache(self) -> None:
