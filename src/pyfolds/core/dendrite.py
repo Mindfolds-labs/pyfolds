@@ -47,6 +47,7 @@ class MPJRDDendrite(nn.Module):
         self._cached_W = None
         self._cache_invalid = True
         self._cache_lock = Lock()
+        self._validate_finite_enabled = bool(getattr(cfg, "scientific_debug_stats", False))
 
     def _ensure_cache_valid(self):
         """
@@ -184,9 +185,10 @@ class MPJRDDendrite(nn.Module):
                                   dt: float = 1.0,
                                   mode=None) -> None:
         """Atualiza sinapses de forma indexada (pré-sináptico por sinapse)."""
-        self._validate_finite("pre_rate", pre_rate)
-        self._validate_finite("post_rate", post_rate)
-        self._validate_finite("R", R)
+        if self._validate_finite_enabled:
+            self._validate_finite("pre_rate", pre_rate)
+            self._validate_finite("post_rate", post_rate)
+            self._validate_finite("R", R)
 
         if pre_rate.dim() == 2 and pre_rate.shape[1] == 1:
             pre_rate = pre_rate.squeeze(1)
@@ -243,15 +245,15 @@ class MPJRDDendrite(nn.Module):
         """Carrega estados."""
         for idx, syn in enumerate(self.synapses):
             if 'N' in states:
-                syn.N.data = states['N'][idx].view(1)
+                syn.N.data = states['N'][idx].reshape(1)
             if 'L' in states:
-                syn.L.data = states['L'][idx].view(1)
+                syn.L.data = states['L'][idx].reshape(1)
             if 'I' in states:
-                syn.I.data = states['I'][idx].view(1)
+                syn.I.data = states['I'][idx].reshape(1)
             if 'u' in states and hasattr(syn, 'u'):
-                syn.u.data = states['u'][idx].view(1)
+                syn.u.data = states['u'][idx].reshape(1)
             if 'R' in states and hasattr(syn, 'R'):
-                syn.R.data = states['R'][idx].view(1)
+                syn.R.data = states['R'][idx].reshape(1)
         self._invalidate_cache()
 
     def extra_repr(self) -> str:
