@@ -6,6 +6,7 @@ from pyfolds.advanced import MPJRDWaveNeuronAdvanced
 from pyfolds.advanced.inhibition import InhibitionLayer
 from pyfolds.advanced.noetic_model import NoeticCore
 from pyfolds.advanced.refractory import RefractoryMixin
+from pyfolds.advanced.time_mixin import TimedMixin
 from pyfolds.core.config import MPJRDConfig
 from pyfolds.core.neuron import MPJRDNeuron
 from pyfolds.utils.types import LearningMode
@@ -20,6 +21,15 @@ class RefractoryOnlyNeuron(RefractoryMixin, MPJRDNeuron):
             refrac_rel_strength=cfg.refrac_rel_strength,
         )
 
+    def _increment_time(self, dt: float = 1.0):
+        TimedMixin._increment_time(self, dt)
+
+    def forward(self, x: torch.Tensor, **kwargs):
+        self._begin_time_step()
+        out = super().forward(x, **kwargs)
+        self._increment_time_once(kwargs.get("dt", 1.0))
+        return out
+
 
 def test_wave_advanced_forward_initializes_mixins() -> None:
     cfg = MPJRDConfig(wave_enabled=True)
@@ -29,7 +39,7 @@ def test_wave_advanced_forward_initializes_mixins() -> None:
     assert "spikes" in out
 
 
-def test_refractory_mixin_is_self_sufficient_for_time_counter() -> None:
+def test_refractory_mixin_reads_shared_time_counter() -> None:
     cfg = MPJRDConfig(
         theta_init=0.5,
         t_refrac_abs=2.0,

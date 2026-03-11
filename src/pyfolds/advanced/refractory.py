@@ -114,8 +114,7 @@ class RefractoryMixin(TimedMixin):
         """
         batch_size = x.shape[0]
         device = x.device
-        self._increment_time(float(kwargs.get("dt", 1.0)))
-        
+
         # Garante que last_spike_time existe
         self._ensure_last_spike_time(batch_size, device)
         
@@ -125,7 +124,7 @@ class RefractoryMixin(TimedMixin):
         output = super().forward(x, **kwargs)
         
         # Verifica estado refratário
-        current_time = self.time_counter.item()
+        current_time = self._get_time()
         blocked, theta_boost = self._check_refractory_batch(current_time, batch_size)
         
         # Aplica refratário

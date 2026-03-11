@@ -16,6 +16,7 @@ from typing import Optional
 import logging
 
 from .refractory import RefractoryMixin
+from .time_mixin import TimedMixin
 from .stdp import STDPMixin
 from .adaptation import AdaptationMixin
 from .short_term import ShortTermDynamicsMixin
@@ -125,6 +126,10 @@ class MPJRDNeuronAdvanced(
         self._init_circadian(cfg)
         _validate_advanced_mro(type(self), MPJRDNeuronBase, getattr(self, "logger", logger))
         self._init_advanced_mixins(cfg, is_wave=False)
+
+    def _increment_time(self, dt: float = 1.0):
+        """Dono do avanço temporal para a cadeia completa de mixins."""
+        TimedMixin._increment_time(self, dt)
 
     def forward(self, x, **kwargs):
         self._begin_time_step()
@@ -250,6 +255,10 @@ class MPJRDWaveNeuronAdvanced(
         self._init_circadian(cfg)
         _validate_advanced_mro(type(self), MPJRDWaveNeuronBase, getattr(self, "logger", logger))
         MPJRDNeuronAdvanced._init_advanced_mixins(self, cfg, is_wave=True)
+
+    def _increment_time(self, dt: float = 1.0):
+        """Dono do avanço temporal para a cadeia completa de mixins."""
+        TimedMixin._increment_time(self, dt)
 
     def forward(self, x, **kwargs):
         self._begin_time_step()
