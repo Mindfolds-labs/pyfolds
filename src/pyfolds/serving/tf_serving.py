@@ -17,7 +17,11 @@ def prepare_versioned_saved_model(
 ) -> Path:
     src = Path(saved_model_dir).expanduser().resolve()
     if not src.exists() or not src.is_dir():
-        raise FileNotFoundError(f"SavedModel inválido: {src}")
+        raise FileNotFoundError(f"SavedModel directory not found: {src}")
+    if not model_name or not isinstance(model_name, str):
+        raise ValueError("Invalid argument `model_name`: expected a non-empty string.")
+    if not str(version):
+        raise ValueError("Invalid argument `version`: expected a non-empty value.")
     dst = Path(serving_root).expanduser().resolve() / model_name / str(version)
     dst.parent.mkdir(parents=True, exist_ok=True)
     if dst.exists():
@@ -34,6 +38,10 @@ def build_tf_serving_command(
     grpc_port: int = 8500,
     docker_image: str = "tensorflow/serving",
 ) -> str:
+    if not model_name or not isinstance(model_name, str):
+        raise ValueError("Invalid argument `model_name`: expected a non-empty string.")
+    if rest_api_port <= 0 or grpc_port <= 0:
+        raise ValueError("Invalid port configuration: expected positive integer values.")
     root = Path(serving_root).expanduser().resolve()
     return (
         "docker run --rm "
@@ -44,6 +52,10 @@ def build_tf_serving_command(
 
 
 def build_inference_payload(instances: Sequence[Any], *, signature_name: Optional[str] = None) -> Dict[str, Any]:
+    if instances is None:
+        raise ValueError("Invalid argument `instances`: expected a non-null sequence.")
+    if signature_name is not None and not isinstance(signature_name, str):
+        raise TypeError("Invalid argument `signature_name`: expected a string when provided.")
     payload: Dict[str, Any] = {"instances": list(instances)}
     if signature_name:
         payload["signature_name"] = signature_name

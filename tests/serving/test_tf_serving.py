@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from pyfolds.serving.tf_serving import (
     build_inference_payload,
     build_tf_serving_command,
@@ -25,3 +27,13 @@ def test_command_and_payload(tmp_path: Path):
     payload = build_inference_payload([[1.0, 2.0]])
     assert "instances" in payload
     assert payload_to_json(payload).startswith("{")
+
+
+def test_serving_rejects_invalid_model_name(tmp_path: Path):
+    with pytest.raises(ValueError, match="Invalid argument `model_name`"):
+        build_tf_serving_command(serving_root=tmp_path, model_name="")
+
+
+def test_payload_rejects_none_instances():
+    with pytest.raises(ValueError, match="Invalid argument `instances`"):
+        build_inference_payload(None)  # type: ignore[arg-type]
