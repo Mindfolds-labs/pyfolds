@@ -137,9 +137,28 @@ class WaveMixin(TimedMixin):
         for osc in self.oscillators:
             osc.update(dt, self.neuromodulator)
 
+    def _phase_from_time_counter(
+        self,
+        frequency_hz: float,
+        *,
+        device: torch.device,
+        time_offset: float = 0.0,
+    ) -> torch.Tensor:
+        if hasattr(self, "time_counter"):
+            time_ref = self.time_counter.to(device)
+        else:
+            time_ref = torch.tensor(0.0, device=device)
+        if time_offset != 0.0:
+            time_ref = time_ref + torch.tensor(float(time_offset), device=device)
+        return torch.remainder(2.0 * torch.pi * float(frequency_hz) * time_ref, 2.0 * torch.pi)
+
+    def _compute_phase_coherence(self, phase: torch.Tensor, reference_phase: torch.Tensor) -> torch.Tensor:
+        return torch.cos(phase - reference_phase)
+
     def _wave_modulate(self, x: torch.Tensor, dt: float = 0.001) -> Tuple[torch.Tensor, Dict]:
         self._update_oscillators(dt)
         combined_sin = torch.zeros(1, device=x.device)
+        enable_phase_computation = bool(getattr(self.wave_cfg, "enable_phase_computation", False))
 
         for i, osc in enumerate(self.oscillators):
             amp = self.neuromodulator.modulate_amplitude(self.wave_amplitudes[i])
@@ -149,9 +168,10 @@ class WaveMixin(TimedMixin):
         modulation = combined_sin.abs().mean()
         x_mod = x * (1.0 + 0.1 * modulation)
 
+        legacy_phase_mean = sum(float(osc.phase.item()) for osc in self.oscillators) / len(self.oscillators)
         wave_state = {
             "wave_modulation": modulation.item(),
-            "wave_phase_mean": sum(float(osc.phase.item()) for osc in self.oscillators) / len(self.oscillators),
+            "wave_phase_mean": legacy_phase_mean,
             "wave_frequencies": [float(osc.frequency.item()) for osc in self.oscillators],
             "wave_amplitudes": self.wave_amplitudes.detach().cpu().tolist(),
             "wave_mode": self.neuromodulator.current_mode.value,
@@ -160,6 +180,25 @@ class WaveMixin(TimedMixin):
             "wave_excitation": self.neuromodulator.excitation_gain,
             "wave_stability": self.neuromodulator.stability_gain,
         }
+        if enable_phase_computation:
+            phase_abs = torch.stack(
+                [
+                    self._phase_from_time_counter(
+                        float(osc.frequency.item()),
+                        device=x.device,
+                        time_offset=dt,
+                    )
+                    for osc in self.oscillators
+                ]
+            )
+            phase_abs_mean = phase_abs.mean()
+            coherence = self._compute_phase_coherence(phase_abs, phase_abs_mean).mean()
+            wave_state.update(
+                {
+                    "wave_phase_mean": float(phase_abs_mean.item()),
+                    "wave_phase_coherence": float(coherence.item()),
+                }
+            )
         return x_mod, wave_state
 
     def _compute_phase_from_potential(self, u: torch.Tensor) -> torch.Tensor:
@@ -240,11 +279,32 @@ class WaveDynamicsMixin:
         if not self._wave_enabled:
             return
 
+        if hasattr(self, "_ensure_time_counter"):
+            self._ensure_time_counter()
+
         self.register_buffer("wave_time", torch.tensor(0.0))
         self.register_buffer("phase_pointer", torch.tensor(0, dtype=torch.long))
         self.register_buffer("phase_history", torch.zeros(int(cfg.phase_buffer_size)))
         self.register_buffer("last_phase_sync", torch.tensor(0.0))
         self.register_buffer("_latency_delay_steps", torch.tensor(0.0))
+
+    def _phase_from_time_counter(
+        self,
+        frequency_hz: float,
+        *,
+        device: torch.device,
+        time_offset: float = 0.0,
+    ) -> torch.Tensor:
+        if hasattr(self, "time_counter"):
+            time_ref = self.time_counter.to(device)
+        else:
+            time_ref = self.wave_time.to(device)
+        if time_offset != 0.0:
+            time_ref = time_ref + torch.tensor(float(time_offset), device=device)
+        return torch.remainder(2.0 * torch.pi * float(frequency_hz) * time_ref, 2.0 * torch.pi)
+
+    def _compute_phase_coherence(self, phase: torch.Tensor, reference_phase: torch.Tensor) -> torch.Tensor:
+        return torch.cos(phase - reference_phase)
 
 
     def _frequency_for_class(self, class_idx: Optional[int]) -> float:
@@ -334,7 +394,17 @@ class WaveDynamicsMixin:
             extra_payload["spatial_latency_ms"] = spatial_latency_ms
 
         prev_mean_phase = self.phase_history.mean().to(device)
-        phase_sync = torch.cos(phase - prev_mean_phase)
+        enable_phase_computation = bool(getattr(self.cfg, "enable_phase_computation", False))
+        frequency_hz = self._frequency_for_class(target_class)
+        if enable_phase_computation:
+            absolute_phase = self._phase_from_time_counter(
+                frequency_hz,
+                device=device,
+                time_offset=float(dt),
+            )
+            phase_sync = self._compute_phase_coherence(phase, absolute_phase)
+        else:
+            phase_sync = torch.cos(phase - prev_mean_phase)
         self.last_phase_sync.copy_(phase_sync.mean().detach())
 
         with torch.no_grad():
@@ -344,13 +414,19 @@ class WaveDynamicsMixin:
             self.phase_history.mul_(self.cfg.phase_decay)
             self.phase_pointer.copy_(torch.tensor((ptr + 1) % self.cfg.phase_buffer_size))
 
-        self.wave_time.add_(dt)
-        frequency_hz = self._frequency_for_class(target_class)
+        if not enable_phase_computation:
+            self.wave_time.add_(dt)
+            wave_time_ref = self.wave_time.to(device)
+        elif hasattr(self, "time_counter"):
+            wave_time_ref = self.time_counter.to(device) + torch.tensor(float(dt), device=device)
+        else:
+            wave_time_ref = self.wave_time.to(device) + torch.tensor(float(dt), device=device)
+
         wave_payload = self._generate_wave_output(
             amplitude=amplitude * spikes,
             phase=phase,
             frequency_hz=frequency_hz,
-            t=self.wave_time.to(device),
+            t=wave_time_ref,
         )
 
         output.update(

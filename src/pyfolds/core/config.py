@@ -240,6 +240,7 @@ class MPJRDConfig:
     dendritic_threshold: float = 0.0
     latency_scale: float = 1.0
     amplitude_eps: float = 1e-6
+    enable_phase_computation: bool = False
     circadian_enabled: bool = False
     circadian_cycle_hours: float = 12.0
     circadian_day_start_hour: float = 6.0
