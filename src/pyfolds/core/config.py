@@ -87,6 +87,7 @@ class CircadianConfig:
     circadian_sleep_duration: float = 60.0
     circadian_plasticity_min: float = 0.1
     circadian_plasticity_max: float = 1.5
+    replay_interval_steps: int = 32
     circadian_day_start_hour: float = 0.0
     circadian_am_cortisol: float = 1.0
     circadian_pm_cortisol: float = 0.3
@@ -251,6 +252,7 @@ class MPJRDConfig:
     circadian_sleep_duration: float = 60.0
     circadian_plasticity_min: float = 0.1
     circadian_plasticity_max: float = 1.5
+    replay_interval_steps: int = 32
 
     # ===== INIBIÇÃO =====
     inhibition_trainable_i2e: bool = False
