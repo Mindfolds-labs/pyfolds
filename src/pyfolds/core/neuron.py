@@ -28,6 +28,13 @@ from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator
 from .dendrite_integration import DendriticIntegration
+from .cognitive_controller import (
+    NetworkOrientationController,
+    NetworkState,
+    NeuromodulatoryState,
+    OrientationPolicy,
+    state_transition_event,
+)
 from .scientific_contract import (
     ContractEnforcer,
     ScientificContract,
@@ -72,6 +79,7 @@ class MPJRDNeuron(BaseNeuron):
         super().__init__()
         self.cfg = cfg
         self._base_i_eta = float(cfg.i_eta)
+        self._active_i_eta = float(cfg.i_eta)
         self.audit_mode = str(audit_mode or getattr(cfg, "audit_mode", "off"))
         self._contract_enforcer = ContractEnforcer(
             level=str(getattr(cfg, "contract_enforcement", "warn"))
@@ -128,6 +136,22 @@ class MPJRDNeuron(BaseNeuron):
 
         # ===== ESTADO =====
         self.mode = LearningMode.ONLINE
+        self.network_state = NetworkState.ACTIVE
+        self.orientation_controller = NetworkOrientationController(
+            base_eta=self._base_i_eta,
+            replay_interval_steps=int(getattr(cfg, "replay_interval_steps", 32)),
+        )
+        self._latest_policy = OrientationPolicy(
+            current_mode=self.network_state,
+            effective_eta=self._base_i_eta,
+            effective_attention_gain=1.0,
+            effective_competition_gain=1.0,
+            effective_replay_priority=0.0,
+            effective_consolidation_rate=1.0,
+            effective_decay_rate=1.0,
+            sensory_excitability=1.0,
+        )
+        self._latest_neuromodulatory_state = NeuromodulatoryState(0.5, 0.5, 0.5, 0.5)
         self.register_buffer("mode_switches", torch.tensor(0))
         self.register_buffer("sleep_count", torch.tensor(0))
         self.logger.debug(f"   ✅ Modo inicial: {self.mode.value}")
@@ -142,6 +166,15 @@ class MPJRDNeuron(BaseNeuron):
 
         # ===== TELEMETRIA =====
         self.register_buffer("step_id", torch.tensor(0, dtype=torch.int64))
+        self.register_buffer("global_time_ms", torch.tensor(0.0, dtype=torch.float32))
+        self.register_buffer("circadian_phase", torch.tensor(0.0, dtype=torch.float32))
+        self.register_buffer("circadian_encoding_gate", torch.tensor(1.0, dtype=torch.float32))
+        self.register_buffer("circadian_consolidation_gate", torch.tensor(0.0, dtype=torch.float32))
+        self.register_buffer("circadian_attention_gate", torch.tensor(1.0, dtype=torch.float32))
+        self.register_buffer("_ema_reward", torch.tensor(0.0, dtype=torch.float32))
+        self.register_buffer("_ema_novelty", torch.tensor(0.0, dtype=torch.float32))
+        self.register_buffer("_ema_spike_rate", torch.tensor(0.0, dtype=torch.float32))
+        self._audit_events: list[dict[str, Any]] = []
         trace_capacity = int(getattr(cfg, "audit_trace_capacity", 512))
         self.register_buffer(
             "_trace_winner_idx",
@@ -416,18 +449,115 @@ class MPJRDNeuron(BaseNeuron):
         self._trace_signal[ptr] = winner_signal.reshape(-1)[0].to(self.theta.dtype)
         self._trace_ptr.fill_((ptr + 1) % self._trace_winner_idx.numel())
 
-    def _compute_circadian_plasticity_gate(self, dt: float) -> float:
-        """Calcula gate circadiano contínuo para modulação de i_eta."""
-        if not bool(getattr(self.cfg, "circadian_enabled", False)):
-            return 1.0
+    def _update_circadian_gates(self, dt: float) -> None:
+        """Update circadian phase and continuous operation gates.
 
-        cycle_h = max(float(getattr(self.cfg, "circadian_cycle_hours", 12.0)), 1e-6)
+        Parameters
+        ----------
+        dt : float
+            Time increment in milliseconds.
+        """
+        self.global_time_ms.add_(float(dt))
+        if not bool(getattr(self.cfg, "circadian_enabled", False)):
+            self.circadian_phase.fill_(0.0)
+            self.circadian_encoding_gate.fill_(1.0)
+            self.circadian_consolidation_gate.fill_(0.0)
+            self.circadian_attention_gate.fill_(1.0)
+            return
+
+        cycle_ms = max(float(getattr(self.cfg, "circadian_cycle_hours", 12.0)) * 3600.0 * 1000.0, 1e-6)
+        phase = float((self.global_time_ms / cycle_ms) * (2.0 * torch.pi))
+        self.circadian_phase.fill_(phase)
+
+        encoding_raw = 0.5 + 0.5 * torch.cos(torch.tensor(phase, dtype=torch.float32))
+        consolidation_raw = 1.0 - encoding_raw
+        attention_raw = 0.6 * encoding_raw + 0.4
+
         min_gate = float(getattr(self.cfg, "circadian_plasticity_min", 0.1))
         max_gate = float(getattr(self.cfg, "circadian_plasticity_max", 1.5))
-        step_idx = float(self._safe_step_id())
-        phase = ((step_idx * float(dt)) / (cycle_h * 3600.0)) * (2.0 * torch.pi)
-        circadian = 0.5 + 0.5 * torch.cos(torch.tensor(phase, dtype=torch.float32)).item()
-        return float(min_gate + (max_gate - min_gate) * circadian)
+        self.circadian_encoding_gate.fill_(min_gate + (max_gate - min_gate) * float(encoding_raw.item()))
+        self.circadian_consolidation_gate.fill_(float(consolidation_raw.item()))
+        self.circadian_attention_gate.fill_(float(attention_raw.item()))
+
+    def _estimate_pending_eligibility_mass(self) -> float:
+        """Estimate current eligibility mass to drive consolidation decisions."""
+        total_mass = 0.0
+        for dend in self.dendrites:
+            syn_batch = getattr(dend, "synapse_batch", None)
+            if syn_batch is not None:
+                total_mass += float(syn_batch.eligibility.abs().mean().item())
+                total_mass += float(syn_batch.stdp_eligibility.abs().mean().item())
+                continue
+            for syn in dend.synapses:
+                total_mass += float(syn.eligibility.abs().mean().item())
+                total_mass += float(syn.stdp_eligibility.abs().mean().item())
+        return total_mass / max(len(self.dendrites), 1)
+
+    def update_network_state(
+        self,
+        reward_signal: float,
+        novelty_estimate: float,
+        surprise_estimate: float,
+        saturation_ratio: float,
+        stability_ratio: float,
+    ) -> None:
+        """Update high-level operating state from circadian and neuromodulatory context."""
+        neuromod_state = self.orientation_controller.compute_neuromodulators(
+            reward_signal=reward_signal,
+            novelty_estimate=novelty_estimate,
+            surprise_estimate=surprise_estimate,
+            stability_ratio=stability_ratio,
+        )
+        self._latest_neuromodulatory_state = neuromod_state
+        pending = self._estimate_pending_eligibility_mass()
+        old_state = self.network_state
+        self.network_state = self.orientation_controller.determine_operational_mode(
+            current_state=self.network_state,
+            circadian_encoding_gate=float(self.circadian_encoding_gate.item()),
+            circadian_consolidation_gate=float(self.circadian_consolidation_gate.item()),
+            pending_eligibility_mass=pending,
+            saturation_ratio=saturation_ratio,
+            stability_ratio=stability_ratio,
+            novelty_estimate=novelty_estimate,
+            step_index=self._safe_step_id(),
+        )
+        self._latest_policy = self.orientation_controller.compose_policy(
+            state=self.network_state,
+            circadian_attention_gate=float(self.circadian_attention_gate.item()),
+            circadian_encoding_gate=float(self.circadian_encoding_gate.item()),
+            circadian_consolidation_gate=float(self.circadian_consolidation_gate.item()),
+            neuromodulatory_state=neuromod_state,
+        )
+        if old_state != self.network_state and self.audit_mode == "full":
+            self._audit_events.append(state_transition_event(old_state, self.network_state, self._safe_step_id()))
+
+    @torch.no_grad()
+    def run_sleep_cycle(self, duration: float = 60.0) -> None:
+        """Run sleep consolidation with decay/noise pruning semantics."""
+        for dend in self.dendrites:
+            dend.consolidate(dt=duration * self._latest_policy.effective_consolidation_rate)
+        self.invalidate_weight_cache()
+
+    @torch.no_grad()
+    def run_replay_cycle(self) -> None:
+        """Run compressed replay by partially reactivating high-eligibility traces."""
+        replay_scale = max(0.0, self._latest_policy.effective_replay_priority)
+        if replay_scale <= 0.0:
+            return
+        for dend in self.dendrites:
+            syn_batch = getattr(dend, "synapse_batch", None)
+            if syn_batch is not None:
+                syn_batch.eligibility.mul_(1.0 + 0.1 * replay_scale)
+                continue
+            for syn in dend.synapses:
+                syn.eligibility.mul_(1.0 + 0.1 * replay_scale)
+
+    @torch.no_grad()
+    def apply_homeostatic_recovery(self) -> None:
+        """Apply recovery mode gains to stabilize firing and threshold drift."""
+        if self.network_state != NetworkState.HOMEOSTATIC_RECOVERY:
+            return
+        self.homeostasis.theta.mul_(1.01).clamp_(self.cfg.theta_min, self.cfg.theta_max)
 
     # ========== CONTROLE DE MODO ==========
 
@@ -603,11 +733,7 @@ class MPJRDNeuron(BaseNeuron):
         effective_mode = normalized_mode if normalized_mode is not None else self.mode
         execution_order: list[ScientificStage] = []
 
-        circadian_gate = self._compute_circadian_plasticity_gate(dt=dt)
-        if circadian_gate != 1.0:
-            self.cfg = self.cfg.with_runtime_update(i_eta=self._base_i_eta * circadian_gate)
-            self._refresh_config_references()
-
+        self._update_circadian_gates(dt=dt)
         self._apply_runtime_injections()
 
         # Valida device
@@ -637,6 +763,8 @@ class MPJRDNeuron(BaseNeuron):
                 ),
             )
             v_dend = torch.nan_to_num(v_dend, nan=0.0, posinf=1e6, neginf=-1e6)
+
+        v_dend = v_dend * float(self._latest_policy.sensory_excitability)
 
         if getattr(self.cfg, "backprop_enabled", True) and hasattr(
             self, "dendrite_amplification"
@@ -727,6 +855,30 @@ class MPJRDNeuron(BaseNeuron):
             if self.cfg.neuromod_mode == "capacity"
             else 0.0
         )
+        novelty_estimate = float((v_dend.std(dim=1).mean() / (v_dend.abs().mean() + 1e-6)).clamp(0.0, 1.0).item())
+        reward_signal = float(reward if reward is not None else 0.0)
+        surprise_estimate = abs(spike_rate - float(self.r_hat.item()))
+        stability_ratio = 1.0 / (1.0 + abs(float(self.homeostasis.homeostasis_error.item())))
+        self._ema_reward.mul_(0.97).add_(0.03 * reward_signal)
+        self._ema_novelty.mul_(0.97).add_(0.03 * novelty_estimate)
+        self._ema_spike_rate.mul_(0.97).add_(0.03 * spike_rate)
+        self.update_network_state(
+            reward_signal=float(self._ema_reward.item()),
+            novelty_estimate=float(self._ema_novelty.item()),
+            surprise_estimate=float(surprise_estimate),
+            saturation_ratio=float(saturation_ratio),
+            stability_ratio=float(stability_ratio),
+        )
+        self._active_i_eta = float(self._latest_policy.effective_eta)
+        self.cfg = self.cfg.with_runtime_update(i_eta=self._active_i_eta)
+        self._refresh_config_references()
+
+        if self.network_state == NetworkState.SLEEP_CONSOLIDATION:
+            self.run_sleep_cycle(duration=dt)
+        elif self.network_state == NetworkState.MEMORY_REPLAY:
+            self.run_replay_cycle()
+        elif self.network_state == NetworkState.HOMEOSTATIC_RECOVERY:
+            self.apply_homeostatic_recovery()
 
         # ===== 6. VALIDAÇÃO ANTES DE HOMEOSTASE =====
         if not (isinstance(spike_rate, float) and -0.1 <= spike_rate <= 1.1):
@@ -865,6 +1017,11 @@ class MPJRDNeuron(BaseNeuron):
             "I_mean": self.I.float().mean().item(),
             "mode": effective_mode.value,
             "integration_mode": integration_mode,
+            "network_state": self.network_state.value,
+            "circadian_encoding_gate": float(self.circadian_encoding_gate.item()),
+            "circadian_consolidation_gate": float(self.circadian_consolidation_gate.item()),
+            "circadian_attention_gate": float(self.circadian_attention_gate.item()),
+            "effective_eta": float(self._latest_policy.effective_eta),
         }
 
         if dend_contribution is not None:
@@ -992,10 +1149,7 @@ class MPJRDNeuron(BaseNeuron):
         self.logger.info(f"💤 Iniciando sono por {duration}ms")
         self.sleep_count.add_(1)
 
-        for i, dend in enumerate(self.dendrites):
-            self.logger.debug(f"   Dendrito {i}: consolidando...")
-            dend.consolidate(dt=duration)
-        self.invalidate_weight_cache()
+        self.run_sleep_cycle(duration=duration)
 
         self.logger.info("✅ Sono concluído")
 
@@ -1102,6 +1256,42 @@ class MPJRDNeuron(BaseNeuron):
             ),
             "device": str(self.theta.device),
             "homeostasis_stable": self.homeostasis.is_stable(),
+            "network_state": self.network_state.value,
+            "global_time_ms": float(self.global_time_ms.item()),
+            "circadian_phase": float(self.circadian_phase.item()),
+            "circadian_encoding_gate": float(self.circadian_encoding_gate.item()),
+            "circadian_consolidation_gate": float(self.circadian_consolidation_gate.item()),
+            "circadian_attention_gate": float(self.circadian_attention_gate.item()),
+            "effective_eta": float(self._latest_policy.effective_eta),
+            "effective_attention_gain": float(self._latest_policy.effective_attention_gain),
+            "effective_competition_gain": float(self._latest_policy.effective_competition_gain),
+            "effective_replay_priority": float(self._latest_policy.effective_replay_priority),
+            "effective_consolidation_rate": float(self._latest_policy.effective_consolidation_rate),
+            "effective_decay_rate": float(self._latest_policy.effective_decay_rate),
+            "dopamine_like_signal": float(self._latest_neuromodulatory_state.dopamine_like_signal),
+            "acetylcholine_like_signal": float(self._latest_neuromodulatory_state.acetylcholine_like_signal),
+            "norepinephrine_like_signal": float(self._latest_neuromodulatory_state.norepinephrine_like_signal),
+            "serotonin_like_signal": float(self._latest_neuromodulatory_state.serotonin_like_signal),
+            "learning_progress_score": float(self._ema_reward.item() * self._ema_spike_rate.item()),
+            "reward_alignment_score": float(1.0 - abs(self._ema_reward.item() - self._ema_spike_rate.item())),
+            "plasticity_utilization": float(min(1.0, self._latest_policy.effective_eta / max(self._base_i_eta, 1e-6))),
+            "useful_update_ratio": float(self._latest_policy.effective_attention_gain / (1.0 + self._latest_policy.effective_competition_gain)),
+            "representational_growth": float(n_flat.std().item()),
+            "active_synapse_ratio": float((w_flat > 0).float().mean().item()),
+            "dendritic_diversity_score": float(w_flat.std().item()),
+            "memory_retention_score": float((n_flat > 0).float().mean().item()),
+            "homeostatic_stability_ratio": float(1.0 / (1.0 + abs(float(self.homeostasis.homeostasis_error.item())))),
+            "firing_stability": float(1.0 - abs(float(self.r_hat.item()) - float(self.cfg.target_spike_rate))),
+            "oscillation_risk_score": float(abs(float(self._ema_spike_rate.item()) - float(self.r_hat.item()))),
+            "consolidation_efficiency": float(self._latest_policy.effective_consolidation_rate * self.circadian_consolidation_gate.item()),
+            "replay_effectiveness": float(self._latest_policy.effective_replay_priority),
+            "noise_pruning_ratio": float(1.0 - self._latest_policy.effective_decay_rate),
+            "retained_memory_after_sleep": float((n_flat > n_flat.mean()).float().mean().item()),
+            "attention_focus_score": float(self._latest_policy.effective_attention_gain),
+            "novelty_capture_rate": float(self._ema_novelty.item()),
+            "winner_selectivity": float((self._trace_winner_idx >= 0).float().mean().item()),
+            "competition_efficiency": float(self._latest_policy.effective_competition_gain),
+            "audit_events_count": len(self._audit_events),
         }
 
         self.logger.debug(
