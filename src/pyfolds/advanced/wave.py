@@ -113,6 +113,17 @@ class WaveMixin(TimedMixin):
         self.register_buffer("phase_ptr", torch.tensor(0, dtype=torch.long))
         self.register_buffer("last_sync", torch.tensor(0.0))
         self.register_buffer("consolidation_buffer", torch.zeros(1000))
+        self._enable_sleep_consolidation = bool(
+            getattr(cfg, "enable_sleep_consolidation", getattr(cfg, "wave_sleep_consolidation", True))
+        )
+        self._offline_pipeline_state: Dict[str, float | int | str] = {
+            "consolidation_requested": 0,
+            "consolidation_executed": 0,
+            "consolidation_skipped_disabled": 0,
+            "replay_runs": 0,
+            "last_pruned": 0,
+            "last_trigger": "init",
+        }
 
 
     @property
@@ -130,8 +141,36 @@ class WaveMixin(TimedMixin):
         if mode_val is None:
             return
         self.neuromodulator.set_mode(mode_val)
-        if mode_val == LearningMode.SLEEP and self.wave_cfg.wave_sleep_consolidation:
-            self._sleep_consolidation()
+        if mode_val == LearningMode.SLEEP:
+            self.consolidate_memories(trigger="set_wave_mode")
+
+    @torch.no_grad()
+    def consolidate_memories(self, trigger: str = "manual", include_replay: Optional[bool] = None) -> Dict[str, int | bool]:
+        self._offline_pipeline_state["consolidation_requested"] = int(
+            self._offline_pipeline_state["consolidation_requested"]
+        ) + 1
+        self._offline_pipeline_state["last_trigger"] = trigger
+
+        if not self._enable_sleep_consolidation:
+            self._offline_pipeline_state["consolidation_skipped_disabled"] = int(
+                self._offline_pipeline_state["consolidation_skipped_disabled"]
+            ) + 1
+            return {"executed": False, "replay": False, "pruned": 0}
+
+        replay_done = False
+        if include_replay is None:
+            include_replay = float(getattr(self.wave_cfg, "wave_sleep_replay_rate", 0.0)) > 0.0
+        if include_replay and hasattr(self, "run_replay_cycle"):
+            self.run_replay_cycle()
+            replay_done = True
+            self._offline_pipeline_state["replay_runs"] = int(self._offline_pipeline_state["replay_runs"]) + 1
+
+        pruned = self._sleep_consolidation()
+        self._offline_pipeline_state["consolidation_executed"] = int(
+            self._offline_pipeline_state["consolidation_executed"]
+        ) + 1
+        self._offline_pipeline_state["last_pruned"] = int(pruned)
+        return {"executed": True, "replay": replay_done, "pruned": int(pruned)}
 
     def _update_oscillators(self, dt: float) -> None:
         for osc in self.oscillators:
@@ -193,14 +232,16 @@ class WaveMixin(TimedMixin):
             self._update_sync_memory(sync)
 
     @torch.no_grad()
-    def _sleep_consolidation(self) -> None:
+    def _sleep_consolidation(self) -> int:
         target_norm = 0.1
         current_mean = self.wave_amplitudes.mean()
         if float(current_mean.item()) > 0:
             self.wave_amplitudes.mul_(target_norm / current_mean)
         threshold = self.wave_cfg.wave_sleep_pruning_threshold
         mask = self.wave_amplitudes.abs() > threshold
+        pruned = int((~mask).sum().item())
         self.wave_amplitudes.mul_(mask.float())
+        return pruned
 
     def get_wave_metrics(self) -> Dict[str, float]:
         if not hasattr(self, "oscillators"):
@@ -215,6 +256,12 @@ class WaveMixin(TimedMixin):
             "wave_focus": float(self.neuromodulator.focus_gain),
             "wave_excitation": float(self.neuromodulator.excitation_gain),
             "wave_stability": float(self.neuromodulator.stability_gain),
+            "wave_sleep_consolidation_enabled": float(self._enable_sleep_consolidation),
+            "wave_consolidation_requested": float(self._offline_pipeline_state["consolidation_requested"]),
+            "wave_consolidation_executed": float(self._offline_pipeline_state["consolidation_executed"]),
+            "wave_consolidation_skipped": float(self._offline_pipeline_state["consolidation_skipped_disabled"]),
+            "wave_replay_runs": float(self._offline_pipeline_state["replay_runs"]),
+            "wave_last_pruned": float(self._offline_pipeline_state["last_pruned"]),
         }
 
     def reset_wave_state(self) -> None:

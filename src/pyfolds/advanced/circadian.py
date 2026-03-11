@@ -75,6 +75,18 @@ class CircadianWaveMixin:
 
         self._last_meridiem = "AM" if start_phase < 180.0 else "PM"
         self.temporal_memory: Dict[str, List[TemporalMemory]] = {}
+        self._enable_sleep_consolidation = bool(
+            getattr(cfg, "enable_sleep_consolidation", getattr(cfg, "wave_sleep_consolidation", True))
+        )
+        self._offline_pipeline_state: Dict[str, int | str] = {
+            "consolidation_requested": 0,
+            "consolidation_executed": 0,
+            "consolidation_skipped_disabled": 0,
+            "replay_runs": 0,
+            "last_consolidated": 0,
+            "last_pruned": 0,
+            "last_trigger": "init",
+        }
 
     def _advance_circadian(self, dt: float) -> None:
         if not getattr(self, "_circadian_enabled", False):
@@ -131,11 +143,9 @@ class CircadianWaveMixin:
         meridiem = str(ctx["meridiem"])
         entered_pm = self._last_meridiem != meridiem and meridiem == "PM"
         if entered_pm:
-            # Trigger consolidation once on AM->PM transition.
+            # Trigger sleep + offline consolidation once on AM->PM transition.
             self.sleep(duration=self._circadian_sleep_duration)
-            self.consolidate_temporal_memory(
-                pruning_threshold=float(getattr(self.cfg, "wave_sleep_pruning_threshold", 0.1))
-            )
+            self.consolidate_memories(trigger="circadian_pm_transition")
         self._last_meridiem = meridiem
 
     def _get_circadian_embedding(self, ctx: Dict[str, float | str], device: torch.device) -> torch.Tensor:
@@ -174,10 +184,14 @@ class CircadianWaveMixin:
         return min_gate + (max_gate - min_gate) * circadian_gate
 
     def forward(self, x: torch.Tensor, **kwargs):
+        phase_snapshot = float(self.circadian_phase.item()) if getattr(self, "_circadian_enabled", False) else 0.0
         output = super().forward(x, **kwargs)
         if not getattr(self, "_circadian_enabled", False):
             return output
 
+        # O core também possui estado circadiano próprio; restauramos o snapshot
+        # para manter este mixin como fonte de verdade do ciclo offline/temporal.
+        self.circadian_phase.fill_(phase_snapshot)
         dt = kwargs.get("dt", 1.0)
         self._advance_circadian(dt=dt)
         ctx = self._get_circadian_context()
@@ -325,6 +339,52 @@ class CircadianWaveMixin:
 
         return {"consolidated": consolidated, "pruned": pruned}
 
+
+    def consolidate_memories(
+        self,
+        trigger: str = "manual",
+        include_replay: bool = False,
+        pruning_threshold: float | None = None,
+    ) -> Dict[str, int | bool]:
+        if not getattr(self, "_circadian_enabled", False):
+            return {"executed": False, "replay": False, "consolidated": 0, "pruned": 0}
+
+        self._offline_pipeline_state["consolidation_requested"] = int(
+            self._offline_pipeline_state["consolidation_requested"]
+        ) + 1
+        self._offline_pipeline_state["last_trigger"] = trigger
+
+        if not self._enable_sleep_consolidation:
+            self._offline_pipeline_state["consolidation_skipped_disabled"] = int(
+                self._offline_pipeline_state["consolidation_skipped_disabled"]
+            ) + 1
+            return {"executed": False, "replay": False, "consolidated": 0, "pruned": 0}
+
+        replay_done = False
+        if include_replay and hasattr(self, "run_replay_cycle"):
+            self.run_replay_cycle()
+            replay_done = True
+            self._offline_pipeline_state["replay_runs"] = int(self._offline_pipeline_state["replay_runs"]) + 1
+
+        report = self.consolidate_temporal_memory(
+            pruning_threshold=float(
+                pruning_threshold
+                if pruning_threshold is not None
+                else getattr(self.cfg, "wave_sleep_pruning_threshold", 0.1)
+            )
+        )
+        self._offline_pipeline_state["consolidation_executed"] = int(
+            self._offline_pipeline_state["consolidation_executed"]
+        ) + 1
+        self._offline_pipeline_state["last_consolidated"] = int(report["consolidated"])
+        self._offline_pipeline_state["last_pruned"] = int(report["pruned"])
+        return {
+            "executed": True,
+            "replay": replay_done,
+            "consolidated": int(report["consolidated"]),
+            "pruned": int(report["pruned"]),
+        }
+
     def narrative_of_life(self) -> str:
         """Gera um resumo curto da história temporal da rede."""
         if not getattr(self, "_circadian_enabled", False):
@@ -352,9 +412,22 @@ class CircadianWaveMixin:
             if getattr(self, "_circadian_enabled", False)
             else 0
         )
-        return {
+        stats = {
             "total_memories": total,
             "memory_slots": len(self.temporal_memory) if getattr(self, "_circadian_enabled", False) else 0,
             "consolidated_memories": consolidated,
             "age_seconds": int(self.age_seconds.item()) if getattr(self, "_circadian_enabled", False) else 0,
         }
+        if getattr(self, "_circadian_enabled", False):
+            stats.update(
+                {
+                    "sleep_consolidation_enabled": int(self._enable_sleep_consolidation),
+                    "offline_consolidation_requested": int(self._offline_pipeline_state["consolidation_requested"]),
+                    "offline_consolidation_executed": int(self._offline_pipeline_state["consolidation_executed"]),
+                    "offline_consolidation_skipped": int(self._offline_pipeline_state["consolidation_skipped_disabled"]),
+                    "offline_replay_runs": int(self._offline_pipeline_state["replay_runs"]),
+                    "offline_last_consolidated": int(self._offline_pipeline_state["last_consolidated"]),
+                    "offline_last_pruned": int(self._offline_pipeline_state["last_pruned"]),
+                }
+            )
+        return stats
