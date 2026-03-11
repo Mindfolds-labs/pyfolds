@@ -26,6 +26,14 @@ from .circadian import CircadianWaveMixin
 from .engram import EngramBank, Engram, EngramType
 from .specialization import SpecializationEngine, KnowledgeHierarchy
 from .noetic_model import NoeticCore
+from .speech_tracking import (
+    analyze_mechanisms,
+    compute_phase_amplitude_coupling,
+    detect_envelope_events,
+    extract_speech_envelope,
+    latency_kernel,
+    reset_phase_if_event,
+)
 
 from ..core.neuron import MPJRDNeuron as MPJRDNeuronBase
 from ..wave import MPJRDWaveNeuron as MPJRDWaveNeuronBase
@@ -55,6 +63,12 @@ __all__ = [
     "SpecializationEngine",
     "KnowledgeHierarchy",
     "NoeticCore",
+    "extract_speech_envelope",
+    "detect_envelope_events",
+    "reset_phase_if_event",
+    "compute_phase_amplitude_coupling",
+    "latency_kernel",
+    "analyze_mechanisms",
 ]
 
 
