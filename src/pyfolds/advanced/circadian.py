@@ -137,6 +137,25 @@ class CircadianWaveMixin:
             dtype=torch.float32,
         )
 
+    def _apply_circadian_plasticity_gate(self, ctx: Dict[str, float | str]) -> float:
+        """Calcula multiplicador de plasticidade baseado na fase circadiana.
+
+        Parameters
+        ----------
+        ctx : Dict[str, float | str]
+            Contexto circadiano atual.
+
+        Returns
+        -------
+        float
+            Multiplicador contínuo entre os limites configurados.
+        """
+        phase_rad = math.radians(float(ctx["phase"]))
+        circadian_gate = 0.5 + 0.5 * math.cos(phase_rad)
+        min_gate = float(getattr(self.cfg, "circadian_plasticity_min", 0.1))
+        max_gate = float(getattr(self.cfg, "circadian_plasticity_max", 1.5))
+        return min_gate + (max_gate - min_gate) * circadian_gate
+
     def forward(self, x: torch.Tensor, **kwargs):
         output = super().forward(x, **kwargs)
         if not getattr(self, "_circadian_enabled", False):
@@ -150,6 +169,11 @@ class CircadianWaveMixin:
         if "frequency" in output:
             output["frequency"] = output["frequency"] * float(1.0 + 0.1 * ctx["focus_gain"])
 
+        plasticity_gate = self._apply_circadian_plasticity_gate(ctx)
+        if hasattr(self, "queue_runtime_injection"):
+            effective_eta = float(self.cfg.i_eta) * plasticity_gate
+            self.queue_runtime_injection("i_eta", effective_eta)
+
         output.update(
             {
                 "circadian_phase": torch.tensor(ctx["phase"], device=output["u"].device),
@@ -160,6 +184,7 @@ class CircadianWaveMixin:
                 "neuromod_cortisol": torch.tensor(ctx["cortisol"], device=output["u"].device),
                 "neuromod_melatonin": torch.tensor(ctx["melatonin"], device=output["u"].device),
                 "circadian_mode": self.mode.value,
+                "circadian_plasticity_gate": plasticity_gate,
             }
         )
         return output
@@ -228,25 +253,56 @@ class CircadianWaveMixin:
         result.sort(key=lambda m: abs(m.age_seconds - target_age))
         return result
 
-    def consolidate_temporal_memory(self, pruning_threshold: float = 0.1) -> Dict[str, int]:
-        """Consolida e poda memórias episódicas para uso durante o sono."""
+    def consolidate_temporal_memory(
+        self,
+        pruning_threshold: float = 0.1,
+        decay_rate: float = 0.95,
+        access_boost: float = 0.1,
+    ) -> Dict[str, int]:
+        """Consolida memórias com curva de esquecimento de Ebbinghaus.
+
+        Parameters
+        ----------
+        pruning_threshold : float, default=0.1
+            Importância mínima para manter a memória após decaimento.
+        decay_rate : float, default=0.95
+            Fator de decaimento temporal por ciclo de consolidação.
+        access_boost : float, default=0.1
+            Reforço multiplicativo baseado em contagem de acessos.
+
+        Returns
+        -------
+        Dict[str, int]
+            Contagem de memórias consolidadas e podadas.
+        """
         if not getattr(self, "_circadian_enabled", False):
             return {"consolidated": 0, "pruned": 0}
 
-        consolidated = 0
-        pruned = 0
+        consolidated, pruned = 0, 0
+        current_age = float(self.age_seconds.item())
+
         for key in list(self.temporal_memory.keys()):
             kept: List[TemporalMemory] = []
             for memory in self.temporal_memory[key]:
+                age_delta = max(0.0, current_age - float(memory.age_seconds))
+                age_factor = math.exp(-decay_rate * age_delta / 3600.0)
+                access_factor = 1.0 + access_boost * float(memory.access_count)
+                effective_importance = float(memory.importance) * age_factor * access_factor
+                memory.importance = min(1.0, effective_importance)
+
                 if memory.importance < pruning_threshold:
                     pruned += 1
                     continue
+
                 if memory.importance >= 0.7 and not memory.consolidated:
                     memory.consolidated = True
                     consolidated += 1
+
                 kept.append(memory)
+
             if kept:
-                self.temporal_memory[key] = kept
+                kept.sort(key=lambda m: m.importance, reverse=True)
+                self.temporal_memory[key] = kept[:10]
             else:
                 del self.temporal_memory[key]
 

@@ -62,7 +62,16 @@ class AdaptationMixin:
         return u - self.adaptation_current
 
     def _update_adaptation_after_spike(self, spikes: torch.Tensor) -> None:
-        """Atualiza I_adapt após spikes confirmados (pós-refratário)."""
+        """Atualiza I_adapt após spikes confirmados (pós-refratário).
+
+        Parameters
+        ----------
+        spikes : torch.Tensor
+            Tensor de spikes por amostra.
+        """
+        if self.adaptation_current is None:
+            self._ensure_adaptation_current(int(spikes.shape[0]), spikes.device)
+
         spike_mask = spikes > 0.5
         increment = self.adaptation_increment * spike_mask.float()
         self.adaptation_current.add_(increment)

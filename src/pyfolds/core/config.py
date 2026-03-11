@@ -1,6 +1,6 @@
 """Configuração imutável do neurônio MPJRD - SUPORTE A 9 MECANISMOS"""
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 import warnings
 import math
 from typing import Literal, Dict, Optional, Tuple
@@ -17,6 +17,80 @@ StatsAccumulatorMode = Literal["dense", "sparse_masked"]
 
 
 @dataclass(frozen=True)
+class TopologyConfig:
+    """Subconfiguração de topologia."""
+
+    n_dendrites: int = 4
+    n_synapses_per_dendrite: int = 32
+    use_vectorized_synapses: bool = False
+
+
+@dataclass(frozen=True)
+class FilamentConfig:
+    """Subconfiguração de filamentos/peso."""
+
+    n_min: int = 0
+    n_max: int = 31
+    w_scale: float = 5.0
+    weight_quantization: WeightQuantization = "logN"
+    n_levels: int = 32
+
+
+@dataclass(frozen=True)
+class PlasticityConfig:
+    """Subconfiguração de plasticidade."""
+
+    i_eta: float = 0.01
+    i_gamma: float = 0.99
+    beta_w: float = 0.0
+    hebbian_ltd_ratio: float = 1.0
+    i_ltp_th: float = 5.0
+    i_ltd_th: float = -5.0
+    ltd_threshold_saturated: float = -10.0
+    i_min: float = -20.0
+    i_max: float = 50.0
+    i_decay_sleep: float = 0.99
+    A_plus: float = 1.0
+    A_minus: float = 1.0
+    neuromod_scale: float = 1.0
+
+
+@dataclass(frozen=True)
+class HomeostasisConfig:
+    """Subconfiguração homeostática."""
+
+    theta_init: float = 1.5
+    theta_min: float = 0.5
+    theta_max: float = 6.0
+    homeostasis_alpha: float = 0.1
+    homeostasis_eta: float = 0.1
+    target_spike_rate: float = 0.1
+    dead_neuron_threshold: float = 0.01
+    dead_neuron_penalty: float = 1.0
+    homeostasis_eps: float = 1e-7
+    homeostasis_stability_window: int = 200
+    dt: float = 1.0
+
+
+@dataclass(frozen=True)
+class CircadianConfig:
+    """Subconfiguração circadiana."""
+
+    circadian_enabled: bool = False
+    circadian_cycle_hours: float = 12.0
+    circadian_phase_bins: int = 24
+    circadian_auto_mode: bool = False
+    circadian_sleep_duration: float = 60.0
+    circadian_plasticity_min: float = 0.1
+    circadian_plasticity_max: float = 1.5
+    circadian_day_start_hour: float = 0.0
+    circadian_am_cortisol: float = 1.0
+    circadian_pm_cortisol: float = 0.3
+    circadian_am_melatonin: float = 0.1
+    circadian_pm_melatonin: float = 0.9
+
+
+@dataclass(frozen=True)
 class MPJRDConfig:
     """
     Configuração completa do neurônio MPJRD com 9 mecanismos avançados.
@@ -30,6 +104,7 @@ class MPJRDConfig:
     # ===== TOPOLOGIA =====
     n_dendrites: int = 4
     n_synapses_per_dendrite: int = 32
+    use_vectorized_synapses: bool = False
     
     # ===== MECANISMO 1: FILAMENTOS (N) =====
     n_min: int = 0
@@ -80,6 +155,7 @@ class MPJRDConfig:
     
     # ✅ NOVO: Epsilon para homeostase (evita divisão por zero)
     homeostasis_eps: float = 1e-7
+    homeostasis_stability_window: int = 200
 
     # ===== INTEGRAÇÃO DENDRÍTICA (substitui WTA hard) =====
     dendrite_integration_mode: str = "nmda_shunting"
@@ -160,6 +236,8 @@ class MPJRDConfig:
     circadian_pm_melatonin: float = 0.8
     circadian_auto_mode: bool = False
     circadian_sleep_duration: float = 60.0
+    circadian_plasticity_min: float = 0.1
+    circadian_plasticity_max: float = 1.5
 
     # ===== INIBIÇÃO =====
     inhibition_trainable_i2e: bool = False
@@ -220,7 +298,14 @@ class MPJRDConfig:
     model_name: str = "Noetic"
     save_checkpoints: bool = True
     checkpoint_interval: int = 86400
-    
+
+    # Sub-configs compostos (mantém compatibilidade flat)
+    topology: TopologyConfig = field(default_factory=TopologyConfig)
+    filament: FilamentConfig = field(default_factory=FilamentConfig)
+    plasticity: PlasticityConfig = field(default_factory=PlasticityConfig)
+    homeostasis: HomeostasisConfig = field(default_factory=HomeostasisConfig)
+    circadian: CircadianConfig = field(default_factory=CircadianConfig)
+
     def __post_init__(self):
         """Validações pós-inicialização."""
         try:
@@ -230,6 +315,51 @@ class MPJRDConfig:
             object.__setattr__(self, '_torch', None)
             warnings.warn("PyTorch não encontrado", RuntimeWarning)
         
+        object.__setattr__(self, "topology", TopologyConfig(self.n_dendrites, self.n_synapses_per_dendrite))
+        object.__setattr__(self, "filament", FilamentConfig(self.n_min, self.n_max, self.w_scale, self.weight_quantization, self.n_levels))
+        object.__setattr__(self, "plasticity", PlasticityConfig(
+            i_eta=self.i_eta,
+            i_gamma=self.i_gamma,
+            beta_w=self.beta_w,
+            hebbian_ltd_ratio=self.hebbian_ltd_ratio,
+            i_ltp_th=self.i_ltp_th,
+            i_ltd_th=self.i_ltd_th,
+            ltd_threshold_saturated=self.ltd_threshold_saturated,
+            i_min=self.i_min,
+            i_max=self.i_max,
+            i_decay_sleep=self.i_decay_sleep,
+            A_plus=self.A_plus,
+            A_minus=self.A_minus,
+            neuromod_scale=self.neuromod_scale,
+        ))
+        object.__setattr__(self, "homeostasis", HomeostasisConfig(
+            theta_init=self.theta_init,
+            theta_min=self.theta_min,
+            theta_max=self.theta_max,
+            homeostasis_alpha=self.homeostasis_alpha,
+            homeostasis_eta=self.homeostasis_eta,
+            target_spike_rate=self.target_spike_rate,
+            dead_neuron_threshold=self.dead_neuron_threshold,
+            dead_neuron_penalty=self.dead_neuron_penalty,
+            homeostasis_eps=self.homeostasis_eps,
+            homeostasis_stability_window=self.homeostasis_stability_window,
+            dt=self.dt,
+        ))
+        object.__setattr__(self, "circadian", CircadianConfig(
+            circadian_enabled=self.circadian_enabled,
+            circadian_cycle_hours=self.circadian_cycle_hours,
+            circadian_phase_bins=self.circadian_phase_bins,
+            circadian_auto_mode=self.circadian_auto_mode,
+            circadian_sleep_duration=self.circadian_sleep_duration,
+            circadian_day_start_hour=self.circadian_day_start_hour,
+            circadian_am_cortisol=self.circadian_am_cortisol,
+            circadian_pm_cortisol=self.circadian_pm_cortisol,
+            circadian_am_melatonin=self.circadian_am_melatonin,
+            circadian_pm_melatonin=self.circadian_pm_melatonin,
+            circadian_plasticity_min=self.circadian_plasticity_min,
+            circadian_plasticity_max=self.circadian_plasticity_max,
+        ))
+
         # Resolve device
         if self.device == "auto":
             if self._torch is not None and self._torch.cuda.is_available():
@@ -553,6 +683,13 @@ class MPJRDConfig:
             out.append(Warning("circadian_cycle_hours > 24 é biologicamente incomum"))
 
         return out
+
+    def __getattr__(self, name: str):
+        """Fallback de compatibilidade para acesso flat via subconfigs."""
+        for sub in (self.topology, self.filament, self.plasticity, self.homeostasis, self.circadian):
+            if hasattr(sub, name):
+                return getattr(sub, name)
+        raise AttributeError(f"MPJRDConfig has no attribute '{name}'")
 
     def __repr__(self) -> str:
         """Representação string da configuração."""

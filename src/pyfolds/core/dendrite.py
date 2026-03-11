@@ -8,6 +8,7 @@ from typing import Optional, Dict
 from threading import Lock
 from .config import MPJRDConfig
 from .synapse import MPJRDSynapse
+from .dendrite_vectorized import VectorizedSynapseBatch
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -29,10 +30,17 @@ class MPJRDDendrite(nn.Module):
         self.id = dendrite_id
         self.n_synapses = cfg.n_synapses_per_dendrite
         
-        # Sinapses como ModuleList
-        self.synapses = nn.ModuleList([
-            MPJRDSynapse(cfg) for _ in range(self.n_synapses)
-        ])
+        self.use_vectorized_synapses = bool(getattr(cfg, "use_vectorized_synapses", False))
+        self.synapse_batch: Optional[VectorizedSynapseBatch] = None
+
+        # Sinapses como ModuleList (legado) ou batch vetorizado
+        if self.use_vectorized_synapses:
+            self.synapse_batch = VectorizedSynapseBatch(cfg, self.n_synapses)
+            self.synapses = nn.ModuleList([])
+        else:
+            self.synapses = nn.ModuleList([
+                MPJRDSynapse(cfg) for _ in range(self.n_synapses)
+            ])
         
         # Cache único (dicionário)
         self._cached_states = None
@@ -50,7 +58,10 @@ class MPJRDDendrite(nn.Module):
                 return
 
             first_synapse = self.synapses[0] if len(self.synapses) > 0 else None
-            device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
+            if self.synapse_batch is not None:
+                device = self.synapse_batch.N.device
+            else:
+                device = first_synapse.N.device if first_synapse is not None else torch.device(self.cfg.device)
 
             N_list = []
             I_list = []
@@ -60,14 +71,23 @@ class MPJRDDendrite(nn.Module):
             u_list = [] if has_short_term_state else None
             R_list = [] if has_short_term_state else None
 
-            for syn in self.synapses:
-                N_list.append(syn.N.to(device))
-                L_list.append(syn.L.to(device))
-                I_list.append(syn.I.to(device))
-                W_list.append(syn.W.to(device))
-                if has_short_term_state:
-                    u_list.append(syn.u.to(device))
-                    R_list.append(syn.R.to(device))
+            if self.synapse_batch is not None:
+                N_list.append(self.synapse_batch.N.to(device).reshape(-1))
+                L_list.append(self.synapse_batch.L.to(device).reshape(-1))
+                I_list.append(self.synapse_batch.I.to(device).reshape(-1))
+                W_list.append(self.synapse_batch.W.to(device).reshape(-1))
+                u_list = [self.synapse_batch.u.to(device).reshape(-1)]
+                R_list = [self.synapse_batch.R.to(device).reshape(-1)]
+                has_short_term_state = True
+            else:
+                for syn in self.synapses:
+                    N_list.append(syn.N.to(device))
+                    L_list.append(syn.L.to(device))
+                    I_list.append(syn.I.to(device))
+                    W_list.append(syn.W.to(device))
+                    if has_short_term_state:
+                        u_list.append(syn.u.to(device))
+                        R_list.append(syn.R.to(device))
 
             self._cached_states = {
                 'N': torch.cat(N_list).to(torch.int32),
@@ -178,10 +198,18 @@ class MPJRDDendrite(nn.Module):
                 f"pre_rate deve ter 1 ou {self.n_synapses} elementos, recebeu {pre_rate.numel()}"
             )
 
-        for s_idx, syn in enumerate(self.synapses):
-            local_pre = pre_rate if pre_rate.numel() == 1 else pre_rate[s_idx:s_idx + 1]
-            syn.update(local_pre, post_rate, R, dt, mode)
-        
+        if self.synapse_batch is not None:
+            if pre_rate.numel() == 1:
+                pre_vec = pre_rate.reshape(1, 1).expand(1, self.n_synapses)
+            else:
+                pre_vec = pre_rate.reshape(1, -1)
+            post_vec = post_rate.reshape(-1)
+            self.synapse_batch.update_batch(pre_vec, post_vec, R.reshape(()), dt, mode)
+        else:
+            for s_idx, syn in enumerate(self.synapses):
+                local_pre = pre_rate if pre_rate.numel() == 1 else pre_rate[s_idx:s_idx + 1]
+                syn.update(local_pre, post_rate, R, dt, mode)
+
         self._invalidate_cache()
 
     @torch.no_grad()
@@ -189,8 +217,11 @@ class MPJRDDendrite(nn.Module):
         """Consolida mudanças sinápticas."""
         if torch.cuda.is_available():
             torch.cuda.synchronize()
-        for syn in self.synapses:
-            syn.consolidate(dt)
+        if self.synapse_batch is not None:
+            self.synapse_batch.consolidate(dt)
+        else:
+            for syn in self.synapses:
+                syn.consolidate(dt)
         self._invalidate_cache()
 
     def get_states(self) -> Dict[str, torch.Tensor]:

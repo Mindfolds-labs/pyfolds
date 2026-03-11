@@ -406,43 +406,41 @@ class MPJRDSynapse(nn.Module):
 
     @torch.no_grad()
     def consolidate(self, dt: float = 1.0) -> None:
-        """
-        Consolida o fator volátil em estável (two-factor consolidation).
+        """Consolida o fator volátil em estado estável sem sincronização D2H.
 
-        ✅ OTIMIZADO V2: Remoção TOTAL de sincronização D2H.
-        Matemática in-place pura, sem desvios baseados no conteúdo da VRAM.
+        Parameters
+        ----------
+        dt : float, default=1.0
+            Passo temporal aplicado na consolidação.
         """
-        # .numel() é seguro pois lê apenas o metadado (shape) alocado na CPU Host
         if self.eligibility.numel() == 0:
             return
 
-        # 1. Matemática Vetorial sem Condicionais
-        # Se a elegibilidade for 0, delta_n será calculado como +0 automaticamente.
         dt_abs = abs(dt)
-        consolidation_scale = self.cfg.consolidation_rate * (dt_abs / self.cfg.tau_consolidation)
-        combined_eligibility = self.eligibility + (
+        scale = self.cfg.consolidation_rate * (dt_abs / self.cfg.tau_consolidation)
+        combined = self.eligibility + (
             self.stdp_eligibility * self.cfg.stdp_consolidation_scale
         )
-        transfer = combined_eligibility.to(dtype=torch.float32) * consolidation_scale
-        delta_n = torch.round(transfer).to(dtype=self.N.dtype)
+        transfer = combined.to(dtype=torch.float32) * scale
 
-        # 2. Adição Maciça In-Place
-        # Adicionar +0 na GPU é exponencialmente mais barato que sincronizar um torch.any()
         if self._is_uniform_mode():
             delta_l = torch.round(transfer).to(dtype=self.L.dtype)
-            self.L.add_(delta_l)
-            self.L.clamp_(self._l_min, self._l_max)
-            self.N.fill_(self._l_to_n(int(self.L.item())))
+            self.L.add_(delta_l).clamp_(self._l_min, self._l_max)
+            n_proxy = torch.round(
+                self.L.float() / float(max(1, self._l_max)) * float(self.cfg.n_max)
+            ).to(dtype=self.N.dtype).clamp_(self.cfg.n_min, self.cfg.n_max)
+            self.N.copy_(n_proxy)
         else:
-            self.N.add_(delta_n)
-            self.N.clamp_(self.cfg.n_min, self.cfg.n_max)
-            self.L.fill_(self._n_to_l(int(self.N.item())))
+            delta_n = torch.round(transfer).to(dtype=self.N.dtype)
+            self.N.add_(delta_n).clamp_(self.cfg.n_min, self.cfg.n_max)
+            l_proxy = torch.round(
+                self.N.float() / float(max(1, self.cfg.n_max)) * float(self._l_max)
+            ).to(dtype=self.L.dtype).clamp_(self._l_min, self._l_max)
+            self.L.copy_(l_proxy)
 
-        # 3. Reseta elegibilidade massivamente
         self.eligibility.zero_()
         self.stdp_eligibility.zero_()
 
-        # 4. Decaimento natural de I
         if self.I.numel() > 0:
             self.I.mul_(self.cfg.i_decay_sleep)
 

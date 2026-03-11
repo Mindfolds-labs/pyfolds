@@ -15,6 +15,7 @@ import hashlib
 import hmac
 import importlib
 import io
+import logging as _logging
 import json
 import mmap
 import os
@@ -57,6 +58,21 @@ google_crc32c = _optional_import("google_crc32c")
 serialization = _optional_import("cryptography.hazmat.primitives.serialization")
 ed25519 = _optional_import("cryptography.hazmat.primitives.asymmetric.ed25519")
 safetensors_torch = _optional_import("safetensors.torch")
+
+_FOLDIO_LOGGER = _logging.getLogger("pyfolds.serialization.foldio")
+
+
+def _check_crc32c_performance() -> None:
+    """Verifica disponibilidade do CRC32C acelerado no startup."""
+    if google_crc32c is None:
+        _FOLDIO_LOGGER.warning(
+            "⚠️  google-crc32c não instalado. Usando fallback Python puro para CRC32C. "
+            "Para modelos grandes (>100MB) isso pode causar lentidão significativa. "
+            "Instale com: pip install google-crc32c"
+        )
+
+
+_check_crc32c_performance()
 
 
 MAGIC = b"FOLDv1\0\0"
@@ -170,12 +186,6 @@ def crc32c_u32(data: bytes) -> int:
             return int.from_bytes(google_crc32c.value(data).to_bytes(4, "big"), "big")
         except Exception:
             pass
-
-    warnings.warn(
-        "google-crc32c não instalado/disponível. Fallback para CRC32C em Python puro.",
-        RuntimeWarning,
-        stacklevel=2,
-    )
 
     return _crc32c_fallback(data)
 
