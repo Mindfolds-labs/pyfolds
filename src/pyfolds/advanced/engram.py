@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import math
 import time
+import hashlib
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
@@ -217,7 +218,10 @@ class EngramBank(nn.Module):
         elif query_pattern.numel() > self.n_frequencies:
             query_pattern = query_pattern[: self.n_frequencies]
 
-        cache_key = f"{hash(query_pattern.numpy().tobytes())}_{query_phase}_{area}_{top_k}"
+        pattern_digest = hashlib.sha256(query_pattern.numpy().tobytes()).hexdigest()
+        phase_key = "none" if query_phase is None else f"{float(query_phase):.6f}"
+        area_key = area or "*"
+        cache_key = f"{pattern_digest}:{phase_key}:{area_key}:{int(top_k)}"
         if use_cache and cache_key in self.search_cache:
             self.cache_hits += 1
             return self.search_cache[cache_key]
