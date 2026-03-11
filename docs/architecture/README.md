@@ -12,3 +12,7 @@
 - [ADR 0001](../governance/adr/legado/0001-import-contract-and-release-readiness.md)
 
 [← Voltar para docs](../README.md) | [Hub](../DEVELOPMENT_HUB.md)
+
+## Auditoria arquitetural atual
+- [Fonte canônica da auditoria atual](../sheer-audit/current_architecture_audit.md)
+
