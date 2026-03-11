@@ -1,6 +1,8 @@
-# ADR-046 — Monitoramento periódico de integridade dos pesos por SHA-256
+# ADR-046 (Superseded) — Monitoramento periódico de integridade dos pesos por SHA-256
 
-- **Status:** Ativo
+> **Superseded by ADR-046 canônico:** [`ADR-046-sanity-check-periodico-de-integridade-de-pesos.md`](./ADR-046-sanity-check-periodico-de-integridade-de-pesos.md).
+
+- **Status:** Superseded
 - **Data:** 2026-02-20
 - **Decisores:** Engenharia de Runtime, Segurança de Modelo e Confiabilidade
 - **Contexto:** Como evolução da blindagem de checkpoint da `v2.0.2`, foi priorizado um mecanismo em runtime para detectar corrupção silenciosa de pesos durante treinos longos (ex.: bitflips em VRAM).

@@ -10,14 +10,14 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Added
 - Canonical root `CONTRIBUTING.md` and `CHANGELOG.md` to strengthen governance onboarding.
 - `WeightIntegrityMonitor` para verificação periódica de hash SHA-256 dos pesos em runtime, com foco em detecção de corrupção silenciosa durante treinos longos.
-- ADR-046 para formalizar monitoramento de integridade de pesos em memória e sua estratégia operacional.
+- ADR-046 canônico (`ADR-046-sanity-check-periodico-de-integridade-de-pesos.md`) para formalizar monitoramento de integridade de pesos em memória e sua estratégia operacional.
 - `docs/development/DEVELOPMENT_HUB.md` compatibility shim.
 - Release process content in `docs/development/release_process.md`.
 - ADR traceability note in `src/pyfolds/serialization/foldio.py`.
 - Optional dependency group for examples with `torchvision` in `pyproject.toml`.
 - Public API deprecation policy for v1 aliases, including removal target in `2.0.0`, objective criteria (minimum major cycle, changelog notice, migration strategy), and contract test coverage.
 - `ModelIntegrityMonitor` para sanity check periódico de hash SHA-256 de pesos/buffers em runtime.
-- ADR-046 formalizando o monitoramento periódico de integridade de pesos como extensão de hardening da v2.0.2.
+- ADR-046 canônico (`ADR-046-sanity-check-periodico-de-integridade-de-pesos.md`) formalizando o monitoramento periódico de integridade de pesos como extensão de hardening da v2.0.2.
 - `WeightIntegrityMonitor` para verificação periódica de hash do estado de pesos em runtime.
 - `BufferedJSONLinesSink` para telemetria JSONL com escrita em lote.
 - `VersionedCheckpoint.load_secure(...)` com manifesto + validação rígida de hash/shape antes de `load_state_dict`.
