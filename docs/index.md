@@ -84,7 +84,7 @@ Atualizado automaticamente pelo Sheer Audit no merge para `main`.
   - `mod:src.utils.logging`
 <!-- SHEER-CODEMAP:END -->
 
-Consulte também: `docs/sheer-audit/sheerdocs/code_map.md`.
+Consulte também a **fonte canônica da auditoria atual**: `docs/sheer-audit/current_architecture_audit.md` (ponte oficial para os artefatos Sheer Audit vigentes).
 
 ## Referências
 - [README da documentação](README.md)
