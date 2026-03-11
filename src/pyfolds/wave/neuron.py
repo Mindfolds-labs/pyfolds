@@ -162,7 +162,7 @@ class MPJRDWaveNeuron(MPJRDNeuron):
             ptr = int(self.phase_pointer.item())
             self.phase_history[ptr] = phase_mean.detach().cpu()
             self.phase_history.mul_(self.cfg.phase_decay)
-            self.phase_pointer.copy_(torch.tensor((ptr + 1) % self.cfg.phase_buffer_size))
+            self.phase_pointer.copy_(self.phase_pointer.new_tensor((ptr + 1) % self.cfg.phase_buffer_size))
 
         self.wave_time.add_(dt)
         frequency_hz = self._frequency_for_class(target_class)
