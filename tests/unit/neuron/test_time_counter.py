@@ -20,15 +20,29 @@ def test_time_counter_increments_at_end_of_forward_step():
 
 
 def test_time_counter_single_increment():
-    cfg = pyfolds.NeuronConfig()
-    neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+    cfg = pyfolds.NeuronConfig(wave_enabled=True)
     x = torch.ones(1, cfg.n_dendrites, cfg.n_synapses_per_dendrite)
 
-    t0 = neuron.time_counter.item()
-    neuron.forward(x, dt=1.0)
-    t1 = neuron.time_counter.item()
+    advanced = pyfolds.MPJRDNeuronAdvanced(cfg)
+    wave_advanced = pyfolds.MPJRDWaveNeuronAdvanced(cfg)
 
-    assert t1 - t0 == 1.0
+    t0_adv = advanced.time_counter.item()
+    out_adv = advanced.forward(x, dt=1.0)
+    t1_adv = advanced.time_counter.item()
+
+    t0_wave = wave_advanced.time_counter.item()
+    out_wave = wave_advanced.forward(x, dt=1.0)
+    t1_wave = wave_advanced.time_counter.item()
+
+    assert t1_adv - t0_adv == 1.0
+    assert t1_wave - t0_wave == 1.0
+
+    # Guarda de regressão: cadeia completa de mixins deve executar sem
+    # provocar incremento temporal duplicado por chamada encadeada.
+    assert "refrac_blocked" in out_adv
+    assert "dendrite_amplification" in out_adv
+    assert "refrac_blocked" in out_wave
+    assert "dendrite_amplification" in out_wave
 
 
 def test_time_counter_increment_once_guard_per_step():
