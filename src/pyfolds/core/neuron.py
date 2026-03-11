@@ -28,6 +28,11 @@ from .homeostasis import HomeostasisController
 from .neuromodulation import Neuromodulator
 from .accumulator import StatisticsAccumulator
 from .dendrite_integration import DendriticIntegration
+from .scientific_contract import (
+    ContractEnforcer,
+    ScientificContract,
+    ScientificStage,
+)
 from ..utils.types import LearningMode, normalize_learning_mode
 from ..utils.validation import validate_input
 
@@ -61,11 +66,16 @@ class MPJRDNeuron(BaseNeuron):
         cfg: MPJRDConfig,
         enable_telemetry: bool = False,
         telemetry_profile: str = "off",
+        audit_mode: Optional[str] = None,
         name: Optional[str] = None,
     ):
         super().__init__()
         self.cfg = cfg
         self._base_i_eta = float(cfg.i_eta)
+        self.audit_mode = str(audit_mode or getattr(cfg, "audit_mode", "off"))
+        self._contract_enforcer = ContractEnforcer(
+            level=str(getattr(cfg, "contract_enforcement", "warn"))
+        )
 
         # ✅ LOGGER específico para este neurônio
         self.logger = get_logger(f"pyfolds.neuron.{name or id(self)}")
@@ -132,6 +142,18 @@ class MPJRDNeuron(BaseNeuron):
 
         # ===== TELEMETRIA =====
         self.register_buffer("step_id", torch.tensor(0, dtype=torch.int64))
+        trace_capacity = int(getattr(cfg, "audit_trace_capacity", 512))
+        self.register_buffer(
+            "_trace_winner_idx",
+            torch.full((trace_capacity,), -1, dtype=torch.int64, device=self.theta.device),
+        )
+        self.register_buffer(
+            "_trace_signal",
+            torch.zeros(trace_capacity, dtype=self.theta.dtype, device=self.theta.device),
+        )
+        self.register_buffer(
+            "_trace_ptr", torch.tensor(0, dtype=torch.int64, device=self.theta.device)
+        )
         self.register_buffer(
             "_theta_cap_buf",
             torch.zeros(1, dtype=self.theta.dtype, device=self.theta.device),
@@ -143,10 +165,13 @@ class MPJRDNeuron(BaseNeuron):
                 TelemetryProfile,
             )
 
+            profile_value = telemetry_profile
+            if isinstance(profile_value, str) and profile_value == "full":
+                profile_value = "heavy"
             profile_enum = (
-                TelemetryProfile(telemetry_profile)
-                if isinstance(telemetry_profile, str)
-                else telemetry_profile
+                TelemetryProfile(profile_value)
+                if isinstance(profile_value, str)
+                else profile_value
             )
             is_light = profile_enum == TelemetryProfile.LIGHT
             telem_cfg = TelemetryConfig(
@@ -373,6 +398,24 @@ class MPJRDNeuron(BaseNeuron):
             return 0
         return int(step_id_buf.item())
 
+    @torch.no_grad()
+    def _append_audit_trace(self, winner_idx: torch.Tensor, winner_signal: torch.Tensor) -> None:
+        """Append minimal decision trace to on-device circular audit buffer.
+
+        Parameters
+        ----------
+        winner_idx : torch.Tensor
+            Winner dendrite index tensor with shape ``[B]``.
+        winner_signal : torch.Tensor
+            Winner dendritic signal tensor with shape ``[B]``.
+        """
+        if self.audit_mode == "off":
+            return
+        ptr = int(self._trace_ptr.item())
+        self._trace_winner_idx[ptr] = winner_idx.reshape(-1)[0].to(torch.int64)
+        self._trace_signal[ptr] = winner_signal.reshape(-1)[0].to(self.theta.dtype)
+        self._trace_ptr.fill_((ptr + 1) % self._trace_winner_idx.numel())
+
     def _compute_circadian_plasticity_gate(self, dt: float) -> float:
         """Calcula gate circadiano contínuo para modulação de i_eta."""
         if not bool(getattr(self.cfg, "circadian_enabled", False)):
@@ -558,6 +601,7 @@ class MPJRDNeuron(BaseNeuron):
         """
         normalized_mode = normalize_learning_mode(mode)
         effective_mode = normalized_mode if normalized_mode is not None else self.mode
+        execution_order: list[ScientificStage] = []
 
         circadian_gate = self._compute_circadian_plasticity_gate(dt=dt)
         if circadian_gate != 1.0:
@@ -628,6 +672,13 @@ class MPJRDNeuron(BaseNeuron):
                 theta_eff = torch.clamp(theta_eff, max=theta_max_eff)
 
             dend_out = self.dendrite_integration(v_dend, theta_eff)
+            execution_order.extend(
+                [
+                    ScientificStage.LOCAL_NONLINEARITY,
+                    ScientificStage.COMPETITION,
+                    ScientificStage.GLOBAL_AGGREGATION,
+                ]
+            )
             u = dend_out.u
             gated = dend_out.v_nmda
             dend_contribution = dend_out.contribution
@@ -647,17 +698,27 @@ class MPJRDNeuron(BaseNeuron):
                 theta_eff = torch.clamp(theta_eff, max=theta_max_eff)
 
             gated = torch.sigmoid(v_dend - (theta_eff * 0.5))
+            execution_order.append(ScientificStage.LOCAL_NONLINEARITY)
             u = gated.sum(dim=1)
+            execution_order.append(ScientificStage.GLOBAL_AGGREGATION)
             dend_contribution = None
         else:
             max_idx = v_dend.max(dim=1, keepdim=True)[1]
             gated = torch.zeros_like(v_dend)
             gated.scatter_(1, max_idx, v_dend.gather(1, max_idx))
+            execution_order.extend(
+                [ScientificStage.COMPETITION, ScientificStage.GLOBAL_AGGREGATION]
+            )
             u = gated.sum(dim=1)
             dend_contribution = None
 
+        self._contract_enforcer.validate(ScientificContract(stage_order=execution_order))
+
         u_raw = u
         spikes = (u >= theta_eff).float()
+        winner_idx = v_dend.argmax(dim=1)
+        winner_signal = v_dend.gather(1, winner_idx.unsqueeze(1)).squeeze(1)
+        self._append_audit_trace(winner_idx, winner_signal)
 
         # ===== 5. ESTATÍSTICAS =====
         spike_rate = spikes.mean().item()
@@ -1047,6 +1108,21 @@ class MPJRDNeuron(BaseNeuron):
             f"📊 Métricas coletadas: N_mean={metrics['N_mean']:.1f}, θ={metrics['theta']:.2f}"
         )
         return metrics
+
+    @torch.no_grad()
+    def get_audit_trace_snapshot(self) -> Dict[str, torch.Tensor]:
+        """Return a snapshot of the on-device circular step trace.
+
+        Returns
+        -------
+        Dict[str, torch.Tensor]
+            Dictionary with winner dendrite indices and associated signal.
+        """
+        return {
+            "winner_idx": self._trace_winner_idx.clone(),
+            "winner_signal": self._trace_signal.clone(),
+            "pointer": self._trace_ptr.clone(),
+        }
 
     def extra_repr(self) -> str:
         return (
