@@ -162,6 +162,30 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
         out["total_memories"] = int(self.engram_bank.total_engrams.item())
         return out
 
+
+    def collect_engram_report(self, top_k: int = 10) -> Dict[str, Any]:
+        """Exporta métricas observáveis de memória e ressonância por engrama."""
+        base = super().collect_engram_report()
+        ranked = sorted(
+            self.engram_bank.engrams.values(),
+            key=lambda e: (float(e.importance), float(e.access_count)),
+            reverse=True,
+        )[: max(1, int(top_k))]
+        base.update({
+            "engram_count": int(len(self.engram_bank.engrams)),
+            "top_engrams": [
+                {
+                    "signature": e.signature,
+                    "concept": e.concept,
+                    "importance": float(e.importance),
+                    "access_count": int(e.access_count),
+                    "consolidated": bool(e.consolidated),
+                }
+                for e in ranked
+            ],
+        })
+        return base
+
     def save(self, path: str, private_key: Optional[str] = None) -> None:
         """Salva estado noético para arquivo local."""
         _ = private_key

@@ -282,6 +282,13 @@ class MPJRDConfig:
     device: str = "auto"
     runtime_queue_maxsize: int = 2048
 
+    # ===== CONECTIVIDADE E PODA ESTRUTURAL =====
+    pruning_enabled: bool = True
+    pruning_strategy: str = "static"  # static | phase_scheduled | replay_consolidated
+    consolidate_pruning_after_replay: bool = False
+    pruning_schedule_strength: float = 1.0
+    pruning_runtime_threshold: float = 0.05
+
     # ===== ESTABILIDADE NUMÉRICA =====
     max_log_weight: float = 10.0
     float_precision: str = "float32"
@@ -557,6 +564,19 @@ class MPJRDConfig:
 
         if self.wave_sleep_pruning_threshold < 0:
             raise ValueError("wave_sleep_pruning_threshold must be >= 0")
+
+        valid_pruning_strategies = {"static", "phase_scheduled", "replay_consolidated"}
+        if self.pruning_strategy not in valid_pruning_strategies:
+            raise ValueError(
+                "pruning_strategy inválido: "
+                f"{self.pruning_strategy}. Use: {valid_pruning_strategies}"
+            )
+
+        if self.pruning_schedule_strength < 0:
+            raise ValueError("pruning_schedule_strength must be >= 0")
+
+        if not 0.0 <= self.pruning_runtime_threshold <= 1.0:
+            raise ValueError("pruning_runtime_threshold must be in [0, 1]")
         
         # Warnings
         if self.ltd_threshold_saturated > self.i_ltd_th:

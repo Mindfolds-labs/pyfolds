@@ -152,8 +152,32 @@ class MPJRDNeuron(BaseNeuron):
             sensory_excitability=1.0,
         )
         self._latest_neuromodulatory_state = NeuromodulatoryState(0.5, 0.5, 0.5, 0.5)
-        self.register_buffer("mode_switches", torch.tensor(0))
-        self.register_buffer("sleep_count", torch.tensor(0))
+        self.register_buffer("mode_switches", torch.tensor(0), persistent=True)
+        self.register_buffer("sleep_count", torch.tensor(0), persistent=True)
+        self.register_buffer(
+            "connectivity_mask",
+            torch.ones(
+                (cfg.n_dendrites, cfg.n_synapses_per_dendrite),
+                dtype=torch.float32,
+                device=self.theta.device,
+            ),
+            persistent=True,
+        )
+        self.register_buffer(
+            "pruning_mask",
+            torch.ones_like(self.connectivity_mask),
+            persistent=True,
+        )
+        self.register_buffer(
+            "phase_activity_hist",
+            torch.zeros(int(cfg.circadian_phase_bins), dtype=torch.float32, device=self.theta.device),
+            persistent=False,
+        )
+        self.register_buffer(
+            "_runtime_resonance_cache",
+            torch.zeros(int(cfg.n_dendrites), dtype=torch.float32, device=self.theta.device),
+            persistent=False,
+        )
         self.logger.debug(f"   ✅ Modo inicial: {self.mode.value}")
 
         # ===== THREAD SAFETY PARA TELEMETRIA =====
@@ -179,17 +203,20 @@ class MPJRDNeuron(BaseNeuron):
         self.register_buffer(
             "_trace_winner_idx",
             torch.full((trace_capacity,), -1, dtype=torch.int64, device=self.theta.device),
+            persistent=False,
         )
         self.register_buffer(
             "_trace_signal",
             torch.zeros(trace_capacity, dtype=self.theta.dtype, device=self.theta.device),
+            persistent=False,
         )
         self.register_buffer(
-            "_trace_ptr", torch.tensor(0, dtype=torch.int64, device=self.theta.device)
+            "_trace_ptr", torch.tensor(0, dtype=torch.int64, device=self.theta.device), persistent=False
         )
         self.register_buffer(
             "_theta_cap_buf",
             torch.zeros(1, dtype=self.theta.dtype, device=self.theta.device),
+            persistent=False,
         )
         if TELEMETRY_AVAILABLE and enable_telemetry:
             from ..telemetry import (
@@ -552,6 +579,9 @@ class MPJRDNeuron(BaseNeuron):
             for syn in dend.synapses:
                 syn.eligibility.mul_(1.0 + 0.1 * replay_scale)
 
+        if bool(getattr(self.cfg, "consolidate_pruning_after_replay", False)):
+            self._consolidate_pruning_from_runtime()
+
     @torch.no_grad()
     def apply_homeostatic_recovery(self) -> None:
         """Apply recovery mode gains to stabilize firing and threshold drift."""
@@ -693,7 +723,9 @@ class MPJRDNeuron(BaseNeuron):
         torch.Size([8, 2])
         """
         weights = self._get_consolidated_weights(x.device)
-        return torch.einsum("bds,ds->bd", x, weights)
+        effective_mask = (self.connectivity_mask * self.pruning_mask).to(device=x.device, dtype=weights.dtype)
+        effective_weights = weights * effective_mask
+        return torch.einsum("bds,ds->bd", x, effective_weights)
 
     @validate_input(
         expected_ndim=3,
@@ -747,6 +779,7 @@ class MPJRDNeuron(BaseNeuron):
 
         self._update_circadian_gates(dt=dt)
         self._apply_runtime_injections()
+        self._refresh_pruning_mask()
 
         # Valida device
         self._validate_input_device(x)
@@ -760,8 +793,9 @@ class MPJRDNeuron(BaseNeuron):
         if use_vectorized_dendrites:
             v_dend = self._compute_dendritic_potentials_vectorized(x)
         else:
+            x_masked = x * (self.connectivity_mask * self.pruning_mask).to(device=x.device, dtype=x.dtype).unsqueeze(0)
             dendrite_outputs = [
-                dend(x[:, d_idx, :]) for d_idx, dend in enumerate(self.dendrites)
+                dend(x_masked[:, d_idx, :]) for d_idx, dend in enumerate(self.dendrites)
             ]
             v_dend = torch.stack(dendrite_outputs, dim=1)
 
@@ -858,6 +892,7 @@ class MPJRDNeuron(BaseNeuron):
         spikes = (u >= theta_eff).float()
         winner_idx = v_dend.argmax(dim=1)
         winner_signal = v_dend.gather(1, winner_idx.unsqueeze(1)).squeeze(1)
+        self._runtime_resonance_cache.copy_(v_dend.abs().mean(dim=0).to(self._runtime_resonance_cache.dtype))
         self._append_audit_trace(winner_idx, winner_signal)
 
         # ===== 5. ESTATÍSTICAS =====
@@ -874,6 +909,9 @@ class MPJRDNeuron(BaseNeuron):
         self._ema_reward.mul_(0.97).add_(0.03 * reward_signal)
         self._ema_novelty.mul_(0.97).add_(0.03 * novelty_estimate)
         self._ema_spike_rate.mul_(0.97).add_(0.03 * spike_rate)
+        phase_bin = int((float(self.circadian_phase.item()) % 360.0) / max(1e-6, (360.0 / max(1, int(self.cfg.circadian_phase_bins)))))
+        phase_bin = max(0, min(int(self.phase_activity_hist.numel()) - 1, phase_bin))
+        self.phase_activity_hist[phase_bin].add_(float(spike_rate))
         self.update_network_state(
             reward_signal=float(self._ema_reward.item()),
             novelty_estimate=float(self._ema_novelty.item()),
@@ -1322,6 +1360,73 @@ class MPJRDNeuron(BaseNeuron):
             "winner_idx": self._trace_winner_idx.clone(),
             "winner_signal": self._trace_signal.clone(),
             "pointer": self._trace_ptr.clone(),
+        }
+
+
+    @torch.no_grad()
+    def _phase_pruning_gate(self) -> float:
+        if self.cfg.pruning_strategy != "phase_scheduled":
+            return 1.0
+        phase_rad = torch.deg2rad(self.circadian_phase.to(dtype=torch.float32))
+        gate = 0.5 * (1.0 + torch.cos(phase_rad))
+        return float((1.0 - self.cfg.pruning_schedule_strength) + self.cfg.pruning_schedule_strength * gate.item())
+
+    @torch.no_grad()
+    def _refresh_pruning_mask(self) -> None:
+        if not bool(getattr(self.cfg, "pruning_enabled", True)):
+            self.pruning_mask.fill_(1.0)
+            return
+
+        if self.cfg.pruning_strategy == "static":
+            threshold = float(getattr(self.cfg, "pruning_runtime_threshold", 0.05))
+        else:
+            threshold = float(getattr(self.cfg, "pruning_runtime_threshold", 0.05)) * self._phase_pruning_gate()
+
+        keep = (self._get_consolidated_weights(self.theta.device).abs() >= threshold).to(self.pruning_mask.dtype)
+        self.pruning_mask.copy_(keep)
+
+    @torch.no_grad()
+    def _consolidate_pruning_from_runtime(self) -> None:
+        self._refresh_pruning_mask()
+
+    @torch.no_grad()
+    def collect_connectivity_snapshot(self) -> Dict[str, torch.Tensor]:
+        effective = self.connectivity_mask * self.pruning_mask
+        return {
+            "connectivity_mask": self.connectivity_mask.clone(),
+            "effective_connectivity": effective.clone(),
+            "active_by_dendrite": effective.sum(dim=1).clone(),
+            "active_ratio": effective.mean().reshape(1).clone(),
+        }
+
+    @torch.no_grad()
+    def collect_pruning_snapshot(self) -> Dict[str, torch.Tensor]:
+        pruned = (self.pruning_mask <= 0).to(self.pruning_mask.dtype)
+        return {
+            "pruning_mask": self.pruning_mask.clone(),
+            "pruned_by_dendrite": pruned.sum(dim=1).clone(),
+            "pruned_ratio": pruned.mean().reshape(1).clone(),
+        }
+
+    @torch.no_grad()
+    def collect_phase_activity_report(self) -> Dict[str, torch.Tensor]:
+        bins = torch.arange(self.phase_activity_hist.numel(), device=self.phase_activity_hist.device)
+        baseline = self.phase_activity_hist.mean().expand_as(self.phase_activity_hist)
+        active_phase_idx = torch.argmax(self.phase_activity_hist).reshape(1)
+        return {
+            "phase_bins": bins.clone(),
+            "activity": self.phase_activity_hist.clone(),
+            "baseline": baseline.clone(),
+            "active_phase_idx": active_phase_idx.clone(),
+            "delta_vs_baseline": (self.phase_activity_hist - baseline).clone(),
+        }
+
+    @torch.no_grad()
+    def collect_engram_report(self) -> Dict[str, torch.Tensor]:
+        return {
+            "resonance_by_dendrite": self._runtime_resonance_cache.clone(),
+            "mean_resonance": self._runtime_resonance_cache.mean().reshape(1).clone(),
+            "max_resonance": self._runtime_resonance_cache.max().reshape(1).clone(),
         }
 
     def extra_repr(self) -> str:
