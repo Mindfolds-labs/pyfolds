@@ -6,6 +6,7 @@ import platform
 import subprocess
 import sys
 import traceback
+from contextlib import nullcontext
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
@@ -15,8 +16,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from models.model_py import ModelPy
-from models.model_wave import ModelWave
+from models.model_mpjrd import ModelMPJRD, ModelMPJRDConfig
 from serialization.folds_io import load_model_fold, save_model_fold
 from serialization.mind_io import load_model_mind, save_model_mind
 
@@ -42,6 +42,15 @@ class TrainArgs:
     log_level: str
     log_file: str
     sheer_cmd: str = ""
+    timesteps: int = 4
+    hidden: int = 128
+    threshold: float = 0.5
+    save_fold: bool = True
+    save_mind: bool = False
+    save_pt: bool = True
+    save_log: bool = True
+    save_metrics: bool = True
+    save_summary: bool = True
 
 
 def _setup_logger(run_dir: Path, *, log_level: str, log_file: str, console: bool = False) -> logging.Logger:
@@ -169,7 +178,8 @@ def run_training(args: TrainArgs) -> int:
     metrics_path = run_dir / "metrics.jsonl"
     summary_path = run_dir / "summary.json"
     checkpoint_path = run_dir / "checkpoint.pt"
-    artifact_path = run_dir / ("model.fold" if args.backend == "folds" else "model.mind")
+    fold_artifact_path = run_dir / "model.fold"
+    mind_artifact_path = run_dir / "model.mind"
 
     test_acc = 0.0
     epoch_loss = 0.0
@@ -178,7 +188,15 @@ def run_training(args: TrainArgs) -> int:
 
     try:
         device = torch.device(args.device)
-        model = ModelPy() if args.model == "py" else ModelWave()
+        if args.model != "mpjrd":
+            raise ValueError("A pipeline MNIST atual suporta somente --model mpjrd")
+        model = ModelMPJRD(
+            ModelMPJRDConfig(
+                hidden_dim=args.hidden,
+                timesteps=args.timesteps,
+                threshold=args.threshold,
+            )
+        )
         model = model.to(device)
         optim = torch.optim.Adam(model.parameters(), lr=args.lr)
         criterion = nn.CrossEntropyLoss()
@@ -191,13 +209,15 @@ def run_training(args: TrainArgs) -> int:
             start_epoch = int(ckpt["epoch"]) + 1
             best_acc = float(ckpt.get("best_acc", 0.0))
             logger.info("RESUME epoch=%s", start_epoch)
-            if artifact_path.exists():
-                _load_backend(args.backend, artifact_path, args.device)
+            preferred_artifact = fold_artifact_path if args.backend == "folds" else mind_artifact_path
+            if preferred_artifact.exists():
+                _load_backend(args.backend, preferred_artifact, args.device)
 
         train_loader, test_loader = _build_loaders(args.batch)
         epochs_completed = start_epoch
 
-        with metrics_path.open("a", encoding="utf-8") as mf:
+        metrics_cm = metrics_path.open("a", encoding="utf-8") if args.save_metrics else nullcontext(None)
+        with metrics_cm as mf:
             for epoch in range(start_epoch, args.epochs):
                 model.train()
                 total_loss, total, correct = 0.0, 0, 0
@@ -243,30 +263,37 @@ def run_training(args: TrainArgs) -> int:
                 )
                 logger.info("Neuron metrics | spike_rate=%.6f", spike_rate)
 
-                mf.write(
-                    json.dumps(
-                        {
-                            "epoch": epoch + 1,
-                            "loss": epoch_loss,
-                            "train_acc_pct": train_acc,
-                            "test_acc_pct": test_acc,
-                            "spike_rate": spike_rate,
-                        }
+                if mf is not None:
+                    mf.write(
+                        json.dumps(
+                            {
+                                "epoch": epoch + 1,
+                                "loss": epoch_loss,
+                                "train_acc_pct": train_acc,
+                                "test_acc_pct": test_acc,
+                                "spike_rate": spike_rate,
+                            }
+                        )
+                        + "\n"
                     )
-                    + "\n"
-                )
-                mf.flush()
+                    mf.flush()
 
-                torch.save(
-                    {
-                        "epoch": epoch,
-                        "model_state": model.state_dict(),
-                        "optimizer_state": optim.state_dict(),
-                        "best_acc": best_acc,
-                    },
-                    checkpoint_path,
-                )
-                _save_backend(args.backend, artifact_path, {"model_state": model.state_dict(), "epoch": epoch})
+                if args.save_pt:
+                    torch.save(
+                        {
+                            "epoch": epoch,
+                            "model_state": model.state_dict(),
+                            "optimizer_state": optim.state_dict(),
+                            "best_acc": best_acc,
+                        },
+                        checkpoint_path,
+                    )
+
+                payload = {"model_state": model.state_dict(), "epoch": epoch, "model_config": model.get_config()}
+                if args.save_fold:
+                    _save_backend("folds", fold_artifact_path, payload)
+                if args.save_mind:
+                    _save_backend("mind", mind_artifact_path, payload)
                 epochs_completed = epoch + 1
 
         _run_sheer_audit(args.sheer_cmd, logger)
@@ -284,8 +311,13 @@ def run_training(args: TrainArgs) -> int:
             "model_config": model.get_config(),
             "train_config": asdict(args),
         }
-        summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+        if args.save_summary:
+            summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
         logger.info("FINAL SUMMARY | final_acc=%.2f%% | best_acc=%.2f%% | final_loss=%.4f", test_acc, best_acc, epoch_loss)
+        if not args.save_log:
+            log_path = run_dir / args.log_file
+            if log_path.exists():
+                log_path.unlink()
         return 0
     except Exception as exc:
         logger.exception("FALHA NO TREINO (stacktrace completo abaixo).")
@@ -305,5 +337,6 @@ def run_training(args: TrainArgs) -> int:
             "train_config": asdict(args),
             "adr_error": adr.name,
         }
-        summary_path.write_text(json.dumps(fail_summary, indent=2), encoding="utf-8")
+        if args.save_summary:
+            summary_path.write_text(json.dumps(fail_summary, indent=2), encoding="utf-8")
         raise
