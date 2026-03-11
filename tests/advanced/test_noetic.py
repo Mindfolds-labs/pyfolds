@@ -63,3 +63,27 @@ def test_engram_bank_isolated() -> None:
     bank.create_engram(torch.ones(4) * 0.9, "b", age=1.0, phase=20.0, meridiem="AM")
     res = bank.search_by_resonance(torch.ones(4), area=None, top_k=1)
     assert res[0].signature == e1.signature
+
+
+def test_search_cache_key_is_deterministic_across_instances() -> None:
+    """Garante determinismo da chave de cache em chamadas repetidas e novas instâncias."""
+    pattern = torch.tensor([1.0, 0.5, -0.25, 0.75], dtype=torch.float32)
+    kwargs = {"query_phase": 45.0, "area": "memoria", "top_k": 3}
+
+    bank1 = EngramBank(max_engrams=10, n_frequencies=4)
+    bank1.create_engram(pattern, "alvo", age=0.0, phase=45.0, meridiem="AM", area="memoria")
+
+    first_results = bank1.search_by_resonance(pattern, use_cache=True, **kwargs)
+    first_key = next(iter(bank1.search_cache))
+
+    second_results = bank1.search_by_resonance(pattern, use_cache=True, **kwargs)
+    assert second_results == first_results
+    assert len(bank1.search_cache) == 1
+    assert bank1.cache_hits == 1
+
+    bank2 = EngramBank(max_engrams=10, n_frequencies=4)
+    bank2.create_engram(pattern, "alvo", age=0.0, phase=45.0, meridiem="AM", area="memoria")
+    bank2.search_by_resonance(pattern, use_cache=True, **kwargs)
+    second_key = next(iter(bank2.search_cache))
+
+    assert second_key == first_key

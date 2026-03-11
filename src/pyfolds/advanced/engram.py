@@ -218,10 +218,7 @@ class EngramBank(nn.Module):
         elif query_pattern.numel() > self.n_frequencies:
             query_pattern = query_pattern[: self.n_frequencies]
 
-        pattern_digest = hashlib.sha256(query_pattern.numpy().tobytes()).hexdigest()
-        phase_key = "none" if query_phase is None else f"{float(query_phase):.6f}"
-        area_key = area or "*"
-        cache_key = f"{pattern_digest}:{phase_key}:{area_key}:{int(top_k)}"
+        cache_key = self._build_search_cache_key(query_pattern, query_phase=query_phase, area=area, top_k=top_k)
         if use_cache and cache_key in self.search_cache:
             self.cache_hits += 1
             return self.search_cache[cache_key]
@@ -248,6 +245,22 @@ class EngramBank(nn.Module):
             if len(self.search_cache) > 1000:
                 self.search_cache.pop(next(iter(self.search_cache)))
         return out
+
+    def _build_search_cache_key(
+        self,
+        query_pattern: torch.Tensor,
+        query_phase: Optional[float],
+        area: Optional[str],
+        top_k: int,
+    ) -> str:
+        """Gera chave determinística de cache baseada em padrão + metadados."""
+        phase_key = "none" if query_phase is None else f"{float(query_phase):.6f}"
+        area_key = area or "*"
+        query_array = query_pattern.contiguous().numpy()
+        hasher = hashlib.blake2b(digest_size=32)
+        hasher.update(query_array.tobytes())
+        hasher.update(f"|dtype={query_array.dtype}|len={query_array.size}|phase={phase_key}|area={area_key}|top_k={int(top_k)}".encode())
+        return hasher.hexdigest()
 
     def create_relation(self, sig1: str, sig2: str, strength: float) -> None:
         """Cria ligação bidirecional entre engrams existentes."""
