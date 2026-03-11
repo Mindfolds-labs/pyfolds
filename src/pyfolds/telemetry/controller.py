@@ -16,6 +16,7 @@ class TelemetryProfile(str, Enum):
     OFF = "off"
     LIGHT = "light"
     HEAVY = "heavy"
+    FULL = "full"
 
 
 Profile = TelemetryProfile
@@ -65,7 +66,7 @@ class TelemetryConfig:
         # Apply profile-specific defaults
         if self.profile == TelemetryProfile.LIGHT and self.sample_every == 1:
             self.sample_every = 50  # Light profile default
-        elif self.profile == TelemetryProfile.HEAVY and self.sample_every != 1:
+        elif self.profile in {TelemetryProfile.HEAVY, TelemetryProfile.FULL} and self.sample_every != 1:
             self.sample_every = 1   # Heavy = every step
 
 
@@ -127,7 +128,7 @@ class TelemetryController:
         if self.cfg.profile == TelemetryProfile.OFF:
             return False
         
-        if self.cfg.profile == TelemetryProfile.HEAVY:
+        if self.cfg.profile in {TelemetryProfile.HEAVY, TelemetryProfile.FULL}:
             return True
         
         # Light profile: emit every sample_every steps

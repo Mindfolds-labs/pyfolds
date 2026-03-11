@@ -14,6 +14,8 @@ STDPInputSource = Literal["raw", "stp"]
 LTDRule = Literal["classic", "current"]
 WeightQuantization = Literal["logN", "uniformW"]
 StatsAccumulatorMode = Literal["dense", "sparse_masked"]
+AuditMode = Literal["off", "light", "full"]
+ContractEnforcement = Literal["off", "warn", "strict"]
 
 
 @dataclass(frozen=True)
@@ -90,6 +92,15 @@ class CircadianConfig:
     circadian_pm_cortisol: float = 0.3
     circadian_am_melatonin: float = 0.1
     circadian_pm_melatonin: float = 0.9
+
+
+@dataclass(frozen=True)
+class AuditConfig:
+    """Subconfiguração de auditoria/telemetria operacional."""
+
+    audit_mode: AuditMode = "off"
+    audit_trace_capacity: int = 512
+    contract_enforcement: ContractEnforcement = "warn"
 
 
 @dataclass(frozen=True)
@@ -303,12 +314,18 @@ class MPJRDConfig:
     save_checkpoints: bool = True
     checkpoint_interval: int = 86400
 
+    # ===== AUDITORIA OPERACIONAL =====
+    audit_mode: AuditMode = "off"
+    audit_trace_capacity: int = 512
+    contract_enforcement: ContractEnforcement = "warn"
+
     # Sub-configs compostos (mantém compatibilidade flat)
     topology: TopologyConfig = field(default_factory=TopologyConfig)
     filament: FilamentConfig = field(default_factory=FilamentConfig)
     plasticity: PlasticityConfig = field(default_factory=PlasticityConfig)
     homeostasis: HomeostasisConfig = field(default_factory=HomeostasisConfig)
     circadian: CircadianConfig = field(default_factory=CircadianConfig)
+    audit: AuditConfig = field(default_factory=AuditConfig)
 
     def __post_init__(self):
         """Validações pós-inicialização."""
@@ -364,6 +381,11 @@ class MPJRDConfig:
             circadian_pm_melatonin=self.circadian_pm_melatonin,
             circadian_plasticity_min=self.circadian_plasticity_min,
             circadian_plasticity_max=self.circadian_plasticity_max,
+        ))
+        object.__setattr__(self, "audit", AuditConfig(
+            audit_mode=self.audit_mode,
+            audit_trace_capacity=self.audit_trace_capacity,
+            contract_enforcement=self.contract_enforcement,
         ))
 
         # Resolve device
@@ -577,6 +599,24 @@ class MPJRDConfig:
                 f"recebido {self.float_precision}"
             )
 
+        if self.audit_mode not in {"off", "light", "full"}:
+            raise ValueError(
+                "audit_mode deve ser 'off', 'light' ou 'full', "
+                f"recebido {self.audit_mode}"
+            )
+
+        if self.contract_enforcement not in {"off", "warn", "strict"}:
+            raise ValueError(
+                "contract_enforcement deve ser 'off', 'warn' ou 'strict', "
+                f"recebido {self.contract_enforcement}"
+            )
+
+        if self.audit_trace_capacity < 1:
+            raise ValueError(
+                "audit_trace_capacity deve ser >= 1, "
+                f"recebido {self.audit_trace_capacity}"
+            )
+
         max_w = self.w_max
         if max_w > 100.0:
             warnings.warn(
@@ -703,7 +743,7 @@ class MPJRDConfig:
 
     def __getattr__(self, name: str):
         """Fallback de compatibilidade para acesso flat via subconfigs."""
-        for sub in (self.topology, self.filament, self.plasticity, self.homeostasis, self.circadian):
+        for sub in (self.topology, self.filament, self.plasticity, self.homeostasis, self.circadian, self.audit):
             if hasattr(sub, name):
                 return getattr(sub, name)
         raise AttributeError(f"MPJRDConfig has no attribute '{name}'")
