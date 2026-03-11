@@ -1,48 +1,26 @@
-# Observabilidade de atividade por fase
+# Phase Activity Observability
 
-## Objetivo do mecanismo
-Monitorar distribuição de atividade por fase e comparar baseline vs ativo.
+## Objetivo
+Monitorar distribuição de atividade por fase para avaliar efeitos de circadiano/replay/pruning.
 
-## Base científica resumida
-Fase oscilatória pode organizar janelas de excitabilidade/plasticidade.
+## Variáveis
+- **Entrada:** atividade corrente, fase ativa e baseline acumulado.
+- **Controle:** `circadian_enabled`, `circadian_phase_bins`, `circadian_auto_mode`.
+- **Saída:** `active_phase_idx`, histograma de fase, `delta_vs_baseline`.
 
-> **Nota de escopo científico**: esta implementação é uma aproximação computacional experimental para observabilidade de dinâmica temporal; não representa equivalência biológica completa.
+## Fluxo
+1. Registrar atividade no bin de fase atual.
+2. Atualizar baseline de referência.
+3. Emitir relatório de desvio para monitoramento.
 
-## Tradução computacional adotada
-`collect_phase_activity_report()` resume o histograma acumulado por `circadian_phase_bins` em buffer não persistente e expõe:
-- `phase_bins`
-- `activity`
-- `baseline`
-- `active_phase_idx`
-- `delta_vs_baseline`
+## Custo computacional
+O(B) para atualização/leitura de bins de fase; memória pequena e fixa por configuração.
 
-Também é possível correlacionar o relatório com telemetria operacional (`get_metrics()`), incluindo `circadian_phase`, gates circadianos e métricas efetivas de política (`effective_replay_priority`, `effective_consolidation_rate`).
+## Integração
+- `MPJRDNeuron.collect_phase_activity_report` (`src/pyfolds/core/neuron.py`).
+- `MPJRDNeuron.get_metrics` inclui contexto de fase (`src/pyfolds/core/neuron.py`).
+- Parâmetros circadianos em `MPJRDConfig` (`src/pyfolds/core/config.py`).
 
-## Arquivos do código afetados
-- `src/pyfolds/core/neuron.py`
-- `src/pyfolds/core/config.py`
-
-## Flags de ativação/desativação
-Principais flags experimentais de contexto:
-- `circadian_enabled`
-- `circadian_phase_bins`
-- `circadian_auto_mode`
-- `replay_interval_steps`
-- `pruning_strategy` (`static`, `phase_scheduled`, `replay_consolidated`)
-
-## Riscos de implementação
-- Perda de detalhe temporal fino por discretização em bins.
-- Interpretação causal indevida entre fase e performance sem controle experimental.
-
-## Estratégia de teste
-Executar forwards em múltiplas etapas e validar presença e consistência de `delta_vs_baseline` e `active_phase_idx`.
-
-## Critérios de observabilidade/debug
-- `collect_phase_activity_report()` para inspeção local.
-- `get_metrics()` para contexto de telemetria associado ao estado circadiano.
-
-## Comportamento offline (consolidação/replay)
-Em cenários com replay periódico (incluindo janelas de sono), o histograma de fase continua acumulando atividade observada em runtime; efeitos indiretos de replay/consolidação podem aparecer como deslocamentos de `active_phase_idx` e de `delta_vs_baseline`, sem persistência automática do histograma entre sessões.
-
-## Baseline safety
-Com flags experimentais desligadas (por exemplo `circadian_enabled=False` e estratégia de pruning padrão), o caminho estável permanece preservado: execução regular com relatório de fase disponível sem acionar comportamento adicional de replay/consolidação orientado por fase.
+## Estado
+- **Rótulo:** `Estável`.
+- **Justificativa:** relatório é observável, de baixo risco e já integrado ao ciclo normal.

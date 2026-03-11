@@ -1,23 +1,26 @@
-# Experimental toggles (safe-by-default)
+# Experimental Toggles
 
 ## Objetivo
-Permitir A/B controlado sem contaminar o baseline.
+Centralizar ativação de mecanismos experimentais para execução controlada de ablações.
 
-## Toggles
-- `enable_phase_gating` (default: `False`): aplica gate de fase no delta STDP.
-- `enable_dynamic_channel_gating` (default: `False`): ponto estrutural para gating por canal no STDP.
-- `enable_wave_modulation` (default: `False`): reservado para modulação wave no forward.
-- `enable_sleep_consolidation` (default: `True`, legado): consolidação durante sono já existente.
-- `enable_dendritic_threshold_modulation` (default: `False`): reservado para modulação de limiar dendrítico.
-- `debug_compare_baseline` (default: `False`): habilita execução comparativa A/B via helper.
-- `debug_collect_mechanism_metrics` (default: `False`): inclui métricas do mecanismo em `forward`.
+## Variáveis
+- **Entrada:** objeto de configuração (`cfg`).
+- **Controle:** flags `enable_*` e `experimental_*`.
+- **Saída:** conjunto de toggles e especificações de mecanismo.
 
-## Contrato
-Use `MechanismToggleSet`/`ExperimentalMechanismConfig` em `pyfolds.advanced.experimental`.
+## Fluxo
+1. Ler flags do `MPJRDConfig`.
+2. Materializar estrutura de toggles ativa/desativada.
+3. Expor metadados para comparação baseline vs experimento.
 
-## Modo comparativo
-Use `compare_mechanism_vs_baseline(...)` para:
-1. clonar estado inicial
-2. rodar baseline e experimento
-3. gerar diffs de saída
-4. coletar métricas objetivas
+## Custo computacional
+O(M) no número de mecanismos registrados; custo irrelevante frente ao forward.
+
+## Integração
+- `ExperimentalMechanismConfig.from_config` (`src/pyfolds/advanced/experimental.py`).
+- `MechanismToggleSet` e `MechanismSpec` (`src/pyfolds/advanced/experimental.py`).
+- Flags em `MPJRDConfig` (`src/pyfolds/core/config.py`).
+
+## Estado
+- **Rótulo:** `Estável`.
+- **Justificativa:** camada de controle é simples, determinística e usada para governar features de experimento.

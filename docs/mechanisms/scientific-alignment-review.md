@@ -1,27 +1,26 @@
-# Revisão crítica de aderência científica
+# Scientific Alignment Review
 
-## Objetivo do mecanismo
-Avaliar o que é alinhado à literatura versus aproximação de engenharia.
+## Objetivo
+Documentar o nível de aderência entre hipóteses neurocientíficas e implementações computacionais atuais.
 
-## Base científica resumida
-Referências conceituais: oscillatory coordination, theta-gamma coding, cortical tracking, STDP, replay, pruning.
+## Variáveis
+- **Entrada:** mecanismos ativos, evidências observáveis e literatura de referência.
+- **Controle:** escopo de revisão por família de mecanismo.
+- **Saída:** classificação de aderência e riscos de interpretação.
 
-## Tradução computacional adotada
-Implementações focam controle de estado, máscaras vetorizadas e relatórios operacionais.
+## Fluxo
+1. Mapear mecanismo para implementação concreta.
+2. Identificar simplificações/modelagens adotadas.
+3. Registrar lacunas para validação futura.
 
-## Arquivos do código afetados
-- `src/pyfolds/core/neuron.py`
-- `src/pyfolds/core/config.py`
-- `src/pyfolds/advanced/noetic_model.py`
+## Custo computacional
+Custo analítico/documental; quando automatizado usa somente coleta de métricas já existente.
 
-## Flags de ativação/desativação
-`pruning_enabled`, `pruning_strategy`, `consolidate_pruning_after_replay`.
+## Integração
+- `compare_mechanism_vs_baseline` e `diff_output_stats` (`src/pyfolds/advanced/experimental.py`).
+- `NoeticCore` para mecanismos de memória/engram (`src/pyfolds/advanced/noetic_model.py`).
+- `MPJRDNeuron` snapshots de fase/poda/conectividade (`src/pyfolds/core/neuron.py`).
 
-## Riscos de implementação
-Confundir analogia computacional com equivalência biológica.
-
-## Estratégia de teste
-Combinar testes unitários com benchmarks e ablações controladas.
-
-## Critérios de observabilidade/debug
-Comparar baseline vs ativo por snapshots de conectividade, fase e engrams.
+## Estado
+- **Rótulo:** `Estável`.
+- **Justificativa:** é um artefato de governança técnica apoiado por interfaces já disponíveis.

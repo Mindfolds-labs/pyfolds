@@ -1,44 +1,26 @@
-# Relatório de ressonância por engrama
+# Engram Resonance Reporting
 
-## Objetivo do mecanismo
-Expor métricas de ressonância e top engrams para inspeção.
+## Objetivo
+Relatar memória/ressonância para rastrear formação, recuperação e consolidação de engrams.
 
-## Base científica resumida
-Memória distribuída pode ser observada por padrões de reativação e importância.
+## Variáveis
+- **Entrada:** padrões de consulta, contexto temporal e banco de engrams.
+- **Controle:** `experimental_engram_enabled`, `enable_engram_resonance_telemetry`.
+- **Saída:** ranking de engrams, estatísticas de memória e sinais de ressonância.
 
-> **Nota de escopo científico**: este módulo usa uma aproximação computacional experimental inspirada em literatura de memória e replay. O relatório **não** implica equivalência biológica completa.
+## Fluxo
+1. Criar/consultar engrams com base no padrão recebido.
+2. Agregar métricas de ressonância e contagem de memória.
+3. Expor relatório para análise offline e telemetria.
 
-## Tradução computacional adotada
-`NoeticCore.collect_engram_report()` combina cache de ressonância runtime e ranking de engrams.
+## Custo computacional
+Busca/ordenação dependem do número de engrams ativos; custo cresce com cardinalidade do banco.
 
-Além do relatório base (`resonance_by_dendrite`, `mean_resonance`, `max_resonance`), a camada Noetic adiciona:
-- `engram_count`
-- `top_engrams` com `signature`, `concept`, `importance`, `access_count` e `consolidated`
+## Integração
+- `NoeticCore.collect_engram_report` (`src/pyfolds/advanced/noetic_model.py`).
+- `EngramBank.search_by_resonance` e `EngramBank.get_stats` (`src/pyfolds/advanced/engram.py`).
+- `MPJRDConfig.experimental_engram_enabled` (`src/pyfolds/core/config.py`).
 
-Isso amplia a telemetria para inspeção de priorização de memória durante ciclos de uso e sono.
-
-## Arquivos do código afetados
-- `src/pyfolds/advanced/noetic_model.py`
-
-## Flags de ativação/desativação
-Sem flag dedicada para o *report* em si; depende de existência do banco de engrams.
-
-Flags experimentais relacionadas ao contexto dos dados observados:
-- `replay_batch_size`: controla volume de replay por ciclo de sono.
-- `consolidate_pruning_after_replay`: quando ativada no neurônio base, permite consolidar poda após replay offline.
-- `pruning_strategy="replay_consolidated"`: estratégia experimental de poda orientada por replay/consolidação.
-
-## Riscos de implementação
-Ranking por importância/acesso é heurístico.
-
-## Estratégia de teste
-Validação funcional em integração Noetic (futuro teste dedicado).
-
-## Critérios de observabilidade/debug
-`collect_engram_report(top_k=...)`.
-
-## Comportamento offline (consolidação/replay)
-Durante `sleep()`, o fluxo Noetic executa replay e consolidação do banco de engrams, e o relatório posterior pode refletir mudanças em `consolidated` e no ranking por acesso/importância.
-
-## Baseline safety
-Com flags experimentais desligadas (ex.: `consolidate_pruning_after_replay=False` e estratégias não orientadas por replay), o caminho estável permanece: coleta de ressonância + ranking básico, sem consolidação adicional induzida por replay.
+## Estado
+- **Rótulo:** `Experimental`.
+- **Justificativa:** dependente de toggles experimentais e sem protocolo final de calibração científica.
