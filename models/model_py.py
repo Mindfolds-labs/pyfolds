@@ -12,6 +12,7 @@ class ModelPyConfig:
     input_dim: int = 28 * 28
     hidden_dim: int = 128
     num_classes: int = 10
+    num_layers: int = 2
 
 
 class ModelPy(nn.Module):
@@ -20,11 +21,15 @@ class ModelPy(nn.Module):
     def __init__(self, config: ModelPyConfig | None = None) -> None:
         super().__init__()
         self.config = config or ModelPyConfig()
-        self.net = nn.Sequential(
-            nn.Linear(self.config.input_dim, self.config.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self.config.hidden_dim, self.config.num_classes),
-        )
+        n_layers = max(1, int(self.config.num_layers))
+        layers: list[nn.Module] = []
+        in_dim = self.config.input_dim
+        for _ in range(n_layers):
+            layers.append(nn.Linear(in_dim, self.config.hidden_dim))
+            layers.append(nn.ReLU())
+            in_dim = self.config.hidden_dim
+        layers.append(nn.Linear(in_dim, self.config.num_classes))
+        self.net = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor, state: dict[str, Any] | None = None):
         x = x.view(x.size(0), -1)

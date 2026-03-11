@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Any
 
 import torch
@@ -8,50 +8,47 @@ from torch import nn
 
 
 @dataclass
-class ModelWaveConfig:
+class ModelMPJRDConfig:
     input_dim: int = 28 * 28
     hidden_dim: int = 128
     num_classes: int = 10
-    timesteps: int = 4
-    threshold: float = 0.5
-    num_layers: int = 1
+    timesteps: int = 8
+    threshold: float = 0.45
 
 
-class ModelWave(nn.Module):
-    """Variante wave com integração temporal simplificada."""
+class ModelMPJRD(nn.Module):
+    """Modelo MPJRD simplificado para classificação MNIST.
 
-    def __init__(self, config: ModelWaveConfig | None = None) -> None:
+    Mantém interface compatível com o pipeline atual:
+    - forward(x, state=...)
+    - retorna (logits, out)
+    - out contém state/spike_rate etc.
+    """
+
+    def __init__(self, config: ModelMPJRDConfig | None = None) -> None:
         super().__init__()
-        self.config = config or ModelWaveConfig()
-        n_layers = max(1, int(self.config.num_layers))
-        enc_layers: list[nn.Module] = []
-        in_dim = self.config.input_dim
-        for _ in range(n_layers):
-            enc_layers.append(nn.Linear(in_dim, self.config.hidden_dim))
-            enc_layers.append(nn.Tanh())
-            in_dim = self.config.hidden_dim
-        self.encoder = nn.Sequential(*enc_layers)
+        self.config = config or ModelMPJRDConfig()
+        self.encoder = nn.Linear(self.config.input_dim, self.config.hidden_dim)
         self.classifier = nn.Linear(self.config.hidden_dim, self.config.num_classes)
 
     def forward(self, x: torch.Tensor, state: dict[str, Any] | None = None):
         batch = x.size(0)
         flat = x.view(batch, -1)
-        h = self.encoder(flat)
+        drive = torch.tanh(self.encoder(flat))
 
         mem = state.get("mem") if state else None
-        if mem is None or mem.shape != h.shape:
-            mem = torch.zeros_like(h)
+        if mem is None or mem.shape != drive.shape:
+            mem = torch.zeros_like(drive)
 
-        spikes_total = torch.zeros_like(h)
-        for _ in range(self.config.timesteps):
-            mem = 0.9 * mem + h
+        spikes_total = torch.zeros_like(drive)
+        for _ in range(max(1, int(self.config.timesteps))):
+            mem = 0.9 * mem + drive
             spikes = (mem > self.config.threshold).float()
             mem = mem * (1.0 - spikes)
             spikes_total += spikes
 
-        features = spikes_total / float(self.config.timesteps)
+        features = spikes_total / float(max(1, int(self.config.timesteps)))
         logits = self.classifier(features)
-
         out = {
             "spikes": spikes_total,
             "spike_rate": float(features.mean().item()),
@@ -75,4 +72,4 @@ class ModelWave(nn.Module):
         return asdict(self.config)
 
     def load_config(self, cfg: dict[str, Any]) -> None:
-        self.config = ModelWaveConfig(**cfg)
+        self.config = ModelMPJRDConfig(**cfg)
