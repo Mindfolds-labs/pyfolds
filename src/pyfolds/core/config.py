@@ -321,6 +321,10 @@ class MPJRDConfig:
     enable_spatial_latency_gradient: bool = False
     spatial_latency_max_ms: float = 100.0
     spatial_latency_scale: float = 1.0
+    enable_experimental_coherence_metrics: bool = False
+    coherence_low_threshold: float = 0.35
+    coherence_high_threshold: float = 0.70
+    debug_oscillation_traces: bool = False
 
     # ===== CONFIGURAÇÕES DO NOETIC =====
     max_engrams: int = 10_000_000
@@ -550,6 +554,12 @@ class MPJRDConfig:
             raise ValueError("spatial_latency_max_ms must be >= 0")
         if self.spatial_latency_scale <= 0:
             raise ValueError("spatial_latency_scale must be > 0")
+        if not -1.0 <= self.coherence_low_threshold <= 1.0:
+            raise ValueError("coherence_low_threshold must be in [-1, 1]")
+        if not -1.0 <= self.coherence_high_threshold <= 1.0:
+            raise ValueError("coherence_high_threshold must be in [-1, 1]")
+        if self.coherence_low_threshold > self.coherence_high_threshold:
+            raise ValueError("coherence_low_threshold must be <= coherence_high_threshold")
         if self.frequency_step < 0:
             raise ValueError("frequency_step must be >= 0")
         if self.phase_decay <= 0 or self.phase_decay > 1:
