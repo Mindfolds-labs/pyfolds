@@ -149,3 +149,33 @@ def test_adaptation_updates_once_with_final_post_refractory_spikes(full_config):
     assert out0["spikes"].item() == 1.0
     assert out1["spikes"].item() == 0.0
     assert neuron.adaptation_current.item() == pytest.approx(2.0, rel=1e-4)
+
+
+def test_sfa_reduces_real_spike_on_next_step_same_input(full_config):
+    cfg = pyfolds.NeuronConfig(
+        n_dendrites=1,
+        n_synapses_per_dendrite=1,
+        t_refrac_abs=0.0,
+        t_refrac_rel=0.0,
+        theta_init=0.01,
+        theta_min=0.001,
+        adaptation_enabled=True,
+        adaptation_increment=10.0,
+        adaptation_tau=1e6,
+        device="cpu",
+    )
+    neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+    for syn in neuron.dendrites[0].synapses:
+        syn.N.fill_(cfg.n_max)
+    neuron.dendrites[0]._invalidate_cache()
+    neuron.u_stp.fill_(1.0)
+    neuron.R_stp.fill_(1.0)
+
+    x = torch.ones(1, 1, 1) * 10.0
+    out0 = neuron.forward(x, dt=1.0, collect_stats=False)
+    out1 = neuron.forward(x, dt=1.0, collect_stats=False)
+
+    assert out0["spikes"].item() == 1.0
+    assert out1["refrac_blocked"].item() is False
+    assert out1["u_eff"].item() < out1["u_raw"].item()
+    assert out1["spikes"].item() == 0.0
