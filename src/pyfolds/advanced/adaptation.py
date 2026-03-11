@@ -18,6 +18,11 @@ class AdaptationMixin:
         - Benda & Herz (2007) - A universal model for spike-frequency adaptation
     """
     
+    def _adaptation_load_state_dict_pre_hook(self, module, state_dict, prefix, *args):
+        key = f"{prefix}adaptation_current"
+        if key in state_dict:
+            self.adaptation_current.resize_(state_dict[key].shape)
+
     def _init_adaptation(self, cfg):
         """
         Inicializa parâmetros de adaptação a partir da config.
@@ -30,14 +35,19 @@ class AdaptationMixin:
         self.adaptation_max = cfg.adaptation_max
         self.adaptation_tau = cfg.adaptation_tau
         
-        # ✅ Estado por batch (inicializado no forward)
-        self.adaptation_current = None  # Será [B]
+        # ✅ Estado por batch (buffer persistente; inicializado no forward)
+        if not hasattr(self, "adaptation_current"):
+            self.register_buffer("adaptation_current", torch.empty(0))
+        if not getattr(self, "_adaptation_state_hook_registered", False):
+            self.register_load_state_dict_pre_hook(self._adaptation_load_state_dict_pre_hook)
+            self._adaptation_state_hook_registered = True
     
     def _ensure_adaptation_current(self, batch_size: int, device: torch.device):
         """Garante que adaptation_current existe com tamanho correto."""
-        if (self.adaptation_current is None or 
-            self.adaptation_current.shape[0] != batch_size):
-            self.adaptation_current = torch.zeros(batch_size, device=device)
+        needs_resize = self.adaptation_current.ndim != 1 or self.adaptation_current.shape[0] != batch_size
+        if needs_resize:
+            self.adaptation_current.resize_(batch_size)
+            self.adaptation_current.zero_()
     
     def _apply_sfa_before_threshold(self, u: torch.Tensor, dt: float = 1.0) -> torch.Tensor:
         """
@@ -51,9 +61,8 @@ class AdaptationMixin:
             Potencial adaptado [B]
         """
         batch_size = u.shape[0]
-        device = u.device
 
-        self._ensure_adaptation_current(batch_size, device)
+        self._ensure_adaptation_current(batch_size, u.device)
         
         # Decaimento ocorre antes da comparação com threshold.
         decay = math.exp(-dt / self.adaptation_tau)
@@ -69,7 +78,7 @@ class AdaptationMixin:
         spikes : torch.Tensor
             Tensor de spikes por amostra.
         """
-        if self.adaptation_current is None:
+        if self.adaptation_current.numel() == 0:
             self._ensure_adaptation_current(int(spikes.shape[0]), spikes.device)
 
         spike_mask = spikes > 0.5
@@ -92,7 +101,7 @@ class AdaptationMixin:
         # SFA é aplicada no ponto de decisão de spike (RefractoryMixin),
         # evitando dupla aplicação e ordem ambígua no pós-forward.
         mode_val = normalize_learning_mode(kwargs.get('mode'))
-        if mode_val != LearningMode.INFERENCE and self.adaptation_current is not None:
+        if mode_val != LearningMode.INFERENCE and self.adaptation_current.numel() > 0:
             output['adaptation_current'] = self.adaptation_current.clone()
 
         return output

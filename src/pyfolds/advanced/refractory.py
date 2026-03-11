@@ -15,6 +15,11 @@ class RefractoryMixin(TimedMixin):
         - Refratário aplicado individualmente
     """
     
+    def _refractory_load_state_dict_pre_hook(self, module, state_dict, prefix, *args):
+        key = f"{prefix}last_spike_time"
+        if key in state_dict:
+            self.last_spike_time.resize_(state_dict[key].shape)
+
     def _init_refractory(self, t_refrac_abs: float = 2.0,
                           t_refrac_rel: float = 5.0,
                           refrac_rel_strength: float = 3.0):
@@ -30,7 +35,11 @@ class RefractoryMixin(TimedMixin):
         self.t_refrac_rel = t_refrac_rel
         self.refrac_rel_strength = refrac_rel_strength
         self._ensure_time_counter()
-        self.last_spike_time = None
+        if not hasattr(self, "last_spike_time"):
+            self.register_buffer("last_spike_time", torch.empty(0))
+        if not getattr(self, "_refractory_state_hook_registered", False):
+            self.register_load_state_dict_pre_hook(self._refractory_load_state_dict_pre_hook)
+            self._refractory_state_hook_registered = True
 
     def _ensure_last_spike_time(self, batch_size: int, device: torch.device):
         """
@@ -40,11 +49,10 @@ class RefractoryMixin(TimedMixin):
             batch_size: Tamanho do batch
             device: Device onde o tensor deve ser alocado
         """
-        if (self.last_spike_time is None or 
-            self.last_spike_time.shape[0] != batch_size):
-            self.last_spike_time = torch.full(
-                (batch_size,), -1000.0, device=device
-            )
+        needs_resize = self.last_spike_time.ndim != 1 or self.last_spike_time.shape[0] != batch_size
+        if needs_resize:
+            self.last_spike_time.resize_(batch_size)
+            self.last_spike_time.fill_(-1000.0)
     
     def _check_refractory_batch(self, current_time: float, 
                                  batch_size: int) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -94,11 +102,12 @@ class RefractoryMixin(TimedMixin):
         spike_mask = spikes > 0.5
         
         # Atualiza último spike time onde houve disparo
-        self.last_spike_time = torch.where(
+        updated = torch.where(
             spike_mask,
             torch.full_like(self.last_spike_time, current_time),
             self.last_spike_time
         )
+        self.last_spike_time.copy_(updated)
         
     
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
@@ -191,7 +200,7 @@ class RefractoryMixin(TimedMixin):
     
     def reset_refractory(self):
         """Reseta o estado refratário."""
-        self.last_spike_time = None
+        self.last_spike_time.resize_(0)
         self._set_refractory_state(False)
         # Nota: time_counter NÃO é resetado aqui pois é compartilhado
     
@@ -208,7 +217,7 @@ class RefractoryMixin(TimedMixin):
             'refrac_rel_strength': self.refrac_rel_strength,
         }
         
-        if self.last_spike_time is not None:
+        if self.last_spike_time.numel() > 0:
             metrics['last_spike_time_mean'] = self.last_spike_time.mean().item()
             metrics['last_spike_time_min'] = self.last_spike_time.min().item()
             metrics['last_spike_time_max'] = self.last_spike_time.max().item()
