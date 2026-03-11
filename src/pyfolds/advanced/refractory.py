@@ -128,7 +128,6 @@ class RefractoryMixin(TimedMixin):
         self._ensure_last_spike_time(batch_size, device)
         
         # Forward da classe base (homeostase adiada para pós-refratário)
-        kwargs = dict(kwargs)
         kwargs["defer_homeostasis"] = True
         output = super().forward(x, **kwargs)
         

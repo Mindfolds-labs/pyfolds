@@ -1235,8 +1235,6 @@ class MPJRDNeuron(BaseNeuron):
         """
 
         device = self.theta.device
-        n_chunks: list[torch.Tensor] = []
-
         q_probs = getattr(self, "_metrics_n_quantile_probs", None)
         if q_probs is None or q_probs.device != device:
             q_probs = torch.tensor((0.25, 0.5, 0.75), device=device)
@@ -1273,8 +1271,6 @@ class MPJRDNeuron(BaseNeuron):
                 w_flat = syn_batch.W.float().reshape(-1)
                 prot_flat = syn_batch.protection.float().reshape(-1)
 
-                n_chunks.append(n_flat)
-
                 n_count += int(n_flat.numel())
                 n_sum += float(n_flat.sum().item())
                 n_sumsq += float((n_flat * n_flat).sum().item())
@@ -1305,8 +1301,6 @@ class MPJRDNeuron(BaseNeuron):
                 w_flat = syn.W.float().reshape(-1)
                 prot_flat = syn.protection.float().reshape(-1)
 
-                n_chunks.append(n_flat)
-
                 n_count += int(n_flat.numel())
                 n_sum += float(n_flat.sum().item())
                 n_sumsq += float((n_flat * n_flat).sum().item())
@@ -1329,12 +1323,20 @@ class MPJRDNeuron(BaseNeuron):
                 prot_count += int(prot_flat.numel())
                 prot_sum += float(prot_flat.sum().item())
 
-        if n_chunks:
-            n_flat_all = torch.cat(n_chunks)
-            percentiles = torch.quantile(n_flat_all, q_probs)
+        if n_count:
             n_mean = n_sum / n_count
             n_var = max((n_sumsq / n_count) - (n_mean * n_mean), 0.0)
             n_std = n_var**0.5
+
+            if self.dendrites:
+                first_batch = getattr(self.dendrites[0], "synapse_batch", None)
+                if first_batch is not None:
+                    all_n = torch.cat([d.synapse_batch.N.float().reshape(-1) for d in self.dendrites])
+                else:
+                    all_n = torch.stack([syn.N.float().reshape(()) for d in self.dendrites for syn in d.synapses])
+                percentiles = torch.quantile(all_n, q_probs)
+            else:
+                percentiles = torch.zeros(3, device=device)
         else:
             percentiles = torch.zeros(3, device=device)
             n_count = 1

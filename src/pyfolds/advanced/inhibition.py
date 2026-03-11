@@ -268,7 +268,7 @@ class InhibitionLayer(nn.Module):
             elif theta.shape[0] == u_inhibited.shape[1]:
                 theta_expanded = theta.unsqueeze(0).expand(batch_size, -1)
             elif theta.shape[0] == 1:
-                theta_expanded = theta.view(1, 1).expand_as(u_inhibited)
+                theta_expanded = theta.reshape(1, 1).expand_as(u_inhibited)
             else:
                 raise ValueError(
                     f"Shape de theta incompatível: {tuple(theta.shape)} para "

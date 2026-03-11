@@ -347,6 +347,7 @@ class MPJRDConfig:
     circadian: CircadianConfig = field(default_factory=CircadianConfig)
     audit: AuditConfig = field(default_factory=AuditConfig)
     _attr_cache: Dict[str, object] = field(default_factory=dict, init=False, repr=False, compare=False)
+    _subfield_owner_cache: Dict[str, object] = field(default_factory=dict, init=False, repr=False, compare=False)
 
     def __post_init__(self):
         """Validações pós-inicialização."""
@@ -792,19 +793,26 @@ class MPJRDConfig:
         if name in self._attr_cache:
             return self._attr_cache[name]
 
-        subconfigs = (
-            self.topology,
-            self.filament,
-            self.plasticity,
-            self.homeostasis,
-            self.circadian,
-            self.audit,
-        )
-        for sub in subconfigs:
-            if name in sub.__dataclass_fields__:
-                value = getattr(sub, name)
-                self._attr_cache[name] = value
-                return value
+        sub_owner = self._subfield_owner_cache.get(name)
+        if sub_owner is None:
+            subconfigs = (
+                self.topology,
+                self.filament,
+                self.plasticity,
+                self.homeostasis,
+                self.circadian,
+                self.audit,
+            )
+            for sub in subconfigs:
+                if name in sub.__dataclass_fields__:
+                    sub_owner = sub
+                    self._subfield_owner_cache[name] = sub
+                    break
+
+        if sub_owner is not None:
+            value = getattr(sub_owner, name)
+            self._attr_cache[name] = value
+            return value
 
         raise AttributeError(
             f"MPJRDConfig has no attribute '{name}'. "
