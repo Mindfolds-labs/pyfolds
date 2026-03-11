@@ -119,7 +119,13 @@ class STDPMixin:
         # LTD: onde trace_post > threshold
         trace_threshold = getattr(self.cfg, "stdp_trace_threshold", 0.01)
         ltd_mask = (self.trace_post > trace_threshold).float()
-        delta_ltd = -self.A_minus * self.trace_post * ltd_mask * pre_spikes
+        ltd_rule = getattr(self.cfg, "ltd_rule", "current")
+        if ltd_rule == "classic":
+            ltd_gate = pre_spikes
+        else:
+            # Regra legada: aplica LTD quando há spike pós-sináptico.
+            ltd_gate = post_expanded
+        delta_ltd = -self.A_minus * self.trace_post * ltd_mask * ltd_gate
 
         # LTP: onde trace_pre > threshold
         ltp_mask = (self.trace_pre > trace_threshold).float()
