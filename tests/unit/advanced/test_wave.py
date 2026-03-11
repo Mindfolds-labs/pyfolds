@@ -52,3 +52,25 @@ def test_wave_mixin_sleep_consolidation_prunes_small_amplitudes():
     neuron.set_wave_mode(LearningMode.SLEEP)
 
     assert neuron.wave_amplitudes[1].item() == 0.0
+
+
+def test_wave_consolidation_pipeline_respects_toggle_and_tracks_audit():
+    cfg = MPJRDConfig(
+        wave_enabled=True,
+        wave_n_frequencies=3,
+        wave_sleep_pruning_threshold=0.05,
+        enable_sleep_consolidation=False,
+    )
+    neuron = WaveTestNeuron(cfg)
+
+    with torch.no_grad():
+        neuron.wave_amplitudes.copy_(torch.tensor([0.1, 0.001, 0.2]))
+
+    report = neuron.consolidate_memories(trigger="unit_test")
+    assert report["executed"] is False
+    assert neuron.wave_amplitudes[1].item() > 0.0
+
+    metrics = neuron.get_wave_metrics()
+    assert metrics["wave_consolidation_requested"] == 1.0
+    assert metrics["wave_consolidation_skipped"] == 1.0
+    assert metrics["wave_consolidation_executed"] == 0.0

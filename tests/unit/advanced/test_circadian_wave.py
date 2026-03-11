@@ -129,3 +129,24 @@ def test_circadian_plasticity_gate_varies_by_phase():
 
     assert gate_am > gate_pm
     assert 0.0 < gate_pm < gate_am <= 2.0
+
+
+def test_circadian_offline_consolidation_pipeline_tracks_audit():
+    cfg = MPJRDConfig(
+        n_dendrites=2,
+        n_synapses_per_dendrite=4,
+        theta_init=0.1,
+        wave_enabled=True,
+        circadian_enabled=True,
+        enable_sleep_consolidation=False,
+    )
+    neuron = MPJRDNeuronAdvanced(cfg)
+    neuron.store_temporal_memory(torch.randn(4), importance=0.95, concept="forte")
+
+    report = neuron.consolidate_memories(trigger="unit_test")
+    assert report["executed"] is False
+
+    stats = neuron.get_temporal_memory_stats()
+    assert stats["offline_consolidation_requested"] == 1
+    assert stats["offline_consolidation_skipped"] == 1
+    assert stats["offline_consolidation_executed"] == 0

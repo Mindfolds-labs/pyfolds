@@ -311,6 +311,7 @@ class MPJRDConfig:
     wave_excitation_gain: float = 1.0
     wave_stability_gain: float = 1.0
     wave_sleep_consolidation: bool = True
+    enable_sleep_consolidation: bool = True
     wave_sleep_replay_rate: float = 0.1
     wave_sleep_pruning_threshold: float = 0.01
 
