@@ -2,7 +2,7 @@
 
 ![PyFolds banner](_static/brand/pyfolds-readme-banner.svg)
 
-Documentação técnica estruturada em seis eixos principais.
+Documentação técnica estruturada em seis eixos principais, incluindo o hub de mecanismos (estáveis/experimentais).
 
 ## Conteúdo técnico
 
