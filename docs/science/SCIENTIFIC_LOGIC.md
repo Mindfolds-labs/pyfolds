@@ -1,4 +1,4 @@
-# Scientific Logic — PyFolds (MPJRD v2.0 / MPJRD-Wave v3.0)
+# Scientific Logic — PyFolds (MPJRD + mecanismos Wave)
 
 ## Objetivo
 
@@ -49,8 +49,8 @@ Gidon et al. (2020) mostram evidências de que dendritos humanos geram eventos a
 
 No PyFolds, essa ideia aparece em dois níveis:
 
-- **v2.0 (MPJRD):** integração/gating entre ramos após computação local (não restrita a WTA duro);
-- **v3.0 (MPJRD-Wave):** integração cooperativa contínua entre ramos via ativação sigmoid por dendrito (`dendritic_activations`), reduzindo perda de informação causada por seleção dura.
+- **Núcleo MPJRD:** integração/gating entre ramos após computação local (não restrita a WTA duro);
+- **Mecanismo Wave (stack avançada):** integração cooperativa contínua entre ramos via ativação sigmoid por dendrito (`dendritic_activations`), reduzindo perda de informação causada por seleção dura.
 
 Interpretação: o dendrito deixa de ser “fio passivo” e passa a ser unidade funcional que participa de inferência, plasticidade e explicação.
 
@@ -58,12 +58,12 @@ Interpretação: o dendrito deixa de ser “fio passivo” e passa a ser unidade
 
 ### 1.4 Codificação por fase e latência (O'Keefe & Recce, 1993; Thorpe et al., 2001)
 
-A arquitetura MPJRD-Wave v3.0 é inspirada em dois eixos experimentais/computacionais:
+A modelagem de dinâmica Wave no PyFolds é inspirada em dois eixos experimentais/computacionais:
 
 - **O'Keefe & Recce (1993):** informação pode ser codificada por fase relativa em oscilações neurais;
 - **Thorpe et al. (2001):** códigos temporais/latência suportam reconhecimento rápido e eficiente.
 
-No MPJRD-Wave:
+No mecanismo Wave:
 
 - amplitude funcional: `amplitude = log2(1 + relu(u))`;
 - fase dinâmica: `phase = (π/2) * (1 - sigmoid((u-theta)*phase_sensitivity))`;
@@ -97,7 +97,7 @@ A hipótese central do framework é:
 1. Melhor rastreabilidade causal de aprendizado (transições de `N`).
 2. Menor sensibilidade a ruído de curto prazo (filtragem via `I`).
 3. Maior separabilidade de padrões compostos (dendritos como especialistas locais).
-4. Em v3.0, maior expressividade temporal por fase/frequência.
+4. Com o mecanismo Wave habilitado, maior expressividade temporal por fase/frequência.
 
 ---
 

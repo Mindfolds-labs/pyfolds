@@ -1,6 +1,6 @@
 # API Reference - Módulo Wave
 
-Documentação do módulo de codificação por fase e amplitude (v3.0).
+Documentação do mecanismo de codificação por fase e amplitude (Wave) no ecossistema MPJRD.
 
 ## Preferência atual
 
