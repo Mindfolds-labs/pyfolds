@@ -31,6 +31,32 @@ class TestBackpropMixin:
         assert len(neuron.backprop_queue) == 1
         assert neuron.backprop_queue[0]['time'] == 10.0
     
+
+    def test_backprop_queue_overflow_tracks_drops(self, full_config):
+        """Queue cheia deve registrar overflow explícito sem perda silenciosa."""
+        if not pyfolds.ADVANCED_AVAILABLE:
+            pytest.skip("Advanced module not available")
+
+        cfg = pyfolds.NeuronConfig(
+            n_dendrites=1,
+            n_synapses_per_dendrite=1,
+            backprop_delay=0.1,
+            device="cpu",
+        )
+        neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+        v_dend = torch.zeros(1, 1)
+
+        maxlen = neuron.backprop_queue.maxlen
+        for idx in range(maxlen + 3):
+            neuron._schedule_backprop(float(idx), v_dend)
+
+        assert len(neuron.backprop_queue) == maxlen
+        assert neuron.backprop_queue_dropped == 3
+
+        metrics = neuron.get_backprop_metrics()
+        assert metrics["backprop_queue_len"] == maxlen
+        assert metrics["backprop_queue_dropped"] == 3
+
     def test_dendrite_amplification_decay(self, full_config):
         """Test amplification decay when there are pending events."""
         if not pyfolds.ADVANCED_AVAILABLE:

@@ -89,10 +89,14 @@ class AdaptationMixin:
         """Forward pass com adaptação POR AMOSTRA."""
         output = super().forward(x, **kwargs)
 
-        if self.adaptation_current is not None and 'u' in output:
+        if 'u' in output:
             u_adapted = self._apply_sfa_before_threshold(output['u'], dt=kwargs.get('dt', 1.0))
             output['u'] = u_adapted
             output['u_eff'] = u_adapted
+
+            final_spikes = output.get('final_spikes')
+            if final_spikes is not None:
+                self._update_adaptation_after_spike(final_spikes)
 
         mode_val = normalize_learning_mode(kwargs.get('mode'))
         if mode_val != LearningMode.INFERENCE and self.adaptation_current is not None:

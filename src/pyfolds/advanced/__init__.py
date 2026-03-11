@@ -90,8 +90,9 @@ class MPJRDNeuronAdvanced(
         self._init_advanced_mixins(cfg, is_wave=False)
 
     def forward(self, x, **kwargs):
+        self._begin_time_step()
         output = super().forward(x, **kwargs)
-        self._increment_time(kwargs.get("dt", 1.0))
+        self._increment_time_once(kwargs.get("dt", 1.0))
         return output
 
     def _init_advanced_mixins(self, cfg, is_wave: bool = False) -> None:
@@ -213,8 +214,9 @@ class MPJRDWaveNeuronAdvanced(
         MPJRDNeuronAdvanced._init_advanced_mixins(self, cfg, is_wave=True)
 
     def forward(self, x, **kwargs):
+        self._begin_time_step()
         output = super().forward(x, **kwargs)
-        self._increment_time(kwargs.get("dt", 1.0))
+        self._increment_time_once(kwargs.get("dt", 1.0))
         return output
 
 

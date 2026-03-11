@@ -52,6 +52,17 @@ class TimedMixin:
         """
         if hasattr(self, 'time_counter'):
             self.time_counter.add_(dt)
+
+    def _begin_time_step(self):
+        """Marca início de um passo para evitar incrementos duplicados."""
+        self._time_step_incremented = False
+
+    def _increment_time_once(self, dt: float = 1.0):
+        """Incrementa tempo uma única vez por passo lógico."""
+        if getattr(self, "_time_step_incremented", False):
+            return
+        self._increment_time(dt)
+        self._time_step_incremented = True
     
     def _get_time(self) -> float:
         """

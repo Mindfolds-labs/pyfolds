@@ -30,6 +30,7 @@ class BackpropMixin(TimedMixin):
 
         self.backprop_trace = None
         self._last_backprop_time = 0.0
+        self.backprop_queue_dropped = 0
 
         max_queue_size = max(100, int(self.backprop_delay * 50))
         self.backprop_queue = deque(maxlen=max_queue_size)
@@ -48,17 +49,18 @@ class BackpropMixin(TimedMixin):
         dend_contribution: Optional[torch.Tensor] = None,
     ):
         """Agenda evento de backpropagação."""
-        self.backprop_queue.append(
-            {
-                "time": spike_time,
-                "v_dend": v_dend.detach().clone(),
-                "dend_contribution": (
-                    dend_contribution.detach().clone()
-                    if dend_contribution is not None
-                    else None
-                ),
-            }
-        )
+        event = {
+            "time": spike_time,
+            "v_dend": v_dend.detach().clone(),
+            "dend_contribution": (
+                dend_contribution.detach().clone() if dend_contribution is not None else None
+            ),
+        }
+
+        if len(self.backprop_queue) == self.backprop_queue.maxlen:
+            self.backprop_queue.popleft()
+            self.backprop_queue_dropped += 1
+        self.backprop_queue.append(event)
 
     def _process_backprop_queue(self, current_time: float):
         """Processa eventos de backpropagação pendentes."""
@@ -111,7 +113,6 @@ class BackpropMixin(TimedMixin):
 
     def forward(self, x: torch.Tensor, **kwargs) -> Dict[str, torch.Tensor]:
         """Forward pass com backpropagação."""
-        dt = kwargs.get("dt", 1.0)
         current_time = self.time_counter.item()
         self._process_backprop_queue(current_time)
 
@@ -136,6 +137,7 @@ class BackpropMixin(TimedMixin):
         self.backprop_trace = None
         self.backprop_queue.clear()
         self._last_backprop_time = 0.0
+        self.backprop_queue_dropped = 0
 
     def get_backprop_metrics(self) -> dict:
         """Retorna métricas de backpropagação."""
@@ -143,6 +145,7 @@ class BackpropMixin(TimedMixin):
             "backprop_amp_mean": self.dendrite_amplification.mean().item(),
             "backprop_amp_max": self.dendrite_amplification.max().item(),
             "backprop_queue_len": len(self.backprop_queue),
+            "backprop_queue_dropped": self.backprop_queue_dropped,
             "bap_proportional": self.bap_proportional,
         }
         if self.backprop_trace is not None:
