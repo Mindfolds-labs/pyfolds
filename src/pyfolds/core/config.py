@@ -312,6 +312,12 @@ class MPJRDConfig:
     wave_stability_gain: float = 1.0
     wave_sleep_consolidation: bool = True
     enable_sleep_consolidation: bool = True
+    enable_phase_gating: bool = False
+    enable_dynamic_channel_gating: bool = False
+    enable_wave_modulation: bool = False
+    enable_dendritic_threshold_modulation: bool = False
+    debug_compare_baseline: bool = False
+    debug_collect_mechanism_metrics: bool = False
     wave_sleep_replay_rate: float = 0.1
     wave_sleep_pruning_threshold: float = 0.01
 
