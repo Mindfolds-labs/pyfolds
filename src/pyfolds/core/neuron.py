@@ -1233,41 +1233,112 @@ class MPJRDNeuron(BaseNeuron):
         Dict[str, Any]
             Dicionário com estatísticas globais de estado do neurônio.
         """
-        n_list: list[torch.Tensor] = []
-        l_list: list[torch.Tensor] = []
-        i_list: list[torch.Tensor] = []
-        w_list: list[torch.Tensor] = []
-        prot_list: list[torch.Tensor] = []
 
-        for dend in self.dendrites:
-            syn_batch = getattr(dend, "synapse_batch", None)
-            if syn_batch is not None:
-                n_list.append(syn_batch.N.float().reshape(-1))
-                l_batch = getattr(syn_batch, "L", syn_batch.N)
-                l_list.append(l_batch.float().reshape(-1))
-                i_list.append(syn_batch.I.float().reshape(-1))
-                w_list.append(syn_batch.W.float().reshape(-1))
-                prot_list.append(syn_batch.protection.float().reshape(-1))
-                continue
+        def _iter_synapse_tensors():
+            for dend in self.dendrites:
+                syn_batch = getattr(dend, "synapse_batch", None)
+                if syn_batch is not None:
+                    l_batch = getattr(syn_batch, "L", syn_batch.N)
+                    yield (
+                        syn_batch.N.float().reshape(-1),
+                        l_batch.float().reshape(-1),
+                        syn_batch.I.float().reshape(-1),
+                        syn_batch.W.float().reshape(-1),
+                        syn_batch.protection.float().reshape(-1),
+                    )
+                    continue
 
-            for syn in dend.synapses:
-                n_list.append(syn.N.float().reshape(-1))
-                l_list.append(syn.L.float().reshape(-1))
-                i_list.append(syn.I.float().reshape(-1))
-                w_list.append(syn.W.float().reshape(-1))
-                prot_list.append(syn.protection.float().reshape(-1))
+                for syn in dend.synapses:
+                    yield (
+                        syn.N.float().reshape(-1),
+                        syn.L.float().reshape(-1),
+                        syn.I.float().reshape(-1),
+                        syn.W.float().reshape(-1),
+                        syn.protection.float().reshape(-1),
+                    )
 
         device = self.theta.device
-        n_flat = torch.cat(n_list) if n_list else torch.zeros(1, device=device)
-        l_flat = torch.cat(l_list) if l_list else torch.zeros(1, device=device)
-        i_flat = torch.cat(i_list) if i_list else torch.zeros(1, device=device)
-        w_flat = torch.cat(w_list) if w_list else torch.zeros(1, device=device)
-        prot_flat = torch.cat(prot_list) if prot_list else torch.zeros(1, device=device)
+        n_chunks: list[torch.Tensor] = []
 
-        percentiles = torch.quantile(
-            n_flat,
-            torch.tensor([0.25, 0.5, 0.75], device=n_flat.device),
-        )
+        n_count = 0
+        n_sum = 0.0
+        n_sumsq = 0.0
+        n_min = float("inf")
+        n_max = float("-inf")
+
+        l_count = 0
+        l_sum = 0.0
+
+        i_count = 0
+        i_sum = 0.0
+        i_sumsq = 0.0
+        i_min = float("inf")
+        i_max = float("-inf")
+
+        w_count = 0
+        w_sum = 0.0
+        w_positive = 0
+
+        prot_count = 0
+        prot_sum = 0.0
+
+        for n_flat, l_flat, i_flat, w_flat, prot_flat in _iter_synapse_tensors():
+            n_chunks.append(n_flat)
+
+            n_count += int(n_flat.numel())
+            n_sum += float(n_flat.sum().item())
+            n_sumsq += float((n_flat * n_flat).sum().item())
+            n_min = min(n_min, float(n_flat.min().item()))
+            n_max = max(n_max, float(n_flat.max().item()))
+
+            l_count += int(l_flat.numel())
+            l_sum += float(l_flat.sum().item())
+
+            i_count += int(i_flat.numel())
+            i_sum += float(i_flat.sum().item())
+            i_sumsq += float((i_flat * i_flat).sum().item())
+            i_min = min(i_min, float(i_flat.min().item()))
+            i_max = max(i_max, float(i_flat.max().item()))
+
+            w_count += int(w_flat.numel())
+            w_sum += float(w_flat.sum().item())
+            w_positive += int((w_flat > 0).sum().item())
+
+            prot_count += int(prot_flat.numel())
+            prot_sum += float(prot_flat.sum().item())
+
+        if n_chunks:
+            n_flat_all = torch.cat(n_chunks)
+            percentiles = torch.quantile(
+                n_flat_all,
+                torch.tensor([0.25, 0.5, 0.75], device=n_flat_all.device),
+            )
+            n_mean = n_sum / n_count
+            n_var = max((n_sumsq / n_count) - (n_mean * n_mean), 0.0)
+            n_std = n_var**0.5
+        else:
+            percentiles = torch.zeros(3, device=device)
+            n_count = 1
+            n_mean = 0.0
+            n_std = 0.0
+            n_min = 0.0
+            n_max = 0.0
+
+        l_mean = (l_sum / l_count) if l_count else 0.0
+
+        if i_count:
+            i_mean = i_sum / i_count
+            i_var = max((i_sumsq / i_count) - (i_mean * i_mean), 0.0)
+            i_std = i_var**0.5
+        else:
+            i_mean = 0.0
+            i_std = 0.0
+            i_min = 0.0
+            i_max = 0.0
+
+        w_mean = (w_sum / w_count) if w_count else 0.0
+        active_synapse_ratio = (w_positive / w_count) if w_count else 0.0
+        protection_ratio = (prot_sum / prot_count) if prot_count else 0.0
 
         metrics = {
             "type": "MPJRDNeuron",
@@ -1275,22 +1346,22 @@ class MPJRDNeuron(BaseNeuron):
             "theta": self.theta.item(),
             "r_hat": self.r_hat.item(),
             "step_count": self.homeostasis.step_count.item(),
-            "N_mean": n_flat.mean().item(),
-            "L_mean": l_flat.mean().item(),
-            "N_std": n_flat.std().item(),
-            "N_min": n_flat.min().item(),
-            "N_max": n_flat.max().item(),
+            "N_mean": n_mean,
+            "L_mean": l_mean,
+            "N_std": n_std,
+            "N_min": n_min,
+            "N_max": n_max,
             "N_25p": percentiles[0].item(),
             "N_median": percentiles[1].item(),
             "N_75p": percentiles[2].item(),
-            "I_mean": i_flat.mean().item(),
-            "I_std": i_flat.std().item(),
-            "I_min": i_flat.min().item(),
-            "I_max": i_flat.max().item(),
-            "W_mean": w_flat.mean().item(),
+            "I_mean": i_mean,
+            "I_std": i_std,
+            "I_min": i_min,
+            "I_max": i_max,
+            "W_mean": w_mean,
             "saturation_ratio": self._compute_saturation_ratio(),
-            "protection_ratio": prot_flat.mean().item(),
-            "total_synapses": int(n_flat.numel()),
+            "protection_ratio": protection_ratio,
+            "total_synapses": int(n_count),
             "total_dendrites": len(self.dendrites),
             "mode": self.mode.value,
             "mode_switches": self.mode_switches.item(),
@@ -1324,30 +1395,12 @@ class MPJRDNeuron(BaseNeuron):
             "reward_alignment_score": float(1.0 - abs(self._ema_reward.item() - self._ema_spike_rate.item())),
             "plasticity_utilization": float(min(1.0, self._latest_policy.effective_eta / max(self._base_i_eta, 1e-6))),
             "useful_update_ratio": float(self._latest_policy.effective_attention_gain / (1.0 + self._latest_policy.effective_competition_gain)),
-            "representational_growth": float(n_flat.std().item()),
-            "active_synapse_ratio": float((w_flat > 0).float().mean().item()),
-            "dendritic_diversity_score": float(w_flat.std().item()),
-            "memory_retention_score": float((n_flat > 0).float().mean().item()),
-            "homeostatic_stability_ratio": float(1.0 / (1.0 + abs(float(self.homeostasis.homeostasis_error.item())))),
-            "firing_stability": float(1.0 - abs(float(self.r_hat.item()) - float(self.cfg.target_spike_rate))),
-            "oscillation_risk_score": float(abs(float(self._ema_spike_rate.item()) - float(self.r_hat.item()))),
-            "consolidation_efficiency": float(self._latest_policy.effective_consolidation_rate * self.circadian_consolidation_gate.item()),
-            "replay_effectiveness": float(self._latest_policy.effective_replay_priority),
-            "noise_pruning_ratio": float(1.0 - self._latest_policy.effective_decay_rate),
-            "retained_memory_after_sleep": float((n_flat > n_flat.mean()).float().mean().item()),
-            "attention_focus_score": float(self._latest_policy.effective_attention_gain),
-            "novelty_capture_rate": float(self._ema_novelty.item()),
-            "winner_selectivity": float((self._trace_winner_idx >= 0).float().mean().item()),
-            "competition_efficiency": float(self._latest_policy.effective_competition_gain),
-            "audit_events_count": len(self._audit_events),
+            "representational_growth": float(n_std),
+            "active_synapse_ratio": float(active_synapse_ratio),
         }
 
-        self.logger.debug(
-            f"📊 Métricas coletadas: N_mean={metrics['N_mean']:.1f}, θ={metrics['theta']:.2f}"
-        )
         return metrics
 
-    @torch.no_grad()
     def get_audit_trace_snapshot(self) -> Dict[str, torch.Tensor]:
         """Return a snapshot of the on-device circular step trace.
 

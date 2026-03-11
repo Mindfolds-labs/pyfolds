@@ -345,6 +345,7 @@ class MPJRDConfig:
     homeostasis: HomeostasisConfig = field(default_factory=HomeostasisConfig)
     circadian: CircadianConfig = field(default_factory=CircadianConfig)
     audit: AuditConfig = field(default_factory=AuditConfig)
+    _attr_cache: Dict[str, object] = field(default_factory=dict, init=False, repr=False, compare=False)
 
     def __post_init__(self):
         """Validações pós-inicialização."""
@@ -784,6 +785,9 @@ class MPJRDConfig:
 
     def __getattr__(self, name: str):
         """Fallback de compatibilidade para acesso flat via subconfigs."""
+        if name in self._attr_cache:
+            return self._attr_cache[name]
+
         subconfigs = (
             self.topology,
             self.filament,
@@ -792,15 +796,11 @@ class MPJRDConfig:
             self.circadian,
             self.audit,
         )
-        known_subfields = {
-            field_name
-            for sub in subconfigs
-            for field_name in sub.__dataclass_fields__.keys()
-        }
-        if name in known_subfields:
-            for sub in subconfigs:
-                if name in sub.__dataclass_fields__:
-                    return getattr(sub, name)
+        for sub in subconfigs:
+            if name in sub.__dataclass_fields__:
+                value = getattr(sub, name)
+                self._attr_cache[name] = value
+                return value
 
         raise AttributeError(
             f"MPJRDConfig has no attribute '{name}'. "

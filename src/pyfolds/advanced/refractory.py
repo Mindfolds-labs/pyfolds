@@ -174,8 +174,7 @@ class RefractoryMixin(TimedMixin):
                 in_refractory_period=self.in_refractory_period,
             )
 
-        if hasattr(self, '_update_adaptation_after_spike'):
-            self._update_adaptation_after_spike(final_spikes)
+        output['final_spikes'] = final_spikes
 
         return output
     

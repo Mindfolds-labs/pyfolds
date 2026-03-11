@@ -29,3 +29,18 @@ def test_time_counter_single_increment():
     t1 = neuron.time_counter.item()
 
     assert t1 - t0 == 1.0
+
+
+def test_time_counter_increment_once_guard_per_step():
+    cfg = pyfolds.NeuronConfig()
+    neuron = pyfolds.MPJRDNeuronAdvanced(cfg)
+
+    neuron._begin_time_step()
+    neuron._increment_time_once(dt=1.0)
+    neuron._increment_time_once(dt=1.0)
+
+    assert neuron.time_counter.item() == 1.0
+
+    neuron._begin_time_step()
+    neuron._increment_time_once(dt=2.0)
+    assert neuron.time_counter.item() == 3.0
