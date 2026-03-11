@@ -4,13 +4,9 @@
 
 ```mermaid
 flowchart LR
-    X[Input BxDxS] --> D[Integração por dendrito]
-    D --> G[Gate competitivo]
-    G --> U[u somático]
-    U --> S[Spike por limiar theta]
-    S --> P[Plasticidade / Acúmulo]
+    Input --> Synapse --> DendriteIntegration --> Soma --> Adaptation --> Refractory --> Spike --> Plasticity --> Homeostasis
 ```
 
 ## Nota de evolução
 
-A base atual usa gate competitivo tipo WTA no `forward`. A trilha v2/v3 discute evolução para integração cooperativa como roadmap arquitetural.
+O fluxo principal documentado deixou de usar WTA hard como caminho canônico. Para rastreabilidade histórica, o diagrama legado foi mantido como arquivo de referência em `docs/architecture/blueprints/sources/dendritic_processing_flow.mmd`.

@@ -1,33 +1,26 @@
-# Title
-Acoustic Edge Detection from Speech Envelope
+# Envelope Event Detection
 
-## Abstract
-Detector de eventos por derivada positiva do envelope para identificar transientes acústicos relevantes.
+## Objetivo
+Detectar bordas acústicas relevantes no envelope para disparar mecanismos dependentes de eventos.
 
-## Background
-Respostas evocadas por bordas acústicas são hipótese central para parte do tracking de fala.
+## Variáveis
+- **Entrada:** `envelope` temporal.
+- **Controle:** limiar adaptativo interno do detector.
+- **Saída:** `onset_times`, `onset_strength`, `event_mask`.
 
-## Related neuroscience literature
-- Oganian & Chang (2019), speech envelope landmarks.
-- Doelling et al. (2014), phase-locking por onsets.
+## Fluxo
+1. Calcular derivada temporal do envelope.
+2. Retificar valores positivos como candidatos a onset.
+3. Aplicar threshold adaptativo e emitir máscara/eventos.
 
-## Computational translation
-`detect_envelope_events(envelope)` retorna `onset_times`, `onset_strength` e `event_mask`.
+## Custo computacional
+O(T) em tempo e memória linear; custo baixo frente ao restante da simulação.
 
-## Implementation details
-- Derivada temporal retificada.
-- Threshold adaptativo: média + k*desvio.
-- Saída pode alimentar reset de fase/gating/priorização.
+## Integração
+- `detect_envelope_events` (`src/pyfolds/advanced/speech_tracking.py`).
+- `WaveDynamicsMixin.forward` usa os eventos para reset/gating (`src/pyfolds/advanced/wave.py`).
+- `analyze_mechanisms` agrega sinais de eventos para diagnóstico (`src/pyfolds/advanced/speech_tracking.py`).
 
-## Files modified
-- `src/pyfolds/advanced/speech_tracking.py`
-- `src/pyfolds/advanced/wave.py`
-
-## Activation flags
-Ativado indiretamente por `enable_speech_envelope_tracking`.
-
-## Limitations
-Threshold único pode perder eventos em SNR muito baixo.
-
-## Future work
-Threshold adaptativo por janela e histerese de eventos.
+## Estado
+- **Rótulo:** `Experimental`.
+- **Justificativa:** estratégia de limiar único pode degradar em cenários de SNR baixo.

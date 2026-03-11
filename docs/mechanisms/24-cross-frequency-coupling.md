@@ -1,33 +1,26 @@
-# Title
-Theta–Gamma Phase-Amplitude Coupling
+# Cross-Frequency Coupling
 
-## Abstract
-Implementa métrica opcional de acoplamento fase-amplitude para estimar interação entre fase lenta e amplitude rápida.
+## Objetivo
+Medir acoplamento fase-amplitude (theta-gamma) como indicador de coordenação multiescala.
 
-## Background
-PAC é frequentemente usado para caracterizar coordenação multiescala em processamento de fala.
+## Variáveis
+- **Entrada:** `phase_theta`, `amp_gamma`.
+- **Controle:** `enable_cross_frequency_coupling`.
+- **Saída:** `modulation_index` e perfil por bins de fase.
 
-## Related neuroscience literature
-- Canolty & Knight (2010), PAC em cognição.
-- Hyafil et al. (2015), cross-frequency em speech parsing.
+## Fluxo
+1. Discretizar fase lenta em bins.
+2. Acumular amplitude rápida por bin.
+3. Estimar MI normalizado e publicar no payload auxiliar.
 
-## Computational translation
-`compute_phase_amplitude_coupling(phase_theta, amp_gamma)` retorna MI e perfil por bins de fase.
+## Custo computacional
+O(T + B) por janela, com B bins de fase; memória pequena para histogramas.
 
-## Implementation details
-- Modulation Index (Tort-style KL normalizado).
-- Executado apenas quando `enable_cross_frequency_coupling=True`.
+## Integração
+- `compute_phase_amplitude_coupling` (`src/pyfolds/advanced/speech_tracking.py`).
+- `WaveDynamicsMixin.forward` injeta resultado em `extra_payload` (`src/pyfolds/advanced/wave.py`).
+- `MPJRDConfig.enable_cross_frequency_coupling` (`src/pyfolds/core/config.py`).
 
-## Files modified
-- `src/pyfolds/advanced/speech_tracking.py`
-- `src/pyfolds/advanced/wave.py`
-- `src/pyfolds/core/config.py`
-
-## Activation flags
-- `enable_cross_frequency_coupling`
-
-## Limitations
-Estimativa simplificada por lote único.
-
-## Future work
-Estimativa PAC em janela móvel e testes com surrogates.
+## Estado
+- **Rótulo:** `Experimental`.
+- **Justificativa:** estimativa em lote único e sem rotina de surrogates/controle estatístico.

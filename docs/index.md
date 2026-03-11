@@ -2,41 +2,29 @@
 
 ![PyFolds banner](_static/brand/pyfolds-readme-banner.svg)
 
-Documentação técnica estruturada para uso, desenvolvimento, API e governança do PyFolds.
-
-## Objetivo
-Estabelecer uma base documental estável, navegável e consistente com padrões técnicos IEEE-like.
-
-## Escopo
-- Guias de usuário (instalação, quickstart, exemplos).
-- Guias de desenvolvimento (contribuição, testes, empacotamento, diagramas).
-- Estratégia de documentação de API.
-- Governança (ADRs e políticas de qualidade).
-- **Hub interno existente:** `docs/development/HUB_CONTROLE.md` (não recriar do zero; apenas evoluir).
-
-## Definições/Termos
-- **IEEE-like:** estilo técnico com seções formais, rastreabilidade e linguagem objetiva.
-- **ADR:** *Architecture Decision Record*.
-- **MyST:** sintaxe Markdown estendida para Sphinx.
+Documentação técnica estruturada em seis eixos principais.
 
 ## Conteúdo técnico
-
-```{raw} html
-<div class="pyfolds-hero">
-  <img src="_static/brand/pyfolds-icon-dark.svg" alt="PyFolds brand mark" class="pyfolds-hero-logo" />
-  <p class="pyfolds-hero-subtitle">Framework neural com identidade visual técnica, dinâmica e orientada a engenharia.</p>
-</div>
-```
 
 ```{toctree}
 :maxdepth: 2
 :caption: Navegação principal
 
-user/index
+architecture/index
+science/index
+mechanisms/index
 development/index
-api/index
-governance/index
+sheer-audit/index
+governance/adr/index
 ```
+
+## Referências/Legado
+
+- [Portal do usuário (legado de navegação)](user/index.md)
+- [API reference (legado de navegação)](api/index.md)
+- [Governança geral (visão ampla)](governance/index.md)
+- [README da documentação](README.md)
+- [Portal interno de prompts](development/prompts.md)
 
 ## Mapa do Código
 
@@ -84,7 +72,7 @@ Atualizado automaticamente pelo Sheer Audit no merge para `main`.
   - `mod:src.utils.logging`
 <!-- SHEER-CODEMAP:END -->
 
-Consulte também: `docs/sheer-audit/sheerdocs/code_map.md`.
+Consulte também a **fonte canônica da auditoria atual**: `docs/sheer-audit/current_architecture_audit.md` (ponte oficial para os artefatos Sheer Audit vigentes).
 
 ## Referências
 - [README da documentação](README.md)

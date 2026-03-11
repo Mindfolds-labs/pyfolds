@@ -25,3 +25,12 @@ Esta pasta centraliza o material de preparação para integrar o **Sheer Audit**
 
 A CLI atual disponível no pacote instalado é um bootstrap e ainda não expõe comandos funcionais (`scan/report/uml/trace`) neste ambiente.
 Por isso, os dados foram extraídos com os módulos Python existentes e estáveis do projeto (`load_config`, `collect_python_files`).
+
+## Fonte da auditoria atual
+
+A **fonte canônica da auditoria atual** é:
+
+- `docs/sheer-audit/current_architecture_audit.md`
+
+Este documento aponta explicitamente para o artefato técnico oficial vigente e para as evidências complementares.
+

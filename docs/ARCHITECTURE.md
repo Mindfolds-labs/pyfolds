@@ -1,5 +1,12 @@
 # ARCHITECTURE — PyFOLDS MPJRD (C4 + fluxo IEEE)
 
+
+## 0) Referência de auditoria arquitetural vigente
+
+Fonte canônica da auditoria atual: `docs/sheer-audit/current_architecture_audit.md`.
+
+---
+
 Este documento define a arquitetura do PyFOLDS sob três perspectivas complementares:
 
 1. **C4** (Context, Container, Component),
@@ -154,7 +161,9 @@ Y_b = \mathbb{1}[U_b\ge\theta_{eff}],
 
 ## 7) Referência de fluxo visual
 
-Fluxo detalhado em Mermaid: `docs/architecture/blueprints/sources/dendritic_processing_flow.mmd`.
+Fluxo detalhado em Mermaid (canônico): `docs/architecture/real_pipeline.md`.
+
+Diagrama legado com WTA hard foi arquivado em `docs/architecture/blueprints/sources/dendritic_processing_flow.mmd`.
 
 ---
 
