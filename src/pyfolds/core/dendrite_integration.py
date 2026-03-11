@@ -65,8 +65,8 @@ class DendriticIntegration(nn.Module):
         raw_logit = v_dend - theta_eff
 
         local_mu = raw_logit.mean(dim=-1, keepdim=True)
-        local_sigma = raw_logit.std(dim=-1, keepdim=True, unbiased=False)
-        norm_logit = (raw_logit - local_mu) / (local_sigma + cfg.gate_local_norm_eps)
+        local_sigma = raw_logit.std(dim=-1, keepdim=True, unbiased=False).clamp_min(cfg.gate_local_norm_eps)
+        norm_logit = (raw_logit - local_mu) / local_sigma
         gate_logit = cfg.gate_logit_scale * norm_logit
 
         v_nmda = torch.sigmoid(gate_logit)
