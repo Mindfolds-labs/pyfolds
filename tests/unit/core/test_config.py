@@ -62,6 +62,8 @@ class TestNeuronConfig:
             {"theta_dend_ratio": 1.5},
             {"shunting_eps": 0.0},
             {"shunting_strength": -0.1},
+            {"gate_local_norm_eps": 0.0},
+            {"gate_logit_scale": 0.0},
         ],
     )
     def test_dendritic_integration_validation(self, kwargs):

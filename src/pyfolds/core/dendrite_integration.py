@@ -39,14 +39,17 @@ class DendriticIntegration(nn.Module):
         super().__init__()
         self.cfg = cfg
         self.n_dendrites = cfg.n_dendrites
-        # Bias local do gate: inicializado em 0 para manter sigmoid(~0)=0.5 no início.
-        self.gate_bias = nn.Parameter(torch.zeros(1, dtype=torch.float32))
+        # Threshold local por dendrito para manter logit próximo da região ativa.
+        self.theta = nn.Parameter(0.01 * torch.randn(self.n_dendrites, dtype=torch.float32))
 
-    def _theta_dend(self, theta: torch.Tensor) -> torch.Tensor:
+    def _theta_dend(self, theta: torch.Tensor, dtype: torch.dtype, device: torch.device) -> torch.Tensor:
         """Threshold local por dendrito = θ_soma × ratio."""
         if theta.dim() == 0:
-            return theta * self.cfg.theta_dend_ratio
-        return theta.mean() * self.cfg.theta_dend_ratio
+            theta_eff = theta * self.cfg.theta_dend_ratio
+        else:
+            theta_eff = theta.mean() * self.cfg.theta_dend_ratio
+        theta_eff = theta_eff + self.theta.to(dtype=dtype, device=device)
+        return theta_eff.unsqueeze(0)
 
     def forward(self, v_dend: torch.Tensor, theta: torch.Tensor) -> DendriticOutput:
         """Integra potenciais dendríticos com NMDA + shunting.
@@ -58,15 +61,15 @@ class DendriticIntegration(nn.Module):
         cfg = self.cfg
         D = self.n_dendrites
 
-        theta_dend = self._theta_dend(theta)
-        raw_gate_logit = v_dend - theta_dend
+        theta_eff = self._theta_dend(theta, dtype=v_dend.dtype, device=v_dend.device)
+        raw_logit = v_dend - theta_eff
 
-        # Centralização/escala estritamente espacial por amostra (dim=1).
-        local_mu = raw_gate_logit.mean(dim=1, keepdim=True)
-        local_sigma = raw_gate_logit.std(dim=1, keepdim=True, unbiased=False).clamp_min(cfg.eps)
-        gate_logit = ((raw_gate_logit - local_mu) / local_sigma) + self.gate_bias.to(raw_gate_logit.dtype)
+        local_mu = raw_logit.mean(dim=-1, keepdim=True)
+        local_sigma = raw_logit.std(dim=-1, keepdim=True, unbiased=False)
+        norm_logit = (raw_logit - local_mu) / (local_sigma + cfg.gate_local_norm_eps)
+        gate_logit = cfg.gate_logit_scale * norm_logit
 
-        v_nmda = torch.sigmoid(cfg.dendrite_gain * gate_logit)
+        v_nmda = torch.sigmoid(gate_logit)
 
         sum_dend = v_nmda.sum(dim=1, keepdim=True)
         v_norm = v_nmda / (cfg.shunting_eps + cfg.shunting_strength * sum_dend)
@@ -86,7 +89,8 @@ class DendriticIntegration(nn.Module):
         cfg = self.cfg
         return (
             f"D={self.n_dendrites}, "
-            f"gain={cfg.dendrite_gain}, "
+            f"gate_logit_scale={cfg.gate_logit_scale}, "
+            f"gate_local_norm_eps={cfg.gate_local_norm_eps}, "
             f"theta_dend_ratio={cfg.theta_dend_ratio}, "
             f"shunting_eps={cfg.shunting_eps}, "
             f"shunting_strength={cfg.shunting_strength}"
