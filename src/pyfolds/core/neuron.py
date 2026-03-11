@@ -218,6 +218,16 @@ class MPJRDNeuron(BaseNeuron):
             torch.zeros(1, dtype=self.theta.dtype, device=self.theta.device),
             persistent=False,
         )
+        self.register_buffer(
+            "gate_activity_mean",
+            torch.tensor(0.5, dtype=self.theta.dtype, device=self.theta.device),
+            persistent=False,
+        )
+        self.register_buffer(
+            "gate_logit_mean",
+            torch.tensor(0.0, dtype=self.theta.dtype, device=self.theta.device),
+            persistent=False,
+        )
         if TELEMETRY_AVAILABLE and enable_telemetry:
             from ..telemetry import (
                 TelemetryConfig,
@@ -734,6 +744,12 @@ class MPJRDNeuron(BaseNeuron):
             self.cfg.n_synapses_per_dendrite,
         ),
     )
+    def _local_gate_logit(self, gate_drive: torch.Tensor, eps: float) -> torch.Tensor:
+        """Normaliza drive de gate apenas com estatísticas espaciais por amostra."""
+        local_mu = gate_drive.mean(dim=1, keepdim=True)
+        local_sigma = gate_drive.std(dim=1, keepdim=True, unbiased=False).clamp_min(eps)
+        return (gate_drive - local_mu) / local_sigma
+
     def forward(
         self,
         x: torch.Tensor,
@@ -823,7 +839,8 @@ class MPJRDNeuron(BaseNeuron):
         # ===== 2-4. INTEGRAÇÃO DENDRÍTICA → POTENCIAL → DISPARO =====
         integration_mode = getattr(self.cfg, "dendrite_integration_mode", "wta_hard")
 
-        theta_eff = self.theta
+        # Ajuste local do limiar para manter gates próximos da região sensível da sigmoide no início.
+        theta_eff = torch.clamp(self.theta + self.dendrite_integration.gate_bias.to(self.theta.dtype), min=self.cfg.theta_min, max=self.cfg.theta_max)
         if integration_mode == "nmda_shunting":
             # Capacidade máxima do somático com NMDA+shunting (v_nmda <= 1):
             # u_max = D² / (shunting_eps + shunting_strength * D)
@@ -855,6 +872,7 @@ class MPJRDNeuron(BaseNeuron):
             )
             u = dend_out.u
             gated = dend_out.v_nmda
+            gate_logit = dend_out.gate_logit
             dend_contribution = dend_out.contribution
         elif integration_mode == "wta_soft":
             theta_cap = float(self.cfg.n_dendrites) - 1e-3
@@ -871,7 +889,10 @@ class MPJRDNeuron(BaseNeuron):
             else:
                 theta_eff = torch.clamp(theta_eff, max=theta_max_eff)
 
-            gated = torch.sigmoid(v_dend - (theta_eff * 0.5))
+            gate_drive = v_dend - (theta_eff * 0.5)
+            gate_logit = self._local_gate_logit(gate_drive, self.cfg.eps)
+            gate_logit = gate_logit + self.dendrite_integration.gate_bias.to(gate_drive.dtype)
+            gated = torch.sigmoid(gate_logit)
             execution_order.append(ScientificStage.LOCAL_NONLINEARITY)
             u = gated.sum(dim=1)
             execution_order.append(ScientificStage.GLOBAL_AGGREGATION)
@@ -884,6 +905,7 @@ class MPJRDNeuron(BaseNeuron):
                 [ScientificStage.COMPETITION, ScientificStage.GLOBAL_AGGREGATION]
             )
             u = gated.sum(dim=1)
+            gate_logit = v_dend
             dend_contribution = None
 
         self._contract_enforcer.validate(ScientificContract(stage_order=execution_order))
@@ -893,6 +915,8 @@ class MPJRDNeuron(BaseNeuron):
         winner_idx = v_dend.argmax(dim=1)
         winner_signal = v_dend.gather(1, winner_idx.unsqueeze(1)).squeeze(1)
         self._runtime_resonance_cache.copy_(v_dend.abs().mean(dim=0).to(self._runtime_resonance_cache.dtype))
+        self.gate_activity_mean.lerp_(gated.mean().detach().to(self.gate_activity_mean.dtype), weight=0.05)
+        self.gate_logit_mean.copy_(gate_logit.mean().detach().to(self.gate_logit_mean.dtype))
         self._append_audit_trace(winner_idx, winner_signal)
 
         # ===== 5. ESTATÍSTICAS =====
@@ -1054,6 +1078,9 @@ class MPJRDNeuron(BaseNeuron):
             "u_eff": u,
             "v_dend": v_dend,
             "gated": gated,
+            "gate_logit": gate_logit,
+            "gate_activity_mean": self.gate_activity_mean.clone(),
+            "gate_logit_mean": self.gate_logit_mean.clone(),
             "theta": self.theta.clone(),
             "theta_eff": theta_eff.clone(),
             "r_hat": self.r_hat.clone(),
