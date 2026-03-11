@@ -1,5 +1,6 @@
 """Mixin para backpropagação dendrítica com bAP proporcional."""
 
+import logging
 import math
 from collections import deque
 from typing import Dict, Optional
@@ -7,6 +8,9 @@ from typing import Dict, Optional
 import torch
 
 from .time_mixin import TimedMixin
+
+
+logger = logging.getLogger(__name__)
 
 
 class BackpropMixin(TimedMixin):
@@ -30,9 +34,13 @@ class BackpropMixin(TimedMixin):
 
         self.backprop_trace = None
         self._last_backprop_time = 0.0
-        self.backprop_queue_dropped = 0
+        self.backprop_dropped_events = 0
 
-        max_queue_size = max(100, int(self.backprop_delay * 50))
+        configured_maxlen = getattr(cfg, "backprop_queue_maxlen", None)
+        if configured_maxlen is None:
+            max_queue_size = max(100, int(self.backprop_delay * 50))
+        else:
+            max_queue_size = int(configured_maxlen)
         self.backprop_queue = deque(maxlen=max_queue_size)
 
     def _ensure_backprop_trace(self, batch_size: int, device: torch.device):
@@ -58,8 +66,15 @@ class BackpropMixin(TimedMixin):
         }
 
         if len(self.backprop_queue) == self.backprop_queue.maxlen:
-            self.backprop_queue.popleft()
-            self.backprop_queue_dropped += 1
+            dropped_event = self.backprop_queue.popleft()
+            self.backprop_dropped_events += 1
+            local_logger = getattr(self, "logger", logger)
+            local_logger.warning(
+                "event=backprop_queue_overflow capacity=%d dropped_event_time=%.6f incoming_event_time=%.6f",
+                self.backprop_queue.maxlen,
+                dropped_event["time"],
+                event["time"],
+            )
         self.backprop_queue.append(event)
 
     def _process_backprop_queue(self, current_time: float):
@@ -137,7 +152,7 @@ class BackpropMixin(TimedMixin):
         self.backprop_trace = None
         self.backprop_queue.clear()
         self._last_backprop_time = 0.0
-        self.backprop_queue_dropped = 0
+        self.backprop_dropped_events = 0
 
     def get_backprop_metrics(self) -> dict:
         """Retorna métricas de backpropagação."""
@@ -145,7 +160,7 @@ class BackpropMixin(TimedMixin):
             "backprop_amp_mean": self.dendrite_amplification.mean().item(),
             "backprop_amp_max": self.dendrite_amplification.max().item(),
             "backprop_queue_len": len(self.backprop_queue),
-            "backprop_queue_dropped": self.backprop_queue_dropped,
+            "backprop_dropped_events": self.backprop_dropped_events,
             "bap_proportional": self.bap_proportional,
         }
         if self.backprop_trace is not None:
