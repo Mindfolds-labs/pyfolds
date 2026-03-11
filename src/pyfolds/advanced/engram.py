@@ -116,6 +116,7 @@ class EngramBank(nn.Module):
         similarity_threshold: float = 0.7,
         pruning_threshold: float = 0.1,
         enable_indexing: bool = True,
+        enable_cache: bool = True,
         eviction_strategy: Literal["importance", "lru", "lru_importance"] = "importance",
     ) -> None:
         """Inicializa capacidade, índices e buffers de estatísticas."""
@@ -125,6 +126,7 @@ class EngramBank(nn.Module):
         self.similarity_threshold = similarity_threshold
         self.pruning_threshold = pruning_threshold
         self.enable_indexing = enable_indexing
+        self.enable_cache = enable_cache
         self.eviction_strategy = eviction_strategy
         self.engrams: Dict[str, Engram] = {}
         self.area_index: Dict[str, List[str]] = defaultdict(list)
@@ -219,7 +221,8 @@ class EngramBank(nn.Module):
             query_pattern = query_pattern[: self.n_frequencies]
 
         cache_key = self._build_search_cache_key(query_pattern, query_phase=query_phase, area=area, top_k=top_k)
-        if use_cache and cache_key in self.search_cache:
+        cache_enabled = bool(use_cache and self.enable_cache)
+        if cache_enabled and cache_key in self.search_cache:
             self.cache_hits += 1
             return self.search_cache[cache_key]
         self.cache_misses += 1
@@ -240,7 +243,7 @@ class EngramBank(nn.Module):
 
         scores.sort(key=lambda item: item[1], reverse=True)
         out = [item[0] for item in scores[:top_k]]
-        if use_cache:
+        if cache_enabled:
             self.search_cache[cache_key] = out
             if len(self.search_cache) > 1000:
                 self.search_cache.pop(next(iter(self.search_cache)))
@@ -365,6 +368,8 @@ class EngramBank(nn.Module):
                 "similarity_threshold": self.similarity_threshold,
                 "pruning_threshold": self.pruning_threshold,
                 "eviction_strategy": self.eviction_strategy,
+                "enable_indexing": self.enable_indexing,
+                "enable_cache": self.enable_cache,
             },
             "stats": self.get_stats(),
         }
@@ -378,6 +383,8 @@ class EngramBank(nn.Module):
         self.similarity_threshold = float(cfg.get("similarity_threshold", self.similarity_threshold))
         self.pruning_threshold = float(cfg.get("pruning_threshold", self.pruning_threshold))
         self.eviction_strategy = str(cfg.get("eviction_strategy", self.eviction_strategy))
+        self.enable_indexing = bool(cfg.get("enable_indexing", self.enable_indexing))
+        self.enable_cache = bool(cfg.get("enable_cache", self.enable_cache))
 
         for sig, data in state.get("engrams", {}).items():
             engram = Engram(

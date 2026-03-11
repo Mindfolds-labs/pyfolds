@@ -236,7 +236,7 @@ class WaveDynamicsMixin:
     """
 
     def _init_wave_dynamics(self, cfg) -> None:
-        self._wave_enabled = bool(getattr(cfg, "wave_enabled", False))
+        self._wave_enabled = bool(getattr(cfg, "wave_enabled", False)) and bool(getattr(cfg, "experimental_wave_enabled", True))
         if not self._wave_enabled:
             return
 
