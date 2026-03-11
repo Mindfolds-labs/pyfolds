@@ -21,7 +21,7 @@ O PyFolds implementa um modelo de neurônio artificial baseado em descobertas re
 
 ### 2.4 Codificação por Fase
 - Informação representada também no tempo relativo do spike.
-- v3.0: fase + amplitude para enriquecer representação.
+- Mecanismo Wave: fase + amplitude para enriquecer representação.
 
 ## 3. Modelo Matemático Formal
 
