@@ -178,6 +178,8 @@ class MPJRDConfig:
     shunting_eps: float = 0.1
     shunting_strength: float = 1.0
     bap_proportional: bool = True
+    gate_local_norm_eps: float = 1e-5
+    gate_logit_scale: float = 1.0
     
     # ===== MECANISMO 5: BACKPROPAGAÇÃO =====
     backprop_enabled: bool = True
@@ -518,6 +520,18 @@ class MPJRDConfig:
             raise ValueError(
                 "shunting_strength deve ser >= 0, "
                 f"recebido {self.shunting_strength}"
+            )
+
+        if self.gate_local_norm_eps <= 0:
+            raise ValueError(
+                "gate_local_norm_eps deve ser > 0, "
+                f"recebido {self.gate_local_norm_eps}"
+            )
+
+        if self.gate_logit_scale <= 0:
+            raise ValueError(
+                "gate_logit_scale deve ser > 0, "
+                f"recebido {self.gate_logit_scale}"
             )
 
         if not (0.0 < self.active_synapses_ratio <= 1.0):

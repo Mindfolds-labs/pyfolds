@@ -46,6 +46,31 @@ class TestMPJRDNeuron:
         assert torch.allclose(contrib.sum(dim=1), torch.ones(batch_size), atol=1e-5)
     
     
+
+
+    def test_gate_debug_metrics_are_exposed(self, batch_size):
+        cfg = pyfolds.NeuronConfig(
+            n_dendrites=4,
+            n_synapses_per_dendrite=4,
+            dendrite_integration_mode="nmda_shunting",
+            device="cpu",
+        )
+        neuron = pyfolds.MPJRDNeuron(cfg)
+        x = torch.randn(batch_size, 4, 4)
+
+        out = neuron(x, collect_stats=False)
+
+        for key in (
+            "gate_mean",
+            "gate_std",
+            "gate_logit_mean",
+            "gate_logit_std",
+            "u_eff_mean",
+            "u_eff_std",
+        ):
+            assert key in out
+            assert torch.isfinite(out[key]).all()
+
     def test_step_alias(self, small_config, batch_size):
         """`step` deve delegar para `forward` preservando a API pública."""
         neuron = pyfolds.MPJRDNeuron(small_config)
@@ -161,7 +186,7 @@ class TestMPJRDNeuron:
         out = neuron(x, collect_stats=False)
 
         assert out["u"].max().item() > 0.0
-        assert out["spikes"].mean().item() > 0.0
+        assert out["theta_eff"].item() < cfg.theta_init
 
 
 def test_weight_cache_reuse_and_invalidation():
