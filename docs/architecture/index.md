@@ -1,19 +1,15 @@
-# Architecture
+# Architecture Index
 
-Visão de arquitetura, design e contratos estruturais do PyFolds.
+## Pipeline real
+- [Real Pipeline](real_pipeline.md)
 
-```{toctree}
-:maxdepth: 2
+## Visão de arquitetura
 
-README
-PYFOLDS_PRODUCTION_REVIEW
-observability_roadmap
-blueprints/README
-specs/FOLD_SPECIFICATION
-specs/PUBLIC_API_V2_CONTRACT
+```mermaid
+flowchart LR
+    Network --> Neuron --> Dendrites --> Synapses --> Plasticity --> Telemetry
 ```
 
-## Referências/Legado
-
-- [Arquitetura estável (legado)](../STABLE_CORE_ARCHITECTURE.md)
-- [Auditoria de arquitetura V1 (legado)](../AUDITORIA_ARQUITETURA_V1.md)
+## Referências
+- [Architecture README](README.md)
+- [ARCHITECTURE (detalhado)](../ARCHITECTURE.md)
