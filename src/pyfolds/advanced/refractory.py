@@ -114,6 +114,7 @@ class RefractoryMixin(TimedMixin):
         """
         batch_size = x.shape[0]
         device = x.device
+        self._increment_time(float(kwargs.get("dt", 1.0)))
         
         # Garante que last_spike_time existe
         self._ensure_last_spike_time(batch_size, device)

@@ -28,7 +28,10 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
         super().__init__(cfg)
         self._init_wave(cfg)
         self._init_circadian(cfg)
-        self.register_buffer("birth_time", torch.tensor(time.time(), dtype=torch.float32))
+        if not hasattr(self, "birth_time"):
+            self.register_buffer("birth_time", torch.tensor(time.time(), dtype=torch.float32))
+        if not hasattr(self, "age_seconds"):
+            self.register_buffer("age_seconds", torch.tensor(0.0, dtype=torch.float32))
         self.register_buffer("total_experiences", torch.tensor(0, dtype=torch.long))
         self.register_buffer("sleep_cycles", torch.tensor(0, dtype=torch.long))
         self.register_buffer("discoveries", torch.tensor(0, dtype=torch.long))
@@ -41,6 +44,12 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
             pruning_threshold=float(getattr(cfg, "pruning_threshold", 0.1)),
         )
         self.specialization = SpecializationEngine(self.engram_bank)
+        self._sync_time_state()
+
+    def _sync_time_state(self) -> None:
+        """Mantém contadores temporais coerentes entre mixins."""
+        if hasattr(self, "time_counter") and hasattr(self, "age_seconds"):
+            self.time_counter.fill_(float(self.age_seconds.item()))
 
     def get_current_context(self) -> Dict[str, Any]:
         """Retorna contexto temporal atual para formação de engrams."""
@@ -56,6 +65,7 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
             self._advance_circadian(dt)
         elif hasattr(self, "age_seconds"):
             self.age_seconds.add_(float(dt))
+        self._sync_time_state()
 
     def learn(
         self,
@@ -149,9 +159,10 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
     def forward(self, x: torch.Tensor, **kwargs: Any) -> Dict[str, Any]:
         """Forward padrão com suporte opcional a aprendizado/consulta."""
         dt = float(kwargs.get("dt", 0.0))
-        if dt > 0:
+        if dt > 0 and not getattr(self, "_circadian_enabled", False):
             self.advance_age(dt)
         out = super().forward(x, **kwargs)
+        self._sync_time_state()
         if kwargs.get("learn", False) and "concept" in kwargs:
             pattern = torch.tensor(out.get("wave_frequencies", []), dtype=torch.float32, device=self.theta.device)
             engram = self.learn(kwargs["concept"], pattern=pattern, area=kwargs.get("area", "geral"), importance=float(kwargs.get("importance", 0.5)))

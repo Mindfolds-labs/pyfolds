@@ -85,6 +85,8 @@ class CircadianWaveMixin:
         next_phase = (prev_phase + delta_phase) % 360.0
         self.circadian_phase.fill_(next_phase)
         self.age_seconds.add_(float(dt))
+        if hasattr(self, "time_counter"):
+            self.time_counter.fill_(float(self.age_seconds.item()))
         if next_phase < prev_phase:
             self.circadian_day.add_(1)
 
