@@ -225,3 +225,72 @@ def test_stdp_vectorized_synapse_batch_matches_non_vectorized():
     vec_row = n_vec.dendrites[0].synapse_batch.stdp_eligibility
     ref_row = torch.stack([s.stdp_eligibility.squeeze(0) for s in n_ref.dendrites[0].synapses])
     assert torch.allclose(vec_row, ref_row, atol=1e-6)
+
+
+def test_stdp_vectorized_path_equivalence_over_multiple_steps():
+    """Caminho synapse_batch deve ser funcionalmente equivalente ao fallback."""
+    cfg_kwargs = dict(
+        n_dendrites=2,
+        n_synapses_per_dendrite=4,
+        plasticity_mode="stdp",
+        spike_threshold=0.25,
+        stdp_trace_threshold=0.0,
+        tau_pre=15.0,
+        tau_post=12.0,
+        A_plus=0.02,
+        A_minus=0.015,
+        device="cpu",
+    )
+    n_vec = pyfolds.MPJRDNeuronAdvanced(pyfolds.NeuronConfig(**cfg_kwargs, use_vectorized_synapses=True))
+    n_ref = pyfolds.MPJRDNeuronAdvanced(pyfolds.NeuronConfig(**cfg_kwargs, use_vectorized_synapses=False))
+
+    x_steps = [
+        torch.tensor([[[0.0, 0.3, 0.8, 0.1], [0.2, 0.9, 0.0, 0.7]]], dtype=torch.float32),
+        torch.tensor([[[0.4, 0.1, 0.6, 0.0], [0.0, 0.2, 1.0, 0.3]]], dtype=torch.float32),
+        torch.tensor([[[0.5, 0.5, 0.0, 0.9], [0.1, 0.0, 0.2, 0.8]]], dtype=torch.float32),
+    ]
+    post_steps = [torch.tensor([1.0]), torch.tensor([0.0]), torch.tensor([1.0])]
+
+    for x, post in zip(x_steps, post_steps):
+        n_vec._update_stdp_traces(x, post, dt=1.0)
+        n_ref._update_stdp_traces(x, post, dt=1.0)
+
+    vec = torch.stack([d.synapse_batch.stdp_eligibility for d in n_vec.dendrites])
+    ref = torch.stack([
+        torch.stack([s.stdp_eligibility.squeeze(0) for s in d.synapses])
+        for d in n_ref.dendrites
+    ])
+
+    assert torch.allclose(vec, ref, atol=1e-6, rtol=1e-5)
+
+
+def test_stdp_synapse_batch_micro_benchmark_smoke():
+    """Micro-benchmark comparativo simples entre caminho vetorizado e fallback."""
+    import time
+
+    cfg_base = dict(
+        n_dendrites=4,
+        n_synapses_per_dendrite=32,
+        plasticity_mode="stdp",
+        spike_threshold=0.3,
+        stdp_trace_threshold=0.0,
+        device="cpu",
+    )
+    n_vec = pyfolds.MPJRDNeuronAdvanced(pyfolds.NeuronConfig(**cfg_base, use_vectorized_synapses=True))
+    n_ref = pyfolds.MPJRDNeuronAdvanced(pyfolds.NeuronConfig(**cfg_base, use_vectorized_synapses=False))
+
+    x = torch.rand(16, cfg_base["n_dendrites"], cfg_base["n_synapses_per_dendrite"])
+    post = (torch.rand(16) > 0.5).float()
+
+    t0 = time.perf_counter()
+    for _ in range(200):
+        n_vec._update_stdp_traces(x, post, dt=1.0)
+    vec_time = time.perf_counter() - t0
+
+    t1 = time.perf_counter()
+    for _ in range(200):
+        n_ref._update_stdp_traces(x, post, dt=1.0)
+    ref_time = time.perf_counter() - t1
+
+    assert vec_time > 0.0
+    assert ref_time > 0.0

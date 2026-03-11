@@ -131,14 +131,22 @@ class STDPMixin:
             delta_total = (delta_ltd + delta_ltp).mean(dim=0)  # [D, S]
             max_elig = getattr(self.cfg, "max_eligibility", 1e6)
             with torch.no_grad():
+                vectorized_dendrites = []
+                fallback_dendrites = []
                 for d_idx, dend in enumerate(self.dendrites):
                     if getattr(dend, "synapse_batch", None) is not None:
-                        batch = dend.synapse_batch
-                        row = delta_total[d_idx].to(batch.stdp_eligibility.device)
-                        batch.stdp_eligibility.add_(row)
-                        batch.stdp_eligibility.clamp_(-max_elig, max_elig)
-                        continue
+                        vectorized_dendrites.append((d_idx, dend.synapse_batch))
+                    else:
+                        fallback_dendrites.append((d_idx, dend))
 
+                # Caminho prioritário com synapse_batch: sem loop interno em sinapses.
+                for d_idx, batch in vectorized_dendrites:
+                    row = delta_total[d_idx].to(batch.stdp_eligibility.device)
+                    batch.stdp_eligibility.add_(row)
+                    batch.stdp_eligibility.clamp_(-max_elig, max_elig)
+
+                # Fallback legado: loop por sinapse quando não há infraestrutura vetorizada.
+                for d_idx, dend in fallback_dendrites:
                     delta_row = delta_total[d_idx]
                     for s_idx, syn in enumerate(dend.synapses):
                         syn.stdp_eligibility.add_(delta_row[s_idx].to(syn.stdp_eligibility.device))

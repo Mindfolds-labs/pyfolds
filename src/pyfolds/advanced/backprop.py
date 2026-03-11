@@ -125,21 +125,20 @@ class BackpropMixin(TimedMixin):
             device = v_dend.device
             self._ensure_backprop_trace(batch_size, device)
 
-            if self.bap_proportional and dend_contribution is not None:
-                amplification_gain = self.backprop_signal * dend_contribution.mean(dim=0)
-            else:
-                activity_factor = torch.sigmoid(v_dend / 5.0)
-                amplification_gain = self.backprop_signal * activity_factor.mean(dim=0)
+            uses_proportional = self.bap_proportional and dend_contribution is not None
+            source = dend_contribution if uses_proportional else v_dend
 
+            if uses_proportional:
+                base_gain = source
+            else:
+                base_gain = torch.sigmoid(source / 5.0)
+
+            amplification_gain = self.backprop_signal * base_gain.mean(dim=0)
             self.dendrite_amplification.add_(
                 amplification_gain.clamp(max=self.backprop_max_amp)
             )
 
-            if self.bap_proportional and dend_contribution is not None:
-                active_mask = dend_contribution > self.backprop_active_threshold
-            else:
-                active_mask = v_dend > self.backprop_active_threshold
-
+            active_mask = source > self.backprop_active_threshold
             self.backprop_trace.add_(
                 active_mask.unsqueeze(-1).to(self.backprop_trace.dtype) * self.backprop_signal
             )
