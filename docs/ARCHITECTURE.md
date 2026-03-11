@@ -1,5 +1,12 @@
 # ARCHITECTURE — PyFOLDS MPJRD (C4 + fluxo IEEE)
 
+
+## 0) Referência de auditoria arquitetural vigente
+
+Fonte canônica da auditoria atual: `docs/sheer-audit/current_architecture_audit.md`.
+
+---
+
 Este documento define a arquitetura do PyFOLDS sob três perspectivas complementares:
 
 1. **C4** (Context, Container, Component),
