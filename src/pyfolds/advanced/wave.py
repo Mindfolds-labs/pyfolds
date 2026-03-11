@@ -13,6 +13,13 @@ import torch.nn as nn
 from ..core.config import MPJRDConfig
 from ..utils.types import LearningMode, normalize_learning_mode
 from .time_mixin import TimedMixin
+from .speech_tracking import (
+    compute_phase_amplitude_coupling,
+    detect_envelope_events,
+    extract_speech_envelope,
+    latency_kernel,
+    reset_phase_if_event,
+)
 
 
 class WaveNeuromodulator(nn.Module):
@@ -237,6 +244,8 @@ class WaveDynamicsMixin:
         self.register_buffer("phase_pointer", torch.tensor(0, dtype=torch.long))
         self.register_buffer("phase_history", torch.zeros(int(cfg.phase_buffer_size)))
         self.register_buffer("last_phase_sync", torch.tensor(0.0))
+        self.register_buffer("_latency_delay_steps", torch.tensor(0.0))
+
 
     def _frequency_for_class(self, class_idx: Optional[int]) -> float:
         freqs = getattr(self.cfg, "class_frequencies", None)
@@ -272,6 +281,9 @@ class WaveDynamicsMixin:
         }
 
     def forward(self, x: torch.Tensor, **kwargs):
+        audio = kwargs.pop("audio", None)
+        audio_sample_rate = kwargs.pop("audio_sample_rate", 16000)
+        neuron_coord = kwargs.pop("neuron_coord", None)
         output = super().forward(x, **kwargs)
 
         if not getattr(self, "_wave_enabled", False):
@@ -286,6 +298,40 @@ class WaveDynamicsMixin:
         amplitude = torch.log2(1.0 + torch.relu(u))
         phase = self._compute_phase(u)
         latency = self._compute_latency(amplitude)
+
+        extra_payload = {}
+        if bool(getattr(self.cfg, "enable_speech_envelope_tracking", False)) and audio is not None:
+            sample_rate = int(audio_sample_rate)
+            method = str(getattr(self.cfg, "speech_envelope_method", "gammatone"))
+            env_data = extract_speech_envelope(audio, sample_rate=sample_rate, method=method)
+            events = detect_envelope_events(env_data["envelope"])
+            extra_payload["speech_envelope"] = env_data
+            extra_payload["envelope_events"] = events
+
+            if bool(getattr(self.cfg, "enable_phase_reset_on_audio_event", False)):
+                event_strength = events["onset_strength"].mean() if events["onset_strength"].numel() else torch.tensor(0.0, device=phase.device)
+                phase = reset_phase_if_event(
+                    phase,
+                    event_strength=event_strength,
+                    strength_threshold=float(getattr(self.cfg, "phase_reset_threshold", 0.25)),
+                    target_phase=float(getattr(self.cfg, "phase_reset_target", 0.0)),
+                )
+
+        if bool(getattr(self.cfg, "enable_cross_frequency_coupling", False)):
+            extra_payload["cross_frequency_coupling"] = compute_phase_amplitude_coupling(
+                phase_theta=phase,
+                amp_gamma=amplitude,
+            )
+
+        if bool(getattr(self.cfg, "enable_spatial_latency_gradient", False)) and neuron_coord is not None:
+            spatial_latency_ms = latency_kernel(
+                neuron_coord,
+                max_latency_ms=float(getattr(self.cfg, "spatial_latency_max_ms", 100.0)),
+                spatial_scale=float(getattr(self.cfg, "spatial_latency_scale", 1.0)),
+            )
+            latency = latency + spatial_latency_ms / 1000.0
+            self._latency_delay_steps.copy_(latency.mean().detach())
+            extra_payload["spatial_latency_ms"] = spatial_latency_ms
 
         prev_mean_phase = self.phase_history.mean().to(device)
         phase_sync = torch.cos(phase - prev_mean_phase)
@@ -315,6 +361,7 @@ class WaveDynamicsMixin:
                 "frequency": torch.tensor(frequency_hz, device=device),
                 "phase_sync": phase_sync,
                 **wave_payload,
+                **extra_payload,
             }
         )
         return output

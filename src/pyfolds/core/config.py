@@ -303,6 +303,17 @@ class MPJRDConfig:
     wave_sleep_replay_rate: float = 0.1
     wave_sleep_pruning_threshold: float = 0.01
 
+    # ===== NEURAL SPEECH TRACKING (OPCIONAL) =====
+    enable_speech_envelope_tracking: bool = False
+    speech_envelope_method: str = "gammatone"
+    enable_phase_reset_on_audio_event: bool = False
+    phase_reset_threshold: float = 0.25
+    phase_reset_target: float = 0.0
+    enable_cross_frequency_coupling: bool = False
+    enable_spatial_latency_gradient: bool = False
+    spatial_latency_max_ms: float = 100.0
+    spatial_latency_scale: float = 1.0
+
     # ===== CONFIGURAÇÕES DO NOETIC =====
     max_engrams: int = 10_000_000
     pruning_threshold: float = 0.1
@@ -518,6 +529,15 @@ class MPJRDConfig:
             raise ValueError("phase_buffer_size must be > 0")
         if self.base_frequency <= 0:
             raise ValueError("base_frequency must be > 0")
+
+        if self.speech_envelope_method not in {"hilbert", "gammatone"}:
+            raise ValueError("speech_envelope_method must be 'hilbert' or 'gammatone'")
+        if self.phase_reset_threshold < 0:
+            raise ValueError("phase_reset_threshold must be >= 0")
+        if self.spatial_latency_max_ms < 0:
+            raise ValueError("spatial_latency_max_ms must be >= 0")
+        if self.spatial_latency_scale <= 0:
+            raise ValueError("spatial_latency_scale must be > 0")
         if self.frequency_step < 0:
             raise ValueError("frequency_step must be >= 0")
         if self.phase_decay <= 0 or self.phase_decay > 1:
