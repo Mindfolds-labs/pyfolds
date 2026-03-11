@@ -140,3 +140,30 @@ Y_b = \mathbb{1}[U_b\ge\theta_{eff}].
 ## 7) Referência de fluxo visual
 
 Fluxo detalhado em Mermaid: `docs/architecture/blueprints/sources/dendritic_processing_flow.mmd`.
+
+---
+
+## 8) Contratos finais por trilha (release)
+
+As trilhas operacionais canônicas do projeto são: `INFERENCE`, `ONLINE`, `BATCH` e `SLEEP`.
+
+### 8.1 Regras transversais
+- Decisão de disparo deve usar `theta_eff` quando disponível; `theta` permanece como estado/base observável.
+- `MPJRDLayer.forward` expõe `u_values` como contrato primário e mantém alias legado `u` durante a janela de compatibilidade.
+- Evidências de validação devem ser registradas por trilha em cada release.
+
+### 8.2 Contrato por trilha
+| Trilha | Contrato final | Critério de não-regressão |
+|---|---|---|
+| `INFERENCE` | Forward sem mutação de plasticidade/homeostase | Saída consistente (`spikes`, `u_values`/`u`) |
+| `ONLINE` | Atualização local imediata com ordem de mecanismos preservada | Decisão de disparo alinhada em `theta_eff` |
+| `BATCH` | Acumulação estatística + atualização por lote | STDP com normalização por `mean(dim=0)` |
+| `SLEEP` | Replay offline e consolidação estrutural opcional | Pruning só com `consolidate_pruning_after_replay=True` |
+
+### 8.3 Checklist mínimo de release
+- [ ] Executar e registrar validação de `INFERENCE`.
+- [ ] Executar e registrar validação de `ONLINE`.
+- [ ] Executar e registrar validação de `BATCH`.
+- [ ] Executar e registrar validação de `SLEEP`.
+- [ ] Confirmar compatibilidade de contrato legado (`u`) e canônico (`u_values`).
+- [ ] Confirmar rastreabilidade de evidência (comando, resultado, trilha).

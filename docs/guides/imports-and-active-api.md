@@ -77,3 +77,12 @@ Quando as dependências do módulo avançado estão disponíveis, estes símbolo
 
 Para aplicações que dependem de `from pyfolds import ...`, use sempre símbolos em `pyfolds.__all__`.
 As verificações automatizadas em `tests/unit/test_public_import_surface.py` exercitam esse contrato para evitar regressões de import.
+
+
+## Compatibilidade de contratos para releases
+
+Para consumidores de API pública, releases devem preservar:
+
+- Compatibilidade de import surface (`pyfolds.__all__`) para símbolos já ativos.
+- Compatibilidade de contratos canônicos/legados de saída de camada (`u_values` como primário, `u` como alias de transição).
+- Rastreabilidade de não-regressão por trilha (`INFERENCE`, `ONLINE`, `BATCH`, `SLEEP`) no relatório de release.
