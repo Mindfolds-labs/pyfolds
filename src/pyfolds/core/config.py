@@ -188,6 +188,7 @@ class MPJRDConfig:
     backprop_max_amp: float = 0.4
     backprop_max_gain: float = 2.0
     backprop_active_threshold: float = 0.1
+    backprop_queue_maxlen: Optional[int] = None
     
     # ===== MECANISMO 6: ADAPTAÇÃO (SFA) =====
     adaptation_enabled: bool = True
@@ -579,6 +580,9 @@ class MPJRDConfig:
 
         if self.wave_phase_buffer_size <= 0:
             raise ValueError("wave_phase_buffer_size must be > 0")
+
+        if self.backprop_queue_maxlen is not None and self.backprop_queue_maxlen <= 0:
+            raise ValueError("backprop_queue_maxlen must be > 0")
 
         if self.wave_sleep_replay_rate < 0:
             raise ValueError("wave_sleep_replay_rate must be >= 0")
