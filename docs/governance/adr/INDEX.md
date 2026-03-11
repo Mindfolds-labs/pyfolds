@@ -66,6 +66,8 @@
 | ADR-047 | Runtime Integrity Enforcement v2.0.3 | Ativo | 2026-02-20 | [ADR-047-runtime-integrity-enforcement-v2-0-3.md](ADR-047-runtime-integrity-enforcement-v2-0-3.md) |
 | ADR-046 | Monitoramento periódico de integridade dos pesos por SHA-256 | Ativo | 2026-02-20 | [ADR-046-monitoramento-periodico-de-integridade-dos-pesos.md](ADR-046-monitoramento-periodico-de-integridade-dos-pesos.md) |
 
+| ADR-049 | Adendo de contratos finais, checklist de release e critérios de não-regressão | Ativo | 2026-03-11 | [ADR-049-adendo-contratos-finais-release-checklist-e-criterios-de-nao-regressao.md](ADR-049-adendo-contratos-finais-release-checklist-e-criterios-de-nao-regressao.md) |
+
 ## ADRs legados e superseded
 
 | ID | Título | Status | Data | Arquivo |

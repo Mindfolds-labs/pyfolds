@@ -43,3 +43,11 @@ Para testes de conformidade Torch vs TF com `float32`, usar:
 
 Essas tolerâncias cobrem diferenças de arredondamento esperadas de kernels e
 ordem de redução numérica.
+
+
+## Contratos finais de release (alinhamento com ADR)
+
+- Trilha `INFERENCE`: saída deve permanecer compatível e auditável (`spikes`, `somatic`, e interfaces consumidoras com `u_values`/`u` quando aplicável em camada).
+- Trilha `ONLINE`: preservar ordem de mecanismos do contrato e consistência temporal (`time_step` incrementado ao fim).
+- Trilha `BATCH`: preservar invariância de escala de atualização por lote (sem dependência espúria do tamanho do batch).
+- Trilha `SLEEP`: replay e consolidação de pruning são desacoplados; consolidação só ocorre com flag explícita.

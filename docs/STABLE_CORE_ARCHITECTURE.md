@@ -67,3 +67,22 @@ PYTHONPATH=src pytest tests/ -v
 ```
 
 - Resultado esperado no freeze: regressão funcional zero nos contratos legados críticos.
+
+
+## 7) Checklist de release por trilhas (obrigatório)
+
+Toda release candidata deve registrar evidência explícita para as quatro trilhas canônicas:
+
+- `INFERENCE`
+- `ONLINE`
+- `BATCH`
+- `SLEEP`
+
+### Gates de não-regressão
+- Manter contrato de saída com `u_values` (primário) e `u` (compatibilidade legada).
+- Manter consistência de disparo com `theta_eff` quando houver mixins/refratário.
+- Garantir comportamento batch sem regressão de escala (normalização por média no eixo do batch).
+- Garantir que replay de sono não force consolidação de pruning sem `consolidate_pruning_after_replay=True`.
+
+### Bloqueio de publicação
+Ausência de evidência em qualquer trilha ou violação de gate acima bloqueia publicação de release.
