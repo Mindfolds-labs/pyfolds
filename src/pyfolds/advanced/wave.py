@@ -265,6 +265,19 @@ class WaveDynamicsMixin:
     def _compute_latency(self, amplitude: torch.Tensor) -> torch.Tensor:
         return self.cfg.latency_scale / (amplitude + self.cfg.amplitude_eps)
 
+    def _compute_phase_coherence(self, phase: torch.Tensor, prev_mean_phase: torch.Tensor) -> torch.Tensor:
+        delta = phase - prev_mean_phase
+        return torch.cos(delta)
+
+    def _categorize_coherence_band(self, coherence_score: float) -> str:
+        low = float(getattr(self.cfg, "coherence_low_threshold", 0.35))
+        high = float(getattr(self.cfg, "coherence_high_threshold", 0.70))
+        if coherence_score < low:
+            return "low"
+        if coherence_score < high:
+            return "medium"
+        return "high"
+
     def _generate_wave_output(
         self,
         amplitude: torch.Tensor,
@@ -334,8 +347,9 @@ class WaveDynamicsMixin:
             extra_payload["spatial_latency_ms"] = spatial_latency_ms
 
         prev_mean_phase = self.phase_history.mean().to(device)
-        phase_sync = torch.cos(phase - prev_mean_phase)
-        self.last_phase_sync.copy_(phase_sync.mean().detach())
+        phase_sync = self._compute_phase_coherence(phase, prev_mean_phase)
+        phase_sync_mean = phase_sync.mean()
+        self.last_phase_sync.copy_(phase_sync_mean.detach())
 
         with torch.no_grad():
             phase_mean = phase[spikes.bool()].mean() if spikes.any() else phase.mean()
@@ -352,6 +366,17 @@ class WaveDynamicsMixin:
             frequency_hz=frequency_hz,
             t=self.wave_time.to(device),
         )
+
+        if bool(getattr(self.cfg, "enable_experimental_coherence_metrics", False)):
+            coherence_score = float(phase_sync_mean.item())
+            extra_payload["coherence_score"] = coherence_score
+            extra_payload["coherence_band"] = self._categorize_coherence_band(coherence_score)
+
+        if bool(getattr(self.cfg, "debug_oscillation_traces", False)):
+            extra_payload["debug_oscillation_traces"] = {
+                "phase_delta": phase - prev_mean_phase,
+                "phase_history_mean": prev_mean_phase,
+            }
 
         output.update(
             {
