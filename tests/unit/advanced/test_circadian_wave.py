@@ -2,6 +2,7 @@ import torch
 
 from pyfolds import MPJRDConfig
 from pyfolds.advanced import MPJRDNeuronAdvanced
+from pyfolds.utils.types import LearningMode
 
 
 def test_circadian_outputs_present_when_enabled():
@@ -88,3 +89,43 @@ def test_circadian_auto_mode_switches_online_and_sleep():
     out_pm = neuron(x, collect_stats=False, dt=0.0)
     assert out_pm["circadian_mode"] == "sleep"
     assert int(neuron.sleep_count.item()) == sleep_before + 1
+
+
+def test_circadian_plasticity_gate_varies_by_phase():
+    """Gate de plasticidade deve ser maior em AM que em PM."""
+    cfg = MPJRDConfig(
+        n_dendrites=2,
+        n_synapses_per_dendrite=4,
+        theta_init=0.1,
+        wave_enabled=True,
+        circadian_enabled=True,
+        circadian_day_start_hour=0.0,
+    )
+    neuron = MPJRDNeuronAdvanced(cfg)
+
+    ctx_am = {
+        "phase": 0.0,
+        "meridiem": "AM",
+        "day": 0,
+        "cortisol": 1.0,
+        "melatonin": 0.1,
+        "hour": 0.0,
+        "focus_gain": 1.0,
+        "recommended_mode": LearningMode.ONLINE,
+    }
+    gate_am = neuron._apply_circadian_plasticity_gate(ctx_am)
+
+    ctx_pm = {
+        "phase": 180.0,
+        "meridiem": "PM",
+        "day": 0,
+        "cortisol": 0.3,
+        "melatonin": 0.9,
+        "hour": 6.0,
+        "focus_gain": 0.3,
+        "recommended_mode": LearningMode.SLEEP,
+    }
+    gate_pm = neuron._apply_circadian_plasticity_gate(ctx_pm)
+
+    assert gate_am > gate_pm
+    assert 0.0 < gate_pm < gate_am <= 2.0

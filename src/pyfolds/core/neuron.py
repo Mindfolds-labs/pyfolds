@@ -119,7 +119,6 @@ class MPJRDNeuron(BaseNeuron):
         self.mode = LearningMode.ONLINE
         self.register_buffer("mode_switches", torch.tensor(0))
         self.register_buffer("sleep_count", torch.tensor(0))
-        self.register_buffer("_theta_cap_buf", torch.zeros(1))
         self.logger.debug(f"   ✅ Modo inicial: {self.mode.value}")
 
         # ===== THREAD SAFETY PARA TELEMETRIA =====
@@ -162,13 +161,13 @@ class MPJRDNeuron(BaseNeuron):
             self.telemetry = None
             self.logger.debug("   ⏭️ Telemetria desativada")
 
-        # Valida devices após inicialização
-        self._validate_internal_devices()
-
         self._gradient_hook_handles = []
         self._install_gradient_health_monitor()
 
         self.logger.info(f"✅ Neurônio {name or id(self)} inicializado com sucesso")
+
+        # Valida devices após inicialização completa (todos os buffers registrados)
+        self._validate_internal_devices()
 
     def _install_gradient_health_monitor(self) -> None:
         """Instala saneamento de gradientes em nível de parâmetro."""
@@ -187,7 +186,7 @@ class MPJRDNeuron(BaseNeuron):
         return torch.zeros_like(grad)
 
     def _validate_internal_devices(self) -> None:
-        """Valida consistência de devices internos."""
+        """Valida consistência de devices internos após inicialização completa."""
         devices = set()
 
         # Device do theta
@@ -207,9 +206,10 @@ class MPJRDNeuron(BaseNeuron):
             )
 
         expected_device = self.theta.device
-        if self.step_id.device != expected_device:
+        step_id_buf = getattr(self, "step_id", None)
+        if step_id_buf is not None and step_id_buf.device != expected_device:
             raise RuntimeError(
-                f"step_id device {self.step_id.device} != theta device {expected_device}"
+                f"step_id device {step_id_buf.device} != theta device {expected_device}"
             )
 
         self.logger.debug(f"✅ Devices consistentes: {devices.pop()}")
@@ -931,14 +931,48 @@ class MPJRDNeuron(BaseNeuron):
     # ========== MÉTRICAS ==========
 
     def get_metrics(self) -> Dict[str, Any]:
-        """Retorna métricas consolidadas do neurônio."""
-        N_flat = self.N.float().flatten()
-        I_flat = self.I.flatten()
+        """Retorna métricas consolidadas do neurônio em uma única passagem.
 
-        if len(N_flat) > 0:
-            percentiles = torch.quantile(N_flat, torch.tensor([0.25, 0.5, 0.75]))
-        else:
-            percentiles = torch.tensor([0.0, 0.0, 0.0])
+        Returns
+        -------
+        Dict[str, Any]
+            Dicionário com estatísticas globais de estado do neurônio.
+        """
+        n_list: list[torch.Tensor] = []
+        l_list: list[torch.Tensor] = []
+        i_list: list[torch.Tensor] = []
+        w_list: list[torch.Tensor] = []
+        prot_list: list[torch.Tensor] = []
+
+        for dend in self.dendrites:
+            syn_batch = getattr(dend, "synapse_batch", None)
+            if syn_batch is not None:
+                n_list.append(syn_batch.N.float().reshape(-1))
+                l_batch = getattr(syn_batch, "L", syn_batch.N)
+                l_list.append(l_batch.float().reshape(-1))
+                i_list.append(syn_batch.I.float().reshape(-1))
+                w_list.append(syn_batch.W.float().reshape(-1))
+                prot_list.append(syn_batch.protection.float().reshape(-1))
+                continue
+
+            for syn in dend.synapses:
+                n_list.append(syn.N.float().reshape(-1))
+                l_list.append(syn.L.float().reshape(-1))
+                i_list.append(syn.I.float().reshape(-1))
+                w_list.append(syn.W.float().reshape(-1))
+                prot_list.append(syn.protection.float().reshape(-1))
+
+        device = self.theta.device
+        n_flat = torch.cat(n_list) if n_list else torch.zeros(1, device=device)
+        l_flat = torch.cat(l_list) if l_list else torch.zeros(1, device=device)
+        i_flat = torch.cat(i_list) if i_list else torch.zeros(1, device=device)
+        w_flat = torch.cat(w_list) if w_list else torch.zeros(1, device=device)
+        prot_flat = torch.cat(prot_list) if prot_list else torch.zeros(1, device=device)
+
+        percentiles = torch.quantile(
+            n_flat,
+            torch.tensor([0.25, 0.5, 0.75], device=n_flat.device),
+        )
 
         metrics = {
             "type": "MPJRDNeuron",
@@ -946,21 +980,22 @@ class MPJRDNeuron(BaseNeuron):
             "theta": self.theta.item(),
             "r_hat": self.r_hat.item(),
             "step_count": self.homeostasis.step_count.item(),
-            "N_mean": N_flat.mean().item(),
-            "L_mean": self.L.float().mean().item(),
-            "N_std": N_flat.std().item(),
-            "N_min": N_flat.min().item(),
-            "N_max": N_flat.max().item(),
+            "N_mean": n_flat.mean().item(),
+            "L_mean": l_flat.mean().item(),
+            "N_std": n_flat.std().item(),
+            "N_min": n_flat.min().item(),
+            "N_max": n_flat.max().item(),
             "N_25p": percentiles[0].item(),
             "N_median": percentiles[1].item(),
             "N_75p": percentiles[2].item(),
-            "I_mean": I_flat.mean().item(),
-            "I_std": I_flat.std().item(),
-            "I_min": I_flat.min().item(),
-            "I_max": I_flat.max().item(),
+            "I_mean": i_flat.mean().item(),
+            "I_std": i_flat.std().item(),
+            "I_min": i_flat.min().item(),
+            "I_max": i_flat.max().item(),
+            "W_mean": w_flat.mean().item(),
             "saturation_ratio": self._compute_saturation_ratio(),
-            "protection_ratio": self.protection.float().mean().item(),
-            "total_synapses": self.N.numel(),
+            "protection_ratio": prot_flat.mean().item(),
+            "total_synapses": int(n_flat.numel()),
             "total_dendrites": len(self.dendrites),
             "mode": self.mode.value,
             "mode_switches": self.mode_switches.item(),

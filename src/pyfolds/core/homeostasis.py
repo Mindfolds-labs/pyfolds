@@ -49,23 +49,32 @@ class HomeostasisController(nn.Module):
         self.ki = cfg.homeostasis_eta * 0.1
         self.kd = cfg.homeostasis_eta * 0.01
 
+        history_size = max(1, int(getattr(cfg, "homeostasis_stability_window", 200)))
+        self.register_buffer("_stability_history", torch.zeros(history_size, dtype=torch.bool))
+        self.register_buffer("_history_ptr", torch.tensor(0, dtype=torch.long))
+        self.register_buffer("_history_filled", torch.tensor(False, dtype=torch.bool))
+
     def update(
         self,
         current_rate: Union[float, torch.Tensor],
         clamp_theta: bool = True,
         in_refractory_period: bool = False,
     ) -> torch.Tensor:
-        """
-        Atualiza parâmetros homeostáticos (PID-like).
+        """Atualiza parâmetros homeostáticos (PID-like).
 
-        Args:
-            current_rate: Taxa atual no intervalo [0, 1].
-                Aceita float ou tensor escalar.
-            clamp_theta: Se deve limitar `theta` entre [theta_min, theta_max].
-            in_refractory_period: Se True, congela atualização de limiar neste passo.
+        Parameters
+        ----------
+        current_rate : Union[float, torch.Tensor]
+            Taxa atual no intervalo ``[0, 1]``.
+        clamp_theta : bool, default=True
+            Se deve limitar ``theta`` entre ``[theta_min, theta_max]``.
+        in_refractory_period : bool, default=False
+            Se ``True``, congela atualização de limiar neste passo.
 
-        Returns:
-            torch.Tensor: theta atualizado (tensor escalar shape [1]).
+        Returns
+        -------
+        torch.Tensor
+            Valor atualizado de ``theta`` (tensor escalar com shape ``[1]``).
         """
         if in_refractory_period:
             return self.theta
@@ -128,6 +137,18 @@ class HomeostasisController(nn.Module):
         # 7. Contador
         self.step_count.add_(1)
 
+        # 8. Histórico circular de estabilidade (fora do hot-path de forward)
+        is_stable = torch.tensor(
+            abs(float(self.r_hat.item()) - self.cfg.target_spike_rate) < 0.05,
+            dtype=torch.bool,
+            device=self._stability_history.device,
+        )
+        ptr = int(self._history_ptr.item())
+        self._stability_history[ptr] = is_stable
+        self._history_ptr.fill_((ptr + 1) % len(self._stability_history))
+        if ptr + 1 >= len(self._stability_history):
+            self._history_filled.fill_(True)
+
         return self.theta
 
     def _check_stability_change(self, tolerance: float = 0.05) -> None:
@@ -178,6 +199,9 @@ class HomeostasisController(nn.Module):
         self.integral_error.zero_()
         self.last_error.zero_()
         self._was_stable = False
+        self._stability_history.zero_()
+        self._history_ptr.zero_()
+        self._history_filled.fill_(False)
 
     @property
     def homeostasis_error(self) -> torch.Tensor:
@@ -189,20 +213,38 @@ class HomeostasisController(nn.Module):
         return abs(self.homeostasis_error.item()) < tolerance
 
     def stability_ratio(self, window: int = 100) -> float:
+        """Calcula proporção de passos estáveis na janela recente.
+
+        Parameters
+        ----------
+        window : int, default=100
+            Número de passos históricos a considerar.
+
+        Returns
+        -------
+        float
+            Proporção em ``[0.0, 1.0]`` de estabilidade na janela solicitada.
         """
-        Calcula proporção de passos estáveis na janela recente.
-        
-        Args:
-            window: Número de passos para considerar
-            
-        Returns:
-            Float entre 0 e 1 indicando proporção de estabilidade
-        """
-        if self.step_count.item() < window:
+        if window <= 0:
             return 0.0
-        
-        # Implementação simplificada - em produção usaria buffer circular
-        return 1.0 if self.is_stable() else 0.0
+
+        filled = bool(self._history_filled.item())
+        history_len = len(self._stability_history)
+        current_ptr = int(self._history_ptr.item())
+        available = history_len if filled else current_ptr
+        effective_window = min(int(window), available)
+        if effective_window <= 0:
+            return 0.0
+
+        start = (current_ptr - effective_window) % history_len
+        if start < current_ptr:
+            recent = self._stability_history[start:current_ptr]
+        else:
+            recent = torch.cat((self._stability_history[start:], self._stability_history[:current_ptr]))
+
+        if recent.numel() == 0:
+            return 0.0
+        return float(recent.float().mean().item())
 
     def extra_repr(self) -> str:
         """Representação string detalhada do módulo."""
