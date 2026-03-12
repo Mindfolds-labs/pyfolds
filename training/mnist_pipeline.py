@@ -318,6 +318,30 @@ def _extract_logits(output: Any, batch_size: int, device: torch.device) -> torch
     return logits
 
 
+def _extract_spike_rate(output: Any) -> float:
+    """Extrai taxa de spike de saídas heterogêneas (tensor, dict ou tuple)."""
+    candidate: Any = output
+    if isinstance(output, tuple) and len(output) >= 2:
+        candidate = output[1]
+
+    if not isinstance(candidate, dict):
+        return 0.0
+
+    spike_rate = candidate.get("spike_rate")
+    if spike_rate is not None:
+        if torch.is_tensor(spike_rate):
+            return float(spike_rate.detach().float().mean().item())
+        try:
+            return float(spike_rate)
+        except (TypeError, ValueError):
+            return 0.0
+
+    spikes = candidate.get("spikes")
+    if torch.is_tensor(spikes):
+        return float(spikes.detach().float().mean().item())
+    return 0.0
+
+
 def run_training(args: TrainArgs) -> int:
     run_dir = Path("runs") / args.run_id
     logger = _setup_logger(run_dir, args.log_file, args.console)
@@ -465,10 +489,8 @@ def run_training(args: TrainArgs) -> int:
                     correct += (pred == y).sum().item()
                     total += y.size(0)
 
-                    if isinstance(out, dict):
-                        spike_rate = out.get("spike_rate", 0.0)
-                        if spike_rate:
-                            spike_rates.append(spike_rate)
+                    spike_rate = _extract_spike_rate(out)
+                    spike_rates.append(spike_rate)
 
                 train_acc = 100.0 * correct / total
                 avg_loss = total_loss / len(train_loader)
