@@ -13,7 +13,7 @@ def _int_to_bool(value: int) -> bool:
 def parse_args() -> TrainArgs:
     parser = argparse.ArgumentParser(description="Treino MNIST unificado (.fold/.mind)")
     parser.add_argument("--backend", choices=["folds", "mind", "both"], default="both")
-    parser.add_argument("--model", choices=["mpjrd"], default="mpjrd")
+    parser.add_argument("--model", choices=["mpjrd", "foldsnet"], default="mpjrd")
     parser.add_argument("--epochs", type=int, required=True)
     parser.add_argument("--batch", "--batch-size", dest="batch", type=int, required=True)
     parser.add_argument("--lr", type=float, required=True)

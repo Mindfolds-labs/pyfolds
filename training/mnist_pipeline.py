@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import logging
 import math
 import sys
@@ -13,24 +14,23 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
+if importlib.util.find_spec("pyfolds") is None:
+    src_path = Path(__file__).resolve().parents[1] / "src"
+    if src_path.exists():
+        sys.path.insert(0, str(src_path))
+
 # Importação dos mecanismos avançados do PyFolds
-try:
-    from pyfolds.advanced import MPJRDNeuronAdvanced
-    from pyfolds.core.config import MPJRDConfig
-    from pyfolds.utils.types import LearningMode
-except ModuleNotFoundError:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-    from pyfolds.advanced import MPJRDNeuronAdvanced
-    from pyfolds.core.config import MPJRDConfig
-    from pyfolds.utils.types import LearningMode
+from pyfolds.advanced import MPJRDNeuronAdvanced
+from pyfolds.core.config import MPJRDConfig
+from pyfolds.utils.types import LearningMode
 
 from serialization.folds_io import save_model_fold
 from serialization.mind_io import save_model_mind
 
-try:
+if importlib.util.find_spec("torchvision") is not None:
     import torchvision
     import torchvision.transforms as transforms
-except Exception:
+else:
     torchvision = None
     transforms = None
 
@@ -48,6 +48,8 @@ class TrainArgs:
     log_level: str
     log_file: str
     sheer_cmd: str = ""
+    model: str = "mpjrd"
+    timesteps: int = 4
 
     # Parâmetros de arquitetura MPJRD
     n_dendrites: int = 4
@@ -305,6 +307,17 @@ def _save_backend(backend: str, path: Path, payload: dict[str, Any]) -> None:
         save_model_mind(path, payload)
 
 
+def _extract_logits(output: Any, batch_size: int, device: torch.device) -> torch.Tensor:
+    if isinstance(output, tuple):
+        logits = output[0]
+    else:
+        logits = output
+
+    if isinstance(logits, dict):
+        return logits.get("logits", logits.get("spikes", torch.zeros(batch_size, 10, device=device)))
+    return logits
+
+
 def run_training(args: TrainArgs) -> int:
     run_dir = Path("runs") / args.run_id
     logger = _setup_logger(run_dir, args.log_file, args.console)
@@ -387,10 +400,23 @@ def run_training(args: TrainArgs) -> int:
             device=str(device),
         )
 
-        raw_neuron = MPJRDNeuronAdvanced(cfg=cfg)
-        model = MPJRDWrapper(raw_neuron, cfg).to(device)
+        if args.model == "mpjrd":
+            raw_neuron = MPJRDNeuronAdvanced(cfg=cfg)
+            model = MPJRDWrapper(raw_neuron, cfg).to(device)
+            print_experiment_layout(args, cfg)
+        elif args.model == "foldsnet":
+            if importlib.util.find_spec("foldsnet") is None:
+                root_path = Path(__file__).resolve().parents[1]
+                if str(root_path) not in sys.path:
+                    sys.path.insert(0, str(root_path))
+            from foldsnet.factory import create_foldsnet
 
-        print_experiment_layout(args, cfg)
+            model = create_foldsnet("4L", "mnist").to(device)
+            logger.info("🧠 Modo FOLDSNet ativo: mecanismos MPJRD por-camada não aplicados neste pipeline.")
+            if args.console:
+                print("🧠 Modo FOLDSNet ativo: mecanismos avançados do pipeline MPJRD estão inativos.")
+        else:
+            raise ValueError("Modelo inválido. Use 'mpjrd' ou 'foldsnet'.")
 
         with torch.no_grad():
             _ = model(torch.zeros(1, 1, 28, 28, device=device))
@@ -423,10 +449,11 @@ def run_training(args: TrainArgs) -> int:
 
                 for x, y in train_loader:
                     x, y = x.to(device), y.to(device)
-                    out = model(x, mode=LearningMode.ONLINE)
-                    logits = out[0] if isinstance(out, tuple) else out
-                    if isinstance(logits, dict):
-                        logits = logits.get("logits", logits.get("spikes", torch.zeros(x.size(0), 10, device=device)))
+                    if args.model == "mpjrd":
+                        out = model(x, mode=LearningMode.ONLINE)
+                    else:
+                        out = model(x)
+                    logits = _extract_logits(out, x.size(0), device)
                     loss = criterion(logits, y)
 
                     optim.zero_grad()
@@ -455,10 +482,11 @@ def run_training(args: TrainArgs) -> int:
                 with torch.no_grad():
                     for x, y in test_loader:
                         x, y = x.to(device), y.to(device)
-                        out = model(x, mode=LearningMode.INFERENCE)
-                        logits = out[0] if isinstance(out, tuple) else out
-                        if isinstance(logits, dict):
-                            logits = logits.get("logits", logits.get("spikes", torch.zeros(x.size(0), 10, device=device)))
+                        if args.model == "mpjrd":
+                            out = model(x, mode=LearningMode.INFERENCE)
+                        else:
+                            out = model(x)
+                        logits = _extract_logits(out, x.size(0), device)
                         pred = logits.argmax(dim=1)
                         t_correct += (pred == y).sum().item()
                         t_total += y.size(0)
@@ -493,7 +521,7 @@ def run_training(args: TrainArgs) -> int:
                     )
                     mf.flush()
 
-                if hasattr(model, "sleep") and not args.disable_homeostase:
+                if args.model == "mpjrd" and hasattr(model, "sleep") and not args.disable_homeostase:
                     logger.info("💤 Ciclo de sono (consolidação I → N)")
                     model.sleep(duration=60.0)
 
@@ -523,7 +551,7 @@ def run_training(args: TrainArgs) -> int:
                 "best_acc": best_acc,
                 "final_acc": test_acc,
                 "final_loss": epoch_loss,
-                "model_type": "mpjrd",
+                "model_type": args.model,
                 "run_id": args.run_id,
                 "timestamp": datetime.now().isoformat(),
                 "hyperparameters": {
@@ -531,7 +559,7 @@ def run_training(args: TrainArgs) -> int:
                     "learning_rate": args.lr,
                     "epochs": args.epochs,
                     "device": args.device,
-                    "model": "mpjrd",
+                    "model": args.model,
                     "n_dendrites": args.n_dendrites,
                     "n_synapses_per_dendrite": args.n_synapses_per_dendrite,
                     "hidden": args.hidden,
@@ -554,7 +582,7 @@ def run_training(args: TrainArgs) -> int:
             summary = {
                 "run_id": args.run_id,
                 "backend": args.backend,
-                "model": "mpjrd",
+                "model": args.model,
                 "epochs_requested": args.epochs,
                 "epochs_completed": epochs_completed,
                 "resume_used": args.resume,
@@ -575,7 +603,7 @@ def run_training(args: TrainArgs) -> int:
         if args.save_summary:
             fail_summary = {
                 "run_id": args.run_id,
-                "model": "mpjrd",
+                "model": args.model,
                 "status": "failed",
                 "error": str(exc),
                 "timestamp": datetime.now().isoformat(),

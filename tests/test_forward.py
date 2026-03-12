@@ -17,7 +17,7 @@ def test_forward_cifar():
     assert y.shape == (2, 10)
 
 
-def test_forward_5l():
+def test_forward_5L():
     model = FOLDSNet(input_shape=(3, 32, 32), n_classes=100, variant="5L")
     x = torch.randn(2, 3, 32, 32)
     y = model(x)

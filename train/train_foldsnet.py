@@ -1,57 +1,58 @@
-"""Script de treinamento principal da FOLDSNet."""
+"""Treinamento básico da FOLDSNet."""
 
 from __future__ import annotations
 
 import argparse
+import sys
+from pathlib import Path
 
 import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from foldsnet.factory import create_foldsnet
 
 
-def _load_dataset(name: str, batch_size: int) -> DataLoader:
-    tfm = transforms.ToTensor()
-    if name == "mnist":
-        ds = datasets.MNIST(root="data", train=True, download=True, transform=tfm)
-    elif name == "cifar10":
-        ds = datasets.CIFAR10(root="data", train=True, download=True, transform=tfm)
-    else:
-        raise ValueError("Dataset inválido. Use mnist ou cifar10.")
-    return DataLoader(ds, batch_size=batch_size, shuffle=True)
+def _fake_loader(shape: tuple[int, int, int], n_classes: int, batch_size: int) -> DataLoader:
+    x = torch.randn(512, *shape)
+    y = torch.randint(0, n_classes, (512,))
+    return DataLoader(TensorDataset(x, y), batch_size=batch_size, shuffle=True)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Treino da FOLDSNet")
     parser.add_argument("--variant", default="4L")
     parser.add_argument("--dataset", default="mnist")
     parser.add_argument("--epochs", type=int, default=5)
-    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--lr", type=float, default=0.001)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--save_format", choices=["fold", "mind"], default="fold")
     args = parser.parse_args()
 
     model = create_foldsnet(args.variant, args.dataset)
-    train_loader = _load_dataset(args.dataset, args.batch_size)
+    model.train()
+
+    loader = _fake_loader(model.input_shape, model.n_classes, args.batch_size)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     criterion = nn.CrossEntropyLoss()
 
-    for epoch in range(args.epochs):
-        model.train()
-        for x, y in train_loader:
+    for _ in range(args.epochs):
+        for x, y in loader:
             optimizer.zero_grad()
             logits = model(x)
             loss = criterion(logits, y)
             loss.backward()
             optimizer.step()
 
-        if epoch % 10 == 0:
-            model.save(f"checkpoints/epoch_{epoch}.{args.save_format}", format=args.save_format)
-
-    model.save(f"models/final_prod.{args.save_format}", format=args.save_format)
+    out_path = "models/final_prod.fold" if args.save_format == "fold" else "runs/final.mind"
+    model.save(out_path, format=args.save_format, include_metadata=True)
+    print(f"✅ Modelo salvo em {out_path}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

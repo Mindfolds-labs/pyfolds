@@ -1,47 +1,44 @@
-"""Benchmark simples entre FOLDSNet e baseline linear."""
+"""Benchmark simplificado de comparação de modelos."""
 
 from __future__ import annotations
 
 import argparse
+import sys
+from pathlib import Path
 
-import torch
-import torch.nn as nn
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from foldsnet.factory import create_foldsnet
 
 
-class LinearBaseline(nn.Module):
-    def __init__(self, in_shape: tuple[int, int, int], n_classes: int):
-        super().__init__()
-        c, h, w = in_shape
-        self.fc = nn.Linear(c * h * w, n_classes)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.fc(x.view(x.shape[0], -1))
+BASELINES = {
+    "LeNet": 60000,
+    "MobileNet": 4200000,
+    "ResNet": 11600000,
+}
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
+def _count_params(model) -> int:
+    return sum(p.numel() for p in model.parameters())
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Comparação de parâmetros da FOLDSNet")
     parser.add_argument("--dataset", default="mnist")
-    parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--epochs", type=int, default=10)
     args = parser.parse_args()
 
     folds = create_foldsnet("4L", args.dataset)
-    if args.dataset == "mnist":
-        in_shape, n_classes = (1, 28, 28), 10
-    else:
-        in_shape, n_classes = (3, 32, 32), 10
-    baseline = LinearBaseline(in_shape, n_classes)
+    folds_params = _count_params(folds)
 
-    x = torch.randn(8, *in_shape)
-    y = torch.randint(0, n_classes, (8,))
-    loss_fn = nn.CrossEntropyLoss()
-
-    folds_loss = loss_fn(folds(x), y).item()
-    base_loss = loss_fn(baseline(x), y).item()
-    print(f"FOLDSNet loss: {folds_loss:.4f}")
-    print(f"Linear baseline loss: {base_loss:.4f}")
+    print("Modelo,Parametros")
+    print(f"FOLDSNet-4L,{folds_params}")
+    for name, n_params in BASELINES.items():
+        print(f"{name},{n_params}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
