@@ -490,7 +490,7 @@ class WaveDynamicsMixin:
         )
 
         if bool(getattr(self.cfg, "enable_experimental_coherence_metrics", False)):
-            coherence_score = float(phase_sync_mean.item())
+            coherence_score = float(phase_sync.mean().item())
             extra_payload["coherence_score"] = coherence_score
             extra_payload["coherence_band"] = self._categorize_coherence_band(coherence_score)
 

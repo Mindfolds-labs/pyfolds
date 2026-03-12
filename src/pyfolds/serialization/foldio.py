@@ -203,12 +203,36 @@ def sha256_hex(data: bytes) -> str:
     ).hexdigest()
 
 
+def _json_default(obj: Any) -> Any:
+    if is_dataclass(obj):
+        return asdict(obj)
+    if hasattr(obj, "to_dict"):
+        try:
+            return obj.to_dict()
+        except Exception:
+            pass
+    if hasattr(obj, "__dict__"):
+        return {k: v for k, v in obj.__dict__.items() if not k.startswith("_")}
+    return str(obj)
+
+
 def _json_bytes(obj: Any) -> bytes:
-    return json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    return json.dumps(
+        obj,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        default=_json_default,
+    ).encode("utf-8")
 
 
 def _canonical_json(obj: Any) -> bytes:
-    return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return json.dumps(
+        obj,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=_json_default,
+    ).encode("utf-8")
 
 
 def _cfg_to_dict(cfg: Any) -> Any:

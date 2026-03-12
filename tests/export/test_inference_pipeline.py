@@ -108,9 +108,12 @@ def test_pipeline_tf_to_tflite_signature_and_numeric_check(tmp_path: Path):
     check = validate_tf_saved_model(saved_model_dir)
     assert "serving_default" in check["signatures"]
 
-    tflite_path = convert_saved_model_to_tflite(saved_model_dir, tmp_path / "model.tflite")
+    report = convert_saved_model_to_tflite(saved_model_dir, tmp_path / "model.tflite")
+    tflite_path = Path(report["model_path"])
     assert tflite_path.exists()
-    assert validate_tflite_model(tflite_path) is True
+
+    validation = validate_tflite_model(tflite_path)
+    assert validation["valid"] is True
 
     interpreter = tf.lite.Interpreter(model_path=str(tflite_path))
     interpreter.allocate_tensors()

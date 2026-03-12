@@ -95,13 +95,29 @@ def _numeric_discrepancy(
     output_details = interpreter.get_output_details()
 
     tf_inputs = {}
+    expected_signature_inputs = set(infer.structured_input_signature[1].keys())
+
+    def _normalize_input_name(name: str) -> str:
+        candidate = name.split(":")[0]
+        if candidate in expected_signature_inputs:
+            return candidate
+        if candidate.startswith("serving_default_"):
+            stripped = candidate[len("serving_default_") :]
+            if stripped in expected_signature_inputs:
+                return stripped
+        if candidate.endswith("_input"):
+            stripped = candidate[: -len("_input")]
+            if stripped in expected_signature_inputs:
+                return stripped
+        return candidate
+
     for item in input_details:
         shape = [dim if dim > 0 else 1 for dim in item["shape"]]
         dtype = item["dtype"]
         tensor = tf.random.uniform(shape=shape, minval=-1.0, maxval=1.0, dtype=tf.float32)
         if dtype != tf.float32.as_numpy_dtype:
             tensor = tf.cast(tensor, tf.as_dtype(dtype))
-        input_name = item["name"].split(":")[0]
+        input_name = _normalize_input_name(item["name"])
         tf_inputs[input_name] = tensor
         interpreter.set_tensor(item["index"], tensor.numpy())
 

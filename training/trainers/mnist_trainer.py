@@ -96,6 +96,17 @@ def run_mnist_training(config: RunConfig) -> int:
     epochs_completed = 0
     best_acc = 0.0
 
+    managed_logger_names = [
+        "pyfolds",
+        "pyfolds.advanced",
+        "pyfolds.core",
+        "pyfolds.advanced.dendrite",
+        "pyfolds.advanced.homeostasis",
+        "pyfolds.advanced.neuron",
+        "pyfolds.core.inhibition",
+    ]
+    previous_levels = {name: logging.getLogger(name).level for name in managed_logger_names}
+
     try:
         _configure_external_loggers()
 
@@ -224,3 +235,6 @@ def run_mnist_training(config: RunConfig) -> int:
             }
             summary_path.write_text(json.dumps(fail_summary, indent=2), encoding="utf-8")
         return 1
+    finally:
+        for name, level in previous_levels.items():
+            logging.getLogger(name).setLevel(level)

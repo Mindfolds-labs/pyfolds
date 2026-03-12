@@ -88,12 +88,16 @@ class BackpropMixin(TimedMixin):
             dropped_event = self.backprop_queue.popleft()
             self.backprop_dropped_events += 1
             local_logger = getattr(self, "logger", logger)
-            local_logger.warning(
-                "event=backprop_queue_overflow capacity=%d dropped_event_time=%.6f incoming_event_time=%.6f",
+            message = (
+                "event=backprop_queue_overflow capacity=%d dropped_event_time=%.6f incoming_event_time=%.6f"
+            )
+            args = (
                 self.backprop_queue.maxlen,
                 dropped_event["time"],
                 event["time"],
             )
+            local_logger.warning(message, *args)
+            logging.getLogger().warning(message, *args)
         self.backprop_queue.append(event)
 
     def _process_backprop_queue(self, current_time: float):

@@ -121,8 +121,8 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
         self,
         inputs: tf.Tensor,
         prev_membrane: tf.Tensor,
-        prev_adapt_state: tf.Tensor,
-        prev_context_state: tf.Tensor,
+        prev_adapt_state: Optional[tf.Tensor] = None,
+        prev_context_state: Optional[tf.Tensor] = None,
         *,
         dt: Optional[float] = None,
         return_diagnostics: bool = False,
@@ -130,6 +130,12 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
         dt_value = self.default_dt if dt is None else float(dt)
         if dt_value <= 0:
             raise ValueError("Invalid argument `dt`: expected a value > 0.")
+
+        legacy_state_contract = prev_adapt_state is None and prev_context_state is None
+        if prev_adapt_state is None:
+            prev_adapt_state = tf.zeros_like(prev_membrane)
+        if prev_context_state is None:
+            prev_context_state = tf.zeros((tf.shape(prev_membrane)[0], 1), dtype=prev_membrane.dtype)
 
         soma_current, v_dend = self._compute_somatic_current(inputs)
         integrated = (self.decay * prev_membrane) + (soma_current * dt_value)
@@ -164,6 +170,8 @@ class MPJRDTFNeuronCell(tf.keras.layers.Layer):
 
         if return_diagnostics:
             return spikes, new_state, next_adapt_state, next_context_state, diagnostics
+        if legacy_state_contract:
+            return spikes, new_state
         return spikes, new_state, next_adapt_state, next_context_state
 
     @property

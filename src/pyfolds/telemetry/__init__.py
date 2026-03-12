@@ -3,7 +3,7 @@
 from .buffer import RingBufferThreadSafe
 from .collector import TelemetryCollector
 from .low_overhead import LowOverheadMetricsCollector
-from .controller import Profile, TelemetryConfig as LegacyTelemetryConfig, TelemetryController, TelemetryProfile
+from .controller import Profile, TelemetryConfig, TelemetryController, TelemetryProfile
 from .decorator import telemetry
 from .events import (
     commit_event,
@@ -22,7 +22,7 @@ from .events import (
 from .exporters import BaseExporter, CSVExporter, ConsoleExporter, PrometheusExporter, TensorBoardExporter
 from .ringbuffer import RingBuffer
 from .sinks import BufferedJSONLinesSink, ConsoleSink, DistributorSink, JSONLinesSink, MemorySink, NoOpSink, Sink
-from .types import CommitPayload, ForwardPayload, SleepPayload, TelemetryConfig, TelemetryEvent, TelemetryStats
+from .types import CommitPayload, ForwardPayload, SleepPayload, TelemetryConfig as EventTelemetryConfig, TelemetryEvent, TelemetryStats
 
 __all__ = [
     "TelemetryCollector",
@@ -49,7 +49,7 @@ __all__ = [
     "commit_event_lazy",
     "sleep_event_lazy",
     "TelemetryController",
-    "LegacyTelemetryConfig",
+    "EventTelemetryConfig",
     "Profile",
     "TelemetryProfile",
     "RingBuffer",

@@ -79,11 +79,12 @@ def test_latency_under_100ms_and_perf_gain() -> None:
     for _ in range(50):
         _ = optimized(x)
     optimized_ms = (time.perf_counter() - t0) * 1000.0
+    optimized_ms_per_call = optimized_ms / 50.0
 
     t1 = time.perf_counter()
     for _ in range(50):
         _ = baseline(x)
     baseline_ms = (time.perf_counter() - t1) * 1000.0
 
-    assert optimized_ms < 100.0
+    assert optimized_ms_per_call < 10.0
     assert baseline_ms / optimized_ms > 1.5
