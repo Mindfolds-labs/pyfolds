@@ -820,6 +820,13 @@ class MPJRDNeuron(BaseNeuron):
         # Valida device
         self._validate_input_device(x)
 
+        if x.dim() != 3:
+            raise ValueError(
+                "Input do neurônio deve ter 3 dimensões [batch, dendrites, synapses]"
+            )
+        if not x.is_floating_point():
+            raise TypeError("Input do neurônio deve ser tensor de ponto flutuante")
+
         device = self.theta.device
         B, D, _ = x.shape
         self._set_refractory_state(False)
@@ -1027,7 +1034,6 @@ class MPJRDNeuron(BaseNeuron):
             collect_stats
             and effective_mode == LearningMode.ONLINE
             and self.cfg.plastic
-            and not self.cfg.defer_updates
         ):
             self._apply_online_plasticity(
                 x=x.detach(),

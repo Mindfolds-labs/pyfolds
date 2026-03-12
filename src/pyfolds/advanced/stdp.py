@@ -125,7 +125,7 @@ class STDPMixin:
         # LTD: onde trace_post > threshold
         trace_threshold = getattr(self.cfg, "stdp_trace_threshold", 0.01)
         ltd_mask = (self.trace_post > trace_threshold).float()
-        ltd_rule = getattr(self.cfg, "ltd_rule", "current")
+        ltd_rule = getattr(self.cfg, "ltd_rule", "classic")
         if ltd_rule == "classic":
             ltd_gate = pre_spikes
         else:

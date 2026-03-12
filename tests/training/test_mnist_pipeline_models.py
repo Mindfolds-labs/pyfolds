@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
@@ -50,3 +52,41 @@ def test_mnist_pipeline_sanity_foldsnet(monkeypatch, tmp_path):
     monkeypatch.setattr("training.trainers.mnist_trainer.build_mnist_loaders", _tiny_loaders)
     result = run_training(_base_args("foldsnet", "test_foldsnet"))
     assert result == 0
+
+
+def test_mnist_pipeline_foldsnet_saves_artifacts(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("training.trainers.mnist_trainer.build_mnist_loaders", _tiny_loaders)
+
+    args = _base_args("foldsnet", "save_foldsnet")
+    args.save_fold = 1
+    args.save_mind = 1
+    args.save_pt = 1
+
+    result = run_training(args)
+    assert result == 0
+
+    run_dir = Path("runs") / args.run_id
+    assert (run_dir / "model.fold").exists()
+    assert (run_dir / "model.mind").exists()
+    assert (run_dir / "checkpoint.pt").exists()
+    assert (run_dir / "summary.json").exists()
+
+
+def test_mnist_pipeline_mpjrd_saves_artifacts(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("training.trainers.mnist_trainer.build_mnist_loaders", _tiny_loaders)
+
+    args = _base_args("mpjrd", "save_mpjrd")
+    args.save_fold = 1
+    args.save_mind = 1
+    args.save_pt = 1
+
+    result = run_training(args)
+    assert result == 0
+
+    run_dir = Path("runs") / args.run_id
+    assert (run_dir / "model.fold").exists()
+    assert (run_dir / "model.mind").exists()
+    assert (run_dir / "checkpoint.pt").exists()
+    assert (run_dir / "summary.json").exists()
