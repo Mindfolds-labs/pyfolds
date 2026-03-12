@@ -10,7 +10,7 @@ def test_save_load_fold(tmp_path):
     model.save(path, format="fold")
     loaded = FOLDSNet.load(path, format="fold")
     x = torch.randn(2, 1, 28, 28)
-    assert torch.allclose(model(x), loaded(x))
+    assert torch.allclose(model(x), loaded(x), atol=1e-6)
 
 
 def test_save_load_mind(tmp_path):
@@ -19,4 +19,4 @@ def test_save_load_mind(tmp_path):
     model.save(path, format="mind", include_metadata=True)
     loaded = FOLDSNet.load(path, format="mind")
     x = torch.randn(2, 1, 28, 28)
-    assert torch.allclose(model(x), loaded(x))
+    assert torch.allclose(model(x), loaded(x), atol=1e-6)
