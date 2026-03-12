@@ -7,7 +7,7 @@ from training.mnist_pipeline import TrainArgs, run_training
 
 
 def parse_args() -> TrainArgs:
-    parser = argparse.ArgumentParser(description="Treino MNIST com backend folds e modelo MPJRD")
+    parser = argparse.ArgumentParser(description="Treino MNIST com backend folds")
     parser.add_argument("--epochs", type=int, required=True)
     parser.add_argument("--batch", "--batch-size", dest="batch", type=int, required=True)
     parser.add_argument("--lr", type=float, required=True)
@@ -18,11 +18,14 @@ def parse_args() -> TrainArgs:
     parser.add_argument("--log-level", default="INFO")
     parser.add_argument("--log-file", default="train.log")
     parser.add_argument("--sheer-cmd", default="")
+    parser.add_argument("--model", choices=["mpjrd", "foldsnet"], default="foldsnet")
 
     # Parâmetros de arquitetura MPJRD
     parser.add_argument("--n-dendrites", type=int, default=4, help="Número de dendritos")
     parser.add_argument("--n-synapses", type=int, default=32, dest="n_synapses_per_dendrite", help="Sinapses por dendrito")
     parser.add_argument("--hidden", type=int, default=128, help="Número de neurônios excitatórios")
+    parser.add_argument("--foldsnet-variant", default="4L")
+    parser.add_argument("--foldsnet-dataset", default="mnist")
     parser.add_argument("--threshold", type=float, default=0.45, help="Limiar inicial de disparo")
 
     # Controle de formatos de saída
@@ -60,6 +63,7 @@ def parse_args() -> TrainArgs:
         log_level=ns.log_level,
         log_file=ns.log_file,
         sheer_cmd=ns.sheer_cmd,
+        model=ns.model,
         n_dendrites=ns.n_dendrites,
         n_synapses_per_dendrite=ns.n_synapses_per_dendrite,
         hidden=ns.hidden,
@@ -81,6 +85,8 @@ def parse_args() -> TrainArgs:
         disable_circadian=ns.disable_circadian,
         disable_engram=ns.disable_engram,
         disable_speech=ns.disable_speech,
+        foldsnet_variant=ns.foldsnet_variant,
+        foldsnet_dataset=ns.foldsnet_dataset,
     )
 
 

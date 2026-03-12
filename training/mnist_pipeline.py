@@ -1,42 +1,15 @@
 from __future__ import annotations
 
-import json
-import importlib.util
-import logging
-import math
-import sys
-from dataclasses import asdict, dataclass
-from datetime import datetime
-from pathlib import Path
-from typing import Any
+from dataclasses import dataclass
 
-import torch
-from torch import nn
-from torch.utils.data import DataLoader, TensorDataset
-
-if importlib.util.find_spec("pyfolds") is None:
-    src_path = Path(__file__).resolve().parents[1] / "src"
-    if src_path.exists():
-        sys.path.insert(0, str(src_path))
-
-# Importação dos mecanismos avançados do PyFolds
-from pyfolds.advanced import MPJRDNeuronAdvanced
-from pyfolds.core.config import MPJRDConfig
-from pyfolds.utils.types import LearningMode
-
-from serialization.folds_io import save_model_fold
-from serialization.mind_io import save_model_mind
-
-if importlib.util.find_spec("torchvision") is not None:
-    import torchvision
-    import torchvision.transforms as transforms
-else:
-    torchvision = None
-    transforms = None
+from training.config.mnist import BaseTrainConfig, FOLDSNetTrainConfig, MPJRDTrainConfig, RunConfig
+from training.trainers.mnist_trainer import run_mnist_training
 
 
 @dataclass
 class TrainArgs:
+    """Legacy args mantidos para compatibilidade dos scripts existentes."""
+
     backend: str
     epochs: int
     batch: int
@@ -51,13 +24,11 @@ class TrainArgs:
     model: str = "mpjrd"
     timesteps: int = 4
 
-    # Parâmetros de arquitetura MPJRD
     n_dendrites: int = 4
     n_synapses_per_dendrite: int = 32
     hidden: int = 128
     threshold: float = 0.45
 
-    # Controle de formatos de saída
     save_fold: int = 1
     save_mind: int = 1
     save_pt: int = 1
@@ -65,7 +36,6 @@ class TrainArgs:
     save_metrics: int = 1
     save_summary: int = 1
 
-    # Controle de mecanismos (desabilitar)
     disable_stdp: bool = False
     disable_homeostase: bool = False
     disable_inibicao: bool = False
@@ -78,244 +48,51 @@ class TrainArgs:
     disable_engram: bool = False
     disable_speech: bool = False
 
-
-# =============================================================================
-# LAYOUT DE INICIALIZAÇÃO COM CAIXAS UNICODE
-# =============================================================================
-def _format_line(content: str, width: int, align: str = "left") -> str:
-    """Formata uma linha para caber dentro da caixa com largura fixa."""
-    if align == "left":
-        padded = content.ljust(width)
-    elif align == "center":
-        padded = content.center(width)
-    elif align == "right":
-        padded = content.rjust(width)
-    else:
-        padded = content.ljust(width)
-    return f"║ {padded} ║"
+    foldsnet_variant: str = "4L"
+    foldsnet_dataset: str = "mnist"
 
 
-def _print_box(title: str, lines: list[str], width: int) -> None:
-    """Imprime uma caixa com título e linhas de conteúdo."""
-    print(f"╔{'═' * (width + 2)}╗")
-    if title:
-        print(_format_line(title, width, "center"))
-        print(f"╠{'═' * (width + 2)}╣")
-    for line in lines:
-        print(_format_line(line, width, "left"))
-    print(f"╚{'═' * (width + 2)}╝")
-
-
-def print_experiment_layout(args: TrainArgs, cfg: MPJRDConfig) -> None:
-    """Imprime o layout completo do experimento com alinhamento absoluto."""
-    if not args.console:
-        return
-
-    import shutil
-
-    term_width = shutil.get_terminal_size().columns
-    box_width = min(78, term_width - 4)
-
-    # ===== CABEÇALHO =====
-    header_lines = [
-        f"📅 Data: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}      📁 Run ID: {args.run_id}",
-        f"🏗️ Framework: PyFolds v2.1.1      ⚙️ Backend: PyTorch {torch.__version__}",
-        f"💻 Dispositivo: {args.device.upper()}              🎯 Modo: ONLINE (aprendizado contínuo)",
-    ]
-    _print_box("", header_lines, box_width)
-    print()
-
-    # ===== CONFIGURAÇÃO DO MODELO =====
-    model_lines = [
-        "Modelo base        : MPJRD",
-        f"Dendritos          : {cfg.n_dendrites}",
-        f"Sinapses/dendrito  : {cfg.n_synapses_per_dendrite}",
-        f"Integração         : {cfg.dendrite_integration_mode} (gain={cfg.dendrite_gain}, θ_ratio={cfg.theta_dend_ratio})",
-        f"Hidden dim         : {args.hidden} (neurônios excitatórios)",
-        f"Threshold inicial  : {cfg.theta_init}",
-        f"Learning rate      : {args.lr}",
-        f"Batch size         : {args.batch}",
-    ]
-    _print_box("CONFIGURAÇÃO DO MODELO", model_lines, box_width)
-    print()
-
-    # ===== MECANISMOS BIOLÓGICOS =====
-    mech_lines: list[str] = []
-
-    mech_lines.append("[OBRIGATÓRIOS]")
-    mech_lines.append(f"  Filamentos (N)      ✅  n_min={cfg.n_min}, n_max={cfg.n_max}, w_scale={cfg.w_scale}")
-    mech_lines.append(f"  Potencial interno (I)✅  i_min={cfg.i_min}, i_max={cfg.i_max}, i_eta={cfg.i_eta}")
-    mech_lines.append("")
-
-    stp_status = "✅" if not args.disable_stp else "❌"
-    mech_lines.append("[PLASTICIDADE DE CURTO PRAZO]")
-    mech_lines.append(f"  STP                  {stp_status}  u0={cfg.u0}, R0={cfg.R0}, U={cfg.U}, τ_fac={cfg.tau_fac}ms,")
-    mech_lines.append(f"                                  τ_rec={cfg.tau_rec}ms")
-    mech_lines.append("")
-
-    stdp_status = "✅" if not args.disable_stdp else "❌"
-    backprop_status = "✅" if not args.disable_backprop else "❌"
-    mech_lines.append("[PLASTICIDADE DE LONGO PRAZO]")
-    mech_lines.append(f"  STDP                 {stdp_status}  modo={cfg.plasticity_mode}, A⁺={cfg.A_plus}, A⁻={cfg.A_minus},")
-    mech_lines.append(f"                                  τ_pre={cfg.tau_pre}ms, τ_post={cfg.tau_post}ms")
-    mech_lines.append(f"  Backpropagação       {backprop_status}  delay={cfg.backprop_delay}ms, sinal={cfg.backprop_signal}, proporcional={cfg.bap_proportional}")
-    mech_lines.append(f"  Hebbian eligibility  ✅  β_w={cfg.beta_w}, LTD_ratio={cfg.hebbian_ltd_ratio}")
-    mech_lines.append("")
-
-    homeo_status = "✅" if not args.disable_homeostase else "❌"
-    sfa_status = "✅" if not args.disable_sfa else "❌"
-    mech_lines.append("[CONTROLE HOMEOSTÁTICO]")
-    mech_lines.append(f"  Homeostase           {homeo_status}  θ_alvo={cfg.target_spike_rate}, η={cfg.homeostasis_eta}, θ∈[{cfg.theta_min}, {cfg.theta_max}]")
-    mech_lines.append(f"  Adaptação SFA        {sfa_status}  inc={cfg.adaptation_increment}, τ={cfg.adaptation_tau}ms, max={cfg.adaptation_max}")
-    mech_lines.append("")
-
-    ref_status = "✅" if not args.disable_refratario else "❌"
-    inh_status = "✅" if not args.disable_inibicao else "❌"
-    mech_lines.append("[DINÂMICA DE DISPARO]")
-    mech_lines.append(f"  Refratário           {ref_status}  abs={cfg.t_refrac_abs}ms, rel={cfg.t_refrac_rel}ms, boost={cfg.refrac_rel_strength}")
-    mech_lines.append(f"  Inibição             {inh_status}  lateral={cfg.lateral_strength}, feedback={cfg.feedback_strength}, E={cfg.n_excitatory}, I={cfg.n_inhibitory}")
-    mech_lines.append("")
-
-    wave_status = "✅" if cfg.wave_enabled and not args.disable_wave else "❌"
-    circ_status = "✅" if cfg.circadian_enabled and not args.disable_circadian else "❌"
-    engram_status = "✅" if cfg.experimental_engram_enabled and not args.disable_engram else "❌"
-    speech_status = "✅" if cfg.enable_speech_envelope_tracking and not args.disable_speech else "❌"
-    mech_lines.append("[OPCIONAIS / EXPERIMENTAIS]")
-    mech_lines.append(f"  Wave oscilatório     {wave_status}  (n_freq={cfg.wave_n_frequencies}, base={cfg.wave_base_frequency}Hz, sleep_consolidation={cfg.wave_sleep_consolidation})")
-    mech_lines.append(f"  Circadiano           {circ_status}  (ciclo={cfg.circadian_cycle_hours}h, auto_mode={cfg.circadian_auto_mode})")
-    mech_lines.append(f"  Memória (Engrams)    {engram_status}  max_engrams={cfg.max_engrams}, pruning_th={cfg.pruning_threshold},")
-    mech_lines.append(f"                                  fase_resonance={cfg.enable_experimental_phase_resonance}")
-    mech_lines.append(f"  Speech tracking      {speech_status}  (método={cfg.speech_envelope_method})")
-
-    _print_box("MECANISMOS BIOLÓGICOS", mech_lines, box_width)
-    print()
-
-    fmt_lines = [
-        f"[{'✅' if args.save_fold else '❌'}] .fold   [{'✅' if args.save_mind else '❌'}] .mind   "
-        f"[{'✅' if args.save_pt else '❌'}] .pt   [{'✅' if args.save_metrics else '❌'}] .jsonl  "
-        f"[{'✅' if args.save_summary else '❌'}] .json"
-    ]
-    _print_box("FORMATOS DE SAÍDA", fmt_lines, box_width)
-    print()
-
-    total_synapses = cfg.n_dendrites * cfg.n_synapses_per_dendrite
-    vc_approx = total_synapses * math.log2(total_synapses + 1)
-    trainable_params = total_synapses
-    cap_lines = [
-        f"Sinapses totais         : {total_synapses}",
-        f"VC-dimension aproximada : {vc_approx:.1e}",
-        f"Parâmetros treináveis   : {trainable_params:,}".replace(",", "."),
-    ]
-    _print_box("MÉTRICAS DE CAPACIDADE", cap_lines, box_width)
-    print()
-
-
-class MPJRDWrapper(nn.Module):
-    """Wrapper para adaptar MNIST [B,1,28,28] para entrada MPJRD [B,D,S]."""
-
-    def __init__(self, neuron: MPJRDNeuronAdvanced, cfg: MPJRDConfig):
-        super().__init__()
-        self.neuron = neuron
-        self.cfg = cfg
-
-        self.proj = nn.Linear(784, cfg.n_dendrites * cfg.n_synapses_per_dendrite)
-        self.classifier = nn.Linear(cfg.n_dendrites * cfg.n_synapses_per_dendrite, 10)
-        nn.init.xavier_uniform_(self.proj.weight, gain=2.0)
-        nn.init.zeros_(self.proj.bias)
-
-    def forward(self, x: torch.Tensor, **kwargs) -> tuple[torch.Tensor, dict]:
-        bsz = x.shape[0]
-        x_flat = x.view(bsz, -1)
-        x_proj = self.proj(x_flat)
-        x_reshaped = x_proj.view(bsz, self.cfg.n_dendrites, self.cfg.n_synapses_per_dendrite)
-        neuron_out = self.neuron(x_reshaped, **kwargs)
-
-        if isinstance(neuron_out, dict):
-            features = neuron_out.get("spikes", neuron_out.get("u", x_reshaped.mean(dim=(1, 2))))
-        else:
-            features = x_reshaped.mean(dim=(1, 2))
-
-        if features.dim() > 2:
-            features = features.view(bsz, -1)
-        elif features.dim() == 1:
-            features = features.unsqueeze(1)
-
-        if features.shape[1] != self.cfg.n_dendrites * self.cfg.n_synapses_per_dendrite:
-            features = x_reshaped.view(bsz, -1)
-
-        logits = self.classifier(features)
-        return logits, neuron_out
-
-    def get_config(self):
-        return self.neuron.get_config() if hasattr(self.neuron, "get_config") else {}
-
-    def __getattr__(self, name):
-        try:
-            return super().__getattr__(name)
-        except AttributeError:
-            return getattr(self.neuron, name)
-
-
-def _setup_logger(run_dir: Path, log_file: str, console: bool) -> logging.Logger:
-    run_dir.mkdir(parents=True, exist_ok=True)
-    logger = logging.getLogger(f"mnist.{run_dir.name}")
-    logger.handlers.clear()
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-    fmt = logging.Formatter("%(message)s")
-
-    f_handler = logging.FileHandler(run_dir / log_file, encoding="utf-8")
-    f_handler.setFormatter(fmt)
-    logger.addHandler(f_handler)
-
-    if console:
-        c_handler = logging.StreamHandler(sys.stdout)
-        c_handler.setFormatter(fmt)
-        logger.addHandler(c_handler)
-
-    return logger
-
-
-def _build_loaders(batch_size: int):
-    if torchvision is not None and transforms is not None:
-        transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,)),
-        ])
-        try:
-            train_ds = torchvision.datasets.MNIST(root="./data", train=True, download=True, transform=transform)
-            test_ds = torchvision.datasets.MNIST(root="./data", train=False, download=True, transform=transform)
-            train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
-            test_loader = DataLoader(test_ds, batch_size=1000, shuffle=False)
-            return train_loader, test_loader
-        except Exception:
-            pass
-
-    x_train = torch.rand(2048, 1, 28, 28)
-    y_train = torch.randint(0, 10, (2048,))
-    x_test = torch.rand(512, 1, 28, 28)
-    y_test = torch.randint(0, 10, (512,))
-    train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(TensorDataset(x_test, y_test), batch_size=512, shuffle=False)
-    return train_loader, test_loader
-
-
-def _save_backend(backend: str, path: Path, payload: dict[str, Any]) -> None:
-    if backend == "folds":
-        save_model_fold(path, payload)
-    else:
-        save_model_mind(path, payload)
-
-
-def _extract_logits(output: Any, batch_size: int, device: torch.device) -> torch.Tensor:
-    if isinstance(output, tuple):
-        logits = output[0]
-    else:
-        logits = output
-
-    if isinstance(logits, dict):
-        return logits.get("logits", logits.get("spikes", torch.zeros(batch_size, 10, device=device)))
-    return logits
+def _to_run_config(args: TrainArgs) -> RunConfig:
+    base = BaseTrainConfig(
+        backend=args.backend,
+        model=args.model,
+        epochs=args.epochs,
+        batch=args.batch,
+        lr=args.lr,
+        run_id=args.run_id,
+        resume=args.resume,
+        device=args.device,
+        console=args.console,
+        log_level=args.log_level,
+        log_file=args.log_file,
+        sheer_cmd=args.sheer_cmd,
+        timesteps=args.timesteps,
+        save_fold=args.save_fold,
+        save_mind=args.save_mind,
+        save_pt=args.save_pt,
+        save_log=args.save_log,
+        save_metrics=args.save_metrics,
+        save_summary=args.save_summary,
+    )
+    mpjrd = MPJRDTrainConfig(
+        n_dendrites=args.n_dendrites,
+        n_synapses_per_dendrite=args.n_synapses_per_dendrite,
+        hidden=args.hidden,
+        threshold=args.threshold,
+        disable_stdp=args.disable_stdp,
+        disable_homeostase=args.disable_homeostase,
+        disable_inibicao=args.disable_inibicao,
+        disable_refratario=args.disable_refratario,
+        disable_backprop=args.disable_backprop,
+        disable_sfa=args.disable_sfa,
+        disable_stp=args.disable_stp,
+        disable_wave=args.disable_wave,
+        disable_circadian=args.disable_circadian,
+        disable_engram=args.disable_engram,
+        disable_speech=args.disable_speech,
+    )
+    foldsnet = FOLDSNetTrainConfig(variant=args.foldsnet_variant, dataset=args.foldsnet_dataset)
+    return RunConfig(base=base, mpjrd=mpjrd, foldsnet=foldsnet)
 
 
 def _extract_spike_rate(output: Any) -> float:
