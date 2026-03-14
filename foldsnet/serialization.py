@@ -27,12 +27,6 @@ def save_payload(path: str, fmt: str, payload: dict[str, Any]) -> None:
 
 
 def load_payload(path: str, fmt: str, map_location: str = "cpu") -> dict[str, Any]:
-    """Carrega payload em formato .fold ou .mind."""
-    if fmt not in {"fold", "mind"}:
-        raise ValueError("Formato inválido. Use 'fold' ou 'mind'.")
-    # weights_only=False necessário: payload contém dicts e
-    # escalares além de tensores. Revisar ao migrar para formato
-    # puramente baseado em tensores.
     """Carrega payload em formato .fold ou .mind.
 
     Args:
@@ -45,6 +39,8 @@ def load_payload(path: str, fmt: str, map_location: str = "cpu") -> dict[str, An
     """
     if fmt not in _VALID_FORMATS:
         raise ValueError(f"Formato inválido '{fmt}'. Use: {sorted(_VALID_FORMATS)}")
-    # weights_only=False necessário pois payload contém dicts arbitrários,
-    # não apenas tensores — manter False enquanto o formato incluir metadados.
-    return torch.load(path, map_location=map_location, weights_only=False)
+    return torch.load(
+        path,
+        map_location=map_location,
+        weights_only=False,  # payload contém dicts e escalares
+    )

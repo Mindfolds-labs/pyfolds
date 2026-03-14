@@ -61,8 +61,10 @@ class STDPMixin:
         self.plasticity_mode = plasticity_mode
 
         # Traços POR AMOSTRA
-        self.trace_pre = None  # [B, D, S]
-        self.trace_post = None  # [B, D, S]
+        if not hasattr(self, "trace_pre"):
+            self.register_buffer("trace_pre", torch.empty(0))
+        if not hasattr(self, "trace_post"):
+            self.register_buffer("trace_post", torch.empty(0))
 
     def _ensure_traces(self, batch_size: int, device: torch.device):
         """Garante a alocação dos traços com shape compatível com o batch.
@@ -73,9 +75,10 @@ class STDPMixin:
         D = self.cfg.n_dendrites
         S = self.cfg.n_synapses_per_dendrite
 
-        if self.trace_pre is None or self.trace_pre.shape[0] != batch_size:
-            self.trace_pre = torch.zeros(batch_size, D, S, device=device)
-            self.trace_post = torch.zeros(batch_size, D, S, device=device)
+        expected = (batch_size, D, S)
+        if self.trace_pre.shape != torch.Size(expected):
+            self.trace_pre = self.trace_pre.resize_(expected).zero_()
+            self.trace_post = self.trace_post.resize_(expected).zero_()
 
     def _stdp_pre_spike_source(self, x: torch.Tensor, x_pre_stp: torch.Tensor | None) -> torch.Tensor:
         """Resolve fonte de pré-spike para STDP conforme configuração."""

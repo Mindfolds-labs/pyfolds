@@ -257,10 +257,9 @@ class WaveMixin(TimedMixin):
     def _update_sync_memory(self, sync: torch.Tensor) -> None:
         ptr = int(self.phase_ptr.item())
         self.phase_history[ptr] = sync.mean().detach().cpu()
-        self.phase_ptr = torch.tensor(
-            (ptr + 1) % self.wave_cfg.wave_phase_buffer_size,
-            dtype=torch.long,
-            device=self.phase_ptr.device,
+        # atualização in-place preserva o buffer e o device
+        self.phase_ptr.fill_(
+            (ptr + 1) % self.wave_cfg.wave_phase_buffer_size
         )
         self.phase_history.mul_(self.wave_cfg.wave_phase_decay)
         self.last_sync = self.phase_history.mean()

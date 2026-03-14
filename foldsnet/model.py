@@ -43,7 +43,7 @@ class FOLDSNet(nn.Module):
         lgn_to_v1, v1_to_it = _create_sparse_connections(self.n_lgn, self.n_v1, self.n_it)
         self.register_buffer("lgn_to_v1", lgn_to_v1)
         self.register_buffer("v1_to_it", v1_to_it)
-
+        # register_buffer: migra automaticamente com .to(device)
         self.register_buffer("pixel_map", self._build_pixel_map())
 
         self.classifier = nn.Linear(self.n_it, n_classes)
@@ -84,10 +84,6 @@ class FOLDSNet(nn.Module):
         r3 = []
         for i, neuron in enumerate(self.v1):
             lgn_indices = torch.where(self.lgn_to_v1[i] > 0)[0]
-            if lgn_indices.numel() == 0:  # guard: máscara vazia
-                lgn_indices = torch.arange(self.n_lgn, device=r2.device)
-            lgn_inputs = r2[:, lgn_indices].mean(dim=1).view(batch_size, 1, 1).repeat(1, 4, 8)
-            out = neuron(lgn_inputs)
             if lgn_indices.numel() == 0:
                 lgn_indices = torch.arange(self.n_lgn, device=r2.device)
             agg = r2[:, lgn_indices].mean(dim=1)
@@ -99,10 +95,6 @@ class FOLDSNet(nn.Module):
         r4 = []
         for i, neuron in enumerate(self.it):
             v1_indices = torch.where(self.v1_to_it[i] > 0)[0]
-            if v1_indices.numel() == 0:  # guard: máscara vazia
-                v1_indices = torch.arange(self.n_v1, device=r3.device)
-            v1_inputs = r3[:, v1_indices].mean(dim=1).view(batch_size, 1, 1).repeat(1, 4, 8)
-            out = neuron(v1_inputs)
             if v1_indices.numel() == 0:
                 v1_indices = torch.arange(self.n_v1, device=r3.device)
             agg = r3[:, v1_indices].mean(dim=1)
@@ -118,14 +110,6 @@ class FOLDSNet(nn.Module):
         fmt = kwargs.pop("format", fmt)
         if kwargs:
             raise TypeError(f"Argumentos inesperados: {sorted(kwargs)}")
-        payload = {
-    def save(
-        self,
-        path: str,
-        format: str = "fold",
-        include_metadata: bool = False,
-    ) -> None:
-        """Salva modelo em formato .fold ou .mind."""
         payload: dict = {
             "state_dict": self.state_dict(),
             "input_shape": self.input_shape,
@@ -134,7 +118,6 @@ class FOLDSNet(nn.Module):
         }
         if include_metadata:
             payload["metadata"] = {"format": fmt, "model": "FOLDSNet"}
-        # fmt evita shadow do builtin format() (Pylint W0622)
         save_payload(path, fmt, payload)
 
     @classmethod
@@ -144,9 +127,6 @@ class FOLDSNet(nn.Module):
         if kwargs:
             raise TypeError(f"Argumentos inesperados: {sorted(kwargs)}")
         payload = load_payload(path, fmt, map_location=device)
-    def load(cls, path: str, format: str = "fold", device: str = "cpu") -> "FOLDSNet":
-        """Carrega modelo salvo em formato .fold ou .mind."""
-        payload = load_payload(path, format, map_location=device)
         model = cls(
             input_shape=tuple(payload["input_shape"]),
             n_classes=payload["n_classes"],

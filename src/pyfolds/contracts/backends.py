@@ -72,6 +72,12 @@ class TorchNeuronContractBackend(_BaseContractBackend):
         if spikes.any():
             self.state.refractory_until = t0 + 2.0
 
+        # Incremento SFA pós-spike (consistente com AdaptationMixin)
+        if spikes.any():
+            self.state.adaptation = min(
+                2.0, self.state.adaptation + 0.6
+            )
+
         # STDP + Homeostase (sem alterar saída neste backend mínimo)
 
         trace = StepExecutionTrace(
@@ -114,6 +120,12 @@ class TensorFlowNeuronContractBackend(_BaseContractBackend):
 
         if bool(tf.reduce_any(spikes > 0).numpy()):
             self.state.refractory_until = t0 + 2.0
+
+        # Incremento SFA pós-spike (consistente com AdaptationMixin)
+        if bool(tf.reduce_any(spikes > 0).numpy()):
+            self.state.adaptation = min(
+                2.0, self.state.adaptation + 0.6
+            )
 
         trace = StepExecutionTrace(
             mechanism_order=list(CONTRACT_MECHANISM_ORDER),
