@@ -17,6 +17,7 @@ class BaseTrainConfig:
     lr: float
     run_id: str
     resume: bool = False
+    init_checkpoint: str = ""
     device: str = "cpu"
     console: bool = False
     log_level: str = "INFO"

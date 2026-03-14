@@ -126,6 +126,31 @@ def run_mnist_training(config: RunConfig) -> int:
         criterion = nn.CrossEntropyLoss()
 
         start_epoch = 0
+
+        init_checkpoint = (config.base.init_checkpoint or "").strip()
+        if init_checkpoint:
+            ckpt_path = Path(init_checkpoint)
+            if not ckpt_path.exists():
+                raise FileNotFoundError(f"Checkpoint inicial não encontrado: {init_checkpoint}")
+            ckpt = torch.load(ckpt_path, map_location=device)
+            model_state = ckpt.get("model_state", ckpt)
+            current_state = model.state_dict()
+            compatible_state = {
+                k: v
+                for k, v in model_state.items()
+                if k in current_state and tuple(v.shape) == tuple(current_state[k].shape)
+            }
+            incompatible_count = len(model_state) - len(compatible_state)
+            missing, unexpected = model.load_state_dict(compatible_state, strict=False)
+            logger.info(
+                "🧠 WARM START carregado de %s | loaded=%d | missing=%d | unexpected=%d | incompatible=%d",
+                ckpt_path,
+                len(compatible_state),
+                len(missing),
+                len(unexpected),
+                incompatible_count,
+            )
+
         if config.base.resume and checkpoint_path.exists():
             ckpt = torch.load(checkpoint_path, map_location=device)
             model.load_state_dict(ckpt["model_state"])
@@ -154,9 +179,10 @@ def run_mnist_training(config: RunConfig) -> int:
                 best_acc = max(best_acc, test_acc)
                 epoch_loss = avg_loss
 
+                spike_text = f"{avg_spike:.6f}" if metadata.family == "mpjrd" else "n/a"
                 msg = (
                     f"Epoch {epoch+1}/{config.base.epochs} | loss={avg_loss:.4f} | "
-                    f"train={train_acc:.2f}% | test={test_acc:.2f}% | spike={avg_spike:.6f}"
+                    f"train={train_acc:.2f}% | test={test_acc:.2f}% | spike={spike_text}"
                 )
                 if config.base.console:
                     print(msg)
