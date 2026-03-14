@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import json
+import secrets
+import string
+
 import argparse
 import sys
 from datetime import datetime
@@ -132,3 +136,26 @@ if __name__ == "__main__":
     args = parse_args()
     _save_run_metadata(args)
     raise SystemExit(run_training(args))
+# =============================================================================
+# COMANDOS DE TREINO — COPIAR E COLAR NO POWERSHELL
+# =============================================================================
+#
+# --- MNIST (50 épocas, salva fold + mind + pt + metrics + summary) ---
+#
+# python train_mnist_folds.py --model foldsnet --foldsnet-variant 4L --foldsnet-dataset mnist --epochs 50 --batch 64 --lr 1e-3 --device cpu --run-id foldsnet_4L_mnist_50ep --save-fold 1 --save-mind 1 --save-pt 1 --save-metrics 1 --save-summary 1 --console
+#
+# --- RETOMAR TREINO MNIST (resume a partir do checkpoint salvo) ---
+#
+# python train_mnist_folds.py --model foldsnet --foldsnet-variant 4L --foldsnet-dataset mnist --epochs 50 --batch 64 --lr 1e-3 --device cpu --run-id foldsnet_4L_mnist_50ep --save-fold 1 --save-mind 1 --save-pt 1 --save-metrics 1 --save-summary 1 --console --resume
+#
+# --- CIFAR10 (50 épocas, salva fold + mind + pt + metrics + summary) ---
+#
+# python train_mnist_folds.py --model foldsnet --foldsnet-variant 4L --foldsnet-dataset cifar10 --epochs 50 --batch 64 --lr 1e-3 --device cpu --run-id foldsnet_4L_cifar10_50ep --save-fold 1 --save-mind 1 --save-pt 1 --save-metrics 1 --save-summary 1 --console
+#
+# --- RETOMAR TREINO CIFAR10 ---
+#
+# python train_mnist_folds.py --model foldsnet --foldsnet-variant 4L --foldsnet-dataset cifar10 --epochs 50 --batch 64 --lr 1e-3 --device cpu --run-id foldsnet_4L_cifar10_50ep --save-fold 1 --save-mind 1 --save-pt 1 --save-metrics 1 --save-summary 1 --console --resume
+#
+# NOTA: O resume usa o checkpoint salvo automaticamente em runs/<run-id>/checkpoint.pt
+# Para continuar de onde parou, use EXATAMENTE o mesmo --run-id do treino original.
+# =============================================================================
