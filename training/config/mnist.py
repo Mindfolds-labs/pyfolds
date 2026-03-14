@@ -17,6 +17,7 @@ class BaseTrainConfig:
     lr: float
     run_id: str
     resume: bool = False
+    init_checkpoint: str = ""
     device: str = "cpu"
     console: bool = False
     log_level: str = "INFO"
@@ -93,8 +94,8 @@ def validate_run_config(config: RunConfig) -> None:
     if base.model == "foldsnet":
         if not config.foldsnet.variant:
             raise ConfigValidationError("variant não pode ser vazio para foldsnet")
-        if config.foldsnet.dataset != "mnist":
-            raise ConfigValidationError("pipeline atual suporta somente dataset=mnist para foldsnet")
+        if config.foldsnet.dataset not in {"mnist", "cifar10", "cifar100"}:
+            raise ConfigValidationError("dataset inválido para foldsnet: use mnist, cifar10 ou cifar100")
 
 
 def serialize_config(config: RunConfig) -> dict[str, Any]:

@@ -16,7 +16,7 @@ from training.io.artifacts import save_backend_artifact
 from training.io.layout import print_layout, setup_logger
 from training.metrics.records import EpochMetrics
 from training.models.factory import build_model, extract_logits
-from training.utils.data import build_mnist_loaders
+from training.utils.data import build_image_loaders, build_mnist_loaders
 
 
 def _configure_external_loggers() -> None:
@@ -115,12 +115,42 @@ def run_mnist_training(config: RunConfig) -> int:
         logger.info("Modelo instanciado: family=%s config=%s", metadata.family, metadata.config)
 
         with torch.no_grad():
-            _ = model(torch.zeros(1, 1, 28, 28, device=device))
+            if metadata.family == "foldsnet":
+                dataset = str(metadata.config.get("dataset", "mnist"))
+                shape = {"mnist": (1, 28, 28), "cifar10": (3, 32, 32), "cifar100": (3, 32, 32)}[dataset]
+                _ = model(torch.zeros(1, *shape, device=device))
+            else:
+                _ = model(torch.zeros(1, 1, 28, 28, device=device))
 
         optim = torch.optim.Adam(model.parameters(), lr=config.base.lr)
         criterion = nn.CrossEntropyLoss()
 
         start_epoch = 0
+
+        init_checkpoint = (config.base.init_checkpoint or "").strip()
+        if init_checkpoint:
+            ckpt_path = Path(init_checkpoint)
+            if not ckpt_path.exists():
+                raise FileNotFoundError(f"Checkpoint inicial não encontrado: {init_checkpoint}")
+            ckpt = torch.load(ckpt_path, map_location=device)
+            model_state = ckpt.get("model_state", ckpt)
+            current_state = model.state_dict()
+            compatible_state = {
+                k: v
+                for k, v in model_state.items()
+                if k in current_state and tuple(v.shape) == tuple(current_state[k].shape)
+            }
+            incompatible_count = len(model_state) - len(compatible_state)
+            missing, unexpected = model.load_state_dict(compatible_state, strict=False)
+            logger.info(
+                "🧠 WARM START carregado de %s | loaded=%d | missing=%d | unexpected=%d | incompatible=%d",
+                ckpt_path,
+                len(compatible_state),
+                len(missing),
+                len(unexpected),
+                incompatible_count,
+            )
+
         if config.base.resume and checkpoint_path.exists():
             ckpt = torch.load(checkpoint_path, map_location=device)
             model.load_state_dict(ckpt["model_state"])
@@ -129,7 +159,10 @@ def run_mnist_training(config: RunConfig) -> int:
             best_acc = float(ckpt.get("best_acc", 0.0))
             logger.info("🔄 RESUME epoch=%s", start_epoch)
 
-        train_loader, test_loader = build_mnist_loaders(config.base.batch)
+        if metadata.family == "foldsnet":
+            train_loader, test_loader = build_image_loaders(config.foldsnet.dataset, config.base.batch)
+        else:
+            train_loader, test_loader = build_mnist_loaders(config.base.batch)
         epochs_completed = start_epoch
 
         with metrics_path.open("a", encoding="utf-8") as mf:
@@ -146,9 +179,10 @@ def run_mnist_training(config: RunConfig) -> int:
                 best_acc = max(best_acc, test_acc)
                 epoch_loss = avg_loss
 
+                spike_text = f"{avg_spike:.6f}" if metadata.family == "mpjrd" else "n/a"
                 msg = (
                     f"Epoch {epoch+1}/{config.base.epochs} | loss={avg_loss:.4f} | "
-                    f"train={train_acc:.2f}% | test={test_acc:.2f}% | spike={avg_spike:.6f}"
+                    f"train={train_acc:.2f}% | test={test_acc:.2f}% | spike={spike_text}"
                 )
                 if config.base.console:
                     print(msg)

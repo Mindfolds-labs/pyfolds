@@ -36,6 +36,15 @@ def _format_line(content: str, width: int, align: str = "left") -> str:
     return f"║ {padded} ║"
 
 
+
+
+def _fit_line(content: str, width: int) -> str:
+    if len(content) <= width:
+        return content
+    if width <= 3:
+        return content[:width]
+    return content[: width - 3] + "..."
+
 def _print_box(title: str, lines: list[str], width: int) -> None:
     print(f"╔{'═' * (width + 2)}╗")
     if title:
@@ -54,15 +63,16 @@ def print_layout(config: RunConfig, metadata: ModelMetadata, mpjrd_cfg: object |
 
     box_width = min(78, shutil.get_terminal_size().columns - 4)
     header = [
-        f"📅 Data: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}      📁 Run ID: {config.base.run_id}",
-        f"🏗️ Framework: PyFolds      ⚙️ Backend: PyTorch {torch.__version__}",
-        f"💻 Dispositivo: {config.base.device.upper()}              🎯 Modelo: {metadata.family.upper()}",
+        _fit_line(f"Data: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Run ID: {config.base.run_id}", box_width),
+        _fit_line(f"Framework: PyFolds | Backend: PyTorch {torch.__version__}", box_width),
+        _fit_line(f"Dispositivo: {config.base.device.upper()} | Modelo: {metadata.family.upper()}", box_width),
     ]
     _print_box("", header, box_width)
     print()
 
     model_lines = [
         f"Modelo base        : {metadata.family.upper()}",
+        f"Epochs             : {config.base.epochs}",
         f"Learning rate      : {config.base.lr}",
         f"Batch size         : {config.base.batch}",
     ]
@@ -83,7 +93,8 @@ def print_layout(config: RunConfig, metadata: ModelMetadata, mpjrd_cfg: object |
             [
                 f"Variant            : {config.foldsnet.variant}",
                 f"Dataset            : {config.foldsnet.dataset}",
-                "Mecanismos MPJRD   : inativos neste modo",
+                "Mecanismos MPJRD   : ativos (plasticidade, homeostase, inibição,",
+                "                      adaptação, backprop, wave, circadiano, engram)",
             ]
         )
 

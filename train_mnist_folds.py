@@ -1,9 +1,46 @@
 from __future__ import annotations
 
 import argparse
+import json
+import secrets
+import string
+import sys
 from datetime import datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+SRC = ROOT / "src"
+if SRC.exists() and str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
 from training.mnist_pipeline import TrainArgs, run_training
+
+
+def _generate_short_id(length: int = 6) -> str:
+    alphabet = string.ascii_lowercase + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(length))
+
+
+def _default_run_id(model: str, dataset: str) -> str:
+    return f"{model}_{dataset}_{_generate_short_id()}"
+
+
+def _save_run_metadata(args: TrainArgs) -> None:
+    run_dir = Path("runs") / args.run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "timestamp": datetime.now().isoformat(),
+        "run_id": args.run_id,
+        "model": args.model,
+        "dataset": args.foldsnet_dataset,
+        "epochs": args.epochs,
+        "batch": args.batch,
+        "lr": args.lr,
+        "device": args.device,
+        "init_checkpoint": args.init_checkpoint,
+        "config": args.__dict__,
+    }
+    (run_dir / "run_metadata.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
 def parse_args() -> TrainArgs:
@@ -11,8 +48,9 @@ def parse_args() -> TrainArgs:
     parser.add_argument("--epochs", type=int, required=True)
     parser.add_argument("--batch", "--batch-size", dest="batch", type=int, required=True)
     parser.add_argument("--lr", type=float, required=True)
-    parser.add_argument("--run-id", default=datetime.now().strftime("%Y%m%d_%H%M%S"))
+    parser.add_argument("--run-id", default="")
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--init-checkpoint", default="", help="Checkpoint .pt para warm start (carrega pesos)")
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     parser.add_argument("--console", action="store_true")
     parser.add_argument("--log-level", default="INFO")
@@ -51,13 +89,16 @@ def parse_args() -> TrainArgs:
 
     ns = parser.parse_args()
 
+    run_id = ns.run_id or _default_run_id(ns.model, ns.foldsnet_dataset)
+
     return TrainArgs(
         backend="folds",
         epochs=ns.epochs,
         batch=ns.batch,
         lr=ns.lr,
-        run_id=ns.run_id,
+        run_id=run_id,
         resume=ns.resume,
+        init_checkpoint=ns.init_checkpoint,
         device=ns.device,
         console=ns.console,
         log_level=ns.log_level,
@@ -91,4 +132,6 @@ def parse_args() -> TrainArgs:
 
 
 if __name__ == "__main__":
-    raise SystemExit(run_training(parse_args()))
+    args = parse_args()
+    _save_run_metadata(args)
+    raise SystemExit(run_training(args))

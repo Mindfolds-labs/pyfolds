@@ -16,10 +16,11 @@ class TrainArgs:
     lr: float
     run_id: str
     resume: bool
-    device: str
-    console: bool
-    log_level: str
-    log_file: str
+    init_checkpoint: str = ""
+    device: str = "cpu"
+    console: bool = False
+    log_level: str = "INFO"
+    log_file: str = "train.log"
     sheer_cmd: str = ""
     model: str = "mpjrd"
     timesteps: int = 4
@@ -61,6 +62,7 @@ def _to_run_config(args: TrainArgs) -> RunConfig:
         lr=args.lr,
         run_id=args.run_id,
         resume=args.resume,
+        init_checkpoint=args.init_checkpoint,
         device=args.device,
         console=args.console,
         log_level=args.log_level,

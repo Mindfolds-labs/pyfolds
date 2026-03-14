@@ -14,6 +14,7 @@ class FOLDSNet(nn.Module):
     """Rede hierárquica Retina→LGN→V1→IT com neurônios MPJRD."""
 
     _VARIANTS = {
+        "2L": {"retina": 8, "lgn": 8, "v1": 16, "it": 8},
         "4L": {"retina": 49, "lgn": 49, "v1": 98, "it": 49},
         "5L": {"retina": 64, "lgn": 64, "v1": 128, "it": 64},
         "6L": {"retina": 128, "lgn": 128, "v1": 256, "it": 128},
@@ -22,7 +23,7 @@ class FOLDSNet(nn.Module):
     def __init__(self, input_shape: tuple[int, int, int], n_classes: int, variant: str = "4L"):
         super().__init__()
         if variant not in self._VARIANTS:
-            raise ValueError("Variante inválida. Use '4L', '5L' ou '6L'.")
+            raise ValueError("Variante inválida. Use '2L', '4L', '5L' ou '6L'.")
 
         self.input_shape = input_shape
         self.n_classes = n_classes

@@ -17,8 +17,8 @@ class FOLDSNet(nn.Module):
 
     def __init__(self, input_shape: tuple[int, int, int], n_classes: int, variant: str = "4L"):
         super().__init__()
-        if variant not in {"4L", "5L", "6L"}:
-            raise ValueError("Variante inválida. Use '4L', '5L' ou '6L'.")
+        if variant not in {"2L", "4L", "5L", "6L"}:
+            raise ValueError("Variante inválida. Use '2L', '4L', '5L' ou '6L'.")
 
         self.input_shape = input_shape
         self.n_classes = n_classes
@@ -28,7 +28,7 @@ class FOLDSNet(nn.Module):
         n_pixels = channels * height * width
         n_retina_base = max(1, n_pixels // 16)
 
-        multiplier = {"4L": 1.0, "5L": 1.3, "6L": 1.7}[variant]
+        multiplier = {"2L": 0.2, "4L": 1.0, "5L": 1.3, "6L": 1.7}[variant]
         n_retina = max(1, int(math.ceil(n_retina_base * multiplier)))
         n_lgn = n_retina
         n_v1 = n_retina * 2
