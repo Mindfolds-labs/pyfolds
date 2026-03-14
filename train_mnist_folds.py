@@ -1,7 +1,14 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from datetime import datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+SRC = ROOT / "src"
+if SRC.exists() and str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
 from training.mnist_pipeline import TrainArgs, run_training
 
