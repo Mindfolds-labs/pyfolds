@@ -5,6 +5,14 @@
 
 ## Fila ativa
 
+## 1.1 Gate técnico atual (última auditoria)
+
+Referência operacional da última auditoria consolidada:
+- ISSUE: `ISSUE-016`
+- Relatório: [`prompts/relatorios/ISSUE-016-auditoria-deps-packaging.md`](./prompts/relatorios/ISSUE-016-auditoria-deps-packaging.md)
+- Log: [`prompts/logs/ISSUE-016-auditoria-deps-packaging-LOG.md`](./prompts/logs/ISSUE-016-auditoria-deps-packaging-LOG.md)
+- Execução: [`prompts/execucoes/EXEC-016-auditoria-deps-packaging.md`](./prompts/execucoes/EXEC-016-auditoria-deps-packaging.md)
+
 ## 2. Escopo e Navegação
 Este HUB **não é documentação de usuário final**. Ele deve ser usado apenas por quem mantém a base documental e os artefatos de governança.
 
@@ -50,6 +58,7 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 | ISSUE-014 | Concluída | Hardening de integridade de pesos (sanity check VRAM) | Codex | 2026-02-20 |
 | ISSUE-014 | Concluída | Sanity check periódico de integridade de pesos e atualização docs v2.0.2 | Codex | 2026-02-20 |
 | ISSUE-015 | Concluída | Hardening final do Core v2.0.3: integridade runtime, telemetria bufferizada e carga segura | Codex | 2026-02-20 |
+| ISSUE-016 | Concluída | Auditoria de dependências e packaging | Codex | 2026-03-14 |
 
 <!-- HUB:QUEUE:END -->
 
@@ -173,6 +182,16 @@ A fila abaixo é gerada automaticamente a partir de `docs/development/execution_
 > **Prioridade:** `Alta` · **Área:** `Segurança/Runtime/Telemetria`  
 >
 > 📄 [Relatório](./prompts/relatorios/ISSUE-015-hardening-core-runtime-v2-0-3.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-015-hardening-core-runtime-v2-0-3.md)
+
+> [!TIP]
+> **ISSUE-016** · Auditoria de dependências e packaging
+>
+> **Status:** ✅ Concluída  
+> **Responsável:** Codex  
+> **Data:** 2026-03-14  
+> **Prioridade:** `Alta` · **Área:** `Packaging/Dependências/Docs`  
+>
+> 📄 [Relatório](./prompts/relatorios/ISSUE-016-auditoria-deps-packaging.md) · 🛠️ [Execução](./prompts/execucoes/EXEC-016-auditoria-deps-packaging.md)
 
 <!-- HUB:CARDS:END -->
 

@@ -36,12 +36,11 @@ pip install pyfolds
 ### Requisitos mínimos (alinhados ao `pyproject.toml`)
 
 - Python `>=3.8`
-- PyTorch `>=2.0.0`
-- torchvision `>=0.15.0`
-- numpy `>=1.24.0`
-- zstandard `>=0.21.0`
-- google-crc32c `>=1.5.0`
-- reedsolo `>=1.7.0`
+- PyTorch `>=2.0`
+- numpy `>=1.24`
+- zstandard `>=0.21`
+- google-crc32c `>=1.5`
+- reedsolo `>=1.7`
 
 ### Extras opcionais
 
@@ -98,18 +97,18 @@ print(output["spikes"])
 
 ## 4. Política de depreciação da API pública
 
-Os aliases legados da v1 continuam disponíveis durante a série `1.x`, sempre emitindo `DeprecationWarning` para facilitar migração gradual.
+Os aliases legados da v1 continuam disponíveis na série `2.x`, emitindo `DeprecationWarning` para facilitar migração gradual sem quebra imediata.
 
 - `MPJRDConfig` → `NeuronConfig`
 - `MPJRDLayer` → `AdaptiveNeuronLayer`
 - `MPJRDNetwork` → `SpikingNetwork`
 
 Critérios objetivos adotados:
-- manutenção por ciclo mínimo de uma major completa (`1.x`),
+- manutenção por ciclo mínimo de uma major completa (`2.x`),
 - aviso explícito no `CHANGELOG.md`,
 - estratégia de migração com mapeamento 1:1 para nomes canônicos v2.
 
-Versão-limite planejada: remoção dos aliases v1 em `2.0.0`.
+Versão-limite planejada: remoção dos aliases v1 em uma próxima major (`3.0.0`), após aviso explícito em changelog.
 
 ## 5. Benchmarks de serialização
 
