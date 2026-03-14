@@ -84,6 +84,10 @@ class FOLDSNet(nn.Module):
         r3 = []
         for i, neuron in enumerate(self.v1):
             lgn_indices = torch.where(self.lgn_to_v1[i] > 0)[0]
+            if lgn_indices.numel() == 0:  # guard: máscara vazia
+                lgn_indices = torch.arange(self.n_lgn, device=r2.device)
+            lgn_inputs = r2[:, lgn_indices].mean(dim=1).view(batch_size, 1, 1).repeat(1, 4, 8)
+            out = neuron(lgn_inputs)
             if lgn_indices.numel() == 0:
                 lgn_indices = torch.arange(self.n_lgn, device=r2.device)
             agg = r2[:, lgn_indices].mean(dim=1)
@@ -95,6 +99,10 @@ class FOLDSNet(nn.Module):
         r4 = []
         for i, neuron in enumerate(self.it):
             v1_indices = torch.where(self.v1_to_it[i] > 0)[0]
+            if v1_indices.numel() == 0:  # guard: máscara vazia
+                v1_indices = torch.arange(self.n_v1, device=r3.device)
+            v1_inputs = r3[:, v1_indices].mean(dim=1).view(batch_size, 1, 1).repeat(1, 4, 8)
+            out = neuron(v1_inputs)
             if v1_indices.numel() == 0:
                 v1_indices = torch.arange(self.n_v1, device=r3.device)
             agg = r3[:, v1_indices].mean(dim=1)
@@ -105,6 +113,12 @@ class FOLDSNet(nn.Module):
 
         return self.classifier(r4)
 
+    def save(self, path: str, fmt: str = "fold", include_metadata: bool = False, **kwargs) -> None:
+        """Salva modelo em .fold ou .mind."""
+        fmt = kwargs.pop("format", fmt)
+        if kwargs:
+            raise TypeError(f"Argumentos inesperados: {sorted(kwargs)}")
+        payload = {
     def save(
         self,
         path: str,
@@ -119,10 +133,17 @@ class FOLDSNet(nn.Module):
             "variant": self.variant,
         }
         if include_metadata:
-            payload["metadata"] = {"format": format, "model": "FOLDSNet"}
-        save_payload(path, format, payload)
+            payload["metadata"] = {"format": fmt, "model": "FOLDSNet"}
+        # fmt evita shadow do builtin format() (Pylint W0622)
+        save_payload(path, fmt, payload)
 
     @classmethod
+    def load(cls, path: str, fmt: str = "fold", device: str = "cpu", **kwargs) -> "FOLDSNet":
+        """Carrega modelo salvo em .fold ou .mind."""
+        fmt = kwargs.pop("format", fmt)
+        if kwargs:
+            raise TypeError(f"Argumentos inesperados: {sorted(kwargs)}")
+        payload = load_payload(path, fmt, map_location=device)
     def load(cls, path: str, format: str = "fold", device: str = "cpu") -> "FOLDSNet":
         """Carrega modelo salvo em formato .fold ou .mind."""
         payload = load_payload(path, format, map_location=device)

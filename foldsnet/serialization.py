@@ -27,6 +27,12 @@ def save_payload(path: str, fmt: str, payload: dict[str, Any]) -> None:
 
 
 def load_payload(path: str, fmt: str, map_location: str = "cpu") -> dict[str, Any]:
+    """Carrega payload em formato .fold ou .mind."""
+    if fmt not in {"fold", "mind"}:
+        raise ValueError("Formato inválido. Use 'fold' ou 'mind'.")
+    # weights_only=False necessário: payload contém dicts e
+    # escalares além de tensores. Revisar ao migrar para formato
+    # puramente baseado em tensores.
     """Carrega payload em formato .fold ou .mind.
 
     Args:
