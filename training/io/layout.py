@@ -93,6 +93,7 @@ def print_layout(config: RunConfig, metadata: ModelMetadata, mpjrd_cfg: object |
             [
                 f"Variant            : {config.foldsnet.variant}",
                 f"Dataset            : {config.foldsnet.dataset}",
+                "Neuron backend     : mpjrd (fixo)",
                 "Mecanismos MPJRD   : ativos (plasticidade, homeostase, inibição,",
                 "                      adaptação, backprop, wave, circadiano, engram)",
             ]
