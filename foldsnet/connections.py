@@ -7,16 +7,18 @@ import torch
 
 def _create_sparse_connections(n_lgn: int, n_v1: int, n_it: int) -> tuple[torch.Tensor, torch.Tensor]:
     """Cria máscaras de conexão LGN→V1 (30%) e V1→IT (15%)."""
-    lgn_to_v1 = torch.zeros(n_v1, n_lgn)
-    for i in range(n_v1):
-        n_conn = max(1, int(n_lgn * 0.30))
-        indices = torch.randperm(n_lgn)[:n_conn]
-        lgn_to_v1[i, indices] = 1.0
 
-    v1_to_it = torch.zeros(n_it, n_v1)
-    for i in range(n_it):
-        n_conn = max(1, int(n_v1 * 0.15))
-        indices = torch.randperm(n_v1)[:n_conn]
-        v1_to_it[i, indices] = 1.0
+    def _sparse_mask(n_out: int, n_in: int, rate: float) -> torch.Tensor:
+        """Gera máscara esparsa (n_out × n_in) com taxa de conexão `rate`."""
+        k = max(1, int(n_in * rate))
+        # vetorizado via argsort; equivalente semântico ao loop anterior
+        noise = torch.rand(n_out, n_in)
+        indices = noise.argsort(dim=1)[:, :k]
+        mask = torch.zeros(n_out, n_in)
+        mask.scatter_(1, indices, 1.0)
+        return mask
+
+    lgn_to_v1 = _sparse_mask(n_v1, n_lgn, 0.30)
+    v1_to_it = _sparse_mask(n_it, n_v1, 0.15)
 
     return lgn_to_v1, v1_to_it

@@ -85,6 +85,9 @@ def run_mnist_training(config: RunConfig) -> int:
 
     run_dir = Path("runs") / config.base.run_id
     logger = setup_logger(run_dir, config.base.log_file, config.base.console)
+    if not config.base.save_log:
+        # saltar FileHandler quando save_log=0 (contrato da flag)
+        logger.handlers = [h for h in logger.handlers if not isinstance(h, logging.FileHandler)]
     device = torch.device(config.base.device)
 
     metrics_path = run_dir / "metrics.jsonl"

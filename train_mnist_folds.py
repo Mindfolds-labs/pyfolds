@@ -1,3 +1,10 @@
+"""CLI de treino para MNIST/CIFAR com FOLDSNet/MPJRD.
+
+Exemplos:
+  python train_mnist_folds.py --epochs 10 --batch 64 --lr 1e-3 --model foldsnet
+  python train_mnist_folds.py --epochs 10 --batch 64 --lr 1e-3 --model mpjrd --hidden 128
+"""
+
 from __future__ import annotations
 
 import json
@@ -44,50 +51,70 @@ def _save_run_metadata(args: TrainArgs) -> None:
     (run_dir / "run_metadata.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
+def _build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Treino MNIST com backend folds",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    obrigatorios = parser.add_argument_group("obrigatórios")
+    obrigatorios.add_argument("--epochs", type=int, required=True)
+    obrigatorios.add_argument("--batch", "--batch-size", dest="batch", type=int, required=True)
+    obrigatorios.add_argument("--lr", type=float, required=True)
+
+    identificacao = parser.add_argument_group("identificação do run")
+    identificacao.add_argument("--run-id", default="")
+    identificacao.add_argument("--resume", action="store_true")
+    identificacao.add_argument("--init-checkpoint", default="", help="Checkpoint .pt para warm start (carrega pesos)")
+
+    hardware = parser.add_argument_group("hardware")
+    hardware.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
+
+    modelo = parser.add_argument_group("modelo")
+    modelo.add_argument("--model", choices=["mpjrd", "foldsnet"], default="foldsnet")
+    modelo.add_argument("--foldsnet-variant", default="4L")
+    modelo.add_argument("--foldsnet-dataset", default="mnist")
+
+    arquitetura = parser.add_argument_group("arquitetura MPJRD")
+    arquitetura.add_argument("--n-dendrites", type=int, default=4, help="Número de dendritos")
+    arquitetura.add_argument("--n-synapses", type=int, default=32, dest="n_synapses_per_dendrite", help="Sinapses por dendrito")
+    arquitetura.add_argument("--hidden", type=int, default=128, help="Número de neurônios excitatórios")
+    arquitetura.add_argument("--threshold", type=float, default=0.45, help="Limiar inicial de disparo")
+
+    mecanismos = parser.add_argument_group("mecanismos biológicos")
+    mecanismos.add_argument("--disable-stdp", action="store_true", help="Desativa STDP")
+    mecanismos.add_argument("--disable-homeostase", action="store_true", help="Desativa Homeostase")
+    mecanismos.add_argument("--disable-inibicao", action="store_true", help="Desativa Inibição")
+    mecanismos.add_argument("--disable-refratario", action="store_true", help="Desativa Período refratário")
+    mecanismos.add_argument("--disable-backprop", action="store_true", help="Desativa Backpropagação")
+    mecanismos.add_argument("--disable-sfa", action="store_true", help="Desativa Adaptação SFA")
+    mecanismos.add_argument("--disable-stp", action="store_true", help="Desativa Dinâmica STP")
+    mecanismos.add_argument("--disable-wave", action="store_true", help="Desativa mecanismo Wave")
+    mecanismos.add_argument("--disable-circadian", action="store_true", help="Desativa mecanismo Circadiano")
+    mecanismos.add_argument("--disable-engram", action="store_true", help="Desativa memória por Engrams")
+    mecanismos.add_argument("--disable-speech", action="store_true", help="Desativa Speech tracking")
+
+    log_console = parser.add_argument_group("log e console")
+    log_console.add_argument("--console", action="store_true")
+    log_console.add_argument("--log-level", default="INFO")
+    log_console.add_argument("--log-file", default="train.log")
+
+    artefatos = parser.add_argument_group("artefatos de saída")
+    artefatos.add_argument("--save-fold", type=int, default=1, help="Salvar .fold (0/1)")
+    artefatos.add_argument("--save-mind", type=int, default=1, help="Salvar .mind (0/1)")
+    artefatos.add_argument("--save-pt", type=int, default=1, help="Salvar .pt (0/1)")
+    artefatos.add_argument("--save-log", type=int, default=1, help="Salvar .log (0/1)")
+    artefatos.add_argument("--save-metrics", type=int, default=1, help="Salvar .jsonl (0/1)")
+    artefatos.add_argument("--save-summary", type=int, default=1, help="Salvar .json (0/1)")
+
+    integracao = parser.add_argument_group("integração")
+    integracao.add_argument("--sheer-cmd", default="")
+
+    return parser
+
+
 def parse_args() -> TrainArgs:
-    parser = argparse.ArgumentParser(description="Treino MNIST com backend folds")
-    parser.add_argument("--epochs", type=int, required=True)
-    parser.add_argument("--batch", "--batch-size", dest="batch", type=int, required=True)
-    parser.add_argument("--lr", type=float, required=True)
-    parser.add_argument("--run-id", default="")
-    parser.add_argument("--resume", action="store_true")
-    parser.add_argument("--init-checkpoint", default="", help="Checkpoint .pt para warm start (carrega pesos)")
-    parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
-    parser.add_argument("--console", action="store_true")
-    parser.add_argument("--log-level", default="INFO")
-    parser.add_argument("--log-file", default="train.log")
-    parser.add_argument("--sheer-cmd", default="")
-    parser.add_argument("--model", choices=["mpjrd", "foldsnet"], default="foldsnet")
-
-    # Parâmetros de arquitetura MPJRD
-    parser.add_argument("--n-dendrites", type=int, default=4, help="Número de dendritos")
-    parser.add_argument("--n-synapses", type=int, default=32, dest="n_synapses_per_dendrite", help="Sinapses por dendrito")
-    parser.add_argument("--hidden", type=int, default=128, help="Número de neurônios excitatórios")
-    parser.add_argument("--foldsnet-variant", default="4L")
-    parser.add_argument("--foldsnet-dataset", default="mnist")
-    parser.add_argument("--threshold", type=float, default=0.45, help="Limiar inicial de disparo")
-
-    # Controle de formatos de saída
-    parser.add_argument("--save-fold", type=int, default=1, help="Salvar .fold (0/1)")
-    parser.add_argument("--save-mind", type=int, default=1, help="Salvar .mind (0/1)")
-    parser.add_argument("--save-pt", type=int, default=1, help="Salvar .pt (0/1)")
-    parser.add_argument("--save-log", type=int, default=1, help="Salvar .log (0/1)")
-    parser.add_argument("--save-metrics", type=int, default=1, help="Salvar .jsonl (0/1)")
-    parser.add_argument("--save-summary", type=int, default=1, help="Salvar .json (0/1)")
-
-    # Controle de mecanismos (desabilitar)
-    parser.add_argument("--disable-stdp", action="store_true", help="Desativa STDP")
-    parser.add_argument("--disable-homeostase", action="store_true", help="Desativa Homeostase")
-    parser.add_argument("--disable-inibicao", action="store_true", help="Desativa Inibição")
-    parser.add_argument("--disable-refratario", action="store_true", help="Desativa Período refratário")
-    parser.add_argument("--disable-backprop", action="store_true", help="Desativa Backpropagação")
-    parser.add_argument("--disable-sfa", action="store_true", help="Desativa Adaptação SFA")
-    parser.add_argument("--disable-stp", action="store_true", help="Desativa Dinâmica STP")
-    parser.add_argument("--disable-wave", action="store_true", help="Desativa mecanismo Wave")
-    parser.add_argument("--disable-circadian", action="store_true", help="Desativa mecanismo Circadiano")
-    parser.add_argument("--disable-engram", action="store_true", help="Desativa memória por Engrams")
-    parser.add_argument("--disable-speech", action="store_true", help="Desativa Speech tracking")
-
+    parser = _build_parser()
     ns = parser.parse_args()
 
     run_id = ns.run_id or _default_run_id(ns.model, ns.foldsnet_dataset)
