@@ -1,0 +1,242 @@
+[
+  {
+    "dataset": "mnist",
+    "variant": "2L",
+    "input_shape": [
+      1,
+      28,
+      28
+    ],
+    "n_classes": 10,
+    "n_pixels": 784,
+    "n_retina": 10,
+    "n_lgn": 10,
+    "n_v1": 20,
+    "n_it": 10,
+    "classifier_weights": 100,
+    "classifier_bias": 10,
+    "classifier_params": 110,
+    "neuron_count_total": 50,
+    "approx_classifier_memory_mib_fp32": 0.00042
+  },
+  {
+    "dataset": "mnist",
+    "variant": "4L",
+    "input_shape": [
+      1,
+      28,
+      28
+    ],
+    "n_classes": 10,
+    "n_pixels": 784,
+    "n_retina": 49,
+    "n_lgn": 49,
+    "n_v1": 98,
+    "n_it": 49,
+    "classifier_weights": 490,
+    "classifier_bias": 10,
+    "classifier_params": 500,
+    "neuron_count_total": 245,
+    "approx_classifier_memory_mib_fp32": 0.001907
+  },
+  {
+    "dataset": "mnist",
+    "variant": "5L",
+    "input_shape": [
+      1,
+      28,
+      28
+    ],
+    "n_classes": 10,
+    "n_pixels": 784,
+    "n_retina": 64,
+    "n_lgn": 64,
+    "n_v1": 128,
+    "n_it": 64,
+    "classifier_weights": 640,
+    "classifier_bias": 10,
+    "classifier_params": 650,
+    "neuron_count_total": 320,
+    "approx_classifier_memory_mib_fp32": 0.00248
+  },
+  {
+    "dataset": "mnist",
+    "variant": "6L",
+    "input_shape": [
+      1,
+      28,
+      28
+    ],
+    "n_classes": 10,
+    "n_pixels": 784,
+    "n_retina": 84,
+    "n_lgn": 84,
+    "n_v1": 168,
+    "n_it": 84,
+    "classifier_weights": 840,
+    "classifier_bias": 10,
+    "classifier_params": 850,
+    "neuron_count_total": 420,
+    "approx_classifier_memory_mib_fp32": 0.003242
+  },
+  {
+    "dataset": "cifar10",
+    "variant": "2L",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "n_classes": 10,
+    "n_pixels": 3072,
+    "n_retina": 39,
+    "n_lgn": 39,
+    "n_v1": 78,
+    "n_it": 39,
+    "classifier_weights": 390,
+    "classifier_bias": 10,
+    "classifier_params": 400,
+    "neuron_count_total": 195,
+    "approx_classifier_memory_mib_fp32": 0.001526
+  },
+  {
+    "dataset": "cifar10",
+    "variant": "4L",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "n_classes": 10,
+    "n_pixels": 3072,
+    "n_retina": 192,
+    "n_lgn": 192,
+    "n_v1": 384,
+    "n_it": 192,
+    "classifier_weights": 1920,
+    "classifier_bias": 10,
+    "classifier_params": 1930,
+    "neuron_count_total": 960,
+    "approx_classifier_memory_mib_fp32": 0.007362
+  },
+  {
+    "dataset": "cifar10",
+    "variant": "5L",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "n_classes": 10,
+    "n_pixels": 3072,
+    "n_retina": 250,
+    "n_lgn": 250,
+    "n_v1": 500,
+    "n_it": 250,
+    "classifier_weights": 2500,
+    "classifier_bias": 10,
+    "classifier_params": 2510,
+    "neuron_count_total": 1250,
+    "approx_classifier_memory_mib_fp32": 0.009575
+  },
+  {
+    "dataset": "cifar10",
+    "variant": "6L",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "n_classes": 10,
+    "n_pixels": 3072,
+    "n_retina": 327,
+    "n_lgn": 327,
+    "n_v1": 654,
+    "n_it": 327,
+    "classifier_weights": 3270,
+    "classifier_bias": 10,
+    "classifier_params": 3280,
+    "neuron_count_total": 1635,
+    "approx_classifier_memory_mib_fp32": 0.012512
+  },
+  {
+    "dataset": "cifar100",
+    "variant": "2L",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "n_classes": 100,
+    "n_pixels": 3072,
+    "n_retina": 39,
+    "n_lgn": 39,
+    "n_v1": 78,
+    "n_it": 39,
+    "classifier_weights": 3900,
+    "classifier_bias": 100,
+    "classifier_params": 4000,
+    "neuron_count_total": 195,
+    "approx_classifier_memory_mib_fp32": 0.015259
+  },
+  {
+    "dataset": "cifar100",
+    "variant": "4L",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "n_classes": 100,
+    "n_pixels": 3072,
+    "n_retina": 192,
+    "n_lgn": 192,
+    "n_v1": 384,
+    "n_it": 192,
+    "classifier_weights": 19200,
+    "classifier_bias": 100,
+    "classifier_params": 19300,
+    "neuron_count_total": 960,
+    "approx_classifier_memory_mib_fp32": 0.073624
+  },
+  {
+    "dataset": "cifar100",
+    "variant": "5L",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "n_classes": 100,
+    "n_pixels": 3072,
+    "n_retina": 250,
+    "n_lgn": 250,
+    "n_v1": 500,
+    "n_it": 250,
+    "classifier_weights": 25000,
+    "classifier_bias": 100,
+    "classifier_params": 25100,
+    "neuron_count_total": 1250,
+    "approx_classifier_memory_mib_fp32": 0.095749
+  },
+  {
+    "dataset": "cifar100",
+    "variant": "6L",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "n_classes": 100,
+    "n_pixels": 3072,
+    "n_retina": 327,
+    "n_lgn": 327,
+    "n_v1": 654,
+    "n_it": 327,
+    "classifier_weights": 32700,
+    "classifier_bias": 100,
+    "classifier_params": 32800,
+    "neuron_count_total": 1635,
+    "approx_classifier_memory_mib_fp32": 0.125122
+  }
+]

@@ -15,7 +15,12 @@ from .serialization import load_foldsnet, save_foldsnet
 class FOLDSNet(nn.Module):
     """Rede visual hierárquica biologicamente plausível baseada em MPJRD."""
 
-    def __init__(self, input_shape: tuple[int, int, int], n_classes: int, variant: str = "4L"):
+    def __init__(
+        self,
+        input_shape: tuple[int, int, int],
+        n_classes: int,
+        variant: str = "4L",
+    ):
         super().__init__()
         if variant not in {"2L", "4L", "5L", "6L"}:
             raise ValueError("Variante inválida. Use '2L', '4L', '5L' ou '6L'.")
