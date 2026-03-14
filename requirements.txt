@@ -1,10 +1,7 @@
-# Runtime dependencies (aligned with pyproject.toml)
-torch>=2.0.0
-torchvision>=0.15.0
-numpy>=1.24.0
-zstandard>=0.21.0
-google-crc32c>=1.5.0
-reedsolo>=1.7.0
-safetensors>=0.4.3
-
-tensorflow-cpu>=2.20.0
+# Canonical runtime dependencies mirror [project.dependencies] in pyproject.toml
+# Optional stacks (tensorflow, examples, serialization, telemetry) are exposed as extras.
+torch>=2.0
+numpy>=1.24
+zstandard>=0.21
+google-crc32c>=1.5
+reedsolo>=1.7

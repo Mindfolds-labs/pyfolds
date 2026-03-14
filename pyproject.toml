@@ -33,7 +33,7 @@ benchmark = [
 ]
 
 interop = [
-  "tensorflow-cpu>=2.20.0",
+  "tensorflow-cpu>=2.20.0; python_version >= '3.9'",
   "onnx>=1.16.0",
   "onnxruntime>=1.18.0",
   "onnx-tf>=1.10.0",
@@ -54,7 +54,7 @@ serialization = [
 telemetry = ["matplotlib>=3.7.0", "tensorboard>=2.14.0", "prometheus-client>=0.20.0"]
 dev = [
   "pytest>=7.0.0",
-  "tensorflow-cpu>=2.20.0",
+  "tensorflow-cpu>=2.20.0; python_version >= '3.9'",
   "black>=23.0.0",
   "isort>=5.0.0",
   "mypy>=1.0.0",
@@ -67,7 +67,7 @@ examples = [
   "torchvision>=0.15.0",
 ]
 tensorflow = [
-  "tensorflow-cpu>=2.20.0",
+  "tensorflow-cpu>=2.20.0; python_version >= '3.9'",
 ]
 
 
@@ -102,11 +102,6 @@ extend-exclude = '''
 [tool.isort]
 profile = "black"
 line_length = 88
-
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra -q --strict-markers"
-testpaths = ["tests"]
 
 [tool.mypy]
 python_version = "3.12"

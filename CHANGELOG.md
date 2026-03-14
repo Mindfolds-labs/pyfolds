@@ -15,7 +15,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Release process content in `docs/development/release_process.md`.
 - ADR traceability note in `src/pyfolds/serialization/foldio.py`.
 - Optional dependency group for examples with `torchvision` in `pyproject.toml`.
-- Public API deprecation policy for v1 aliases, including removal target in `2.0.0`, objective criteria (minimum major cycle, changelog notice, migration strategy), and contract test coverage.
+- Public API deprecation policy for v1 aliases, with carry-over in `2.x`, objective criteria for future removal in `3.0.0` (minimum major cycle, changelog notice, migration strategy), and contract test coverage.
 - `ModelIntegrityMonitor` para sanity check periódico de hash SHA-256 de pesos/buffers em runtime.
 - ADR-046 canônico (`ADR-046-sanity-check-periodico-de-integridade-de-pesos.md`) formalizando o monitoramento periódico de integridade de pesos como extensão de hardening da v2.0.2.
 - `WeightIntegrityMonitor` para verificação periódica de hash do estado de pesos em runtime.
@@ -24,7 +24,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - ADR-047 formalizando o pacote de hardening final da release v2.0.3.
 
 ### Deprecated
-- v1 public aliases remain supported during `1.x` with `DeprecationWarning` and are scheduled for removal in `2.0.0`: `MPJRDConfig` (use `NeuronConfig`), `MPJRDLayer` (use `AdaptiveNeuronLayer`), and `MPJRDNetwork` (use `SpikingNetwork`).
+- v1 public aliases remain supported during `2.x` with `DeprecationWarning` and are scheduled for removal in a future major (`3.0.0`): `MPJRDConfig` (use `NeuronConfig`), `MPJRDLayer` (use `AdaptiveNeuronLayer`), and `MPJRDNetwork` (use `SpikingNetwork`).
 
 ### Changed
 - STDP agora aplica `ltd_rule` de forma efetiva: `classic` usa gate por spike pré (`pre_spikes`), enquanto `current` preserva o gate legado por spike pós (`post_spike`).
