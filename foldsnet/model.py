@@ -23,7 +23,7 @@ class FOLDSNet(nn.Module):
     def __init__(self, input_shape: tuple[int, int, int], n_classes: int, variant: str = "4L"):
         super().__init__()
         if variant not in self._VARIANTS:
-            raise ValueError("Variante inválida. Use '2L', '4L', '5L' ou '6L'.")
+            raise ValueError(f"Variante inválida '{variant}'. Use: {list(self._VARIANTS)}")
 
         self.input_shape = input_shape
         self.n_classes = n_classes
@@ -44,25 +44,25 @@ class FOLDSNet(nn.Module):
         self.register_buffer("lgn_to_v1", lgn_to_v1)
         self.register_buffer("v1_to_it", v1_to_it)
 
-        # register_buffer garante migração automática com .to(device)
         self.register_buffer("pixel_map", self._build_pixel_map())
+
         self.classifier = nn.Linear(self.n_it, n_classes)
 
     def _build_pixel_map(self) -> torch.Tensor:
-        """Cria mapa de pixels 4x4 para cada neurônio da retina."""
+        """Cria mapa de pixels 4×4 (16 pixels) para cada neurônio da retina."""
         n_pixels = self.input_shape[0] * self.input_shape[1] * self.input_shape[2]
         if n_pixels < 16:
-            raise ValueError("A entrada precisa ter ao menos 16 pixels para a Retina.")
+            raise ValueError(f"Entrada tem apenas {n_pixels} pixels; mínimo necessário: 16.")
 
-        indices = []
         stride = max(1, (n_pixels - 16) // max(1, self.n_retina - 1))
+        indices = []
         for i in range(self.n_retina):
             start = min(i * stride, n_pixels - 16)
             indices.append(torch.arange(start, start + 16, dtype=torch.long))
         return torch.stack(indices, dim=0)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Executa forward pass hierárquico da FOLDSNet."""
+        """Forward pass hierárquico Retina → LGN → V1 → IT → classificador."""
         batch_size = x.shape[0]
         x_flat = x.view(batch_size, -1)
 
@@ -88,6 +88,11 @@ class FOLDSNet(nn.Module):
                 lgn_indices = torch.arange(self.n_lgn, device=r2.device)
             lgn_inputs = r2[:, lgn_indices].mean(dim=1).view(batch_size, 1, 1).repeat(1, 4, 8)
             out = neuron(lgn_inputs)
+            if lgn_indices.numel() == 0:
+                lgn_indices = torch.arange(self.n_lgn, device=r2.device)
+            agg = r2[:, lgn_indices].mean(dim=1)
+            v1_input = agg.view(batch_size, 1, 1).repeat(1, 4, 8)
+            out = neuron(v1_input)
             r3.append(out["spikes"])
         r3 = torch.stack(r3, dim=1)
 
@@ -98,11 +103,15 @@ class FOLDSNet(nn.Module):
                 v1_indices = torch.arange(self.n_v1, device=r3.device)
             v1_inputs = r3[:, v1_indices].mean(dim=1).view(batch_size, 1, 1).repeat(1, 4, 8)
             out = neuron(v1_inputs)
+            if v1_indices.numel() == 0:
+                v1_indices = torch.arange(self.n_v1, device=r3.device)
+            agg = r3[:, v1_indices].mean(dim=1)
+            it_input = agg.view(batch_size, 1, 1).repeat(1, 4, 8)
+            out = neuron(it_input)
             r4.append(out["spikes"])
         r4 = torch.stack(r4, dim=1)
 
-        logits = self.classifier(r4)
-        return logits
+        return self.classifier(r4)
 
     def save(self, path: str, fmt: str = "fold", include_metadata: bool = False, **kwargs) -> None:
         """Salva modelo em .fold ou .mind."""
@@ -110,6 +119,14 @@ class FOLDSNet(nn.Module):
         if kwargs:
             raise TypeError(f"Argumentos inesperados: {sorted(kwargs)}")
         payload = {
+    def save(
+        self,
+        path: str,
+        format: str = "fold",
+        include_metadata: bool = False,
+    ) -> None:
+        """Salva modelo em formato .fold ou .mind."""
+        payload: dict = {
             "state_dict": self.state_dict(),
             "input_shape": self.input_shape,
             "n_classes": self.n_classes,
@@ -127,6 +144,9 @@ class FOLDSNet(nn.Module):
         if kwargs:
             raise TypeError(f"Argumentos inesperados: {sorted(kwargs)}")
         payload = load_payload(path, fmt, map_location=device)
+    def load(cls, path: str, format: str = "fold", device: str = "cpu") -> "FOLDSNet":
+        """Carrega modelo salvo em formato .fold ou .mind."""
+        payload = load_payload(path, format, map_location=device)
         model = cls(
             input_shape=tuple(payload["input_shape"]),
             n_classes=payload["n_classes"],
