@@ -16,7 +16,7 @@ from training.io.artifacts import save_backend_artifact
 from training.io.layout import print_layout, setup_logger
 from training.metrics.records import EpochMetrics
 from training.models.factory import build_model, extract_logits
-from training.utils.data import build_mnist_loaders
+from training.utils.data import build_image_loaders, build_mnist_loaders
 
 
 def _configure_external_loggers() -> None:
@@ -115,7 +115,12 @@ def run_mnist_training(config: RunConfig) -> int:
         logger.info("Modelo instanciado: family=%s config=%s", metadata.family, metadata.config)
 
         with torch.no_grad():
-            _ = model(torch.zeros(1, 1, 28, 28, device=device))
+            if metadata.family == "foldsnet":
+                dataset = str(metadata.config.get("dataset", "mnist"))
+                shape = {"mnist": (1, 28, 28), "cifar10": (3, 32, 32), "cifar100": (3, 32, 32)}[dataset]
+                _ = model(torch.zeros(1, *shape, device=device))
+            else:
+                _ = model(torch.zeros(1, 1, 28, 28, device=device))
 
         optim = torch.optim.Adam(model.parameters(), lr=config.base.lr)
         criterion = nn.CrossEntropyLoss()
@@ -129,7 +134,10 @@ def run_mnist_training(config: RunConfig) -> int:
             best_acc = float(ckpt.get("best_acc", 0.0))
             logger.info("🔄 RESUME epoch=%s", start_epoch)
 
-        train_loader, test_loader = build_mnist_loaders(config.base.batch)
+        if metadata.family == "foldsnet":
+            train_loader, test_loader = build_image_loaders(config.foldsnet.dataset, config.base.batch)
+        else:
+            train_loader, test_loader = build_mnist_loaders(config.base.batch)
         epochs_completed = start_epoch
 
         with metrics_path.open("a", encoding="utf-8") as mf:

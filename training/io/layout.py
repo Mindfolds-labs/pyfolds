@@ -83,7 +83,8 @@ def print_layout(config: RunConfig, metadata: ModelMetadata, mpjrd_cfg: object |
             [
                 f"Variant            : {config.foldsnet.variant}",
                 f"Dataset            : {config.foldsnet.dataset}",
-                "Mecanismos MPJRD   : inativos neste modo",
+                "Mecanismos MPJRD   : ativos (plasticidade, homeostase, inibição,",
+                "                      adaptação, backprop, wave, circadiano, engram)",
             ]
         )
 
