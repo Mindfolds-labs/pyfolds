@@ -237,7 +237,11 @@ class NoeticCore(CircadianWaveMixin, WaveMixin, MPJRDNeuron):
     def load(cls, path: str, cfg: MPJRDConfig, public_key: Optional[str] = None) -> "NoeticCore":
         """Carrega estado noético previamente salvo."""
         _ = public_key
-        payload = torch.load(path, map_location="cpu")
+        payload = torch.load(
+            path,
+            map_location="cpu",
+            weights_only=False,  # payload contém dicts e metadados
+        )
         model = cls(cfg)
         model.load_state_dict(payload["state_dict"], strict=False)
         model.engram_bank.load_state(payload.get("engram_bank", {}))

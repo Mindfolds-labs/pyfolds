@@ -153,9 +153,8 @@ class VersionedCheckpoint:
                 message=r"(?i).*dict(?:ionary)?.*",
                 module=r"torch(?:\..*)?",
             )
-            if weights_only is None:
-                return torch.load(path, map_location=map_location)
-            return torch.load(path, map_location=map_location, weights_only=weights_only)
+            wo = weights_only if weights_only is not None else False
+            return torch.load(path, map_location=map_location, weights_only=wo)
 
     @classmethod
     def _to_weights_only_safe(cls, value: Any) -> Any:

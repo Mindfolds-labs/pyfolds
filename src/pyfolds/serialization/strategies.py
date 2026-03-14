@@ -65,7 +65,11 @@ class ZstdFoldStrategy(SerializationStrategy):
         protected = Path(path).read_bytes()
         decoded = self._ecc.decode(protected)[0]
         decompressed = self._decompressor.decompress(decoded)
-        loaded = torch.load(io.BytesIO(decompressed), map_location="cpu")
+        loaded = torch.load(
+            io.BytesIO(decompressed),
+            map_location="cpu",
+            weights_only=False,  # payload contém metadados não-tensor
+        )
         if not isinstance(loaded, dict):
             raise TypeError("Decoded payload must be a dictionary")
         return cast(dict[str, Any], loaded)
@@ -95,7 +99,11 @@ class TorchCheckpointStrategy(SerializationStrategy):
         return target
 
     def load(self, path: str | Path) -> dict[str, Any]:
-        loaded = torch.load(Path(path), map_location="cpu")
+        loaded = torch.load(
+            Path(path),
+            map_location="cpu",
+            weights_only=False,  # payload contém metadados não-tensor
+        )
         if not isinstance(loaded, dict):
             raise TypeError("Torch checkpoint payload must be a dictionary")
         return cast(dict[str, Any], loaded)
