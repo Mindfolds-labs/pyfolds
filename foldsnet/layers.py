@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 import torch.nn as nn
@@ -17,14 +18,30 @@ from pyfolds.advanced import MPJRDNeuronAdvanced
 from pyfolds.core.config import MPJRDConfig
 
 
-def _base_full_cfg(*, n_synapses_per_dendrite: int, theta_init: float, lateral_strength: float) -> MPJRDConfig:
+@dataclass(frozen=True)
+class LayerProfile:
+    n_dendrites: int
+    n_synapses_per_dendrite: int
+    theta_init: float
+    lateral_strength: float
+
+
+_LAYER_PROFILES: dict[str, LayerProfile] = {
+    "retina": LayerProfile(n_dendrites=4, n_synapses_per_dendrite=4, theta_init=0.35, lateral_strength=0.1),
+    "lgn": LayerProfile(n_dendrites=4, n_synapses_per_dendrite=4, theta_init=0.4, lateral_strength=0.5),
+    "v1": LayerProfile(n_dendrites=4, n_synapses_per_dendrite=8, theta_init=0.45, lateral_strength=0.3),
+    "it": LayerProfile(n_dendrites=4, n_synapses_per_dendrite=8, theta_init=0.5, lateral_strength=0.2),
+}
+
+
+def _cfg_from_profile(profile: LayerProfile) -> MPJRDConfig:
     return MPJRDConfig(
-        n_dendrites=4,
-        n_synapses_per_dendrite=n_synapses_per_dendrite,
-        theta_init=theta_init,
+        n_dendrites=profile.n_dendrites,
+        n_synapses_per_dendrite=profile.n_synapses_per_dendrite,
+        theta_init=profile.theta_init,
         plasticity_mode="both",
         homeostasis_eta=0.1,
-        lateral_strength=lateral_strength,
+        lateral_strength=profile.lateral_strength,
         inhibition_mode="both",
         refrac_mode="both",
         adaptation_enabled=True,
@@ -39,21 +56,23 @@ def _base_full_cfg(*, n_synapses_per_dendrite: int, theta_init: float, lateral_s
     )
 
 
-def _create_retina(n_neurons: int) -> nn.ModuleList:
-    cfg = _base_full_cfg(n_synapses_per_dendrite=4, theta_init=0.35, lateral_strength=0.1)
+def _create_layer(stage: str, n_neurons: int) -> nn.ModuleList:
+    profile = _LAYER_PROFILES[stage]
+    cfg = _cfg_from_profile(profile)
     return nn.ModuleList([MPJRDNeuronAdvanced(cfg) for _ in range(n_neurons)])
+
+
+def _create_retina(n_neurons: int) -> nn.ModuleList:
+    return _create_layer("retina", n_neurons)
 
 
 def _create_lgn(n_neurons: int) -> nn.ModuleList:
-    cfg = _base_full_cfg(n_synapses_per_dendrite=4, theta_init=0.4, lateral_strength=0.5)
-    return nn.ModuleList([MPJRDNeuronAdvanced(cfg) for _ in range(n_neurons)])
+    return _create_layer("lgn", n_neurons)
 
 
 def _create_v1(n_neurons: int) -> nn.ModuleList:
-    cfg = _base_full_cfg(n_synapses_per_dendrite=8, theta_init=0.45, lateral_strength=0.3)
-    return nn.ModuleList([MPJRDNeuronAdvanced(cfg) for _ in range(n_neurons)])
+    return _create_layer("v1", n_neurons)
 
 
 def _create_it(n_neurons: int) -> nn.ModuleList:
-    cfg = _base_full_cfg(n_synapses_per_dendrite=8, theta_init=0.5, lateral_strength=0.2)
-    return nn.ModuleList([MPJRDNeuronAdvanced(cfg) for _ in range(n_neurons)])
+    return _create_layer("it", n_neurons)
