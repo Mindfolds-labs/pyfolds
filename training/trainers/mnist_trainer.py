@@ -80,6 +80,26 @@ def evaluate(model, loader, device, model_name: str):
     return 100.0 * correct / total
 
 
+
+
+def _load_checkpoint_compat(path: Path, device: torch.device) -> dict:
+    if not path.exists():
+        raise FileNotFoundError(f"Checkpoint não encontrado: {path}")
+    ckpt = torch.load(path, map_location=device)
+    if not isinstance(ckpt, dict):
+        raise ValueError(f"Checkpoint inválido em {path}: esperado dict, recebido {type(ckpt).__name__}")
+    return ckpt
+
+
+def _extract_compatible_state(model: nn.Module, model_state: dict[str, torch.Tensor]) -> tuple[dict[str, torch.Tensor], int]:
+    current_state = model.state_dict()
+    compatible_state = {
+        k: v
+        for k, v in model_state.items()
+        if k in current_state and tuple(v.shape) == tuple(current_state[k].shape)
+    }
+    return compatible_state, len(model_state) - len(compatible_state)
+
 def run_mnist_training(config: RunConfig) -> int:
     validate_run_config(config)
 
@@ -133,17 +153,11 @@ def run_mnist_training(config: RunConfig) -> int:
         init_checkpoint = (config.base.init_checkpoint or "").strip()
         if init_checkpoint:
             ckpt_path = Path(init_checkpoint)
-            if not ckpt_path.exists():
-                raise FileNotFoundError(f"Checkpoint inicial não encontrado: {init_checkpoint}")
-            ckpt = torch.load(ckpt_path, map_location=device)
+            ckpt = _load_checkpoint_compat(ckpt_path, device)
             model_state = ckpt.get("model_state", ckpt)
-            current_state = model.state_dict()
-            compatible_state = {
-                k: v
-                for k, v in model_state.items()
-                if k in current_state and tuple(v.shape) == tuple(current_state[k].shape)
-            }
-            incompatible_count = len(model_state) - len(compatible_state)
+            if not isinstance(model_state, dict):
+                raise ValueError(f"init-checkpoint inválido em {ckpt_path}: campo model_state deve ser dict")
+            compatible_state, incompatible_count = _extract_compatible_state(model, model_state)
             missing, unexpected = model.load_state_dict(compatible_state, strict=False)
             logger.info(
                 "🧠 WARM START carregado de %s | loaded=%d | missing=%d | unexpected=%d | incompatible=%d",
@@ -155,12 +169,27 @@ def run_mnist_training(config: RunConfig) -> int:
             )
 
         if config.base.resume and checkpoint_path.exists():
-            ckpt = torch.load(checkpoint_path, map_location=device)
-            model.load_state_dict(ckpt["model_state"])
-            optim.load_state_dict(ckpt["optimizer_state"])
-            start_epoch = int(ckpt["epoch"]) + 1
+            ckpt = _load_checkpoint_compat(checkpoint_path, device)
+            model_state = ckpt.get("model_state")
+            optim_state = ckpt.get("optimizer_state")
+            if not isinstance(model_state, dict) or optim_state is None:
+                raise ValueError(
+                    "Checkpoint de resume inválido: chaves obrigatórias ausentes (model_state/optimizer_state)."
+                )
+            compatible_state, incompatible_count = _extract_compatible_state(model, model_state)
+            if incompatible_count:
+                logger.warning("Resume com %d parâmetros incompatíveis por shape (serão ignorados).", incompatible_count)
+            missing, unexpected = model.load_state_dict(compatible_state, strict=False)
+            optim.load_state_dict(optim_state)
+            start_epoch = int(ckpt.get("epoch", -1)) + 1
             best_acc = float(ckpt.get("best_acc", 0.0))
-            logger.info("🔄 RESUME epoch=%s", start_epoch)
+            logger.info(
+                "🔄 RESUME epoch=%s | loaded=%d | missing=%d | unexpected=%d",
+                start_epoch,
+                len(compatible_state),
+                len(missing),
+                len(unexpected),
+            )
 
         if metadata.family == "foldsnet":
             train_loader, test_loader = build_image_loaders(config.foldsnet.dataset, config.base.batch)
@@ -206,6 +235,8 @@ def run_mnist_training(config: RunConfig) -> int:
                             "model_state": model.state_dict(),
                             "optimizer_state": optim.state_dict(),
                             "best_acc": best_acc,
+                            "model_type": metadata.family,
+                            "model_config": metadata.config,
                         },
                         checkpoint_path,
                     )
